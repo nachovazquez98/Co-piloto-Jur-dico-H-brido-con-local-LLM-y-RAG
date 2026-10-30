@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "copiloto-juridico"
+version = "10.0.0"
+description = "Co-piloto Jurídico Híbrido: RAG sobre sentencias del STJ Jalisco con LLMs locales y app web en Streamlit"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ignacio Vázquez", email = "ignaciodavidvazquezperez@gmail.com" }]
+dependencies = [
+    "streamlit>=1.40",
+    "chromadb>=1.0",
+    "sentence-transformers>=3.0",
+    "torch>=2.2",
+    "spacy>=3.7",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "pyarrow>=15",
+    "pypdf>=4.0",
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+copiloto-datos = "copiloto_juridico.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

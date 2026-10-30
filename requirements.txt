@@ -1,0 +1,14 @@
+# Instala también el paquete local:  pip install -e .
+streamlit>=1.40
+chromadb>=1.0
+sentence-transformers>=3.0
+torch>=2.2
+spacy>=3.7
+es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl
+numpy>=1.26
+pandas>=2.1
+pyarrow>=15
+pypdf>=4.0
+requests>=2.31
+python-dotenv>=1.0
+pytest>=8

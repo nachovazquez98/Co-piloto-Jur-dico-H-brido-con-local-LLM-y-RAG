@@ -1,0 +1,18 @@
+# Entorno
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.env
+
+# Datos generados localmente (se reconstruyen solos)
+data/chroma/
+data/cache/
+data/raw/
+
+# Notebooks / editores
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
