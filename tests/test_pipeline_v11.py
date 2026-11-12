@@ -111,8 +111,8 @@ def test_filtro_expande_familias_a_tipos():
 
 
 def test_prompt_penal_v11_y_datos_de_la_ficha(monkeypatch):
-    assert prompts.prompts_penal()[0] is prompts.PROMPT_EXTRACCION_PENAL  # por defecto v10
-    monkeypatch.setattr(config, "PROMPT_PENAL_VERSION", "v11")
+    assert prompts.prompts_penal("v10")[0] is prompts.PROMPT_EXTRACCION_PENAL
+    assert config.PROMPT_PENAL_VERSION == "v11"  # por defecto v11
     ext, rep = prompts.prompts_para("penal")
     for campo in ("Acto Impugnado", "Agravios Planteados", "Calificación de los Agravios", "Sentido del Fallo"):
         assert campo in ext
@@ -171,7 +171,7 @@ def test_clasificador_a_nivel_familia(monkeypatch):
     monkeypatch.setattr(cl, "embed_texts", _emb_falsos)
     tipos = ["penal/robo-calificado", "penal/robo-simple", "penal/fraude", "civil/accion-de-divorcio"]
     familias = {"penal/robo-calificado": "robo", "penal/robo-simple": "robo", "penal/fraude": "fraude"}
-    c = cl.ClasificadorHibrido(tipos, nivel="familia", familias=familias)
+    c = cl.ClasificadorHibrido(tipos, nivel="familia", familias=familias, enriquecer=False)
     assert c.tipos == ["civil/accion-de-divorcio", "penal/familia/fraude", "penal/familia/robo"]
     assert c.tipos_de("penal/familia/robo") == ["penal/robo-calificado", "penal/robo-simple"]
     q = _emb_falsos(["robo"])[0]
@@ -181,19 +181,11 @@ def test_clasificador_a_nivel_familia(monkeypatch):
     assert cl.etiqueta_tipo("penal/familia/delitos-sexuales") == "PENAL · familia: delitos sexuales"
 
 
-def test_kem_vocabulario_y_lista_de_tokens(monkeypatch, tmp_path):
-    vocab = tmp_path / "v.txt"
-    vocab.write_text("# comentario\nrobo\ncalificado\n")
-    monkeypatch.setattr(config, "VOCABULARIO_KEM_PATH", vocab)
-    conceptos = cl.lemmatized_tokens("robo de celular a un menor")
-    assert cl.terminos_importantes(conceptos, "conceptos") == conceptos
-    # Solo sobrevive el término del vocabulario. Ojo: spaCy lematiza "robo" aislado como "robar"; el
-    # vocabulario guarda ambas formas para que coincida con el lema en contexto ("robo").
-    assert cl.terminos_importantes(conceptos, "vocabulario") == {"robo"}  # "celular" y "menor" no son clave
-    with pytest.raises(ValueError):
-        cl.terminos_importantes(conceptos, "otro")
-    monkeypatch.setattr(config, "USAR_LISTA_TOKENS_PENALIZADOS", False)
+def test_lista_de_tokens_desactivada_por_defecto(monkeypatch):
     assert cl.PesosClasificador.desde_config().penal_tokens is False
+    assert config.KEM_WEIGHT == 0 and config.JACCARD_WEIGHT == 0.40
+    monkeypatch.setattr(config, "USAR_LISTA_TOKENS_PENALIZADOS", True)
+    assert cl.PesosClasificador.desde_config().penal_tokens is True
 
 
 def test_construir_clasificador_respeta_materias(monkeypatch):
@@ -217,7 +209,8 @@ def test_materias_filtro_del_store():
 def test_ejemplos_penales_existen_en_el_corpus():
     import glob
 
-    from copiloto_juridico.ejemplos import EJEMPLOS_PENALES, EJEMPLOS_V10, ejemplos_activos
+    from copiloto_juridico.ejemplos import EJEMPLOS, EJEMPLOS_PENALES
+    from copiloto_juridico.evaluacion.regresion import EJEMPLOS_V10
 
     tipos = set(pd.concat([pd.read_parquet(f, columns=["tipo"])
                            for f in sorted(glob.glob(str(config.CORPUS_DIR / "*.parquet")))])["tipo"])
@@ -228,18 +221,19 @@ def test_ejemplos_penales_existen_en_el_corpus():
         else:
             assert e.tipo_corpus in tipos, e.tipo_corpus
     assert {e.etapa for e in EJEMPLOS_PENALES} >= {"Vinculación a proceso", "Prisión preventiva", "Sentencia de juicio oral"}
-    assert all(e.materia == "Penal" for e in ejemplos_activos(["penal"]))
+    assert EJEMPLOS == EJEMPLOS_PENALES and all(e.materia == "Penal" for e in EJEMPLOS)
 
 
 def test_prompt_conceptos_v11(monkeypatch):
     from copiloto_juridico.evaluacion import conjuntos as cj
     from copiloto_juridico.evaluacion import experimentos as ex
 
-    assert prompts.prompt_conceptos() is prompts.PROMPT_EXTRACCION_ENTIDADES  # v10 por defecto
+    monkeypatch.setattr(config, "PROMPT_CONCEPTOS_VERSION", "v10")
+    assert prompts.prompt_conceptos() is prompts.PROMPT_EXTRACCION_ENTIDADES
     c = cj.Consulta("A1", "texto", None, None, None, "prueba")
     clave_v10 = ex.clave_conceptos(c)
     monkeypatch.setattr(config, "PROMPT_CONCEPTOS_VERSION", "v11")
-    assert "PRIMER concepto debe ser el delito" in prompts.prompt_conceptos()
+    assert "PRIMER concepto debe ser SIEMPRE el nombre del delito" in prompts.prompt_conceptos()
     assert ex.clave_conceptos(c) != clave_v10  # la caché no mezcla versiones
     llm_ = LLMFalso()
     _correr(StoreFalso([_cand(f"d{i}") for i in range(4)], []), ClasificadorFalso(), llm_, num_precedentes=1)

@@ -315,8 +315,8 @@ class Entorno:
 
 
 def clave_conceptos(c: Consulta) -> str:
-    """Clave de caché: texto de la consulta + versión del prompt de conceptos (si cambia cualquiera, se recalcula)."""
-    return hashlib.sha256(f"{config.PROMPT_CONCEPTOS_VERSION}|{c.consulta}".encode()).hexdigest()[:16]
+    """Clave de caché: texto de la consulta + texto del prompt de conceptos (si cambia cualquiera, se recalcula)."""
+    return hashlib.sha256(f"{prompts.prompt_conceptos()}|{c.consulta}".encode()).hexdigest()[:16]
 
 
 def leer_conceptos(path: Path = config.CONCEPTOS_CACHE_PATH) -> dict:

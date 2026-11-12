@@ -15,7 +15,7 @@ import streamlit as st
 
 from copiloto_juridico import config
 from copiloto_juridico.ayudas import AYUDA, USO_RESPONSABLE
-from copiloto_juridico.ejemplos import ejemplos_activos
+from copiloto_juridico.ejemplos import EJEMPLOS
 from copiloto_juridico.llm import get_client
 from copiloto_juridico.pipeline import DESCRIPCION_PASOS, PASOS, Copiloto, Opciones, Resultado
 
@@ -52,7 +52,6 @@ st.markdown('<div class="cj-hero"><h1>⚖️ Co-piloto Jurídico Híbrido</h1>'
 
 # --- Consulta ---
 OPCION_PROPIA = "✍️ Escribir mi propia consulta"
-EJEMPLOS = ejemplos_activos(config.MATERIAS_ACTIVAS)
 etiquetas = [OPCION_PROPIA] + [e.etiqueta for e in EJEMPLOS]
 por_etiqueta = {e.etiqueta: e for e in EJEMPLOS}
 

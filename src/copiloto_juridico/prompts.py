@@ -17,7 +17,7 @@ Conceptos Clave:
 # delitos). Esta variante pide primero el delito. Se activa con COPILOTO_PROMPT_CONCEPTOS=v11.
 PROMPT_EXTRACCION_ENTIDADES_V11 = """
 Tu única tarea es analizar la Consulta del Usuario y extraer de 1 a 3 conceptos jurídicos clave que sirvan como etiquetas de búsqueda.
-El PRIMER concepto debe ser el delito o la conducta que se discute, con su modalidad si se menciona o se deduce de los hechos (ej: 'robo calificado', 'homicidio a título de culpa', 'violencia familiar'). Los demás, si los hay, son el problema procesal (ej: 'vinculación a proceso', 'prisión preventiva').
+El PRIMER concepto debe ser SIEMPRE el nombre del delito, con su modalidad si se menciona o se deduce (ej: 'robo calificado', 'homicidio a título de culpa', 'violencia familiar'). Si la consulta no nombra el delito, dedúcelo de los hechos descritos (ej: "le quitaron la cartera amenazándolo con una navaja" -> 'robo calificado'). Los demás, si los hay, son el problema procesal (ej: 'vinculación a proceso', 'prisión preventiva', 'detención ilegal').
 Es FUNDAMENTAL que respondas ÚNICAMENTE con los conceptos separados por comas, sin ningún tipo de explicación, preámbulo, disculpa o texto adicional. Si no puedes extraer, responde solo: 'FALLA'.
 Consulta del Usuario: "{texto_consulta}"
 Conceptos Clave:

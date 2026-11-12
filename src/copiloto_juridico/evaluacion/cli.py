@@ -231,6 +231,17 @@ def cmd_generacion(args) -> None:
     _log(f"\nResultados: {pj}\nAfirmaciones para marcar alucinaciones: {base}_afirmaciones.csv")
 
 
+def cmd_regresion(args) -> None:
+    from . import regresion
+
+    if args.recalcular_conceptos:
+        regresion.calcular_conceptos(_llm(con_cache=False), log=_log)
+    from ..vectorstore import SentenciasStore
+
+    _log("Cargando la base de sentencias...")
+    _guardar(regresion.correr_regresion(SentenciasStore(log=lambda _m: None), log=_log))
+
+
 def cmd_latencia(args) -> None:
     from .experimentos import experimento_latencia
 
@@ -289,6 +300,10 @@ def main(argv=None) -> None:
     s.add_argument("--con-fuente", action="store_true")
     s.add_argument("--sin-prueba", action="store_true", help="Solo desarrollo (no toca la partición de prueba)")
     s.set_defaults(func=cmd_pesos)
+
+    s = sub.add_parser("regresion", help="Top-3 de categorías en los ejemplos fijos (sin LLM)")
+    s.add_argument("--recalcular-conceptos", action="store_true", help="Precalcula los conceptos con el LLM")
+    s.set_defaults(func=cmd_regresion)
 
     s = sub.add_parser("generacion", help="Fichas del conjunto C vs. anotación")
     s.add_argument("--prompt-penal", choices=["v10", "v11"], default=None)

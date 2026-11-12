@@ -85,11 +85,15 @@ RRF_K = _env("COPILOTO_RRF_K", 60)  # Constante k de Reciprocal Rank Fusion (val
 TOP_N_CANDIDATES_INITIAL = 20
 TOP_N_CANDIDATES_FINAL = 10
 
-# Pesos para Re-ranking Híbrido (v10: se añade el voto de recuperación y se reducen Jaccard/KEM, que con
-# 567 tipos finos sobrevaloraban coincidencias de una sola palabra, p. ej. "menores")
+# Pesos del score híbrido de categorías (suman 1; solo importa el orden dentro de una consulta).
+# v11: KEM sale del score (peso 0) y su peso pasa a Jaccard. Con los conceptos de la consulta como "términos
+# importantes", KEM = |A∩B|/|A| y Jaccard = |A∩B|/|A∪B| usan los mismos conjuntos (correlación 0.995 en la
+# ablación). La alternativa, KEM sobre un vocabulario jurídico sin Jaccard, perdió un caso en la regresión de las
+# 18 consultas v10 (13/14 frente a 14/14): evaluacion/resultados/20261112-033711_*_regresion.md.
+# Pesos de v10: coseno 0.20, Jaccard 0.20, KEM 0.20, concisión 0.05, voto 0.35.
 COSINE_WEIGHT = 0.20
-JACCARD_WEIGHT = 0.20
-KEM_WEIGHT = 0.20
+JACCARD_WEIGHT = 0.40
+KEM_WEIGHT = 0.00
 CONCISION_WEIGHT = 0.05
 VOTE_WEIGHT = 0.35
 NUM_CATEGORIAS_FILTRO = 3         # El filtro estricto usa las 3 mejores categorías
@@ -110,25 +114,24 @@ def _env_lista(name: str, default: list[str]) -> list[str]:
     return [v.strip() for v in value.split(",") if v.strip()] if value else list(default)
 
 
-# --- Cambios de v11: cada uno configurable; el valor por defecto reproduce v10 salvo donde se indica ---
-# Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS. Ojo: incluye "violacion" y "falsedad", que
-# son delitos reales (penal/violacion tiene 30 sentencias). Se conserva hasta que la ablación decida.
-USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", True)
-# KEM: "conceptos" (v10: términos importantes = todos los conceptos de la consulta, redundante con Jaccard) o
-# "vocabulario" (solo los conceptos que están en un vocabulario de términos jurídicos clave).
-KEM_MODO = _env("COPILOTO_KEM_MODO", "conceptos")
-VOCABULARIO_KEM_PATH = Path(_env("COPILOTO_VOCABULARIO_KEM", str(DATA_DIR / "vocabulario" / "terminos_juridicos.txt")))
-# Alcance: materias en las que se clasifica y busca (p. ej. COPILOTO_MATERIAS=penal) y nivel de clasificación.
-MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", MATERIAS)
-NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "tipo")  # "tipo" | "familia" (solo penal se agrupa)
+# --- v11: el alcance es la defensa penal en apelación. Las opciones de v10 quedan por variable de entorno solo
+# para comparar en la evaluación (p. ej. COPILOTO_MATERIAS=penal,civil,familiar,mercantil,laboral). ---
+# Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS ("violacion", "falsedad"...): castigaba delitos
+# reales (penal/violacion tiene 30 sentencias) sin evidencia a favor. Desactivada; en la regresión solo ayudaba a un
+# ejemplo por accidente, y ese caso se resuelve con ENRIQUECER_FAMILIAS (mismo archivo de resultados).
+USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", False)
+MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", ["penal"])
+NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" | "familia" (solo penal se agrupa)
+# El embedding de una familia incluye los nombres de sus tipos más generales ("contra la salud: narcomenudeo...").
+ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
 # Texto que lee QC_1: "inicio" (v10: primeros 2,500 caracteres) o "fragmento_similar" (ventana alrededor del
 # fragmento más parecido a la consulta).
 QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "inicio")
 QC1_MAX_CHARS = 2500
 # Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).
-PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v10")
+PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v11")
 # Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
-PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v10")
+PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
 # queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".

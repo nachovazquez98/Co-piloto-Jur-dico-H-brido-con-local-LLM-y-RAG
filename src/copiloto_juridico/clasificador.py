@@ -14,7 +14,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, replace
 from functools import lru_cache
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -60,8 +59,8 @@ def key_entity_match(category_tokens: set, entity_tokens: set, high_importance_t
 
     KEM = |R ∩ C| / |R|, con R = términos importantes presentes en la consulta y C = lemas de la categoría.
     A diferencia de Jaccard no castiga que la categoría tenga palabras extra: mide cobertura de la consulta.
-    Nota: si los "términos importantes" son todos los conceptos de la consulta (modo por defecto de v10),
-    R = conceptos y KEM queda muy correlacionado con Jaccard (mismos conjuntos, distinto denominador).
+    Con R = conceptos de la consulta, KEM queda casi idéntico a Jaccard (mismos conjuntos, distinto denominador):
+    por eso su peso es 0 en v11. Se sigue calculando porque la penalización por longitud lo usa.
     """
     relevantes = high_importance_tokens & entity_tokens
     return len(relevantes & category_tokens) / len(relevantes) if relevantes else 0.0
@@ -77,46 +76,6 @@ def etiqueta_tipo(tipo: str) -> str:
     if accion.startswith(PREFIJO_FAMILIA):
         return f"{materia.upper()} · familia: " + accion[len(PREFIJO_FAMILIA):].replace("-", " ")
     return f"{materia.upper()} · " + accion.replace("_", " / ").replace("-", " ")
-
-
-def vocabulario_kem(path: Path | None = None) -> frozenset[str]:
-    """Lemas del vocabulario de términos jurídicos clave (archivo de datos, una expresión por línea)."""
-    path = Path(path or config.VOCABULARIO_KEM_PATH)
-    return _vocabulario_kem(str(path), path.stat().st_mtime if path.exists() else 0.0)
-
-
-@lru_cache(maxsize=4)
-def _vocabulario_kem(path_str: str, _mtime: float) -> frozenset[str]:
-    path = Path(path_str)
-    if not path.exists():
-        logger.warning("No existe el vocabulario de KEM %s; KEM quedará en 0.", path)
-        return frozenset()
-    # Se guarda el lema Y la forma original: el lema de una palabra aislada depende del contexto que spaCy
-    # no tiene ("robo" solo se lematiza como el verbo "robar"; en "robo de celular", como el sustantivo "robo").
-    lemas: set[str] = set()
-    for linea in path.read_text(encoding="utf-8").splitlines():
-        linea = linea.strip().lower()
-        if linea and not linea.startswith("#"):
-            lemas |= lemmatized_tokens(linea)
-            lemas |= {t.text for t in get_nlp()(linea.replace("-", " "))
-                      if t.is_alpha and not t.is_stop}
-    return frozenset(lemas)
-
-
-def terminos_importantes(entity_tokens: set[str], modo: str | None = None) -> set[str]:
-    """Términos de la consulta que KEM considera importantes.
-
-    - "conceptos" (v10): todos los conceptos clave. Entonces KEM = |A∩B| / |A| y Jaccard = |A∩B| / |A∪B| usan
-      los mismos conjuntos y están casi perfectamente correlacionados (redundancia que mide la ablación).
-    - "vocabulario": solo los conceptos que son términos jurídicos distintivos (`data/vocabulario/...`), de modo
-      que una coincidencia en "menores" o "persona" no cuente como coincidencia clave.
-    """
-    modo = modo or config.KEM_MODO
-    if modo == "vocabulario":
-        return entity_tokens & vocabulario_kem()
-    if modo != "conceptos":
-        raise ValueError(f"KEM_MODO desconocido: {modo}")
-    return entity_tokens
 
 
 @dataclass(frozen=True)
@@ -179,10 +138,12 @@ class ClasificadorHibrido:
     con filtro usa todos los tipos de las familias elegidas; los tipos de otras materias quedan como están.
     """
 
-    def __init__(self, tipos: list[str], nivel: str = "tipo", familias: dict[str, str] | None = None):
+    def __init__(self, tipos: list[str], nivel: str = "tipo", familias: dict[str, str] | None = None,
+                 enriquecer: bool | None = None):
         if nivel not in ("tipo", "familia"):
             raise ValueError(f"nivel desconocido: {nivel}")
         self.nivel = nivel
+        self.enriquecer = config.ENRIQUECER_FAMILIAS if enriquecer is None else enriquecer
         self.categoria_de: dict[str, str] = {}
         for t in tipos:
             if nivel == "familia" and t.startswith("penal/") and familias is not None:
@@ -195,9 +156,18 @@ class ClasificadorHibrido:
         self.tipos = sorted(self.miembros)
         textos = [t.replace(PREFIJO_FAMILIA, "").replace("/", " ").replace("_", " ").replace("-", " ")
                   for t in self.tipos]
-        self.embeddings = embed_texts(textos, kind="query")
+        # El embedding de una familia incluye los nombres de sus tipos más generales (los más cortos): "penal
+        # contra la salud" solo no dice "narcomenudeo". Jaccard sigue usando solo el nombre de la familia.
+        self.embeddings = embed_texts([self._texto_embedding(c, t) for c, t in zip(self.tipos, textos)], kind="query")
         self.tokens = [lemmatized_tokens(t) for t in textos]
         self.indice = {t: i for i, t in enumerate(self.tipos)}
+
+    def _texto_embedding(self, categoria: str, texto: str, max_tipos: int = 6) -> str:
+        if PREFIJO_FAMILIA not in categoria or not self.enriquecer:
+            return texto
+        nombres = sorted({t.split("/", 1)[1].replace("_", " ").replace("-", " ") for t in self.miembros[categoria]},
+                         key=len)[:max_tipos]
+        return f"{texto}: {', '.join(nombres)}"
 
     def tipos_de(self, categoria: str) -> list[str]:
         """Tipos del corpus que cubre una categoría (a nivel tipo, la propia categoría)."""
@@ -216,7 +186,7 @@ class ClasificadorHibrido:
         - penal_tokens: 0.70 si la categoría contiene una palabra de `config.IRRELEVANT_TOKENS`, si no 1.
         """
         entity_tokens = lemmatized_tokens(entidades) if entidades else lemmatized_tokens(consulta)
-        high_importance = terminos_importantes(entity_tokens)
+        high_importance = entity_tokens  # KEM = |A∩B|/|A| con A = conceptos (peso 0 en v11, ver config)
 
         cos = self.embeddings @ query_embedding
         votos: dict[str, float] = {}

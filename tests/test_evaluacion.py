@@ -212,7 +212,7 @@ def _comp():
 
 
 def test_ablacion_y_penalizaciones():
-    comp, pesos = _comp(), PesosClasificador.desde_config()
+    comp, pesos = _comp(), PesosClasificador(0.20, 0.20, 0.20, 0.05, 0.35, True, True)  # pesos de v10
     s = puntuar(comp, pesos)
     assert s[1] == pytest.approx((0.2 + 0.2 + 0.025) * 0.7)
     assert puntuar(comp, pesos.sin("penal_tokens"))[1] == pytest.approx(0.425)
