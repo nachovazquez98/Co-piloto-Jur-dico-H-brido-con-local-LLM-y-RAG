@@ -11,9 +11,14 @@
 ## Origen
 
 Sentencias públicas del [Supremo Tribunal de Justicia del Estado de Jalisco](https://publicasentencias.stjjalisco.gob.mx),
-descargadas de su API pública (fase 0 del notebook) y procesadas en la fase 1 (extracción con muestreo de páginas en
-PDFs largos y limpieza por regex). El texto se recuperó de la base `chroma_db_juridica_8.2` (5,805 sentencias) y de 44
-PDFs locales (ya incluidos en esa base).
+descargadas de su API pública (fase 0 del notebook) y procesadas en la fase 1 (extracción y limpieza por regex). El
+texto se recuperó de la base `chroma_db_juridica_8.2` (5,805 sentencias) y de 44 PDFs locales (ya incluidos en esa base).
+
+Aquella extracción **muestreaba los PDF de más de 50 páginas** (leía 40); esas sentencias conservan la marca
+"... N págs omitidas ..." en el texto y la lista se obtiene con `cli limpiar-corpus --omitidas lista.csv`. La ingesta
+actual lee los PDF completos. En v11 el texto guardado se limpió además del anexo de datos testados, las etiquetas de
+testado y los restos de encabezados (`cli limpiar-corpus`). Las sentencias penales se indexan completas; las de otras
+materias, con hasta 12 fragmentos.
 
 ## Criterio de balance
 

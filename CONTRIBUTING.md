@@ -43,4 +43,4 @@ streamlit run app/Copiloto.py
 ## Reportar errores
 
 Incluye: pasos para reproducirlo, consulta usada, modelo de LLM, sistema operativo / GPU y el contenido de la
-pestaña **Logs** de la app.
+sección **Detalles técnicos → Registro** de la app.

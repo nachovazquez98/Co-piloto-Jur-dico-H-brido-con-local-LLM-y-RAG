@@ -2,6 +2,45 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y versionado [SemVer](https://semver.org/lang/es/).
 
+## [11.0.0] - 2026-11-12
+
+Respuesta a la evaluación del jurado: alcance acotado a la defensa penal en apelación, evaluación reproducible y
+explicación de cada número. Ningún resultado se reporta si no está en una corrida guardada en `evaluacion/resultados/`.
+
+### Añadido
+- Módulo `evaluacion`: métricas (Precision/Recall/Hit@k, MRR, nDCG, F1 macro, kappa, IC de Wilson y bootstrap
+  pareado) probadas con los ejemplos resueltos del informe; familias de delito (289 tipos penales -> 24 familias,
+  CSV para revisión de un abogado); conjuntos de consultas, juicios y fichas con validación y detección de fuga;
+  experimentos `recuperacion`, `ablacion`, `pesos`, `qc`, `qc-diagnostico`, `generacion`, `latencia`, `regresion`;
+  borradores de consultas con el LLM (`revisado: false`, la partición de prueba se rechaza hasta revisarlos) y hojas
+  de anotación CSV.
+- Ficha penal orientada a la defensa: acto impugnado, apelante, agravios y su calificación, sentido del fallo con
+  valores cerrados; generada en una sola llamada (JSON validado con reintento).
+- Verificaciones deterministas de la ficha: sentido del fallo leído de los resolutivos, artículos citados contra el
+  texto de la sentencia y QC_2 por familia del delito; las discrepancias se marcan "verificar".
+- Limpieza del texto: anexo de datos testados, etiquetas de testado, encabezados y palabras deletreadas
+  (`cli limpiar-corpus`); comandos `cli pendientes` y `estado --salida`.
+- Página "Cómo funciona" con el flujo, los límites de tamaño, glosario y la última evaluación guardada.
+
+### Cambiado
+- Por defecto: solo materia penal, clasificación por familia de delito, prompts v11; las opciones de v10 quedan por
+  variable de entorno para comparar.
+- Clasificador: Jaccard 0.40 y KEM 0 (eran redundantes); sin la lista fija de tokens penalizados; el embedding de
+  cada familia incluye los nombres de sus tipos. Decisiones respaldadas por la regresión guardada.
+- QC_1: lee el fragmento más parecido a la consulta y acepta mismo delito, misma familia o mismo problema
+  procesal; si descarta todo, se muestran los mejores candidatos marcados "no verificado".
+- Evaluación del conjunto A con *leave-one-out*: la sentencia fuente no vota por su propio tipo.
+- Índice: sentencias penales completas (antes 12 fragmentos); PDF leídos completos (antes se muestreaban los de más
+  de 50 páginas); recorte para el LLM que conserva inicio, análisis de agravios y resolutivos.
+- Interfaz: pantalla principal con consulta, pasos, síntesis y tarjetas; detalles técnicos en un solo desplegable;
+  configuración en la barra lateral, cerrada. Ayudas de una frase en cada número visible.
+- LLM con semilla fija (42); embeddings en CPU si la GPU no tiene memoria.
+
+### Eliminado
+- Páginas "Datos" (sus herramientas están en la CLI) y "Evaluación" (integrada en "Cómo funciona").
+- Ejemplos de otras materias en la app (se conservan como regresión en `evaluacion/regresion.py`).
+- KEM sobre vocabulario y su archivo de términos (perdió en la regresión).
+
 ## [10.0.0] - 2026-10-30
 
 ### Añadido
