@@ -1,4 +1,4 @@
-"""Co-piloto Jurídico Híbrido — interfaz web (Streamlit).
+"""Co-piloto Jurídico — interfaz web (Streamlit).
 
 Ejecutar desde la raíz del repositorio:
     streamlit run app/Copiloto.py
@@ -13,46 +13,26 @@ from datetime import datetime
 
 import streamlit as st
 
-from copiloto_juridico import config
-from copiloto_juridico.ayudas import AYUDA, USO_RESPONSABLE
+from copiloto_juridico.ayudas import AYUDA, AVISO_LEGAL
 from copiloto_juridico.ejemplos import EJEMPLOS
+from copiloto_juridico.fichas import extraer_articulos
 from copiloto_juridico.llm import get_client
-from copiloto_juridico.pipeline import DESCRIPCION_PASOS, PASOS, Copiloto, Opciones, Resultado
+from copiloto_juridico.pipeline import PASOS, Copiloto, Opciones, Resultado
 
 st.set_page_config(page_title="Co-piloto Jurídico", page_icon="⚖️", layout="wide")
 
-from ui_common import get_clasificador, get_store, inject_css, sidebar_llm  # noqa: E402
+from ui_common import get_clasificador, get_store, inject_css, sidebar_configuracion  # noqa: E402
 
 inject_css()
-
-# --- Barra lateral ---
-settings = sidebar_llm()
-st.sidebar.header("🔎 Análisis")
-num_precedentes = st.sidebar.slider("Precedentes a analizar", 1, 5, config.RAG_NUM_RESULTS_DESIRED,
-                                    help="Informes válidos que se buscan antes de la síntesis.")
-qc1 = st.sidebar.toggle("QC_1 · Verificar relevancia del documento", value=True,
-                        help="Antes de extraer, el LLM compara la consulta con un fragmento de la sentencia "
-                             f"({'el más parecido a la consulta' if config.QC1_CONTEXTO == 'fragmento_similar' else 'los primeros 2,500 caracteres'}) "
-                             "y descarta contextos distintos aunque compartan palabras.")
-qc2 = st.sidebar.toggle("QC_2 · Verificar el informe (anti-alucinación)", value=True,
-                        help="Después de generar la ficha, el LLM verifica que trate el mismo tema que la consulta y que "
-                             "no contenga datos sin relación.")
-
+settings, opciones = sidebar_configuracion()
 store = get_store()
 clasificador = get_clasificador()
-st.sidebar.caption(f"📚 {len(store.corpus):,} sentencias · {store.corpus['tipo'].nunique()} tipos · "
-                   f"{store.manifest['num_chunks']:,} fragmentos indexados")
-st.sidebar.caption(f"🎯 Alcance: {', '.join(config.MATERIAS_ACTIVAS)} · clasificación por {config.NIVEL_CLASIFICACION} · "
-                   f"ficha penal {config.PROMPT_PENAL_VERSION} · semilla {settings.seed}")
 
-# --- Encabezado ---
-st.markdown('<div class="cj-hero"><h1>⚖️ Co-piloto Jurídico Híbrido</h1>'
-            '<p>Análisis de precedentes del Supremo Tribunal de Justicia de Jalisco con RAG y LLMs locales</p></div>',
-            unsafe_allow_html=True)
+st.title("⚖️ Co-piloto Jurídico")
+st.markdown("Describe tu caso y encuentra cómo han resuelto las Salas Penales del STJ Jalisco apelaciones parecidas.")
 
 # --- Consulta ---
-OPCION_PROPIA = "✍️ Escribir mi propia consulta"
-etiquetas = [OPCION_PROPIA] + [e.etiqueta for e in EJEMPLOS]
+ESCRIBIR = "Escribir mi propia consulta"
 por_etiqueta = {e.etiqueta: e for e in EJEMPLOS}
 
 
@@ -62,194 +42,127 @@ def _cargar_ejemplo() -> None:
 
 
 if "consulta" not in st.session_state:
-    st.session_state["consulta"] = EJEMPLOS[0].texto
-    st.session_state["ejemplo"] = EJEMPLOS[0].etiqueta
-
-col_a, col_b = st.columns([2, 1])
-with col_a:
-    st.selectbox("Consultas de ejemplo (materia · tipo de delito o acción · acto impugnado)", etiquetas, key="ejemplo",
-                 on_change=_cargar_ejemplo,
-                 help="Elige un caso de ejemplo para cargarlo en el cuadro de texto; puedes editarlo antes de analizar. "
-                      "Los primeros están redactados como los plantearía un defensor en apelación. Los marcados "
-                      "'sin tipo en el corpus' sirven para ver cómo responde el sistema cuando no hay precedentes del "
-                      "mismo tipo.")
-with col_b:
-    ej = por_etiqueta.get(st.session_state["ejemplo"])
-    if ej:
-        st.markdown(f"<br><span class='cj-chip'>Materia: {ej.materia}</span>"
-                    f"<span class='cj-chip'>Tipo: {html.escape(ej.tipo)}</span>"
-                    + (f"<span class='cj-chip'>{html.escape(ej.etapa)}</span>" if ej.etapa else "")
-                    + ("<span class='cj-chip cj-warn'>Sin tipo en el corpus</span>" if ej.sin_tipo_en_corpus else ""),
-                    unsafe_allow_html=True)
-
-consulta = st.text_area("Describe el caso", key="consulta", height=130,
-                        placeholder="Describe los hechos, el delito o la acción y los argumentos de las partes...")
-analizar = st.button("Analizar precedentes", type="primary", disabled=not consulta.strip())
+    st.session_state["consulta"] = ""
+st.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
+consulta = st.text_area("Describe el caso", key="consulta", height=140,
+                        placeholder="Hechos, delito, qué resolución se apela y por qué...")
+buscar = st.button("Buscar precedentes", type="primary", disabled=not consulta.strip())
 
 
-# --- Ejecución con pasos animados y logs en vivo ---
+# --- Ejecución: solo los 5 pasos con su estado ---
 def render_pasos(estado: dict) -> str:
     filas = []
     for clave, titulo in PASOS:
         e = estado[clave]
-        tiempo = f"<span class='time'>{e['t']:.1f} s</span>" if e.get("t") is not None else ""
+        tiempo = f"<span class='time'>{e['t']:.0f} s</span>" if e.get("t") is not None else ""
         detalle = f"<div class='detail'>{html.escape(e['detalle'])}</div>" if e.get("detalle") else ""
-        desc = f"<div class='desc'>{html.escape(DESCRIPCION_PASOS.get(clave, ''))}</div>"
         filas.append(f"<div class='cj-step {e['estado']}'><span class='dot'></span>"
-                     f"<div class='title'>{titulo}{tiempo}</div>{desc}{detalle}</div>")
+                     f"<div class='title'>{titulo}{tiempo}</div>{detalle}</div>")
     return "<div class='cj-steps'>" + "".join(filas) + "</div>"
 
 
-def ejecutar(consulta: str) -> None:
+def ejecutar(texto: str) -> None:
     copiloto = Copiloto(store, clasificador, get_client(settings))
-    opciones = Opciones(num_precedentes=num_precedentes, qc_relevancia=qc1, qc_post_reporte=qc2)
     estado = {k: {"estado": "pending", "detalle": "", "t": None} for k, _ in PASOS}
-    inicio_paso: dict[str, float] = {}
-
-    st.subheader("Progreso del análisis")
-    col_pasos, col_logs = st.columns([1, 1.25])
-    with col_pasos:
-        ph_pasos = st.empty()
-        ph_barra = st.empty()
-    with col_logs:
-        st.caption("Logs de ejecución")
-        with st.container(height=340):
-            ph_logs = st.empty()
-    ph_vivo = st.container()
-    ph_sintesis = None
+    inicio: dict[str, float] = {}
+    ph_pasos = st.empty()
     logs: list[str] = []
-    sintesis = ""
-
-    ph_pasos.markdown(render_pasos(estado), unsafe_allow_html=True)
-    for ev in copiloto.analizar(consulta, opciones):
+    for ev in copiloto.analizar(texto, Opciones(**opciones)):
         if ev.tipo == "paso_inicio":
-            inicio_paso[ev.paso] = time.time()
+            inicio[ev.paso] = time.time()
             estado[ev.paso]["estado"] = "running"
-            if ev.paso == "sintesis":
-                with ph_vivo:
-                    st.markdown("#### ✍️ Redactando la síntesis...")
-                    ph_sintesis = st.empty()
         elif ev.tipo == "paso_fin":
             estado[ev.paso].update(estado="done", detalle=ev.mensaje or estado[ev.paso]["detalle"],
-                                   t=time.time() - inicio_paso[ev.paso])
-            if ev.paso == "analisis":
-                ph_barra.empty()
+                                   t=time.time() - inicio[ev.paso])
         elif ev.tipo == "progreso":
-            estado[ev.paso]["detalle"] = ev.mensaje
-            ph_barra.progress(ev.datos["validos"] / ev.datos["meta"],
-                              text=f"Informes válidos: {ev.datos['validos']}/{ev.datos['meta']}")
+            estado[ev.paso]["detalle"] = f"{ev.mensaje} · fichas válidas {ev.datos['validos']}/{ev.datos['meta']}"
         elif ev.tipo == "log":
             logs.append(ev.mensaje)
-            ph_logs.code("\n".join(logs[-400:]), language=None)
             continue
-        elif ev.tipo == "precedente":
-            p = ev.datos["precedente"]
-            with ph_vivo:
-                st.toast(f"Precedente {p.numero} listo: {p.candidato.doc_id}", icon="📜")
-        elif ev.tipo == "token" and ph_sintesis is not None:
-            sintesis += ev.mensaje
-            ph_sintesis.markdown(sintesis + " ▌")
+        elif ev.tipo == "token":
             continue
         elif ev.tipo == "error":
             if ev.paso:
                 estado[ev.paso].update(estado="error", detalle=ev.mensaje)
-            logs.append(f"❌ {ev.mensaje}")
-            ph_logs.code("\n".join(logs[-400:]), language=None)
             st.error(ev.mensaje)
         elif ev.tipo == "resultado":
             st.session_state["resultado"] = ev.datos["resultado"]
-            st.session_state["logs"] = logs
-            st.session_state["pasos"] = estado
+        st.session_state["logs"] = logs
         ph_pasos.markdown(render_pasos(estado), unsafe_allow_html=True)
 
 
-if analizar:
+if buscar:
     st.session_state.pop("resultado", None)
     ejecutar(consulta.strip())
     if "resultado" in st.session_state:
         st.rerun()
 
+
 # --- Resultado ---
+def tarjeta(p) -> None:
+    t = p.tarjeta()
+    with st.container(border=True):
+        st.markdown(f"#### Precedente {p.numero} · `{t['documento']}`")
+        if t["no_verificado_qc1"]:
+            st.warning("No verificado por QC_1: el control lo descartó, pero se muestra porque descartó todos los "
+                       "candidatos. Revísalo con más cuidado.")
+        a, b, c = st.columns(3)
+        a.markdown(f"**Toca / expediente**  \n{t['identificador']}  \n**Fecha de publicación**  \n{t['fecha']}")
+        b.markdown(f"**Delito**  \n{t['delito']}  \n**Acto impugnado**  \n{t['acto_impugnado']}")
+        verificar_sentido = any(v.startswith("sentido") for v in t["verificar"])
+        c.metric("Sentido del fallo", t["sentido_fallo"] + (" · verificar" if verificar_sentido else ""),
+                 help=AYUDA["sentido_fallo"])
+        if t["agravios"]:
+            st.markdown("**Agravios y cómo los calificó la Sala**")
+            st.markdown("\n".join(f"- {ag}" + (f" — **{cal}**" if cal else "") for ag, cal in t["agravios"]))
+        if t["fundamento"]:
+            faltan = set(t["articulos_no_encontrados"])
+            st.markdown("**Fundamento legal**")
+            st.markdown("\n".join(
+                f"- {f}" + (" — _no encontrado en la sentencia, verificar_" if extraer_articulos(f) & faltan else "")
+                for f in t["fundamento"]))
+        for v in t["verificar"]:
+            st.caption(f"Verificar: {v}")
+        with st.expander("Ficha completa"):
+            st.markdown(p.informe)
+
+
 res: Resultado | None = st.session_state.get("resultado")
 if res:
-    st.divider()
-    m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Precedentes válidos", len(res.precedentes), help=AYUDA["precedentes_validos"])
-    m2.metric("Descartados por QC", len(res.descartados), help=AYUDA["descartados"])
-    m3.metric("Veredictos ambiguos", getattr(res, "veredictos_ambiguos", 0), help=AYUDA["ambiguos"])
-    m4.metric("Tiempo total", f"{res.segundos:.0f} s", help=AYUDA["tiempo"])
-    m5.metric("Modelo", res.modelo, help=AYUDA["modelo"])
-    if getattr(res, "aviso_cobertura", None):
-        st.warning(res.aviso_cobertura, icon="⚠️")
-    st.markdown(f"<span class='cj-chip'>Categoría: {html.escape(res.tabla_clasificacion.iloc[0]['categoría'])}</span>"
-                f"<span class='cj-chip'>{html.escape(res.modo_busqueda)}</span>"
-                f"<span class='cj-chip'>Conceptos: {html.escape(res.entidades[:120])}</span>",
-                unsafe_allow_html=True)
+    st.subheader("Síntesis")
+    if res.aviso_cobertura:
+        st.warning(res.aviso_cobertura)
+    st.markdown(res.sintesis)
+    st.subheader("Precedentes")
+    for p in res.precedentes:
+        tarjeta(p)
+    nombre = re.sub(r"\W+", "_", res.consulta[:40]).strip("_").lower()
+    st.download_button("Descargar informe (.md)", res.markdown(),
+                       file_name=f"informe_{nombre}_{datetime.now():%Y%m%d_%H%M}.md", mime="text/markdown")
 
-    if st.session_state.get("pasos"):
-        with st.expander("Pasos del análisis", expanded=False):
-            st.markdown(render_pasos(st.session_state["pasos"]), unsafe_allow_html=True)
-
-    tab_s, tab_p, tab_c, tab_l = st.tabs(["📋 Síntesis", "📚 Precedentes", "🧭 Clasificación", "📝 Logs"])
-    with tab_s:
-        with st.container(border=True):
-            st.markdown("## Síntesis de precedentes relevantes")
-            st.markdown(res.sintesis)
-        nombre = re.sub(r"\W+", "_", res.consulta[:40]).strip("_").lower()
-        st.download_button("⬇️ Descargar informe completo (.md)", res.markdown(),
-                           file_name=f"informe_{nombre}_{datetime.now():%Y%m%d_%H%M}.md", mime="text/markdown")
-    with tab_p:
-        for p in res.precedentes:
-            c = p.candidato
-            with st.expander(f"📜 Precedente {p.numero} · {c.doc_id}", expanded=p.numero == 1):
-                a, b, cc, rr, d = st.columns(5)
-                a.metric("Materia", c.materia.upper())
-                b.metric("Fecha", c.fecha)
-                cc.metric("Similitud", f"{c.similitud:.3f}", help=AYUDA["similitud"])
-                rr.metric("RRF", f"{c.relevancia:.4f}", help=AYUDA["rrf"])
-                d.metric("Fuente", p.fuente + (" · genérica" if p.fallback else ""), help=AYUDA["fuente"])
-                st.caption(f"Tipo indexado: {c.tipo}")
-                dp = getattr(p, "datos_penales", {}) or {}
-                if any(dp.get(k) for k in ("acto_impugnado", "sentido_fallo", "agravios")):
-                    x, y = st.columns([1, 2])
-                    x.metric("Sentido del fallo", dp.get("sentido_fallo") or "—", help=AYUDA["sentido_fallo"])
-                    y.markdown(f"**Acto impugnado**  \n{dp.get('acto_impugnado') or '—'}",
-                               help=AYUDA["acto_impugnado"])
-                    if dp.get("agravios"):
-                        with st.container(border=True):
-                            st.markdown("**Agravios planteados**", help=AYUDA["agravios"])
-                            st.markdown(dp["agravios"])
-                            if dp.get("calificacion_agravios"):
-                                st.markdown("**Calificación de la Sala**")
-                                st.markdown(dp["calificacion_agravios"])
-                ambiguos = [n for n, a_ in (("QC_1", getattr(p, "ambiguo_qc1", False)),
-                                            ("QC_2", getattr(p, "ambiguo_qc2", False))) if a_]
-                if ambiguos:
-                    st.caption(f"⚠️ Veredicto no interpretable en {' y '.join(ambiguos)}: esta ficha pasó con un "
-                               "control menos.", help=AYUDA["ambiguos"])
-                st.markdown(p.informe)
-                with st.popover("Ver hechos extraídos y verificaciones"):
-                    st.markdown("**Hechos extraídos (paso de extracción):**")
-                    st.markdown(p.extraccion)
-                    if p.veredicto_relevancia:
-                        st.markdown("**QC_1 (relevancia):**")
-                        st.text(p.veredicto_relevancia)
-                    if p.veredicto_reporte:
-                        st.markdown("**QC_2 (anti-alucinación):**")
-                        st.text(p.veredicto_reporte)
+    with st.expander("Detalles técnicos"):
+        st.markdown(f"**Conceptos clave:** {res.entidades} · **Tiempo:** {res.segundos:.0f} s · "
+                    f"**Llamadas al LLM:** {res.llamadas_llm} · **Modelo:** {res.modelo}")
+        st.markdown("**Clasificación de la consulta** (las 3 primeras categorías filtran la búsqueda)")
+        tabla = res.tabla_clasificacion[["categoría", "score_híbrido", "coseno", "jaccard", "voto_recuperación"]]
+        st.dataframe(tabla, hide_index=True, width="stretch", column_config={
+            "score_híbrido": st.column_config.NumberColumn("score", format="%.3f", help=AYUDA["score_hibrido"]),
+            "coseno": st.column_config.NumberColumn(format="%.3f", help=AYUDA["coseno"]),
+            "jaccard": st.column_config.NumberColumn(format="%.3f", help=AYUDA["jaccard"]),
+            "voto_recuperación": st.column_config.NumberColumn("voto", format="%.3f", help=AYUDA["voto"])})
+        st.markdown("**Puntajes de cada precedente**")
+        st.dataframe([{"documento": p.candidato.doc_id, "similitud": p.candidato.similitud,
+                       "RRF": p.candidato.relevancia, "fuente": p.fuente} for p in res.precedentes],
+                     hide_index=True, width="stretch", column_config={
+                         "similitud": st.column_config.NumberColumn(format="%.3f", help=AYUDA["similitud"]),
+                         "RRF": st.column_config.NumberColumn(format="%.4f", help=AYUDA["rrf"]),
+                         "fuente": st.column_config.Column(help=AYUDA["fuente"])})
         if res.descartados:
-            st.markdown("**Documentos descartados por los controles de calidad**", help=AYUDA["descartados"])
-            st.dataframe(res.descartados, width="stretch", hide_index=True)
-    with tab_c:
-        st.markdown("Top de categorías según el **score híbrido** (Coseno · Jaccard · KEM · Voto de recuperación · Concisión). "
-                    f"Las {config.NUM_CATEGORIAS_FILTRO} primeras se usan como filtro estricto de la búsqueda. "
-                    "Pasa el cursor sobre el nombre de cada columna para ver qué mide.")
-        ayuda_col = {"score_híbrido": "score_hibrido", "coseno": "coseno", "jaccard": "jaccard", "kem": "kem",
-                     "voto_recuperación": "voto", "concisión": "concision", "penalidad": "penalidad"}
-        cfg = {c: st.column_config.NumberColumn(format="%.3f", help=AYUDA[k]) for c, k in ayuda_col.items()}
-        cfg["tokens"] = st.column_config.NumberColumn(help=AYUDA["tokens"])
-        st.dataframe(res.tabla_clasificacion.drop(columns=["tipo"]), width="stretch", hide_index=True, column_config=cfg)
-    with tab_l:
+            st.markdown("**Candidatos descartados**", help=AYUDA["descartados"])
+            st.dataframe(res.descartados, hide_index=True, width="stretch")
+        if res.veredictos_ambiguos:
+            st.caption(f"Veredictos de control no interpretables: {res.veredictos_ambiguos}. {AYUDA['ambiguos']}")
+        st.markdown("**Registro**")
         st.code("\n".join(st.session_state.get("logs", [])), language=None)
 
-st.caption(USO_RESPONSABLE)
+st.caption(AVISO_LEGAL)

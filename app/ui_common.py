@@ -51,7 +51,7 @@ def get_store() -> SentenciasStore:
     return SentenciasStore()
 
 
-@st.cache_resource(show_spinner="Cargando el clasificador híbrido...")
+@st.cache_resource(show_spinner="Cargando el clasificador...")
 def get_clasificador() -> ClasificadorHibrido:
     store = get_store()
     return construir_clasificador(store.corpus["tipo"].unique().tolist())
@@ -63,43 +63,38 @@ def _listar_modelos(provider: str, base_url: str, api_key: str) -> list[str]:
     return get_client(s).list_models()
 
 
-def sidebar_llm() -> config.LLMSettings:
-    """Selector del proveedor y modelo de LLM. Cambiar de modelo no requiere tocar código."""
+def sidebar_configuracion() -> tuple[config.LLMSettings, dict]:
+    """Barra lateral: solo el estado del modelo; todo lo demás en un desplegable "Configuración" cerrado."""
     defaults = config.LLMSettings()
-    st.sidebar.header("🧠 Modelo de lenguaje")
-    claves = list(PROVIDERS)
-    provider = st.sidebar.selectbox(
-        "Proveedor", claves, index=claves.index(defaults.provider) if defaults.provider in claves else 0,
-        format_func=lambda k: PROVIDERS[k][0], key="llm_provider",
-        help="Ollama ejecuta modelos locales. 'API compatible con OpenAI' sirve para OpenAI, Groq, OpenRouter, "
-             "LM Studio, vLLM, llama.cpp server, etc.")
-    default_url = defaults.base_url if provider == defaults.provider else PROVIDER_DEFAULT_URLS[provider]
-    base_url = st.sidebar.text_input("URL del servidor", value=default_url, key=f"llm_url_{provider}")
-    api_key = ""
-    if provider != "ollama":
-        api_key = st.sidebar.text_input("API key", value=defaults.api_key, type="password", key="llm_key",
-                                        help="También puede definirse en `.env` (COPILOTO_LLM_API_KEY).")
-
-    modelos = _listar_modelos(provider, base_url, api_key)
-    default_model = defaults.model if provider == defaults.provider else ""
-    if modelos:
-        opciones = modelos + ["✏️ Otro (escribir nombre)"]
-        idx = opciones.index(default_model) if default_model in opciones else 0
-        elegido = st.sidebar.selectbox("Modelo", opciones, index=idx, key=f"llm_model_{provider}")
-        model = st.sidebar.text_input("Nombre del modelo", key=f"llm_model_txt_{provider}") \
-            if elegido.startswith("✏️") else elegido
-    else:
-        model = st.sidebar.text_input("Modelo", value=default_model or "gpt-4o-mini", key=f"llm_model_txt_{provider}")
-
-    with st.sidebar.expander("Parámetros avanzados"):
+    estado = st.sidebar.empty()
+    with st.sidebar.expander("Configuración", expanded=False):
+        opciones = {
+            "num_precedentes": st.slider("Precedentes a analizar", 1, 5, config.RAG_NUM_RESULTS_DESIRED),
+            "qc_relevancia": st.toggle("QC_1: verificar que el documento sirva como precedente", value=True),
+            "qc_post_reporte": st.toggle("QC_2: verificar la ficha", value=True),
+        }
+        claves = list(PROVIDERS)
+        provider = st.selectbox("Proveedor del modelo", claves,
+                                index=claves.index(defaults.provider) if defaults.provider in claves else 0,
+                                format_func=lambda k: PROVIDERS[k][0], key="llm_provider")
+        default_url = defaults.base_url if provider == defaults.provider else PROVIDER_DEFAULT_URLS[provider]
+        base_url = st.text_input("URL del servidor", value=default_url, key=f"llm_url_{provider}")
+        api_key = ""
+        if provider != "ollama":
+            api_key = st.text_input("API key", value=defaults.api_key, type="password", key="llm_key")
+        modelos = _listar_modelos(provider, base_url, api_key)
+        default_model = defaults.model if provider == defaults.provider else ""
+        if modelos:
+            idx = modelos.index(default_model) if default_model in modelos else 0
+            model = st.selectbox("Modelo", modelos, index=idx, key=f"llm_model_{provider}")
+        else:
+            model = st.text_input("Modelo", value=default_model or "gpt-4o-mini", key=f"llm_model_txt_{provider}")
         temperature = st.slider("Temperatura", 0.0, 1.0, float(defaults.temperature), 0.05)
         num_ctx = st.select_slider("Ventana de contexto (tokens)", [4096, 8192, 12288, 16384, 32768],
-                                   value=defaults.num_ctx,
-                                   help="Más contexto = el LLM lee más texto de cada sentencia, pero usa más VRAM.")
+                                   value=defaults.num_ctx)
         max_tokens = st.slider("Máx. tokens de respuesta", 256, 4096, int(defaults.max_tokens), 128)
-
     settings = config.LLMSettings(provider=provider, model=model, base_url=base_url, api_key=api_key,
                                   temperature=temperature, num_ctx=num_ctx, max_tokens=max_tokens)
     ok, msg = get_client(settings).health() if model else (False, "Indica un modelo")
-    (st.sidebar.success if ok else st.sidebar.warning)(msg)
-    return settings
+    estado.markdown(f"✓ Modelo listo: `{model}`" if ok else f"✗ {msg}")
+    return settings, opciones
