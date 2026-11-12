@@ -7,7 +7,7 @@ import logging
 import streamlit as st
 
 from copiloto_juridico import config
-from copiloto_juridico.clasificador import ClasificadorHibrido
+from copiloto_juridico.clasificador import ClasificadorHibrido, construir_clasificador
 from copiloto_juridico.llm import PROVIDER_DEFAULT_URLS, PROVIDERS, get_client
 from copiloto_juridico.vectorstore import SentenciasStore
 
@@ -52,7 +52,7 @@ def get_store() -> SentenciasStore:
 @st.cache_resource(show_spinner="Cargando el clasificador híbrido...")
 def get_clasificador() -> ClasificadorHibrido:
     store = get_store()
-    return ClasificadorHibrido(store.corpus["tipo"].unique().tolist())
+    return construir_clasificador(store.corpus["tipo"].unique().tolist())
 
 
 @st.cache_data(ttl=30, show_spinner=False)

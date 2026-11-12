@@ -82,6 +82,7 @@ class SentenciasStore:
         self.doc_ids = self.corpus["id"].to_numpy()
         self.doc_pos = {d: i for i, d in enumerate(self.doc_ids)}
         self.doc_tipos = self.corpus["tipo"].to_numpy()
+        self.doc_materias = self.corpus["materia"].to_numpy()
         self.bm25 = BM25(self.corpus["texto"].tolist())
         log(f"✅ Base lista: {len(self.corpus)} sentencias · {self.collection.count()} fragmentos.")
 
@@ -116,7 +117,19 @@ class SentenciasStore:
     def tipos(self) -> pd.DataFrame:
         return self.corpus.groupby(["materia", "tipo", "delito_o_accion"]).size().rename("sentencias").reset_index()
 
-    def _densa(self, q: np.ndarray, tipos: list[str] | None) -> dict[str, float]:
+    def materias_filtro(self, materias: list[str] | None = None) -> list[str] | None:
+        """Materias a las que se restringe la búsqueda (config.MATERIAS_ACTIVAS), o None si son todas las del
+        corpus (así el comportamiento por defecto es idéntico al de v10)."""
+        materias = list(config.MATERIAS_ACTIVAS if materias is None else materias)
+        existentes = set(np.unique(self.doc_materias))
+        desconocidas = set(materias) - existentes
+        if desconocidas:
+            # Una materia mal escrita dejaría la búsqueda vacía sin avisar: se falla de forma explícita.
+            raise ValueError(f"Materias desconocidas en COPILOTO_MATERIAS: {sorted(desconocidas)}. "
+                             f"Válidas: {sorted(existentes)}")
+        return None if existentes <= set(materias) else materias
+
+    def _densa(self, q: np.ndarray, tipos: list[str] | None, materias: list[str] | None = None) -> dict[str, float]:
         """Ranking denso: los 300 fragmentos más cercanos (HNSW de ChromaDB) agrupados por sentencia; el puntaje
         de una sentencia es el coseno de su fragmento más parecido. Con `tipos`, ChromaDB filtra por metadatos
         *antes* de buscar vecinos (no es lo mismo que filtrar después)."""
@@ -124,6 +137,8 @@ class SentenciasStore:
                   "include": ["metadatas", "distances"]}
         if tipos:
             kwargs["where"] = {"tipo": {"$in": list(tipos)}}
+        elif materias:
+            kwargs["where"] = {"materia": {"$in": list(materias)}}
         res = self.collection.query(**kwargs)
         mejores: dict[str, float] = {}
         for meta, dist in zip(res["metadatas"][0], res["distances"][0]):
@@ -153,11 +168,14 @@ class SentenciasStore:
         inicio = max(0, min(inicio - (largo - len(chunks[mejor])) // 2, len(texto) - largo))
         return texto[inicio:inicio + largo]
 
-    def ranking_lexico(self, consulta_lexica: str, tipos: list[str] | None = None) -> list[str]:
+    def ranking_lexico(self, consulta_lexica: str, tipos: list[str] | None = None,
+                       materias: list[str] | None = None) -> list[str]:
         """Ranking BM25: ids de las 60 sentencias con mayor puntaje (> 0), de mayor a menor."""
         bm = self.bm25.scores(consulta_lexica)
         if tipos:
             bm = np.where(np.isin(self.doc_tipos, list(tipos)), bm, 0.0)
+        elif materias:
+            bm = np.where(np.isin(self.doc_materias, list(materias)), bm, 0.0)
         return [self.doc_ids[i] for i in np.argsort(-bm)[:config.RAG_NUM_DOCS_TO_FETCH * 2] if bm[i] > 0]
 
     @staticmethod
@@ -174,19 +192,22 @@ class SentenciasStore:
 
     def buscar(self, consulta: str, num_docs: int = config.RAG_NUM_DOCS_TO_FETCH, tipos: list[str] | None = None,
                query_embedding: np.ndarray | None = None, consulta_lexica: str | None = None,
-               rrf_k: int | None = None, modo: str = "hibrida", excluir: set[str] | None = None) -> list[Candidato]:
+               rrf_k: int | None = None, modo: str = "hibrida", excluir: set[str] | None = None,
+               materias: list[str] | None = None) -> list[Candidato]:
         """Búsqueda híbrida: embeddings (fragmentos agrupados por sentencia) + BM25, fusionados con RRF.
 
         `modo` permite las líneas base de la evaluación: "densa" (solo embeddings) o "lexica" (solo BM25); en
         ambos casos `relevancia` es 1/(k + rango) de esa única lista. `excluir` quita documentos del resultado
-        (evaluación *leave-one-out*: que la sentencia fuente no vote por su propio tipo)."""
+        (evaluación *leave-one-out*: que la sentencia fuente no vote por su propio tipo). Sin `tipos`, la búsqueda
+        se restringe a `config.MATERIAS_ACTIVAS` (o a `materias`)."""
         if modo not in ("hibrida", "densa", "lexica"):
             raise ValueError(f"modo desconocido: {modo}")
         k = rrf_k or self.RRF_K
         q = embed_query(consulta) if query_embedding is None else query_embedding
-        densos = self._densa(q, tipos) if modo != "lexica" else {}
+        mats = None if tipos else self.materias_filtro(materias)
+        densos = self._densa(q, tipos, mats) if modo != "lexica" else {}
         rank_denso = [d for d, _ in sorted(densos.items(), key=lambda kv: kv[1], reverse=True)]
-        rank_lex = self.ranking_lexico(consulta_lexica or consulta, tipos) if modo != "densa" else []
+        rank_lex = self.ranking_lexico(consulta_lexica or consulta, tipos, mats) if modo != "densa" else []
         if excluir:
             rank_denso = [d for d in rank_denso if d not in excluir]
             rank_lex = [d for d in rank_lex if d not in excluir]

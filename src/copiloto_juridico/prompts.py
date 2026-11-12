@@ -373,9 +373,93 @@ PROMPTS_POR_MATERIA = {
 PROMPTS_DEFAULT = (PROMPT_EXTRACCION_DEFAULT, PROMPT_REPORTE_DEFAULT)
 
 
+# --- v11: ficha penal orientada a la defensa en apelación (config.PROMPT_PENAL_VERSION = "v11") ---
+PROMPT_EXTRACCION_PENAL_V11 = """
+Eres un Analista Legal Penal que apoya a la DEFENSA en segunda instancia. Extrae de la SENTENCIA PENAL (resolución de
+un recurso de apelación de una Sala Penal) la información que un defensor necesita para usarla como precedente.
+
+""" + _NOTA_ANONIMIZACION + """
+
+**Formato de Extracción (Detallado):**
+- **Tribunal:** [Nombre completo de la Sala que resolvió, incluyendo la fecha exacta de la resolución]
+- **Identificador Judicial:** [Toca/Expediente/Causa, tal como aparece]
+- **Etapa Procesal:** [Etapa del proceso en la que se dictó la resolución apelada (ej: etapa de investigación complementaria, etapa intermedia, juicio oral)]
+- **Acto Impugnado:** [Qué resolución se apeló: auto de vinculación a proceso, auto de no vinculación, medida cautelar (ej. prisión preventiva), sentencia definitiva de juicio oral, sobreseimiento, u otro]
+- **Apelante:** [Quién interpuso el recurso: defensa, Ministerio Público, asesor jurídico de la víctima]
+- **Delito(s) Principal(es):** [Lista completa y precisa de los delitos imputados/acreditados (ej: Robo Calificado Art. 233)]
+- **Acusado(s):** [Nombre(s) o identificador(es) del acusado/sentenciado.]
+- **Víctima(s)/Ofendido(s):** [Nombre(s) o identificador(es) de la víctima/ofendido.]
+- **Hechos Clave:** [Narrativa breve y fáctica de la acción delictiva, las circunstancias de modo, tiempo y lugar.]
+- **Agravios Planteados:** [Lista numerada y breve de los argumentos del apelante contra la resolución]
+- **Calificación de los Agravios:** [Para cada agravio, cómo lo calificó la Sala: FUNDADO, INFUNDADO o INOPERANTE, con una frase de por qué]
+- **Sentido del Fallo:** [EXACTAMENTE una de estas palabras: CONFIRMA, MODIFICA, REVOCA, REPONE u OTRO]
+- **Decisión Específica:** [Detalle del fallo: qué se confirma, modifica o revoca; pena final impuesta (años/multa) si la hay.]
+- **Fundamento Legal:** [Enumera los artículos, códigos y jurisprudencias exactas citados como base de la decisión.]
+- **Pruebas Decisivas:** [Enumera las pruebas cruciales que sustentaron el fallo (ej: Testimonial del ofendido, Peritaje balístico).]
+
+Contexto (Sentencia):
+{contexto}
+
+Hechos Extraídos:
+"""
+
+PROMPT_REPORTE_PENAL_V11 = """
+Con base en los siguientes HECHOS EXTRAÍDOS de una sentencia penal de segunda instancia, genera un informe legal
+profesional, **detallado y analítico**, útil para un defensor que prepara o contesta una apelación.
+""" + _INSTRUCCION_FORMATO + """
+
+**Hechos Extraídos:**
+{hechos}
+
+**Formato del Informe:**
+#### 1. Resumen Ejecutivo
+[Resumen breve (2-3 frases): delito, acto impugnado, quién apeló y qué resolvió la Sala.]
+
+#### 2. Datos de Identificación del Proceso
+- **Tribunal:** [dato 'Tribunal']
+- **Expediente:** [dato 'Identificador Judicial']
+- **Etapa Procesal:** [dato 'Etapa Procesal']
+- **Acto Impugnado:** [dato 'Acto Impugnado']
+- **Apelante:** [dato 'Apelante']
+- **Delito(s):** [dato 'Delito(s) Principal(es)']
+- **Sentido del Fallo:** [dato 'Sentido del Fallo']
+
+#### 3. Partes Involucradas
+- **Acusado(s):** [dato 'Acusado(s)']
+- **Víctima(s)/Ofendido(s):** [dato 'Víctima(s)/Ofendido(s)']
+
+#### 4. Agravios y su Calificación
+[Para cada agravio de 'Agravios Planteados', una viñeta con el agravio y su calificación según 'Calificación de los Agravios'.]
+
+#### 5. Análisis de Hechos y Decisión
+**Hechos Clave:** [narrativa de 'Hechos Clave']
+
+**Decisión del Tribunal:** [dato 'Decisión Específica']
+
+**Razonamiento del Tribunal:** [Con base en 'Fundamento Legal' y 'Pruebas Decisivas', **explica** por qué la Sala resolvió así y qué argumentos de la defensa prosperaron o no.]
+"""
+
+PROMPTS_PENAL_VERSIONES = {
+    "v10": (PROMPT_EXTRACCION_PENAL, PROMPT_REPORTE_PENAL),
+    "v11": (PROMPT_EXTRACCION_PENAL_V11, PROMPT_REPORTE_PENAL_V11),
+}
+
+
 def prompts_penal(version: str | None = None) -> tuple[str, str]:
     """(extracción, informe) penales de la versión indicada (por defecto `config.PROMPT_PENAL_VERSION`)."""
-    return PROMPTS_POR_MATERIA["penal"]
+    from . import config
+
+    version = version or config.PROMPT_PENAL_VERSION
+    if version not in PROMPTS_PENAL_VERSIONES:
+        raise ValueError(f"Versión de prompt penal desconocida: {version}")
+    return PROMPTS_PENAL_VERSIONES[version]
+
+
+def prompts_para(materia: str) -> tuple[str, str]:
+    """Prompts (extracción, informe) de una materia; los penales según la versión configurada."""
+    if materia == "penal":
+        return prompts_penal()
+    return PROMPTS_POR_MATERIA.get(materia, PROMPTS_DEFAULT)
 
 
 # --- Solo para la evaluación: borrador de consulta a partir de una sentencia (lo revisa una persona) ---

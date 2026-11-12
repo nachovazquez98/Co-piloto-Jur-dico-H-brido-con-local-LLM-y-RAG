@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, replace
 from functools import lru_cache
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -66,10 +67,56 @@ def key_entity_match(category_tokens: set, entity_tokens: set, high_importance_t
     return len(relevantes & category_tokens) / len(relevantes) if relevantes else 0.0
 
 
+PREFIJO_FAMILIA = "familia/"
+
+
 def etiqueta_tipo(tipo: str) -> str:
-    """`penal/robo-calificado_otros` -> `PENAL · robo calificado / otros`"""
+    """`penal/robo-calificado_otros` -> `PENAL · robo calificado / otros`;
+    `penal/familia/delitos-sexuales` -> `PENAL · familia: delitos sexuales`."""
     materia, accion = tipo.split("/", 1)
+    if accion.startswith(PREFIJO_FAMILIA):
+        return f"{materia.upper()} · familia: " + accion[len(PREFIJO_FAMILIA):].replace("-", " ")
     return f"{materia.upper()} · " + accion.replace("_", " / ").replace("-", " ")
+
+
+def vocabulario_kem(path: Path | None = None) -> frozenset[str]:
+    """Lemas del vocabulario de términos jurídicos clave (archivo de datos, una expresión por línea)."""
+    path = Path(path or config.VOCABULARIO_KEM_PATH)
+    return _vocabulario_kem(str(path), path.stat().st_mtime if path.exists() else 0.0)
+
+
+@lru_cache(maxsize=4)
+def _vocabulario_kem(path_str: str, _mtime: float) -> frozenset[str]:
+    path = Path(path_str)
+    if not path.exists():
+        logger.warning("No existe el vocabulario de KEM %s; KEM quedará en 0.", path)
+        return frozenset()
+    # Se guarda el lema Y la forma original: el lema de una palabra aislada depende del contexto que spaCy
+    # no tiene ("robo" solo se lematiza como el verbo "robar"; en "robo de celular", como el sustantivo "robo").
+    lemas: set[str] = set()
+    for linea in path.read_text(encoding="utf-8").splitlines():
+        linea = linea.strip().lower()
+        if linea and not linea.startswith("#"):
+            lemas |= lemmatized_tokens(linea)
+            lemas |= {t.text for t in get_nlp()(linea.replace("-", " "))
+                      if t.is_alpha and not t.is_stop}
+    return frozenset(lemas)
+
+
+def terminos_importantes(entity_tokens: set[str], modo: str | None = None) -> set[str]:
+    """Términos de la consulta que KEM considera importantes.
+
+    - "conceptos" (v10): todos los conceptos clave. Entonces KEM = |A∩B| / |A| y Jaccard = |A∩B| / |A∪B| usan
+      los mismos conjuntos y están casi perfectamente correlacionados (redundancia que mide la ablación).
+    - "vocabulario": solo los conceptos que son términos jurídicos distintivos (`data/vocabulario/...`), de modo
+      que una coincidencia en "menores" o "persona" no cuente como coincidencia clave.
+    """
+    modo = modo or config.KEM_MODO
+    if modo == "vocabulario":
+        return entity_tokens & vocabulario_kem()
+    if modo != "conceptos":
+        raise ValueError(f"KEM_MODO desconocido: {modo}")
+    return entity_tokens
 
 
 @dataclass(frozen=True)
@@ -92,7 +139,7 @@ class PesosClasificador:
     @classmethod
     def desde_config(cls) -> "PesosClasificador":
         return cls(config.COSINE_WEIGHT, config.JACCARD_WEIGHT, config.KEM_WEIGHT, config.CONCISION_WEIGHT,
-                   config.VOTE_WEIGHT, True, True)
+                   config.VOTE_WEIGHT, True, config.USAR_LISTA_TOKENS_PENALIZADOS)
 
     def sin(self, componente: str) -> "PesosClasificador":
         """Copia con un componente apagado (peso 0 o penalización desactivada), para la ablación."""
@@ -125,16 +172,36 @@ class ResultadoClasificacion:
 
 
 class ClasificadorHibrido:
-    def __init__(self, tipos: list[str]):
-        self.tipos = sorted(tipos)
-        textos = [t.replace("/", " ").replace("_", " ").replace("-", " ") for t in self.tipos]
+    """Clasificador híbrido sobre un conjunto de categorías.
+
+    A nivel "tipo" cada categoría es un tipo del corpus (`penal/robo-calificado`). A nivel "familia" los tipos
+    penales se agrupan en familias de delito (`penal/familia/robo`, ver `evaluacion/familias.py`) y la búsqueda
+    con filtro usa todos los tipos de las familias elegidas; los tipos de otras materias quedan como están.
+    """
+
+    def __init__(self, tipos: list[str], nivel: str = "tipo", familias: dict[str, str] | None = None):
+        if nivel not in ("tipo", "familia"):
+            raise ValueError(f"nivel desconocido: {nivel}")
+        self.nivel = nivel
+        self.categoria_de: dict[str, str] = {}
+        for t in tipos:
+            if nivel == "familia" and t.startswith("penal/") and familias is not None:
+                self.categoria_de[t] = f"penal/{PREFIJO_FAMILIA}{familias.get(t, t.split('/', 1)[1])}"
+            else:
+                self.categoria_de[t] = t
+        self.miembros: dict[str, list[str]] = {}
+        for t, cat in sorted(self.categoria_de.items()):
+            self.miembros.setdefault(cat, []).append(t)
+        self.tipos = sorted(self.miembros)
+        textos = [t.replace(PREFIJO_FAMILIA, "").replace("/", " ").replace("_", " ").replace("-", " ")
+                  for t in self.tipos]
         self.embeddings = embed_texts(textos, kind="query")
         self.tokens = [lemmatized_tokens(t) for t in textos]
         self.indice = {t: i for i, t in enumerate(self.tipos)}
 
     def tipos_de(self, categoria: str) -> list[str]:
         """Tipos del corpus que cubre una categoría (a nivel tipo, la propia categoría)."""
-        return [categoria]
+        return self.miembros.get(categoria, [categoria])
 
     def componentes(self, consulta: str, entidades: str, query_embedding: np.ndarray,
                     recuperados: list | None = None) -> tuple[pd.DataFrame, list[str]]:
@@ -149,12 +216,13 @@ class ClasificadorHibrido:
         - penal_tokens: 0.70 si la categoría contiene una palabra de `config.IRRELEVANT_TOKENS`, si no 1.
         """
         entity_tokens = lemmatized_tokens(entidades) if entidades else lemmatized_tokens(consulta)
-        high_importance = entity_tokens
+        high_importance = terminos_importantes(entity_tokens)
 
         cos = self.embeddings @ query_embedding
         votos: dict[str, float] = {}
         for c in recuperados or []:
-            votos[c.tipo] = votos.get(c.tipo, 0.0) + c.relevancia
+            cat = self.categoria_de.get(c.tipo, c.tipo)
+            votos[cat] = votos.get(cat, 0.0) + c.relevancia
         max_voto = max(votos.values(), default=0.0) or 1.0
 
         candidatos = list(np.argsort(cos)[-config.TOP_N_CANDIDATES_INITIAL:][::-1])
@@ -178,7 +246,7 @@ class ClasificadorHibrido:
                 "penal_tokens": config.IRRELEVANT_TOKENS_PENALTY_FACTOR
                 if config.IRRELEVANT_TOKENS & cat_tokens else 1.0,
             })
-        return pd.DataFrame(filas), sorted(entity_tokens)
+        return pd.DataFrame(filas), sorted(high_importance)
 
     @staticmethod
     def tabla_desde_componentes(comp: pd.DataFrame, pesos: PesosClasificador,
@@ -203,7 +271,23 @@ class ClasificadorHibrido:
         return ResultadoClasificacion(tipo=tabla.iloc[0]["tipo"], tabla=tabla, tokens_kem=tokens)
 
 
-def construir_clasificador(tipos: list[str]) -> ClasificadorHibrido:
-    """Clasificador sobre los tipos del corpus, según el alcance configurado (`config.MATERIAS_ACTIVAS`)."""
-    activos = [t for t in tipos if t.split("/", 1)[0] in config.MATERIAS_ACTIVAS]
-    return ClasificadorHibrido(activos or tipos)
+def construir_clasificador(tipos: list[str], nivel: str | None = None) -> ClasificadorHibrido:
+    """Clasificador sobre los tipos del corpus según el alcance configurado: solo las materias de
+    `config.MATERIAS_ACTIVAS` y al nivel de `config.NIVEL_CLASIFICACION`."""
+    activos = [t for t in tipos if t.split("/", 1)[0] in config.MATERIAS_ACTIVAS] or tipos
+    nivel = nivel or config.NIVEL_CLASIFICACION
+    familias = None
+    if nivel == "familia":
+        from .evaluacion.familias import cargar_familias
+
+        familias = cargar_familias(activos)
+    return ClasificadorHibrido(activos, nivel=nivel, familias=familias)
+
+
+def senales_coincidencia(tabla: pd.DataFrame, n_filtro: int = config.NUM_CATEGORIAS_FILTRO) -> dict[str, float]:
+    """Señales de qué tan bien coincide la mejor categoría con la consulta, para el aviso "no hay precedentes
+    del mismo tipo": score híbrido de la primera, coseno de la primera y KEM máximo entre las del filtro."""
+    if tabla.empty:
+        return {"score_hibrido": 0.0, "coseno": 0.0, "kem_max": 0.0}
+    return {"score_hibrido": float(tabla.iloc[0]["score_híbrido"]), "coseno": float(tabla.iloc[0]["coseno"]),
+            "kem_max": float(tabla["kem"].head(n_filtro).max())}

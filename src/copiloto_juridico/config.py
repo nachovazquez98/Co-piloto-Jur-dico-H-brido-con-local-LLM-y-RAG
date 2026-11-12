@@ -94,13 +94,44 @@ CONCISION_WEIGHT = 0.05
 VOTE_WEIGHT = 0.35
 NUM_CATEGORIAS_FILTRO = 3         # El filtro estricto usa las 3 mejores categorías
 
-# Alcance (v11). Por defecto se conserva el comportamiento de v10: todas las materias, clasificación por tipo.
-MATERIAS_ACTIVAS = [m.strip() for m in _env("COPILOTO_MATERIAS", ",".join(MATERIAS)).split(",") if m.strip()]
-NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "tipo")  # "tipo" | "familia" (solo penal se agrupa)
 IRRELEVANT_TOKENS_PENALTY_FACTOR = 0.70
 KEM_THRESHOLD_FOR_PENALTY = 0.6
 MAX_TOKENS_FOR_PENALTY = 5
 IRRELEVANT_TOKENS = {"desmantelamiento", "falsedad", "informe", "violacion", "medica", "medico"}
+
+
+def _env_opcional_float(name: str) -> float | None:
+    value = os.getenv(name)
+    return float(value) if value not in (None, "") else None
+
+
+def _env_lista(name: str, default: list[str]) -> list[str]:
+    value = os.getenv(name)
+    return [v.strip() for v in value.split(",") if v.strip()] if value else list(default)
+
+
+# --- Cambios de v11: cada uno configurable; el valor por defecto reproduce v10 salvo donde se indica ---
+# Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS. Ojo: incluye "violacion" y "falsedad", que
+# son delitos reales (penal/violacion tiene 30 sentencias). Se conserva hasta que la ablación decida.
+USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", True)
+# KEM: "conceptos" (v10: términos importantes = todos los conceptos de la consulta, redundante con Jaccard) o
+# "vocabulario" (solo los conceptos que están en un vocabulario de términos jurídicos clave).
+KEM_MODO = _env("COPILOTO_KEM_MODO", "conceptos")
+VOCABULARIO_KEM_PATH = Path(_env("COPILOTO_VOCABULARIO_KEM", str(DATA_DIR / "vocabulario" / "terminos_juridicos.txt")))
+# Alcance: materias en las que se clasifica y busca (p. ej. COPILOTO_MATERIAS=penal) y nivel de clasificación.
+MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", MATERIAS)
+NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "tipo")  # "tipo" | "familia" (solo penal se agrupa)
+# Texto que lee QC_1: "inicio" (v10: primeros 2,500 caracteres) o "fragmento_similar" (ventana alrededor del
+# fragmento más parecido a la consulta).
+QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "inicio")
+QC1_MAX_CHARS = 2500
+# Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
+PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v10")
+# Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
+# un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
+# queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".
+UMBRAL_SIN_PRECEDENTES = _env_opcional_float("COPILOTO_UMBRAL_SIN_PRECEDENTES")
+SENAL_SIN_PRECEDENTES = _env("COPILOTO_SENAL_SIN_PRECEDENTES", "kem_max")  # score_hibrido | coseno | kem_max
 
 FAILURE_KEYWORDS = [
     "lo siento", "no puedo", "plantilla general", "sin hechos", "hechos extraídos que no",
@@ -122,9 +153,12 @@ class LLMSettings:
     # Ventana de contexto de Ollama. Sin fijarla, Ollama recorta silenciosamente a 2-4k tokens.
     num_ctx: int = _env("COPILOTO_LLM_NUM_CTX", 8192)
     timeout: int = _env("COPILOTO_LLM_TIMEOUT", 600)
+    # Semilla del muestreo. Con temperatura 0 reduce (no elimina del todo, en GPU) la variación entre corridas.
+    seed: int = _env("COPILOTO_LLM_SEED", 42)
 
     @property
     def max_context_chars(self) -> int:
-        """Caracteres de sentencia que caben en el prompt (~3.5 caracteres por token en español)."""
+        """Caracteres de sentencia que caben en el prompt: (num_ctx − reservados) × 3.2, con 3.2 caracteres por
+        token como estimación conservadora para español (en la práctica, 3.2–4)."""
         reservados = self.max_tokens + 900  # salida + plantilla del prompt
         return max(4000, int((self.num_ctx - reservados) * 3.2))

@@ -53,7 +53,8 @@ class OllamaClient(LLMClient):
             "model": s.model,
             "messages": [{"role": "user", "content": prompt}],
             "stream": True,
-            "options": {"temperature": s.temperature, "num_predict": s.max_tokens, "num_ctx": s.num_ctx},
+            "options": {"temperature": s.temperature, "num_predict": s.max_tokens, "num_ctx": s.num_ctx,
+                        "seed": s.seed},
         }
         try:
             with requests.post(self._url("/api/chat"), json=payload, stream=True, timeout=s.timeout) as r:
@@ -109,6 +110,7 @@ class OpenAICompatibleClient(LLMClient):
             "messages": [{"role": "user", "content": prompt}],
             "temperature": s.temperature,
             "max_tokens": s.max_tokens,
+            "seed": s.seed,
             "stream": True,
         }
         try:

@@ -448,8 +448,8 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
 
     # --- Clasificación ---
     filas_cls, por_consulta, errores = [], {}, []
-    variantes_cls = ["Híbrido v10 (con fuente)", "Híbrido v10 (sin fuente)", "k-NN 10 (con fuente)",
-                     "k-NN 10 (sin fuente)"]
+    hib = "Híbrido v10" if config.NIVEL_CLASIFICACION == "tipo" else "Híbrido por familia"
+    variantes_cls = [f"{hib} (con fuente)", f"{hib} (sin fuente)", "k-NN 10 (con fuente)", "k-NN 10 (sin fuente)"]
     res_cls = {v: [] for v in variantes_cls}
     rankings_v10: dict[str, tuple[list, list[str]]] = {}
     log(f"Clasificación: {len(conocidas)} consultas con documento conocido...")
@@ -480,7 +480,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         for col, key in [("Hit@3 tipo", "hit3_tipo"), ("Hit@3 familia", "hit3_familia"),
                          ("Top-1 tipo", "top1_tipo"), ("Top-1 familia", "top1_familia")]:
             fila.update(_fila_proporcion(col, [r[key] for r in rs]))
-        fila["F1 macro tipo"] = m.f1_macro([r["tipo"] for r in rs], [r["pred_tipo"] for r in rs]) if rs else float("nan")
+        por_tipo = rs and not any(r["pred_tipo"].startswith("penal/familia/") for r in rs)
+        fila["F1 macro tipo"] = m.f1_macro([r["tipo"] for r in rs], [r["pred_tipo"] for r in rs]) \
+            if por_tipo else float("nan")  # a nivel familia la predicción no es un tipo
         fila["F1 macro familia"] = m.f1_macro([r["familia"] for r in rs], [r["pred_familia"] for r in rs]) if rs else float("nan")
         filas_cls.append(fila)
     corrida.tabla(
@@ -490,13 +492,13 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         "estimación honesta para casos nuevos. IC95 de Wilson. F1 macro sobre la predicción top-1.",
         pd.DataFrame(filas_cls))
     if errores:
-        corrida.tabla("Errores de clasificación (Híbrido v10, sin fuente)",
+        corrida.tabla(f"Errores de clasificación ({hib}, sin fuente)",
                       "Consultas cuyo tipo correcto quedó fuera del filtro top-3.", pd.DataFrame(errores))
     rs = res_cls[variantes_cls[1]]
     if rs:
         cm = m.matriz_confusion([r["familia"] for r in rs], [r["pred_familia"] for r in rs])
         cm = cm.loc[(cm.sum(axis=1) > 0) | (cm.sum(axis=0) > 0)]
-        corrida.tabla("Matriz de confusión por familia (Híbrido v10, sin fuente, top-1)",
+        corrida.tabla(f"Matriz de confusión por familia ({hib}, sin fuente, top-1)",
                       "Filas = familia correcta, columnas = familia predicha. La diagonal son aciertos.",
                       cm.reset_index())
 
@@ -603,12 +605,10 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
 
 
 def senales_sin_respuesta(tabla: pd.DataFrame, n_filtro: int = config.NUM_CATEGORIAS_FILTRO) -> dict[str, float]:
-    """Señales de "no hay categoría que coincida bien", calculadas sobre la tabla de clasificación:
-    score híbrido de la primera categoría, coseno de la primera y KEM máximo entre las del filtro."""
-    if tabla.empty:
-        return {"score_hibrido": 0.0, "coseno": 0.0, "kem_max": 0.0}
-    return {"score_hibrido": float(tabla.iloc[0]["score_híbrido"]), "coseno": float(tabla.iloc[0]["coseno"]),
-            "kem_max": float(tabla["kem"].head(n_filtro).max())}
+    """Mismas señales que usa la app para el aviso de cobertura (`clasificador.senales_coincidencia`)."""
+    from ..clasificador import senales_coincidencia
+
+    return senales_coincidencia(tabla, n_filtro)
 
 
 def _tabla_sin_respuesta(env: Entorno, sin_resp: list[Preparada], conocidas: list[Preparada]):
