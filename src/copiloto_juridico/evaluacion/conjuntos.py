@@ -46,6 +46,7 @@ class Consulta:
     particion: str
     sin_respuesta: bool = False
     borrador: bool = False
+    revisado: bool = False     # una persona revisó la consulta (obligatorio para usar la partición de prueba)
     notas: str = ""
     extra: dict = field(default_factory=dict)
 
@@ -58,11 +59,12 @@ _CAMPOS = ("id", "consulta", "doc_id_fuente", "tipo", "familia", "particion", "s
 
 
 def _consulta_desde_dict(d: dict) -> Consulta:
-    conocidos = set(_CAMPOS) | {"borrador", "notas"}
+    conocidos = set(_CAMPOS) | {"borrador", "revisado", "notas"}
     return Consulta(
         id=str(d["id"]), consulta=d.get("consulta") or "", doc_id_fuente=d.get("doc_id_fuente") or None,
         tipo=d.get("tipo") or None, familia=d.get("familia") or None, particion=d.get("particion", ""),
         sin_respuesta=bool(d.get("sin_respuesta", False)), borrador=bool(d.get("borrador", False)),
+        revisado=bool(d.get("revisado", False)),
         notas=d.get("notas") or "", extra={k: v for k, v in d.items() if k not in conocidos})
 
 
@@ -141,17 +143,25 @@ def guardar_consultas(consultas: list[Consulta], path: Path) -> Path:
 
 
 def cargar_juicios(path: Path = config.JUICIOS_PATH, ids_consultas: set[str] | None = None) -> pd.DataFrame:
-    """Lee `juicios.csv` (consulta_id, doc_id, relevancia ∈ {0,1,2}, anotador) y valida su contenido.
+    """Lee la hoja de juicios (consulta_id, doc_id, relevancia ∈ {0,1,2}, anotador; puede traer más columnas de
+    apoyo, como el resumen) y valida su contenido. Las filas sin relevancia (aún no juzgadas) se ignoran; si falta
+    el anotador se asume "anotador1".
 
     Si un mismo par lo juzgaron varios anotadores, se conservan todas las filas (sirven para calcular kappa);
     `relevancia_por_par` decide qué juicio usar en las métricas.
     """
+    vacio = pd.DataFrame(columns=["consulta_id", "doc_id", "relevancia", "anotador"])
     if not path.exists():
-        return pd.DataFrame(columns=["consulta_id", "doc_id", "relevancia", "anotador"])
+        return vacio
     df = pd.read_csv(path, dtype={"consulta_id": str, "doc_id": str, "anotador": str})
-    faltan = {"consulta_id", "doc_id", "relevancia", "anotador"} - set(df.columns)
+    faltan = {"consulta_id", "doc_id", "relevancia"} - set(df.columns)
     if faltan:
         raise ErrorValidacion(f"{path.name}: faltan columnas {sorted(faltan)}")
+    df = df[df["relevancia"].notna() & (df["relevancia"].astype(str).str.strip() != "")].copy()
+    if df.empty:
+        return vacio
+    df["anotador"] = df.get("anotador", pd.Series(index=df.index, dtype=str)).fillna("anotador1")
+    df["relevancia"] = pd.to_numeric(df["relevancia"], errors="coerce")
     problemas = []
     malas = df[~df["relevancia"].isin([0, 1, 2])]
     for _, r in malas.iterrows():
@@ -199,24 +209,32 @@ def acuerdo_entre_anotadores(juicios: pd.DataFrame) -> dict | None:
 
 
 def cargar_fichas_anotadas(path: Path = config.FICHAS_ANOTADAS_PATH) -> list[dict]:
-    """Conjunto C: anotación manual de sentencias (sentido del fallo, etapa, delito, artículos, agravios)."""
+    """Conjunto C desde la hoja que llena el abogado: una fila por sentencia con sentido_fallo, etapa,
+    acto_impugnado, delito, articulos ("233; 236"), agravios y, opcional, consulta_id + ficha_aceptable (si/no).
+    Las filas sin sentido del fallo (aún no anotadas) se ignoran."""
     if not path.exists():
         return []
-    fichas, problemas = [], []
-    for n, linea in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-        if not linea.strip():
+    df = pd.read_csv(path, dtype=str).fillna("")
+    if "doc_id" not in df.columns:
+        raise ErrorValidacion(f"{path.name}: falta la columna doc_id")
+    fichas = []
+    for fila in df.to_dict("records"):
+        if not fila.get("sentido_fallo", "").strip():
             continue
-        try:
-            d = json.loads(linea)
-        except json.JSONDecodeError as e:
-            problemas.append(f"línea {n}: JSON inválido ({e})")
-            continue
-        if not d.get("doc_id"):
-            problemas.append(f"línea {n}: falta doc_id")
+        d = {k: v.strip() for k, v in fila.items() if isinstance(v, str) and v.strip()}
+        d["articulos"] = [a.strip() for a in re.split(r"[;,]", fila.get("articulos", "")) if a.strip()]
+        if fila.get("ficha_aceptable", "").strip():
+            d["ficha_aceptable"] = fila["ficha_aceptable"].strip().lower() in {"si", "sí", "1", "true"}
         fichas.append(d)
-    if problemas:
-        raise ErrorValidacion(f"{path.name}: " + "; ".join(problemas))
     return fichas
+
+
+def exigir_revisadas(consultas: list["Consulta"]) -> None:
+    """La partición de prueba solo se usa con consultas revisadas por una persona (no con borradores del LLM)."""
+    sin = [c.id for c in consultas if c.particion == "prueba" and not c.revisado]
+    if sin:
+        raise ErrorValidacion(f"Rechazado: {len(sin)} consultas de prueba sin revisar (revisado: false), p. ej. "
+                              f"{', '.join(sin[:5])}. Revísalas y marca revisado: true antes de medir en prueba.")
 
 
 # --------------------------------------------------------------------------------------------------------------

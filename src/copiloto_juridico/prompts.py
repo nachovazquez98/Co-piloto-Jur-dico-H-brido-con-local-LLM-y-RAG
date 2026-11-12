@@ -572,3 +572,11 @@ Extracto de la sentencia:
 
 Consulta:
 """
+
+PROMPT_BORRADOR_SIN_RESPUESTA = """
+Eres un defensor penal en Jalisco. Escribe en 2 a 4 frases la consulta que harías a un buscador de precedentes sobre
+este tema: "{tema}". Describe un caso concreto y verosímil (hechos y qué resolución quieres apelar), sin nombres.
+Responde ÚNICAMENTE con el texto de la consulta.
+
+Consulta:
+"""

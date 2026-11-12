@@ -79,27 +79,13 @@ def cmd_familias(args) -> None:
 
 def cmd_plantilla(args) -> None:
     from ..datos.corpus import load_corpus
-    from .conjuntos import guardar_consultas, muestrear_plantilla, ngramas_compartidos
+    from .conjuntos import guardar_consultas, muestrear_plantilla
     from .familias import cargar_familias
 
     corpus = load_corpus()
     familias = cargar_familias(corpus["tipo"].unique().tolist())
     plantilla = muestrear_plantilla(corpus, familias, n_por_familia=args.n_por_familia, n_raros=args.n_raros,
                                     n_sin_respuesta=args.n_sin_respuesta, semilla=args.semilla)
-    if args.redactar_con_llm:
-        from .. import prompts
-
-        llm = _llm()
-        textos = corpus.set_index("id")["texto"]
-        for c in plantilla:
-            if not c.doc_id_fuente:
-                continue
-            borrador = llm.generate(prompts.PROMPT_BORRADOR_CONSULTA.format(
-                extracto=textos[c.doc_id_fuente][:6000])).strip().strip('"')
-            fuga = ngramas_compartidos(borrador, textos[c.doc_id_fuente])
-            c.consulta = borrador
-            c.extra["fuga_detectada"] = fuga
-            _log(f"   {c.id}: {borrador[:100]}{'  ⚠️ fuga' if fuga else ''}")
     path = Path(args.salida)
     if path.resolve() == config.CONSULTAS_PATH.resolve():
         sys.exit("❌ La plantilla no puede sobrescribir el conjunto final; usa otra ruta de salida.")
@@ -109,6 +95,46 @@ def cmd_plantilla(args) -> None:
     _log(pd.Series(dist).unstack(fill_value=0).to_string())
     _log("\nSiguiente paso: redacta/corrige cada 'consulta', pon borrador: false, guarda como "
          f"{config.CONSULTAS_PATH.name} y corre `validar`.")
+
+
+def cmd_borradores(args) -> None:
+    from ..datos.corpus import load_corpus
+    from .anotacion import redactar_borradores
+    from .conjuntos import cargar_consultas, guardar_consultas
+
+    destino = Path(args.consultas)
+    if destino.exists() and not args.forzar:
+        sys.exit(f"❌ {destino} ya existe (puede tener consultas revisadas). Usa --forzar para sobrescribirlo.")
+    plantilla = cargar_consultas(Path(args.plantilla), permitir_vacias=True)
+    textos = load_corpus().set_index("id")["texto"]
+    consultas = redactar_borradores(plantilla, textos, _llm(), n=args.n, log=_log)
+    guardar_consultas(consultas, destino)
+    fugas = sum(1 for c in consultas if c.extra.get("fuga"))
+    _log(f"\n{len(consultas)} borradores en {destino} (borrador: true, revisado: false); {fugas} aún con fuga. "
+         "Revísalos y marca revisado: true; la partición de prueba se rechaza mientras haya sin revisar.")
+
+
+def cmd_hojas(args) -> None:
+    from ..clasificador import construir_clasificador
+    from ..vectorstore import SentenciasStore
+    from .anotacion import hoja_fichas, hoja_juicios
+    from .conjuntos import cargar_consultas
+    from .experimentos import conceptos_de, leer_conceptos
+    from .familias import cargar_familias
+
+    for path in (config.JUICIOS_PATH, config.FICHAS_ANOTADAS_PATH):
+        if path.exists() and not args.forzar:
+            sys.exit(f"❌ {path} ya existe (puede tener anotaciones). Usa --forzar para sobrescribirlo.")
+    store = SentenciasStore(log=lambda _m: None)
+    tipos = store.corpus["tipo"].unique().tolist()
+    consultas = cargar_consultas(Path(args.consultas), permitir_vacias=True)
+    conceptos, _ = conceptos_de(consultas, leer_conceptos())
+    jz = hoja_juicios(store, construir_clasificador(tipos), consultas, conceptos, n_consultas=args.n_consultas)
+    jz.to_csv(config.JUICIOS_PATH, index=False)
+    fc = hoja_fichas(store.corpus, cargar_familias(tipos), n=args.n_fichas)
+    fc.to_csv(config.FICHAS_ANOTADAS_PATH, index=False)
+    _log(f"Hoja de juicios: {config.JUICIOS_PATH} ({jz['consulta_id'].nunique()} consultas, {len(jz)} pares)\n"
+         f"Hoja de fichas: {config.FICHAS_ANOTADAS_PATH} ({len(fc)} sentencias). Instrucciones en evaluacion/README.md.")
 
 
 def cmd_validar(args) -> None:
@@ -189,8 +215,14 @@ def cmd_pesos(args) -> None:
     if not args.sin_prueba:
         from .conjuntos import cargar_consultas
 
+        from .conjuntos import ErrorValidacion, exigir_revisadas
+
         prueba = [c for c in cargar_consultas(Path(args.consultas), permitir_vacias=True)
                   if c.particion == "prueba" and c.consulta.strip()]
+        try:
+            exigir_revisadas(prueba)
+        except ErrorValidacion as e:
+            sys.exit(f"❌ {e} (o usa --sin-prueba)")
         env_prueba = env_dev.__class__(env_dev.store, env_dev.clasificador, env_dev.familias, prueba,
                                        {**env_dev.conceptos}, env_dev.juicios, env_dev.corrida)
         from .experimentos import conceptos_de, leer_conceptos
@@ -292,9 +324,19 @@ def main(argv=None) -> None:
     s.add_argument("--n-sin-respuesta", type=int, default=10)
     s.add_argument("--semilla", type=int, default=config.EVAL_SEED)
     s.add_argument("--salida", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
-    s.add_argument("--redactar-con-llm", action="store_true",
-                   help="Propone un texto de consulta con el LLM (sigue siendo borrador: revísalo)")
     s.set_defaults(func=cmd_plantilla)
+
+    s = sub.add_parser("borradores", help="Borradores de consultas con el LLM (verificador de fuga incluido)")
+    s.add_argument("--n", type=int, default=None, help="Entradas de la plantilla a redactar (todas por defecto)")
+    s.add_argument("--plantilla", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
+    s.add_argument("--forzar", action="store_true")
+    s.set_defaults(func=cmd_borradores)
+
+    s = sub.add_parser("hojas-anotacion", help="Hojas CSV para el abogado (juicios y fichas)")
+    s.add_argument("--n-consultas", type=int, default=30)
+    s.add_argument("--n-fichas", type=int, default=40)
+    s.add_argument("--forzar", action="store_true")
+    s.set_defaults(func=cmd_hojas)
 
     s = sub.add_parser("validar", help="Valida consultas/juicios y detecta fuga")
     s.add_argument("--permitir-vacias", action="store_true", help="Acepta consultas aún sin redactar")

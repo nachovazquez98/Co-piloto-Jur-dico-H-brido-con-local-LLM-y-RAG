@@ -61,7 +61,7 @@ def _corpus():
     filas = []
     for t, n in (("penal/robo-calificado", 12), ("penal/robo-simple", 3), ("penal/fraude", 11), ("penal/lesiones", 2)):
         for i in range(n):
-            filas.append({"id": f"{t.split('/')[1]}-{i}.pdf", "materia": "penal", "tipo": t,
+            filas.append({"id": f"{t.split('/')[1]}-{i}.pdf", "materia": "penal", "tipo": t, "fecha": "2025-01-01",
                           "texto": f"vistos para resolver el toca {t} numero {i} " * 20})
     return pd.DataFrame(filas)
 
@@ -346,3 +346,53 @@ def test_ficha_penal_desde_json():
             FichaPenal.desde_json(malo)
     assert familia_del_delito("Delitos contra la salud en su modalidad de narcomenudeo") == "contra-la-salud"
     assert familia_del_delito("Tocamientos a un menor") == "otros"
+
+
+def test_borradores_reintentan_si_copian_y_quedan_sin_revisar():
+    from copiloto_juridico.evaluacion.anotacion import redactar_borradores
+
+    fuente = "el imputado sustrajo con violencia el teléfono celular de la víctima en la vía pública de noche"
+
+    class LLM:
+        def __init__(self):
+            self.n = 0
+
+        def generate(self, prompt):
+            self.n += 1
+            if "sin respuesta" in prompt or "Escribe en 2 a 4 frases" in prompt:
+                return "Mi cliente adolescente fue internado; quiero apelar la medida."
+            return fuente if self.n == 1 else "Le quitaron el móvil a alguien en la calle; quiero apelar."
+
+    plantilla = [cj.Consulta("A1", "", "d1", "penal/robo-calificado", "robo", "prueba"),
+                 cj.Consulta("S1", "", None, None, None, "prueba", sin_respuesta=True, extra={"tema_sugerido": "x"})]
+    llm = LLM()
+    out = redactar_borradores(plantilla, pd.Series({"d1": fuente}), llm, log=lambda m: None)
+    assert out[0].extra["intentos"] == 2 and "fuga" not in out[0].extra
+    assert all(c.borrador and not c.revisado for c in out) and out[1].consulta.startswith("Mi cliente")
+    with pytest.raises(cj.ErrorValidacion, match="sin revisar"):
+        cj.exigir_revisadas(out)
+    for c in out:
+        c.revisado = True
+    cj.exigir_revisadas(out)
+
+
+def test_hojas_de_anotacion_csv(tmp_path):
+    from copiloto_juridico.evaluacion.anotacion import hoja_fichas, resumen_sentencia
+
+    r = resumen_sentencia("vistos para resolver el toca ... " * 20 + " r e s u e l v e primera. se confirma el auto",
+                          "penal/robo-calificado", "2025-01-01")
+    assert r.count("\n") == 2 and "PENAL · robo calificado" in r and "se confirma" in r
+    corpus = _corpus()
+    familias = {t: fam.asignar_familia(t).familia for t in corpus["tipo"].unique()}
+    fc = hoja_fichas(corpus, familias, n=6)
+    assert len(fc) == 6 and set(fc["familia"]) == {"robo", "fraude-y-abuso-de-confianza", "lesiones"}
+    # El abogado llena dos filas; el cargador lee solo esas
+    fc.loc[0, ["sentido_fallo", "articulos", "ficha_aceptable"]] = ["CONFIRMA", "233; 236", "sí"]
+    fc.loc[1, "sentido_fallo"] = "REVOCA"
+    fc.to_csv(tmp_path / "f.csv", index=False)
+    fichas = cj.cargar_fichas_anotadas(tmp_path / "f.csv")
+    assert len(fichas) == 2 and fichas[0]["articulos"] == ["233", "236"] and fichas[0]["ficha_aceptable"] is True
+    p = tmp_path / "j.csv"
+    p.write_text("consulta_id,consulta,doc_id,resumen,relevancia,anotador\nB1,c,d1,r,2,\nB1,c,d2,r,,\n")
+    j = cj.cargar_juicios(p)
+    assert len(j) == 1 and j.iloc[0]["anotador"] == "anotador1"

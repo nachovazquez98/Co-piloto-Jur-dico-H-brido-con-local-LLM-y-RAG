@@ -366,6 +366,10 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(vacias)} consultas sin redactar se omiten: {', '.join(vacias[:10])}"
                          f"{'...' if len(vacias) > 10 else ''}")
     consultas = [c for c in todas if c.consulta.strip() and (particion in (None, "todas") or c.particion == particion)]
+    if particion in ("prueba", "todas"):
+        from .conjuntos import exigir_revisadas
+
+        exigir_revisadas(consultas)
     if any(c.borrador for c in consultas):
         corrida.borrador = True
         corrida.advertir("Hay consultas en borrador: esta corrida NO es reportable.")
