@@ -31,7 +31,12 @@ def get_model(model_name: str = config.EMBEDDING_MODEL_NAME):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.info("Cargando modelo de embeddings %s en %s...", model_name, device)
-    model = SentenceTransformer(model_name, device=device)
+    # Primero desde la caché local: evita consultas al Hub (y sus reintentos) si no hay red.
+    try:
+        model = SentenceTransformer(model_name, device=device, local_files_only=True)
+    except OSError:
+        logger.info("Modelo no encontrado en caché; descargándolo del Hub...")
+        model = SentenceTransformer(model_name, device=device)
     if device == "cuda":
         model.half()
     return model
