@@ -24,6 +24,7 @@ CSS = """
   background: rgba(128,128,128,.35); border: 2px solid transparent; box-sizing: border-box; }
 .cj-step .title { font-weight: 600; }
 .cj-step .detail { color: var(--cj-muted); font-size: .88rem; margin-top: .1rem; }
+.cj-step .desc { color: var(--cj-muted); font-size: .8rem; margin-top: .05rem; line-height: 1.3; }
 .cj-step .time { color: var(--cj-muted); font-size: .8rem; margin-left: .4rem; font-weight: 400; }
 .cj-step.pending .title { color: var(--cj-muted); font-weight: 500; }
 .cj-step.running .dot { background: transparent; border-color: var(--cj-accent); border-top-color: transparent;
@@ -36,6 +37,7 @@ CSS = """
 @media (prefers-color-scheme: dark) { :root { --cj-accent: #6fa8dc; } }
 .cj-chip { display: inline-block; padding: .1rem .55rem; border-radius: 999px; font-size: .8rem;
   background: rgba(31,78,121,.12); color: var(--cj-accent); margin-right: .3rem; }
+.cj-chip.cj-warn { background: rgba(198,40,40,.12); color: var(--cj-err); }
 </style>
 """
 
