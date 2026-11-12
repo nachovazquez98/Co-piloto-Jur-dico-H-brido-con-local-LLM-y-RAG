@@ -4,6 +4,7 @@
     python -m copiloto_juridico.cli indexar
     python -m copiloto_juridico.cli descargar          # descarga balanceada (si la API lo permite)
     python -m copiloto_juridico.cli estado
+    python -m copiloto_juridico.cli pendientes --materia penal   # qué descargar a mano, por prioridad
 """
 
 from __future__ import annotations
@@ -92,6 +93,40 @@ def cmd_estado(args) -> None:
          f"Sentencias faltantes para el balance total: {int(rep['faltan'].sum())}")
 
 
+def cmd_pendientes(args) -> None:
+    """Tipos que aún no llegan a su meta, ordenados por prioridad para la descarga manual.
+
+    Prioridad: primero los tipos de familias con al menos 10 sentencias (donde la evaluación tendrá consultas)
+    y, entre ellos, los que más sentencias pueden ganar. Los tipos con menos de 5 sentencias publicadas no pueden
+    balancearse descargando: para ellos se evalúa a nivel familia.
+    """
+    from .datos.balance import balance_report, load_catalogo
+    from .datos.corpus import load_corpus
+    from .evaluacion.familias import cargar_familias
+
+    corpus = load_corpus()
+    rep = balance_report(corpus, load_catalogo())
+    if args.materia:
+        rep = rep[rep["materia"] == args.materia]
+    rep = rep[rep["faltan"] > 0].copy()
+    familias = cargar_familias(rep["tipo"].tolist())
+    rep["familia"] = rep["tipo"].map(familias)
+    en_corpus_fam = corpus.assign(familia=corpus["tipo"].map(cargar_familias(corpus["tipo"].unique().tolist())))
+    tam = en_corpus_fam.groupby("familia").size()
+    rep["sentencias_familia"] = rep["familia"].map(tam).fillna(0).astype(int)
+    rep["familia_grande"] = rep["sentencias_familia"] >= 10
+    rep = rep.sort_values(["familia_grande", "faltan", "sentencias_familia"], ascending=False)
+    cols = ["tipo", "familia", "disponibles", "en_corpus", "meta", "faltan"]
+    _log(f"{len(rep)} tipos incompletos · faltan {int(rep['faltan'].sum()):,} sentencias "
+         f"(tope {config.MAX_SENTENCIAS_POR_TIPO} por tipo).")
+    _log(rep[cols].head(args.top).to_string(index=False))
+    if args.salida:
+        rep[cols + ["sentencias_familia"]].to_csv(args.salida, index=False)
+        _log(f"\nLista completa: {args.salida}")
+    _log("\nLa API exige reCAPTCHA: descarga los PDFs desde el portal, cópialos a la carpeta de PDFs y corre "
+         "`construir-corpus --pdfs <carpeta>` y luego `indexar`. Congela el corpus antes de medir.")
+
+
 def main(argv=None) -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     p = argparse.ArgumentParser(prog="copiloto_juridico", description="Preparación de datos del Co-piloto Jurídico")
@@ -111,6 +146,12 @@ def main(argv=None) -> None:
     d.set_defaults(func=cmd_descargar)
 
     sub.add_parser("estado", help="Muestra el balance del corpus").set_defaults(func=cmd_estado)
+
+    pe = sub.add_parser("pendientes", help="Tipos incompletos por prioridad (para descargar a mano)")
+    pe.add_argument("--materia", default="penal")
+    pe.add_argument("--top", type=int, default=30)
+    pe.add_argument("--salida", help="CSV con la lista completa")
+    pe.set_defaults(func=cmd_pendientes)
 
     args = p.parse_args(argv)
     args.func(args)

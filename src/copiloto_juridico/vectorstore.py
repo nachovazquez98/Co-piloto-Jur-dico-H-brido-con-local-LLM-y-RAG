@@ -69,7 +69,7 @@ class BM25:
 
 
 class SentenciasStore:
-    RRF_K = 60
+    RRF_K = config.RRF_K
 
     def __init__(self, log: Callable[[str], None] = logger.info):
         manifest, chunks, emb = load_index()
@@ -117,6 +117,9 @@ class SentenciasStore:
         return self.corpus.groupby(["materia", "tipo", "delito_o_accion"]).size().rename("sentencias").reset_index()
 
     def _densa(self, q: np.ndarray, tipos: list[str] | None) -> dict[str, float]:
+        """Ranking denso: los 300 fragmentos más cercanos (HNSW de ChromaDB) agrupados por sentencia; el puntaje
+        de una sentencia es el coseno de su fragmento más parecido. Con `tipos`, ChromaDB filtra por metadatos
+        *antes* de buscar vecinos (no es lo mismo que filtrar después)."""
         kwargs = {"query_embeddings": [q.tolist()], "n_results": config.RAG_NUM_CHUNKS_TO_FETCH,
                   "include": ["metadatas", "distances"]}
         if tipos:
@@ -133,23 +136,62 @@ class SentenciasStore:
         filas = np.flatnonzero(self.chunk_doc == doc_id)
         return float((self.emb[filas].astype(np.float32) @ q).max()) if len(filas) else 0.0
 
-    def buscar(self, consulta: str, num_docs: int = config.RAG_NUM_DOCS_TO_FETCH, tipos: list[str] | None = None,
-               query_embedding: np.ndarray | None = None, consulta_lexica: str | None = None) -> list[Candidato]:
-        """Búsqueda híbrida: embeddings (fragmentos agrupados por sentencia) + BM25, fusionados con RRF."""
-        q = embed_query(consulta) if query_embedding is None else query_embedding
-        densos = self._densa(q, tipos)
-        rank_denso = {d: r for r, (d, _) in enumerate(sorted(densos.items(), key=lambda kv: kv[1], reverse=True))}
+    def fragmento_mas_similar(self, doc_id: str, q: np.ndarray, largo: int = 2500) -> str:
+        """Ventana de `largo` caracteres de la sentencia alrededor del fragmento indexado más parecido a la
+        consulta. Alternativa a "los primeros 2,500 caracteres" para QC_1 (config.QC1_CONTEXTO)."""
+        from .embeddings import chunk_text
 
-        bm = self.bm25.scores(consulta_lexica or consulta)
+        texto = self.corpus.loc[doc_id, "texto"]
+        filas = np.flatnonzero(self.chunk_doc == doc_id)
+        if not len(filas):
+            return texto[:largo]
+        mejor = int(np.argmax(self.emb[filas].astype(np.float32) @ q))
+        chunks = chunk_text(texto)
+        inicio = texto.find(chunks[mejor]) if mejor < len(chunks) else -1
+        if inicio < 0:
+            return texto[:largo]
+        inicio = max(0, min(inicio - (largo - len(chunks[mejor])) // 2, len(texto) - largo))
+        return texto[inicio:inicio + largo]
+
+    def ranking_lexico(self, consulta_lexica: str, tipos: list[str] | None = None) -> list[str]:
+        """Ranking BM25: ids de las 60 sentencias con mayor puntaje (> 0), de mayor a menor."""
+        bm = self.bm25.scores(consulta_lexica)
         if tipos:
             bm = np.where(np.isin(self.doc_tipos, list(tipos)), bm, 0.0)
-        top_bm = [i for i in np.argsort(-bm)[:config.RAG_NUM_DOCS_TO_FETCH * 2] if bm[i] > 0]
-        rank_lex = {self.doc_ids[i]: r for r, i in enumerate(top_bm)}
+        return [self.doc_ids[i] for i in np.argsort(-bm)[:config.RAG_NUM_DOCS_TO_FETCH * 2] if bm[i] > 0]
 
+    @staticmethod
+    def fusion_rrf(rankings: list[list[str]], k: int) -> dict[str, float]:
+        """Reciprocal Rank Fusion: RRF(d) = Σ_listas 1 / (k + rango(d)), con rango empezando en 0.
+
+        Usa solo la posición en cada lista, no los puntajes (coseno y BM25 están en escalas distintas). Con
+        k = 60 el máximo es 2/60 ≈ 0.033 (primer lugar en las dos listas)."""
         fusion: dict[str, float] = {}
-        for ranking in (rank_denso, rank_lex):
-            for d, r in ranking.items():
-                fusion[d] = fusion.get(d, 0.0) + 1.0 / (self.RRF_K + r)
+        for ranking in rankings:
+            for r, d in enumerate(ranking):
+                fusion[d] = fusion.get(d, 0.0) + 1.0 / (k + r)
+        return fusion
+
+    def buscar(self, consulta: str, num_docs: int = config.RAG_NUM_DOCS_TO_FETCH, tipos: list[str] | None = None,
+               query_embedding: np.ndarray | None = None, consulta_lexica: str | None = None,
+               rrf_k: int | None = None, modo: str = "hibrida", excluir: set[str] | None = None) -> list[Candidato]:
+        """Búsqueda híbrida: embeddings (fragmentos agrupados por sentencia) + BM25, fusionados con RRF.
+
+        `modo` permite las líneas base de la evaluación: "densa" (solo embeddings) o "lexica" (solo BM25); en
+        ambos casos `relevancia` es 1/(k + rango) de esa única lista. `excluir` quita documentos del resultado
+        (evaluación *leave-one-out*: que la sentencia fuente no vote por su propio tipo)."""
+        if modo not in ("hibrida", "densa", "lexica"):
+            raise ValueError(f"modo desconocido: {modo}")
+        k = rrf_k or self.RRF_K
+        q = embed_query(consulta) if query_embedding is None else query_embedding
+        densos = self._densa(q, tipos) if modo != "lexica" else {}
+        rank_denso = [d for d, _ in sorted(densos.items(), key=lambda kv: kv[1], reverse=True)]
+        rank_lex = self.ranking_lexico(consulta_lexica or consulta, tipos) if modo != "densa" else []
+        if excluir:
+            rank_denso = [d for d in rank_denso if d not in excluir]
+            rank_lex = [d for d in rank_lex if d not in excluir]
+
+        fusion = self.fusion_rrf([r for r in (rank_denso, rank_lex) if r], k)
         ordenados = sorted(fusion.items(), key=lambda kv: kv[1], reverse=True)[:num_docs]
         out = []
         for doc_id, score in ordenados:

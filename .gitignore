@@ -16,3 +16,6 @@ data/raw/
 .vscode/
 .idea/
 .DS_Store
+
+# Evaluación: caché de respuestas del LLM (se regenera; puede pesar mucho)
+evaluacion/cache/llm.jsonl

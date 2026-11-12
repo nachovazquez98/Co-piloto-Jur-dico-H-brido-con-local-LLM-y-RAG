@@ -131,6 +131,29 @@ def recortar_contexto(texto: str, max_chars: int) -> str:
     return texto[:cabeza] + "\n\n[... texto intermedio omitido por longitud ...]\n\n" + texto[-cola:]
 
 
+def limpiar_conceptos(respuesta: str, consulta: str) -> tuple[str, bool]:
+    """Post-proceso de la respuesta del LLM en el paso de conceptos clave. Si el LLM no extrajo conceptos
+    (respuesta vacía, "FALLA" o un texto demasiado largo para ser una lista), se usa la consulta completa.
+    Devuelve (conceptos, ok)."""
+    conceptos = (respuesta or "").strip()
+    if not conceptos or "falla" in conceptos.lower() or len(conceptos) > 300:
+        return consulta, False
+    return conceptos, True
+
+
+def combinar_candidatos(estrictos: list[Candidato], amplios: list[Candidato],
+                        num_precedentes: int) -> tuple[list[tuple[Candidato, str]], str]:
+    """Búsqueda adaptativa: primero los candidatos del filtro estricto; si son menos de 2×N, se completan con
+    la búsqueda amplia (sin filtro). Devuelve la lista (candidato, fuente) y el modo de búsqueda resultante."""
+    candidatos = [(c, "Filtro estricto") for c in estrictos]
+    if len(estrictos) < num_precedentes * 2:
+        vistos = {c.doc_id for c in estrictos}
+        candidatos += [(c, "Búsqueda amplia") for c in amplios if c.doc_id not in vistos]
+    modo = "Filtro estricto" if all(f == "Filtro estricto" for _, f in candidatos[:num_precedentes]) \
+        else "Filtro estricto + búsqueda amplia" if estrictos else "Búsqueda amplia (sin filtro)"
+    return candidatos, modo
+
+
 class Copiloto:
     def __init__(self, store: SentenciasStore, clasificador: ClasificadorHibrido, llm: LLMClient):
         self.store = store
@@ -149,13 +172,13 @@ class Copiloto:
         yield Evento("paso_inicio", "entidades")
         yield log("--- PASO 1: EXTRACCIÓN DE ENTIDADES CLAVE ---", "entidades")
         try:
-            entidades = self._llm(prompts.PROMPT_EXTRACCION_ENTIDADES.format(texto_consulta=consulta)).strip()
+            entidades, ok = limpiar_conceptos(
+                self._llm(prompts.PROMPT_EXTRACCION_ENTIDADES.format(texto_consulta=consulta)), consulta)
         except LLMError as e:
             yield Evento("error", "entidades", str(e))
             return
-        if not entidades or "falla" in entidades.lower() or len(entidades) > 300:
+        if not ok:
             yield log("   ⚠️ El LLM no extrajo entidades. Se usa la consulta completa.", "entidades")
-            entidades = consulta
         else:
             yield log(f"   -> Entidades extraídas: '{entidades}'", "entidades")
         yield Evento("paso_fin", "entidades", entidades)
@@ -182,16 +205,12 @@ class Copiloto:
         estrictos = self.store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
         yield log(f"Filtro estricto (top {len(filtro)} categorías: {', '.join(filtro)}): "
                   f"{len(estrictos)} sentencias candidatas.", "busqueda")
-        candidatos = [(c, "Filtro estricto") for c in estrictos]
-        if len(estrictos) < op.num_precedentes * 2:
-            vistos = {c.doc_id for c in estrictos}
-            extra = [(c, "Búsqueda amplia") for c in amplios if c.doc_id not in vistos]
-            candidatos += extra
-            yield log(f"   ⚠️ Pocos candidatos con el filtro. La búsqueda amplia añade {len(extra)}.", "busqueda")
+        candidatos, modo = combinar_candidatos(estrictos, amplios, op.num_precedentes)
+        if len(candidatos) > len(estrictos):
+            yield log(f"   ⚠️ Pocos candidatos con el filtro. La búsqueda amplia añade "
+                      f"{len(candidatos) - len(estrictos)}.", "busqueda")
         for c, fuente in candidatos[:8]:
             yield log(f"   · {c.doc_id} | RRF {c.relevancia:.4f} | coseno {c.similitud:.3f} | {fuente}", "busqueda")
-        modo = "Filtro estricto" if all(f == "Filtro estricto" for _, f in candidatos[:op.num_precedentes]) \
-            else "Filtro estricto + búsqueda amplia" if estrictos else "Búsqueda amplia (sin filtro)"
         if not candidatos:
             yield Evento("error", "busqueda", "No se encontraron precedentes en la base de datos.")
             return

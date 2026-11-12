@@ -40,6 +40,17 @@ RAW_PDF_DIR = Path(_env("COPILOTO_PDF_DIR", str(DATA_DIR / "raw" / "pdfs")))  # 
 CHROMA_DIR = Path(_env("COPILOTO_CHROMA_DIR", str(DATA_DIR / "chroma")))       # DB vectorial local (se reconstruye)
 CACHE_DIR = DATA_DIR / "cache"
 
+# --- Evaluación (v11) ---
+EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))
+FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito (lo revisa un abogado)
+CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Conjuntos A y B (consultas)
+JUICIOS_PATH = EVAL_DIR / "juicios.csv"                     # Juicios de relevancia 0/1/2
+FICHAS_ANOTADAS_PATH = EVAL_DIR / "fichas_anotadas.jsonl"   # Conjunto C
+CONCEPTOS_CACHE_PATH = EVAL_DIR / "cache" / "conceptos.json"
+RESULTADOS_DIR = EVAL_DIR / "resultados"
+EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
+EVAL_BOOTSTRAP = 1000
+
 COLLECTION_NAME = "sentencias_judiciales"
 MATERIAS = ["penal", "civil", "familiar", "mercantil", "laboral"]
 
@@ -70,6 +81,7 @@ MAX_WORKERS_FASE_1 = None
 RAG_NUM_RESULTS_DESIRED = _env("COPILOTO_NUM_PRECEDENTES", 3)
 RAG_NUM_DOCS_TO_FETCH = 30        # Sentencias candidatas a revisar
 RAG_NUM_CHUNKS_TO_FETCH = 300     # Fragmentos que se recuperan para agrupar por sentencia
+RRF_K = _env("COPILOTO_RRF_K", 60)  # Constante k de Reciprocal Rank Fusion (valor propuesto por Cormack et al.)
 TOP_N_CANDIDATES_INITIAL = 20
 TOP_N_CANDIDATES_FINAL = 10
 
@@ -81,6 +93,10 @@ KEM_WEIGHT = 0.20
 CONCISION_WEIGHT = 0.05
 VOTE_WEIGHT = 0.35
 NUM_CATEGORIAS_FILTRO = 3         # El filtro estricto usa las 3 mejores categorías
+
+# Alcance (v11). Por defecto se conserva el comportamiento de v10: todas las materias, clasificación por tipo.
+MATERIAS_ACTIVAS = [m.strip() for m in _env("COPILOTO_MATERIAS", ",".join(MATERIAS)).split(",") if m.strip()]
+NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "tipo")  # "tipo" | "familia" (solo penal se agrupa)
 IRRELEVANT_TOKENS_PENALTY_FACTOR = 0.70
 KEM_THRESHOLD_FOR_PENALTY = 0.6
 MAX_TOKENS_FOR_PENALTY = 5

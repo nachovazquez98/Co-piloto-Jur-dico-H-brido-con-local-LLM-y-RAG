@@ -1,0 +1,286 @@
+"""Pruebas del módulo de evaluación sin GPU, sin Ollama y sin la base vectorial (datos pequeños)."""
+
+import json
+from types import SimpleNamespace
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from copiloto_juridico.clasificador import PesosClasificador, puntuar
+from copiloto_juridico.evaluacion import conjuntos as cj
+from copiloto_juridico.evaluacion import experimentos as ex
+from copiloto_juridico.evaluacion import familias as fam
+from copiloto_juridico.fichas import (coincide_texto, datos_penales, extraer_articulos, f1_conjuntos,
+                                      normalizar_sentido, parsear_campos)
+
+# --- Familias -------------------------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("tipo, familia", [
+    ("penal/robo-calificado", "robo"),
+    ("penal/tentativa-de-robo-calificado", "robo"),
+    ("penal/robo-de-infante", "sustraccion-de-menores"),
+    ("penal/violacion", "delitos-sexuales"),
+    ("penal/violacion-de-deposito", "fraude-y-abuso-de-confianza"),
+    ("penal/homicidio-a-titulo-de-culpa", "delitos-culposos"),
+    ("penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa", "delitos-culposos"),
+    ("penal/homicidio-calificado-y-robo-calificado", "homicidio"),
+    ("penal/despojo-de-inmuebles-y-aguas", "despojo"),
+    ("penal/contra-la-salud-en-su-modalidad-de-narcomenudeo", "contra-la-salud"),
+    ("penal/crueldad-animal", "otros"),
+    ("civil/accion-de-divorcio", "civil/accion-de-divorcio"),
+])
+def test_asignar_familia(tipo, familia):
+    assert fam.asignar_familia(tipo).familia == familia
+
+
+def test_familia_marca_compuestos_y_no_falsos_positivos():
+    a = fam.asignar_familia("penal/homicidio-calificado-y-robo-calificado")
+    assert a.revisar and "robo" in a.nota
+    assert "delitos-sexuales" not in fam.asignar_familia("penal/violacion-de-deposito").nota
+    assert not fam.asignar_familia("penal/despojo-de-inmuebles-y-aguas").revisar
+
+
+def test_csv_revisado_manda(tmp_path):
+    path = tmp_path / "familias.csv"
+    fam.exportar_csv({"penal/robo": 3, "penal/feminicidio": 2}, path)
+    with pytest.raises(FileExistsError):
+        fam.exportar_csv({"penal/robo": 3}, path)
+    df = pd.read_csv(path)
+    df.loc[df.tipo == "penal/feminicidio", "familia"] = "homicidio"  # decisión del abogado
+    df.to_csv(path, index=False)
+    mapa = fam.cargar_familias(["penal/robo", "penal/feminicidio", "penal/fraude"], path)
+    assert mapa == {"penal/robo": "robo", "penal/feminicidio": "homicidio", "penal/fraude": "fraude-y-abuso-de-confianza"}
+
+
+# --- Conjuntos ------------------------------------------------------------------------------------------------
+
+
+def _corpus():
+    filas = []
+    for t, n in (("penal/robo-calificado", 12), ("penal/robo-simple", 3), ("penal/fraude", 11), ("penal/lesiones", 2)):
+        for i in range(n):
+            filas.append({"id": f"{t.split('/')[1]}-{i}.pdf", "materia": "penal", "tipo": t,
+                          "texto": f"vistos para resolver el toca {t} numero {i} " * 20})
+    return pd.DataFrame(filas)
+
+
+def test_plantilla_estratificada_y_reproducible():
+    corpus = _corpus()
+    familias = fam.cargar_familias(corpus["tipo"].unique().tolist(), path=fam.config.ROOT_DIR / "no-existe.csv")
+    a = cj.muestrear_plantilla(corpus, familias, n_por_familia=4, n_raros=2, n_sin_respuesta=2, semilla=1)
+    b = cj.muestrear_plantilla(corpus, familias, n_por_familia=4, n_raros=2, n_sin_respuesta=2, semilla=1)
+    assert [c.doc_id_fuente for c in a] == [c.doc_id_fuente for c in b]
+    conocidas = [c for c in a if c.doc_id_fuente]
+    assert all(c.borrador and c.consulta == "" for c in a)
+    assert len({c.doc_id_fuente for c in conocidas}) == len(conocidas)        # sin repetidos
+    robo = [c for c in conocidas if c.familia == "robo" and c.extra["origen_muestra"] == "A"]
+    assert len(robo) == 4 and {c.tipo for c in robo} == {"penal/robo-calificado", "penal/robo-simple"}
+    assert {c.particion for c in robo} == {"desarrollo", "prueba"}
+    assert sum(c.sin_respuesta for c in a) == 2
+
+
+def test_validacion_lista_todos_los_problemas(tmp_path):
+    corpus = _corpus()
+    path = tmp_path / "c.jsonl"
+    filas = [
+        {"id": "1", "consulta": "robo de celular", "doc_id_fuente": "robo-calificado-0.pdf",
+         "tipo": "penal/robo-calificado", "familia": "robo", "particion": "desarrollo", "sin_respuesta": False},
+        {"id": "1", "consulta": "", "doc_id_fuente": "no-existe.pdf", "tipo": "penal/robo-calificado",
+         "familia": "robo", "particion": "otra", "sin_respuesta": False},
+        {"id": "3", "consulta": "x", "doc_id_fuente": "fraude-0.pdf", "tipo": "penal/fraude", "familia": "robo",
+         "particion": "prueba", "sin_respuesta": True},
+    ]
+    path.write_text("\n".join(json.dumps(f) for f in filas))
+    familias = {t: fam.asignar_familia(t).familia for t in corpus["tipo"].unique()}
+    with pytest.raises(cj.ErrorValidacion) as e:
+        cj.cargar_consultas(path, corpus, familias)
+    msg = str(e.value)
+    for esperado in ("id duplicado", "vacía", "partición", "no está en el corpus", "sin respuesta", "familia"):
+        assert esperado in msg
+    ok = cj.cargar_consultas(_escribir(tmp_path, filas[:1]), corpus, familias)
+    assert ok[0].documento_conocido
+
+
+def _escribir(tmp_path, filas):
+    p = tmp_path / "ok.jsonl"
+    p.write_text("\n".join(json.dumps(f) for f in filas))
+    return p
+
+
+def test_juicios_y_acuerdo(tmp_path):
+    p = tmp_path / "j.csv"
+    p.write_text("consulta_id,doc_id,relevancia,anotador\nB1,d1,2,ana\nB1,d2,0,ana\nB1,d1,2,luis\nB1,d2,1,luis\n")
+    j = cj.cargar_juicios(p, {"B1"})
+    assert cj.relevancia_por_par(j, "ana") == {"B1": {"d1": 2, "d2": 0}}
+    ac = cj.acuerdo_entre_anotadores(j)
+    assert ac["pares"] == 2 and ac["kappa_binario"] == 0.0
+    p.write_text("consulta_id,doc_id,relevancia,anotador\nB1,d1,3,ana\n")
+    with pytest.raises(cj.ErrorValidacion):
+        cj.cargar_juicios(p)
+
+
+def test_fuga_ngramas():
+    fuente = "El imputado sustrajo con violencia el teléfono celular de la víctima en la vía pública de noche."
+    copia = "Mi cliente sustrajo con violencia el telefono celular de la victima, según el MP."
+    propia = "Le quitaron el móvil a una persona en la calle usando la fuerza; quiero apelar la condena."
+    assert cj.ngramas_compartidos(copia, fuente)  # 7 palabras seguidas iguales (sin acentos)
+    assert cj.ngramas_compartidos(propia, fuente) == []
+    c = cj.Consulta("x", "es un robo calificado en la calle", "d", "penal/robo-calificado", "robo", "prueba")
+    assert cj.nombre_tipo_en_consulta(c)
+
+
+# --- Fichas ---------------------------------------------------------------------------------------------------
+
+FICHA = """- **Tribunal:** Primera Sala Penal, 12 de marzo de 2025
+- **Etapa Procesal:** Auto de vinculación a proceso
+- **Delito(s) Principal(es):** Robo calificado (art. 236)
+- **Acto Impugnado:** Auto de vinculación a proceso
+- **Agravios Planteados:**
+  1. Falta de valoración del testimonio.
+- **Sentido del Fallo:** CONFIRMA
+- **Fundamento Legal:** artículos 233, 234 y 236 del Código Penal; numeral 316 del CNPP; art. 168 bis
+"""
+
+
+def test_parsear_ficha():
+    c = parsear_campos(FICHA)
+    assert c["etapa procesal"] == "Auto de vinculación a proceso"
+    assert "testimonio" in c["agravios planteados"]
+    d = datos_penales(FICHA)
+    assert d["sentido_fallo"] == "CONFIRMA" and d["acto_impugnado"].startswith("Auto")
+    assert extraer_articulos(FICHA) == {"233", "234", "236", "316", "168bis"}
+
+
+def test_sentido_y_coincidencias():
+    assert normalizar_sentido("Se MODIFICA la sentencia apelada en cuanto a la pena") == "MODIFICA"
+    assert normalizar_sentido("Se revocó el auto") == "REVOCA"
+    assert normalizar_sentido("Se ordena la reposición del procedimiento") == "REPONE"
+    assert normalizar_sentido("[DATO NO DISPONIBLE]") is None
+    assert normalizar_sentido("Absuelve") == "OTRO"
+    assert coincide_texto("Robo calificado, art. 236", "robo calificado")
+    assert not coincide_texto("Fraude", "robo calificado")
+    assert f1_conjuntos({"1", "2"}, {"2", "3"})["f1"] == 0.5
+
+
+def test_comparar_ficha_detecta_articulo_inexistente():
+    r = ex.comparar_ficha(FICHA, {"doc_id": "d", "sentido_fallo": "confirma", "etapa": "vinculación a proceso",
+                                  "delito": "robo calificado", "articulos": ["233", "236"]},
+                          texto_sentencia="... articulo 233 y articulo 236 del codigo penal ...")
+    assert r["sentido_ok"] and r["etapa_ok"] and r["delito_ok"]
+    assert r["articulos_recall"] == 1.0 and r["articulos_precision"] == pytest.approx(2 / 5)
+    assert "316" in r["articulos_inexistentes"]
+
+
+# --- Experimentos (funciones puras) ---------------------------------------------------------------------------
+
+
+def test_resumen_categorias_y_familia():
+    familias = {"penal/robo-calificado": "robo", "penal/robo-simple": "robo", "penal/fraude": "fraude"}
+    r = ex.resumen_categorias("penal/robo-simple", "robo", ["penal/fraude", "penal/robo-calificado", "penal/x"],
+                              lambda c: [c], familias)
+    assert r["hit3_tipo"] == 0.0 and r["hit3_familia"] == 1.0 and r["top1_familia"] == 0.0
+    # A nivel familia una categoría cubre varios tipos: top1_tipo no aplica
+    r = ex.resumen_categorias("penal/robo-simple", "robo", ["penal/familia/robo"],
+                              lambda c: ["penal/robo-calificado", "penal/robo-simple"], familias)
+    assert r["hit3_tipo"] == 1.0 and np.isnan(r["top1_tipo"]) and r["top1_familia"] == 1.0
+
+
+def test_metricas_documento_y_metadatos():
+    r = ex.metricas_documento(["a", "b", "fuente", "c"], "fuente")
+    assert r["hit1"] == 0 and r["hit3"] == 1 and r["rr"] == pytest.approx(1 / 3)
+    doc_tipo = {"a": "penal/robo", "b": "penal/robo-simple", "c": "penal/fraude"}
+    familias = {"penal/robo": "robo", "penal/robo-simple": "robo", "penal/fraude": "fraude"}
+    assert ex.relevancias_metadatos(["a", "b", "c"], "penal/robo", "robo", doc_tipo, familias) == [2, 1, 0]
+    assert ex.ideales_metadatos("penal/robo", "robo", {"penal/robo": 2, "penal/robo-simple": 1, "penal/fraude": 5},
+                                familias) == [2, 2, 1]
+    g = ex.metricas_graduadas(["a", "z"], {"a": 2, "q": 1})
+    assert g["cobertura"] == 0.2 and 0 < g["ndcg5"] < 1
+
+
+def test_knn_mayoritario():
+    v = [SimpleNamespace(tipo=t, similitud=s) for t, s in
+         (("A", 0.9), ("B", 0.89), ("B", 0.8), ("A", 0.7), ("C", 0.95))]
+    assert ex.ranking_knn(v) == ["B", "A", "C"]  # empate 2-2: B gana por similitud acumulada (1.69 > 1.60)
+
+
+def _comp():
+    return pd.DataFrame({"tipo": ["t1", "t2", "t3"], "coseno": [1.0, 0.0, 0.5], "jaccard": [0.0, 1.0, 0.0],
+                         "kem": [0.0, 1.0, 0.0], "concision": [0.5, 0.5, 0.5], "voto": [0.0, 0.0, 1.0],
+                         "penal_longitud": [1.0, 1.0, 0.9], "penal_tokens": [1.0, 0.7, 1.0]})
+
+
+def test_ablacion_y_penalizaciones():
+    comp, pesos = _comp(), PesosClasificador.desde_config()
+    s = puntuar(comp, pesos)
+    assert s[1] == pytest.approx((0.2 + 0.2 + 0.025) * 0.7)
+    assert puntuar(comp, pesos.sin("penal_tokens"))[1] == pytest.approx(0.425)
+    assert ex.ranking_categorias(comp, pesos.sin("voto"))[0] == "t2"
+    with pytest.raises(ValueError):
+        pesos.sin("inventado")
+
+
+def test_malla_pesos_y_evaluacion_vectorizada():
+    W = ex.malla_pesos(0.05)
+    assert W.shape == (10626, 5) and np.allclose(W.sum(axis=1), 1) and (W >= 0).all()
+    comp = _comp()
+    caso = ex.caso_malla(comp, "t2", "f2", {"t1": "f1", "t2": "f2", "t3": "f3"}, PesosClasificador.desde_config())
+    res = ex.evaluar_malla([caso], np.array([[0, 1, 0, 0, 0], [1, 0, 0, 0, 0.0]]), k=1)
+    assert res["top1_tipo"].tolist() == [1.0, 0.0]
+    # Debe coincidir con el ranking no vectorizado
+    pesos = PesosClasificador(*W[1234], True, True)
+    esperado = float(ex.ranking_categorias(comp, pesos)[0] == "t2")
+    assert ex.evaluar_malla([caso], W[1234:1235], k=1)["top1_tipo"][0] == esperado
+
+
+def test_resumen_binario_falla_abierta():
+    r = ex.resumen_binario([True, True, False, False], [True, None, None, False])
+    assert (r["VP"], r["FP"], r["FN"], r["VN"]) == (2, 1, 0, 1)
+    assert r["tasa_no_interpretables"] == 0.5
+
+
+def test_auc_y_senales():
+    assert ex.auc_roc([3, 4], [1, 2]) == 1.0 and ex.auc_roc([1], [1]) == 0.5
+    t = pd.DataFrame({"score_híbrido": [0.6, 0.4], "coseno": [0.8, 0.7], "kem": [0.0, 1.0]})
+    assert ex.senales_sin_respuesta(t) == {"score_hibrido": 0.6, "coseno": 0.8, "kem_max": 1.0}
+
+
+class _LLMFalso:
+    def __init__(self):
+        self.settings = SimpleNamespace(provider="x", model="m", temperature=0.0, max_tokens=10, num_ctx=100,
+                                        seed=42, max_context_chars=1000)
+        self.n = 0
+
+    def generate(self, prompt):
+        self.n += 1
+        return f"respuesta a {prompt}"
+
+
+def test_cache_llm_persiste(tmp_path):
+    base = _LLMFalso()
+    c1 = ex.LLMConCache(base, tmp_path / "llm.jsonl")
+    assert c1.generate("hola") == c1.generate("hola") and base.n == 1
+    c2 = ex.LLMConCache(base, tmp_path / "llm.jsonl")
+    assert c2.generate("hola") == "respuesta a hola" and base.n == 1 and c2.aciertos == 1
+
+
+def test_conceptos_en_cache_se_invalidan_si_cambia_la_consulta():
+    c = cj.Consulta("A1", "texto original", None, None, None, "prueba")
+    cache = {"A1": {"clave": ex.clave_conceptos(c), "conceptos": "robo"}}
+    assert ex.conceptos_de([c], cache) == ({"A1": "robo"}, [])
+    c.consulta = "texto editado"
+    assert ex.conceptos_de([c], cache) == ({"A1": "texto editado"}, ["A1"])
+
+
+def test_reporte_guarda_json_y_md(tmp_path):
+    from copiloto_juridico.evaluacion.reporte import Corrida, ultimo_resultado
+
+    cor = Corrida("prueba", parametros={"particion": "desarrollo"}, borrador=True)
+    cor.tabla("Tabla", "desc", pd.DataFrame([{"variante": "x", "Hit@3": 0.5, "n": np.int64(3)}]))
+    pj, pm = cor.guardar(tmp_path)
+    datos = json.loads(pj.read_text())
+    assert datos["borrador"] and datos["tablas"]["Tabla"]["filas"][0]["n"] == 3
+    assert "configuracion" in datos and "corpus_fingerprint" in datos
+    assert "BORRADOR" in pm.read_text()
+    assert ultimo_resultado("prueba", tmp_path)["_archivo"] == pj.name

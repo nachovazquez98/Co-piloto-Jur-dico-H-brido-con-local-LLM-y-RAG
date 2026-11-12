@@ -371,3 +371,27 @@ PROMPTS_POR_MATERIA = {
     "mercantil": (PROMPT_EXTRACCION_MERCANTIL, PROMPT_REPORTE_MERCANTIL),
 }
 PROMPTS_DEFAULT = (PROMPT_EXTRACCION_DEFAULT, PROMPT_REPORTE_DEFAULT)
+
+
+def prompts_penal(version: str | None = None) -> tuple[str, str]:
+    """(extracción, informe) penales de la versión indicada (por defecto `config.PROMPT_PENAL_VERSION`)."""
+    return PROMPTS_POR_MATERIA["penal"]
+
+
+# --- Solo para la evaluación: borrador de consulta a partir de una sentencia (lo revisa una persona) ---
+PROMPT_BORRADOR_CONSULTA = """
+Eres un defensor penal en Jalisco. A partir del extracto de una sentencia de segunda instancia, escribe la consulta
+que harías a un buscador de precedentes ANTES de conocer esa sentencia: describe en 2 a 4 frases los hechos del
+caso y el problema procesal que te interesa (qué se apela y por qué), en tus propias palabras.
+
+Reglas obligatorias:
+- NO copies frases del extracto (nunca más de 5 palabras seguidas iguales).
+- NO escribas el nombre técnico del delito tal como aparece en la sentencia; describe la conducta.
+- NO incluyas nombres, números de toca, fechas ni el resultado de la apelación.
+Responde ÚNICAMENTE con el texto de la consulta.
+
+Extracto de la sentencia:
+{extracto}
+
+Consulta:
+"""
