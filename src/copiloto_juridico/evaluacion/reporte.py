@@ -81,6 +81,8 @@ class Corrida:
     advertencias: list[str] = field(default_factory=list)
     borrador: bool = False
     extra: dict = field(default_factory=dict)
+    # Commit y estado del árbol al EMPEZAR la corrida: el código que corre es el de ese momento.
+    git: dict = field(default_factory=info_commit)
 
     def tabla(self, nombre: str, descripcion: str, df: pd.DataFrame, diagnostico: bool = False) -> None:
         """Añade una tabla. `diagnostico=True`: solo va al .md (la interfaz no la muestra)."""
@@ -98,7 +100,7 @@ class Corrida:
             manifest = json.loads((config.INDICE_DIR / MANIFEST).read_text())
         except (OSError, ValueError):
             manifest = {}
-        return {"comando": self.comando, "fecha": datetime.now().isoformat(timespec="seconds"), **info_commit(),
+        return {"comando": self.comando, "fecha": datetime.now().isoformat(timespec="seconds"), **self.git,
                 "semilla": config.EVAL_SEED, "parametros": self.parametros,
                 "corpus_fingerprint": manifest.get("corpus_fingerprint"),
                 "modelo_embeddings": manifest.get("embedding_model"),
