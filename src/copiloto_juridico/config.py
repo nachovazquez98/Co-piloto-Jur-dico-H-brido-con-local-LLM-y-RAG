@@ -125,9 +125,11 @@ MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", ["penal"])
 NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" | "familia" (solo penal se agrupa)
 # El embedding de una familia incluye los nombres de sus tipos más generales ("contra la salud: narcomenudeo...").
 ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
-# Texto que lee QC_1: "inicio" (v10: primeros 2,500 caracteres) o "fragmento_similar" (ventana alrededor del
-# fragmento más parecido a la consulta).
-QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "inicio")
+# QC_1. En una consulta real de defensa, la versión v10 (inicio del documento + "mismo tema Y contexto") descartó
+# 14 de 15 candidatos. v11: lee la ventana alrededor del fragmento más parecido a la consulta y acepta mismo delito,
+# misma familia o mismo problema procesal. Comparación sin anotaciones: `evaluacion qc-diagnostico`.
+QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "fragmento_similar")  # "inicio" | "fragmento_similar"
+PROMPT_QC1_VERSION = _env("COPILOTO_PROMPT_QC1", "v11")
 QC1_MAX_CHARS = 2500
 # Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).
 PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v11")

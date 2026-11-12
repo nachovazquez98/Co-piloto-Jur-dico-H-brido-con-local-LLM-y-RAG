@@ -414,14 +414,16 @@ def _clasificacion(env: Entorno, p: Preparada, rrf_k: int | None = None, excluir
 
 
 def _lista_pipeline(env: Entorno, p: Preparada, ranking: list[str], amplios: list, n_filtro: int,
-                    rrf_k: int | None) -> list[str]:
+                    rrf_k: int | None, excluir: set | None = None) -> list[str]:
+    """Lista final de candidatos como la arma la app: filtro con las `n_filtro` primeras categorías y, si da
+    pocos, se completa con la búsqueda amplia (`amplios`). 0 = sin filtro."""
     from ..pipeline import combinar_candidatos
 
     if n_filtro == 0:
         return [c.doc_id for c in amplios]
     filtro = [t for c in ranking[:n_filtro] for t in env.clasificador.tipos_de(c)]
     estrictos = env.store.buscar(p.consulta.consulta, tipos=filtro, query_embedding=p.q, consulta_lexica=p.lexica,
-                                 rrf_k=rrf_k)
+                                 rrf_k=rrf_k, excluir=excluir)
     candidatos, _ = combinar_candidatos(estrictos, amplios, config.RAG_NUM_RESULTS_DESIRED)
     return [c.doc_id for c, _ in candidatos][:config.RAG_NUM_DOCS_TO_FETCH]
 
@@ -434,77 +436,83 @@ VARIANTES_RECUPERACION = [
     ("RRF k=60, sin filtro", "hibrida", 60, 0),
     ("RRF k=100, sin filtro", "hibrida", 100, 0),
     ("RRF k=60 + filtro top-1", "hibrida", 60, 1),
-    ("RRF k=60 + filtro top-3 (v10)", "hibrida", 60, 3),
+    ("RRF k=60 + filtro top-3 (app)", "hibrida", 60, 3),
     ("RRF k=60 + filtro top-5", "hibrida", 60, 5),
     ("RRF k=20 + filtro top-3", "hibrida", 20, 3),
     ("RRF k=100 + filtro top-3", "hibrida", 100, 3),
 ]
 
 
+def _resumen_cls(nombre: str, rs: list[dict]) -> dict:
+    fila = {"variante": nombre, "n": len(rs)}
+    for col, key in [("Hit@3 tipo", "hit3_tipo"), ("Hit@3 familia", "hit3_familia"),
+                     ("Top-1 tipo", "top1_tipo"), ("Top-1 familia", "top1_familia")]:
+        fila.update(_fila_proporcion(col, [r[key] for r in rs]))
+    por_tipo = rs and not any(r["pred_tipo"].startswith("penal/familia/") for r in rs)
+    fila["F1 macro tipo"] = m.f1_macro([r["tipo"] for r in rs], [r["pred_tipo"] for r in rs]) \
+        if por_tipo else float("nan")  # a nivel familia la predicción no es un tipo
+    fila["F1 macro familia"] = m.f1_macro([r["familia"] for r in rs], [r["pred_familia"] for r in rs]) \
+        if rs else float("nan")
+    return fila
+
+
 def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -> Corrida:
-    """Líneas base de recuperación, efecto del filtro, k de RRF y clasificador k-NN (sección 6.3)."""
+    """Líneas base de recuperación, efecto del filtro, k de RRF y clasificador k-NN (sección 6.3).
+
+    Leave-one-out en todo el conjunto A: la sentencia fuente se excluye de la búsqueda que alimenta el voto del
+    clasificador y del k-NN, y de las listas con que se calculan nDCG@5 y P@5 por metadatos (que miden "otros
+    precedentes del mismo tipo"). Solo Hit@k y MRR buscan la sentencia fuente en la lista final, porque es el
+    objetivo de esa métrica. La clasificación con la fuente incluida queda como tabla de diagnóstico."""
     corrida = env.corrida
     preparadas = preparar(env)
     conocidas = [p for p in preparadas if p.consulta.documento_conocido]
     doc_tipo, conteo = env.doc_tipo, env.conteo_tipos
+    tipo_unico = lambda t: [t]  # noqa: E731
 
     # --- Clasificación ---
-    filas_cls, por_consulta, errores = [], {}, []
-    hib = "Híbrido v10" if config.NIVEL_CLASIFICACION == "tipo" else "Híbrido por familia"
-    variantes_cls = [f"{hib} (con fuente)", f"{hib} (sin fuente)", "k-NN 10 (con fuente)", "k-NN 10 (sin fuente)"]
-    res_cls = {v: [] for v in variantes_cls}
-    rankings_v10: dict[str, tuple[list, list[str]]] = {}
+    hib = "Híbrido (app)"
+    res = {k: [] for k in ("hib", "knn", "hib_diag", "knn_diag")}
+    errores = []
     log(f"Clasificación: {len(conocidas)} consultas con documento conocido...")
     for p in conocidas:
         c = p.consulta
         sin = {c.doc_id_fuente}
-        amplios, comp, rk = _clasificacion(env, p)
-        rankings_v10[c.id] = (amplios, rk)
-        _, _, rk_loo = _clasificacion(env, p, excluir=sin)
-        vec = env.store.buscar(c.consulta, query_embedding=p.q, modo="densa", num_docs=10)
-        vec_loo = env.store.buscar(c.consulta, query_embedding=p.q, modo="densa", num_docs=10, excluir=sin)
-        for v, ranking, tipos_de in [(variantes_cls[0], rk, env.clasificador.tipos_de),
-                                     (variantes_cls[1], rk_loo, env.clasificador.tipos_de),
-                                     (variantes_cls[2], ranking_knn(vec), lambda t: [t]),
-                                     (variantes_cls[3], ranking_knn(vec_loo), lambda t: [t])]:
+        _, _, rk = _clasificacion(env, p, excluir=sin)
+        _, _, rk_diag = _clasificacion(env, p)
+        vec = env.store.buscar(c.consulta, query_embedding=p.q, modo="densa", num_docs=10, excluir=sin)
+        vec_diag = env.store.buscar(c.consulta, query_embedding=p.q, modo="densa", num_docs=10)
+        for clave_, ranking, tipos_de in (("hib", rk, env.clasificador.tipos_de), ("knn", ranking_knn(vec), tipo_unico),
+                                          ("hib_diag", rk_diag, env.clasificador.tipos_de),
+                                          ("knn_diag", ranking_knn(vec_diag), tipo_unico)):
             r = resumen_categorias(c.tipo, c.familia, ranking, tipos_de, env.familias)
             r.update(id=c.id, tipo=c.tipo, familia=c.familia, top3=ranking[:3])
-            res_cls[v].append(r)
-        r_loo = res_cls[variantes_cls[1]][-1]
-        if not r_loo["hit3_tipo"]:
+            res[clave_].append(r)
+        if not res["hib"][-1]["hit3_familia"]:
             errores.append({"consulta": c.id, "partición": c.particion, "tipo correcto": c.tipo,
-                            "familia": c.familia, "top-3 (sin fuente)": " · ".join(r_loo["top3"])})
+                            "familia": c.familia, "top-3": " · ".join(res["hib"][-1]["top3"])})
 
-    for v in variantes_cls:
-        rs = res_cls[v]
-        por_consulta[v] = rs
-        fila = {"variante": v, "n": len(rs)}
-        for col, key in [("Hit@3 tipo", "hit3_tipo"), ("Hit@3 familia", "hit3_familia"),
-                         ("Top-1 tipo", "top1_tipo"), ("Top-1 familia", "top1_familia")]:
-            fila.update(_fila_proporcion(col, [r[key] for r in rs]))
-        por_tipo = rs and not any(r["pred_tipo"].startswith("penal/familia/") for r in rs)
-        fila["F1 macro tipo"] = m.f1_macro([r["tipo"] for r in rs], [r["pred_tipo"] for r in rs]) \
-            if por_tipo else float("nan")  # a nivel familia la predicción no es un tipo
-        fila["F1 macro familia"] = m.f1_macro([r["familia"] for r in rs], [r["pred_familia"] for r in rs]) if rs else float("nan")
-        filas_cls.append(fila)
     corrida.tabla(
         "Clasificación de la consulta",
         "Hit@3 = la categoría correcta queda dentro del filtro de 3 categorías (si no, ninguna etapa posterior la "
-        "recupera). 'Sin fuente' excluye la sentencia de la que se redactó la consulta (leave-one-out): es la "
-        "estimación honesta para casos nuevos. IC95 de Wilson. F1 macro sobre la predicción top-1.",
-        pd.DataFrame(filas_cls))
+        "recupera). La sentencia de la que se redactó la consulta no participa (leave-one-out). IC95 de Wilson; "
+        "F1 macro sobre la predicción top-1. k-NN = tipo mayoritario de las 10 sentencias más cercanas.",
+        pd.DataFrame([_resumen_cls(hib, res["hib"]), _resumen_cls("k-NN 10 (línea base)", res["knn"])]))
+    corrida.tabla(
+        "Diagnóstico: clasificación con la sentencia fuente incluida",
+        "Solo diagnóstico (no es la métrica): cuánto se inflaría la exactitud si la sentencia fuente votara por su "
+        "propio tipo.", pd.DataFrame([_resumen_cls(f"{hib}, con fuente", res["hib_diag"]),
+                                      _resumen_cls("k-NN 10, con fuente", res["knn_diag"])]), diagnostico=True)
     if errores:
-        corrida.tabla(f"Errores de clasificación ({hib}, sin fuente)",
-                      "Consultas cuyo tipo correcto quedó fuera del filtro top-3.", pd.DataFrame(errores))
-    rs = res_cls[variantes_cls[1]]
-    if rs:
-        cm = m.matriz_confusion([r["familia"] for r in rs], [r["pred_familia"] for r in rs])
+        corrida.tabla("Errores de clasificación", "Consultas cuya familia correcta quedó fuera del top-3.",
+                      pd.DataFrame(errores))
+    if res["hib"]:
+        cm = m.matriz_confusion([r["familia"] for r in res["hib"]], [r["pred_familia"] for r in res["hib"]])
         cm = cm.loc[(cm.sum(axis=1) > 0) | (cm.sum(axis=0) > 0)]
-        corrida.tabla(f"Matriz de confusión por familia ({hib}, sin fuente, top-1)",
+        corrida.tabla("Matriz de confusión por familia (top-1)",
                       "Filas = familia correcta, columnas = familia predicha. La diagonal son aciertos.",
                       cm.reset_index())
 
-    # --- Recuperación del documento fuente ---
+    # --- Recuperación ---
     log("Recuperación: variantes de búsqueda...")
     res_rec: dict[str, list[dict]] = {}
     for nombre, modo, k, n_filtro in VARIANTES_RECUPERACION:
@@ -513,24 +521,28 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
             c = p.consulta
             if c.sin_respuesta:
                 continue
-            if modo != "hibrida":
-                ids = [x.doc_id for x in env.store.buscar(c.consulta, query_embedding=p.q, consulta_lexica=p.lexica,
-                                                          modo=modo, rrf_k=k)]
-            else:
-                if k == config.RRF_K and c.id in rankings_v10:
-                    amplios, rk = rankings_v10[c.id]
-                else:
-                    amplios, _, rk = _clasificacion(env, p, rrf_k=k)
-                ids = _lista_pipeline(env, p, rk, amplios, n_filtro, k)
+            sin = {c.doc_id_fuente} if c.documento_conocido else None
+
+            def lista(excluir):
+                if modo != "hibrida":
+                    return [x.doc_id for x in env.store.buscar(c.consulta, query_embedding=p.q, modo=modo, rrf_k=k,
+                                                               consulta_lexica=p.lexica, excluir=excluir)]
+                amplios = env.store.buscar(c.consulta, query_embedding=p.q, consulta_lexica=p.lexica, rrf_k=k,
+                                           excluir=excluir)
+                _, _, rk = _clasificacion(env, p, rrf_k=k, excluir=sin)  # el voto nunca incluye la fuente
+                return _lista_pipeline(env, p, rk, amplios, n_filtro, k, excluir)
+
             fila = {"id": c.id}
             if c.documento_conocido:
-                fila.update(metricas_documento(ids, c.doc_id_fuente))
-                rels = relevancias_metadatos(ids, c.tipo, c.familia, doc_tipo, env.familias)
-                ideales = ideales_metadatos(c.tipo, c.familia, conteo, env.familias)
+                fila.update(metricas_documento(lista(None), c.doc_id_fuente))
+                ids_sin = lista(sin)
+                rels = relevancias_metadatos(ids_sin, c.tipo, c.familia, doc_tipo, env.familias)
+                ideales = ideales_metadatos(c.tipo, c.familia, {**conteo, c.tipo: conteo.get(c.tipo, 1) - 1},
+                                            env.familias)
                 fila["ndcg5_meta"] = m.ndcg_at_k(rels, 5, ideales)
                 fila["p5_meta"] = m.precision_at_k(rels, 5, umbral=2)
             if c.id in env.juicios:
-                fila.update(metricas_graduadas(ids, env.juicios[c.id]))
+                fila.update(metricas_graduadas(lista(None), env.juicios[c.id]))
             filas.append(fila)
         res_rec[nombre] = filas
 
@@ -553,17 +565,17 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
             fj["cobertura juicios top-5"] = float(np.mean([f["cobertura"] for f in jz]))
             tabla_juicios.append(fj)
     corrida.tabla(
-        "Recuperación del documento fuente (conjunto A)",
+        "Recuperación (conjunto A)",
         "Hit@k = la sentencia de la que se redactó la consulta aparece en los k primeros; MRR = promedio de 1/rango "
-        "(lista de hasta 30). nDCG@5 (metadatos) usa relevancia aproximada 2 = mismo tipo, 1 = misma familia; "
-        "no sustituye al juicio humano. IC95: Wilson para Hit, bootstrap (1,000) para MRR y nDCG.",
-        pd.DataFrame(tabla_doc))
+        "(lista de hasta 30). nDCG@5 y P@5 por metadatos (2 = mismo tipo, 1 = misma familia) se calculan sin la "
+        "sentencia fuente: miden si aparecen OTROS precedentes del mismo tipo; no sustituyen al juicio humano. "
+        "IC95: Wilson para Hit, bootstrap (1,000) para MRR y nDCG.", pd.DataFrame(tabla_doc))
     if tabla_juicios:
-        corrida.tabla("Relevancia juzgada por humanos (conjunto B)",
-                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios de juicios.csv; los no juzgados cuentan 0.",
+        corrida.tabla("Relevancia juzgada por humanos",
+                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0.",
                       pd.DataFrame(tabla_juicios))
     else:
-        corrida.advertir("Sin juicios de relevancia (juicios.csv): nDCG@5 y P@5 humanos quedan por medir.")
+        corrida.advertir("Sin juicios de relevancia anotados: nDCG@5 y P@5 humanos quedan por medir.")
 
     # --- Comparaciones pareadas clave ---
     comparaciones = []
@@ -581,15 +593,14 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         comparar("RRF k=60, sin filtro", base, "rr", "RR (documento fuente)")
         comparar("RRF k=60, sin filtro", base, "ndcg5_meta", "nDCG@5 (metadatos)")
         comparar("RRF k=60, sin filtro", base, "ndcg5", "nDCG@5 (juicios)")
-    comparar("RRF k=60 + filtro top-3 (v10)", "RRF k=60, sin filtro", "hit5", "Hit@5 (documento fuente)")
-    comparar("RRF k=60 + filtro top-3 (v10)", "RRF k=60, sin filtro", "ndcg5_meta", "nDCG@5 (metadatos)")
-    comparar("RRF k=60 + filtro top-3 (v10)", "RRF k=60, sin filtro", "ndcg5", "nDCG@5 (juicios)")
-    cls = {v: {r["id"]: r for r in por_consulta[v]} for v in variantes_cls}
+    for metrica, etiqueta in (("hit5", "Hit@5 (documento fuente)"), ("ndcg5_meta", "nDCG@5 (metadatos)"),
+                              ("ndcg5", "nDCG@5 (juicios)")):
+        comparar("RRF k=60 + filtro top-3 (app)", "RRF k=60, sin filtro", metrica, etiqueta)
+    a, b = {r["id"]: r for r in res["hib"]}, {r["id"]: r for r in res["knn"]}
     for metrica in ("hit3_tipo", "hit3_familia"):
-        a, b = cls[variantes_cls[1]], cls[variantes_cls[3]]
         comunes = sorted(set(a) & set(b))
         if comunes:
-            comparaciones.append({"A": variantes_cls[1], "B": variantes_cls[3], "métrica": metrica, "n": len(comunes),
+            comparaciones.append({"A": hib, "B": "k-NN 10", "métrica": metrica, "n": len(comunes),
                                   **_fila_diferencia([a[i][metrica] for i in comunes], [b[i][metrica] for i in comunes])})
     if comparaciones:
         corrida.tabla("Comparaciones pareadas",
@@ -645,24 +656,24 @@ def _tabla_sin_respuesta(env: Entorno, sin_resp: list[Preparada], conocidas: lis
 # --------------------------------------------------------------------------------------------------------------
 
 
-def _componentes_por_consulta(env: Entorno, con_fuente: bool) -> list[tuple[Consulta, pd.DataFrame]]:
+def _componentes_por_consulta(env: Entorno) -> list[tuple[Consulta, pd.DataFrame]]:
+    """Señales del clasificador por consulta del conjunto A, sin la sentencia fuente en el voto."""
     out = []
     for p in preparar(env):
         c = p.consulta
         if not c.documento_conocido:
             continue
-        _, comp, _ = _clasificacion(env, p, excluir=None if con_fuente else {c.doc_id_fuente})
+        _, comp, _ = _clasificacion(env, p, excluir={c.doc_id_fuente})
         out.append((c, comp))
     return out
 
 
-def experimento_ablacion(env: Entorno, con_fuente: bool = False, log: Callable[[str], None] = print) -> Corrida:
+def experimento_ablacion(env: Entorno, log: Callable[[str], None] = print) -> Corrida:
     """Quita un componente del clasificador a la vez y mide la diferencia pareada contra el clasificador
     completo. Si quitar un componente no empeora (Δ ≥ 0 o IC con 0), no está aportando en estos datos."""
     corrida = env.corrida
-    corrida.parametros["con_fuente"] = con_fuente
     log("Calculando componentes del clasificador por consulta...")
-    datos = _componentes_por_consulta(env, con_fuente)
+    datos = _componentes_por_consulta(env)
     completo = PesosClasificador.desde_config()
 
     def evaluar(pesos: PesosClasificador) -> dict[str, list[float]]:
@@ -689,7 +700,7 @@ def experimento_ablacion(env: Entorno, con_fuente: bool = False, log: Callable[[
     corrida.tabla(
         "Ablación del clasificador",
         "Cada fila apaga un componente (peso 0 o penalización desactivada). Δ = variante − completo, pareado por "
-        f"consulta. {'Con' if con_fuente else 'Sin'} la sentencia fuente en el voto. Δ negativo significativo = el "
+        "consulta, sin la sentencia fuente en el voto. Δ negativo significativo = el "
         "componente ayuda; Δ ≥ 0 = no aporta (o estorba) en estos datos.", pd.DataFrame(filas))
 
     todas = pd.concat([comp for _, comp in datos], ignore_index=True) if datos else pd.DataFrame()
@@ -702,17 +713,16 @@ def experimento_ablacion(env: Entorno, con_fuente: bool = False, log: Callable[[
 
 
 def experimento_pesos(env_dev: Entorno, env_prueba: Entorno | None, objetivo: str = "hit3_familia",
-                      paso: float = 0.05, top: int = 10, con_fuente: bool = False,
-                      log: Callable[[str], None] = print) -> Corrida:
+                      paso: float = 0.05, top: int = 10, log: Callable[[str], None] = print) -> Corrida:
     """Búsqueda en malla de pesos (suman 1, paso 0.05) **solo en desarrollo**; el mejor se evalúa una vez en
     prueba contra los pesos v10. Elegir con prueba y reportar con prueba inflaría el resultado (sobreajuste)."""
     corrida = env_dev.corrida
-    corrida.parametros.update(objetivo=objetivo, paso=paso, con_fuente=con_fuente)
+    corrida.parametros.update(objetivo=objetivo, paso=paso)
     base = PesosClasificador.desde_config()
     W = malla_pesos(paso)
     log(f"Malla: {len(W):,} combinaciones de pesos...")
     casos = [caso_malla(comp, c.tipo, c.familia, env_dev.familias, base)
-             for c, comp in _componentes_por_consulta(env_dev, con_fuente)]
+             for c, comp in _componentes_por_consulta(env_dev)]
     res = evaluar_malla(casos, W)
     secundario = "top1_familia" if objetivo != "top1_familia" else "hit3_tipo"
     orden = np.lexsort((-res[secundario], -res[objetivo]))
@@ -729,7 +739,7 @@ def experimento_pesos(env_dev: Entorno, env_prueba: Entorno | None, objetivo: st
 
     if env_prueba is not None:
         log("Evaluando una sola vez en prueba (v10 vs. mejores de desarrollo)...")
-        datos = _componentes_por_consulta(env_prueba, con_fuente)
+        datos = _componentes_por_consulta(env_prueba)
         filas_p, por_variante = [], {}
         for nombre, pesos in (("v10", base), ("mejores de desarrollo", mejor)):
             rs = [resumen_categorias(c.tipo, c.familia, ranking_categorias(comp, pesos),
@@ -871,6 +881,52 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
     corrida.tabla("QC_2 (anti-alucinación) contra el juicio humano",
                   "Positivo = QC_2 acepta la ficha; verdad = el anotador la marcó como aceptable.",
                   pd.DataFrame([_filas_qc("QC_2", r, r["VP"], r["VP"] + r["FN"])]))
+    return corrida
+
+
+def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callable[[str], None] = print) -> Corrida:
+    """Diagnóstico de QC_1 SIN anotaciones: con los 16 ejemplos penales de la app, qué fracción de sus k primeros
+    candidatos descarta cada versión del prompt y cada contexto, y en cuántas consultas descarta todo.
+
+    No mide calidad (no sabemos cuáles descartes son correctos): solo muestra qué tan estricto es el control.
+    La calidad se mide con `qc` contra juicios humanos."""
+    from ..embeddings import embed_query
+    from ..pipeline import combinar_candidatos, parse_veredicto
+    from .regresion import EJEMPLOS_PENALES, conceptos_para, leer_conceptos
+
+    cache = leer_conceptos()
+    pares = []
+    for e in EJEMPLOS_PENALES:
+        conceptos = conceptos_para(e.texto, "v11", cache)
+        q = embed_query(e.texto)
+        lexica = f"{e.texto} {conceptos}"
+        amplios = store.buscar(e.texto, query_embedding=q, consulta_lexica=lexica)
+        tabla = clasificador.clasificar(e.texto, conceptos, q, recuperados=amplios).tabla
+        filtro = [t for c in tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO) for t in clasificador.tipos_de(c)]
+        estrictos = store.buscar(e.texto, tipos=filtro, query_embedding=q, consulta_lexica=lexica)
+        candidatos, _ = combinar_candidatos(estrictos, amplios, config.RAG_NUM_RESULTS_DESIRED)
+        pares += [(e, q, c) for c, _ in candidatos[:k]]
+    filas = []
+    for version in ("v10", "v11"):
+        for contexto in ("inicio", "fragmento_similar"):
+            log(f"   QC_1 {version} · {contexto} ({len(pares)} pares)...")
+            veredictos: dict[str, list] = {}
+            for e, q, c in pares:
+                frag = (store.fragmento_mas_similar(c.doc_id, q, config.QC1_MAX_CHARS) if contexto == "fragmento_similar"
+                        else c.texto[:config.QC1_MAX_CHARS])
+                resp = llm.generate(prompts.prompt_qc1(version).format(texto_consulta=e.texto, fragmento_documento=frag))
+                veredictos.setdefault(e.etiqueta, []).append(parse_veredicto(resp))
+            todos = [v for vs in veredictos.values() for v in vs]
+            filas.append({"prompt QC_1": version, "contexto": contexto, "pares": len(todos),
+                          "descartados (NO)": sum(v is False for v in todos) / len(todos),
+                          "ambiguos": sum(v is None for v in todos) / len(todos),
+                          f"consultas con los {k} descartados": sum(all(v is False for v in vs)
+                                                                    for vs in veredictos.values())})
+    corrida = Corrida("qc-diagnostico", parametros={"k": k, "consultas": "16 ejemplos penales de la app"})
+    corrida.tabla("Tasa de descarte de QC_1 por versión y contexto",
+                  f"Para los {k} primeros candidatos de cada uno de los 16 ejemplos penales. Solo diagnóstico: un "
+                  "descarte puede ser correcto o injusto; la calidad se mide con `qc` contra juicios humanos.",
+                  pd.DataFrame(filas), diagnostico=True)
     return corrida
 
 

@@ -178,7 +178,7 @@ def cmd_ablacion(args) -> None:
     from .experimentos import experimento_ablacion
 
     env = _entorno(args, "ablacion", args.particion)
-    _guardar(experimento_ablacion(env, con_fuente=args.con_fuente, log=_log))
+    _guardar(experimento_ablacion(env, log=_log))
 
 
 def cmd_pesos(args) -> None:
@@ -196,8 +196,7 @@ def cmd_pesos(args) -> None:
         from .experimentos import conceptos_de, leer_conceptos
 
         env_prueba.conceptos, _ = conceptos_de(prueba, leer_conceptos())
-    _guardar(experimento_pesos(env_dev, env_prueba, objetivo=args.objetivo, paso=args.paso,
-                               con_fuente=args.con_fuente, log=_log))
+    _guardar(experimento_pesos(env_dev, env_prueba, objetivo=args.objetivo, paso=args.paso, log=_log))
 
 
 def cmd_qc(args) -> None:
@@ -229,6 +228,16 @@ def cmd_generacion(args) -> None:
             f.write(json.dumps(g, ensure_ascii=False) + "\n")
     print(corrida.markdown())
     _log(f"\nResultados: {pj}\nAfirmaciones para marcar alucinaciones: {base}_afirmaciones.csv")
+
+
+def cmd_qc_diagnostico(args) -> None:
+    from ..clasificador import construir_clasificador
+    from ..vectorstore import SentenciasStore
+    from .experimentos import experimento_qc_diagnostico
+
+    store = SentenciasStore(log=lambda _m: None)
+    clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
+    _guardar(experimento_qc_diagnostico(store, clas, _llm(), k=args.k, log=_log))
 
 
 def cmd_regresion(args) -> None:
@@ -285,8 +294,6 @@ def main(argv=None) -> None:
                                 ("latencia", cmd_latencia, "Latencia de punta a punta")):
         s = sub.add_parser(nombre, help=ayuda)
         s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
-        if nombre == "ablacion":
-            s.add_argument("--con-fuente", action="store_true", help="Deja votar a la sentencia fuente")
         if nombre == "qc":
             s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ambas"], default="ambas")
         if nombre == "latencia":
@@ -297,9 +304,12 @@ def main(argv=None) -> None:
     s.add_argument("--objetivo", choices=["hit3_familia", "hit3_tipo", "top1_familia", "top1_tipo"],
                    default="hit3_familia")
     s.add_argument("--paso", type=float, default=0.05)
-    s.add_argument("--con-fuente", action="store_true")
     s.add_argument("--sin-prueba", action="store_true", help="Solo desarrollo (no toca la partición de prueba)")
     s.set_defaults(func=cmd_pesos)
+
+    s = sub.add_parser("qc-diagnostico", help="Tasa de descarte de QC_1 por versión y contexto (sin anotaciones)")
+    s.add_argument("--k", type=int, default=5, help="Candidatos por consulta")
+    s.set_defaults(func=cmd_qc_diagnostico)
 
     s = sub.add_parser("regresion", help="Top-3 de categorías en los ejemplos fijos (sin LLM)")
     s.add_argument("--recalcular-conceptos", action="store_true", help="Precalcula los conceptos con el LLM")

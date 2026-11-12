@@ -77,12 +77,16 @@ class Corrida:
     comando: str
     parametros: dict = field(default_factory=dict)
     tablas: dict[str, tuple[str, pd.DataFrame]] = field(default_factory=dict)
+    diagnosticos: set[str] = field(default_factory=set)
     advertencias: list[str] = field(default_factory=list)
     borrador: bool = False
     extra: dict = field(default_factory=dict)
 
-    def tabla(self, nombre: str, descripcion: str, df: pd.DataFrame) -> None:
+    def tabla(self, nombre: str, descripcion: str, df: pd.DataFrame, diagnostico: bool = False) -> None:
+        """Añade una tabla. `diagnostico=True`: solo va al .md (la interfaz no la muestra)."""
         self.tablas[nombre] = (descripcion, df)
+        if diagnostico:
+            self.diagnosticos.add(nombre)
 
     def advertir(self, msg: str) -> None:
         self.advertencias.append(msg)
@@ -106,7 +110,7 @@ class Corrida:
         directorio.mkdir(parents=True, exist_ok=True)
         base = f"{datetime.now():%Y%m%d-%H%M%S}_{meta['commit']}{'-sucio' if meta['sucio'] else ''}_{self.comando}"
         datos = {**meta, "tablas": {
-            n: {"descripcion": d, "columnas": list(df.columns),
+            n: {"descripcion": d, "columnas": list(df.columns), "diagnostico": n in self.diagnosticos,
                 "filas": [{k: _limpio(v) for k, v in fila.items()} for fila in df.to_dict("records")]}
             for n, (d, df) in self.tablas.items()}}
         pj = directorio / f"{base}.json"

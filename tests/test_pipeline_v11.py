@@ -84,6 +84,8 @@ def test_veredictos_ambiguos_se_cuentan():
 
 
 def test_qc1_contexto_configurable(monkeypatch):
+    assert config.QC1_CONTEXTO == "fragmento_similar"  # por defecto en v11
+    monkeypatch.setattr(config, "QC1_CONTEXTO", "inicio")
     store = StoreFalso([_cand(f"d{i}") for i in range(4)], [])
     llm_ = LLMFalso()
     _correr(store, ClasificadorFalso(), llm_, num_precedentes=1)
@@ -238,3 +240,24 @@ def test_prompt_conceptos_v11(monkeypatch):
     llm_ = LLMFalso()
     _correr(StoreFalso([_cand(f"d{i}") for i in range(4)], []), ClasificadorFalso(), llm_, num_precedentes=1)
     assert "PRIMER concepto" in llm_.prompts[0]
+
+
+def test_qc1_descarta_todo_muestra_no_verificados():
+    store = StoreFalso([_cand(f"d{i}") for i in range(5)], [])
+    _, res = _correr(store, ClasificadorFalso(), LLMFalso(qc1="VEREDICTO: NO"), num_precedentes=2)
+    assert res is not None and len(res.precedentes) == 2
+    assert all(p.no_verificado_qc1 for p in res.precedentes)
+    assert not any(d["documento"] in {"d0", "d1"} for d in res.descartados)
+    assert "VEREDICTO: SI o NO" in prompts.prompt_qc1("v10") and "MISMO problema procesal" in prompts.prompt_qc1()
+
+
+def test_verificar_ficha_marca_sentido_y_articulos():
+    texto = ("... considerando ... artículo 233 del código penal ... r e s u e l v e primera. - se modifica el auto "
+             "de vinculación a proceso de fecha 24 veinticuatro de enero de 2025")
+    c = _cand("d1", texto=texto)
+    ext = "- **Sentido del Fallo:** CONFIRMA\n- **Fundamento Legal:** artículos 233 y 161 del código penal"
+    prec = pipeline.Precedente(1, c, "Filtro estricto", "informe", ext, False)
+    pipeline.verificar_ficha(prec)
+    assert prec.sentido_reglas == "MODIFICA" and prec.datos_penales["sentido_fallo"] == "MODIFICA"
+    assert prec.datos_penales["sentido_llm"] == "CONFIRMA"
+    assert prec.articulos_no_encontrados == ["161"] and len(prec.verificar) == 2

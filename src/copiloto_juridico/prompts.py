@@ -56,6 +56,45 @@ Responde exactamente con este formato:
 VEREDICTO: SI o NO
 """
 
+# v11: el criterio es el que usa un defensor para decidir si una sentencia le sirve como precedente.
+PROMPT_VERIFICACION_RELEVANCIA_V11 = """
+Eres un Asistente de Verificación de Relevancia para un defensor penal. Decide si el Documento Recuperado puede
+servirle como precedente para la Consulta.
+
+Responde SI si el documento trata:
+- el MISMO delito o un delito de la MISMA familia (ej: robo calificado y robo equiparado; homicidio calificado y
+  homicidio en grado de tentativa), o
+- el MISMO problema procesal (ej: prisión preventiva, vinculación a proceso, legalidad de la detención,
+  valoración de un reconocimiento), aunque el delito sea otro.
+No hace falta que los hechos sean idénticos.
+
+Responde NO si el documento trata otro delito Y otro problema procesal, aunque compartan palabras.
+**EJEMPLO NO:** consulta sobre "lesiones en una riña de bar" (lesiones entre desconocidos en un lugar público) y
+documento sobre "lesiones por violencia familiar" (otro delito: protege la integridad familiar, contexto doméstico).
+
+**Consulta del Usuario:**
+"{texto_consulta}"
+
+**Fragmento del Documento Recuperado:**
+"{fragmento_documento}"
+
+Responde exactamente con este formato:
+1. Delito y problema de la consulta: <una frase>
+2. Delito y problema del documento: <una frase>
+VEREDICTO: SI o NO
+"""
+
+
+def prompt_qc1(version: str | None = None) -> str:
+    """Prompt de QC_1 según `config.PROMPT_QC1_VERSION` ("v10": mismo tema Y contexto; "v11": criterio de defensa)."""
+    from . import config
+
+    version = version or config.PROMPT_QC1_VERSION
+    if version not in ("v10", "v11"):
+        raise ValueError(f"Versión de QC_1 desconocida: {version}")
+    return PROMPT_VERIFICACION_RELEVANCIA if version == "v10" else PROMPT_VERIFICACION_RELEVANCIA_V11
+
+
 PROMPT_VERIFICACION_POST_REPORTE = """
 Tu única tarea es actuar como un verificador de CALIDAD.
 Compara la Consulta Original del Usuario con el Informe de Análisis que se acaba de generar.

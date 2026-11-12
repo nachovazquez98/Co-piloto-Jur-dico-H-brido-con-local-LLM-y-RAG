@@ -78,7 +78,7 @@ def normalizar_sentido(texto: str | None) -> str | None:
 
 
 _RE_ARTICULOS = re.compile(
-    r"\b(?:art[ií]culos?|arts?\.?|numeral(?:es)?|preceptos?)\s*((?:\d+\s*(?:[°ºo]\s*)?(?:bis|ter|quater)?"
+    r"\b(?:art[ií]culos?|arts?\.?|numeral(?:es)?|ordinal(?:es)?|preceptos?|dispositivos?)\s*((?:\d+\s*(?:[°ºo]\s*)?(?:bis|ter|quater)?"
     r"(?:\s*(?:,|;|\by\b|\be\b|\bal\b|-)\s*)?)+)", re.IGNORECASE)
 _RE_NUMERO = re.compile(r"(\d+)\s*(?:[°ºo]\s*)?(bis|ter|quater)?", re.IGNORECASE)
 
@@ -127,3 +127,57 @@ def datos_penales(extraccion: str) -> dict[str, str | None]:
         "etapa": campo(c, "etapa procesal", "etapa"),
         "delito": campo(c, "delito"),
     }
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Sentido del fallo por reglas (puntos resolutivos)
+# --------------------------------------------------------------------------------------------------------------
+
+# Se buscan sobre el texto "compacto" (sin espacios ni acentos) porque la extracción del PDF parte palabras
+# ("segund o", "co ntrol"). El orden importa solo para nombrar el valor; se elige el primer verbo que aparece.
+_VERBOS_SENTIDO = [
+    ("REPONE", r"seordenalareposicion|seordenareponer|serepone[n]?el|sedecretalareposicion"),
+    ("REVOCA", r"serevoca[n]?|esderevocarse|revocase|procederevocar|sedeclaralarevocacion"),
+    ("MODIFICA", r"semodifica[n]?|esdemodificarse|modificase|proceedemodificar|procedemodificar"),
+    ("CONFIRMA", r"seconfirma[n]?|esdeconfirmarse|confirmase|procedeconfirmar"),
+]
+_RE_VERBO = re.compile("|".join(f"(?P<{s}>{p})" for s, p in _VERBOS_SENTIDO))
+_RE_MARCA = re.compile(r"seresuelve|resuelve|proposiciones|puntosresolutivos|resolutivos")
+# Anexo de datos testados al final del documento ("no.214 eliminado... lgppicr."): no es parte del fallo.
+_RE_ANEXO = re.compile(r"no\d+eliminado[a-z0-9]{0,200}?lgppicr")
+
+
+def _compacto(texto: str) -> str:
+    t = unicodedata.normalize("NFKD", (texto or "").lower()).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z0-9]", "", t)
+
+
+def sentido_por_reglas(texto_sentencia: str, fraccion_final: float = 0.5, seccion: int = 2500) -> str | None:
+    """Sentido del fallo leído de los puntos resolutivos, sin LLM: CONFIRMA / MODIFICA / REVOCA / REPONE.
+
+    1. Sobre la mitad final del texto (sin el anexo de datos testados) se ubica la sección de resolutivos: la última
+       marca "resuelve" / "proposiciones" / "resolutivos" que tenga un verbo de decisión en los siguientes
+       `seccion` caracteres. (Los ordinales solos no sirven de marca: "primera instancia" aparece en el cuerpo.)
+    2. Si la sección ordena la reposición del procedimiento, el sentido es REPONE (aunque también revoque);
+       si no, el primer verbo de la sección (el del resolutivo PRIMERO).
+    None si no se encuentra (en los PDF largos los resolutivos pueden caer en páginas no extraídas): entonces no
+    hay contraste con el LLM; no es un error.
+    """
+    c = _RE_ANEXO.sub("", _compacto(texto_sentencia))
+    # Mitad final en documentos largos; el texto completo si es corto (siempre al menos 3 secciones).
+    tramo = c[max(0, min(int(len(c) * (1 - fraccion_final)), len(c) - 3 * seccion)):]
+    for m in reversed(list(_RE_MARCA.finditer(tramo))):
+        verbos = [v.lastgroup for v in _RE_VERBO.finditer(tramo, m.end(), m.end() + seccion)]
+        if verbos:
+            return "REPONE" if "REPONE" in verbos else verbos[0]
+    return None
+
+
+def verificar_articulos(texto_ficha: str, texto_sentencia: str) -> list[str]:
+    """Artículos citados en la ficha que NO aparecen en el texto de la sentencia (posibles alucinaciones).
+
+    Se comparan números normalizados ("art. 161", "artículo 161", "numeral 161", "ordinal 161" -> "161"). Ojo: en
+    PDFs de más de 50 páginas el corpus solo tiene 40 páginas, así que "no encontrado" significa "no está en el
+    texto disponible"; por eso se marca para verificar en lugar de borrarlo.
+    """
+    return sorted(extraer_articulos(texto_ficha) - extraer_articulos(texto_sentencia))

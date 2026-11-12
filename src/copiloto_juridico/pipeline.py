@@ -76,13 +76,24 @@ class Precedente:
     veredicto_reporte: str = ""
     ambiguo_qc1: bool = False      # QC_1 respondió algo que no se pudo interpretar como SI/NO
     ambiguo_qc2: bool = False
+    no_verificado_qc1: bool = False  # QC_1 lo descartó, pero se muestra porque QC_1 descartó todo
+    sentido_reglas: str | None = None  # sentido del fallo leído de los resolutivos, sin LLM
+    articulos_no_encontrados: list[str] = field(default_factory=list)
+    verificar: list[str] = field(default_factory=list)  # marcas "verificar" para el usuario
 
     @property
     def datos_penales(self) -> dict:
-        """Acto impugnado, agravios, calificación y sentido del fallo, si la ficha los trae (prompt v11)."""
+        """Acto impugnado, agravios, calificación y sentido del fallo (prompt v11). Si el sentido leído de los
+        resolutivos difiere del que dio el LLM, manda el de los resolutivos y se marca para verificar."""
         from .fichas import datos_penales
 
-        return datos_penales(self.extraccion) if self.candidato.materia == "penal" else {}
+        if self.candidato.materia != "penal":
+            return {}
+        d = datos_penales(self.extraccion)
+        d["sentido_llm"] = d.get("sentido_fallo")
+        if self.sentido_reglas:
+            d["sentido_fallo"] = self.sentido_reglas
+        return d
 
     def markdown(self) -> str:
         c = self.candidato
@@ -129,6 +140,27 @@ class Resultado:
         partes.append("\n---\n_Herramienta de apoyo basada en precedentes públicos del STJ Jalisco. "
                       "No sustituye la asesoría de un profesional del derecho._")
         return "\n".join(partes)
+
+
+def verificar_ficha(prec: "Precedente") -> None:
+    """Chequeos deterministas de la ficha contra el texto de la sentencia (sin LLM).
+
+    - Sentido del fallo: el de los resolutivos (por reglas) contra el del LLM; si difieren, se marca.
+    - Artículos citados que no aparecen en el texto de la sentencia: se marcan y se cuentan.
+    """
+    from .fichas import datos_penales, sentido_por_reglas, verificar_articulos
+
+    if prec.candidato.materia != "penal":
+        return
+    prec.sentido_reglas = sentido_por_reglas(prec.candidato.texto)
+    sentido_llm = datos_penales(prec.extraccion).get("sentido_fallo")
+    if prec.sentido_reglas and sentido_llm and sentido_llm != prec.sentido_reglas:
+        prec.verificar.append(f"sentido del fallo: la ficha dice {sentido_llm}, los resolutivos dicen "
+                              f"{prec.sentido_reglas}")
+    prec.articulos_no_encontrados = verificar_articulos(prec.extraccion, prec.candidato.texto)
+    if prec.articulos_no_encontrados:
+        prec.verificar.append("artículos no encontrados en la sentencia: "
+                              + ", ".join(prec.articulos_no_encontrados))
 
 
 _RE_VEREDICTO = re.compile(r"veredicto[^a-záéíóú]*\b(s[ií]|no)\b", re.IGNORECASE)
@@ -217,6 +249,46 @@ class Copiloto:
         self.llamadas += 1
         return self.llm.generate(prompt)
 
+    def _analizar_candidato(self, consulta: str, cand: Candidato, fuente: str, categorias: list[str],
+                            op: "Opciones") -> tuple["Precedente | None", str, list[str]]:
+        """Ficha de un candidato + verificaciones + QC_2. Devuelve (precedente | None, motivo de descarte, logs)."""
+        logs: list[str] = []
+        max_chars = self.llm.settings.max_context_chars
+        p_ext, p_rep = prompts.prompts_para(cand.materia)
+        contexto = recortar_contexto(cand.texto, max_chars)
+        logs.append(f"   -> Extrayendo hechos con prompt {cand.materia.upper()} "
+                    f"({len(contexto):,} de {len(cand.texto):,} caracteres)...")
+        hechos = self._llm(p_ext.format(contexto=contexto))
+        fallback = False
+        if es_fallo(hechos):
+            logs.append("   ⚠️ Falló la extracción específica. Reintentando con extracción genérica...")
+            p_ext, p_rep = prompts.PROMPTS_DEFAULT
+            hechos = self._llm(p_ext.format(contexto=contexto))
+            fallback = True
+            if es_fallo(hechos):
+                logs.append("   ❌ Falló también la extracción genérica. Descartado.")
+                return None, "Extracción", logs
+        logs.append("   -> Generando informe...")
+        informe = self._llm(p_rep.format(hechos=hechos))
+        if es_fallo(informe):
+            logs.append("   ❌ Falló la generación del informe. Descartado.")
+            return None, "Informe", logs
+        prec = Precedente(0, cand, fuente, informe, hechos, fallback)
+        verificar_ficha(prec)
+        for marca in prec.verificar:
+            logs.append(f"   ⚠️ Verificar: {marca}")
+        if op.qc_post_reporte:
+            prec.veredicto_reporte = self._llm(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
+                texto_consulta=consulta, informe_generado=informe))
+            ok2 = parse_veredicto(prec.veredicto_reporte)
+            if ok2 is False:
+                logs.append("   ❌ QC_2: el informe no es coherente con la consulta (posible alucinación). Descartado.")
+                return None, "QC_2 anti-alucinación", logs
+            prec.ambiguo_qc2 = ok2 is None
+            logs.append("   ✅ QC_2: informe coherente con la consulta." if ok2 else
+                        "   ⚠️ QC_2: veredicto ambiguo, se continúa.")
+        return prec, "", logs
+
     def _contexto_qc1(self, cand: Candidato, q_emb) -> str:
         """Texto de la sentencia que lee QC_1, según `config.QC1_CONTEXTO`."""
         if config.QC1_CONTEXTO == "fragmento_similar":
@@ -283,87 +355,69 @@ class Copiloto:
         # 4. Análisis de precedentes
         yield Evento("paso_inicio", "analisis")
         yield log(f"--- PASO 4: ANÁLISIS DE PRECEDENTES (meta: {op.num_precedentes} informes válidos) ---", "analisis")
-        max_chars = self.llm.settings.max_context_chars
         precedentes: list[Precedente] = []
         descartados: list[dict] = []
+        rechazados_qc1: list[tuple[Candidato, str, str]] = []
         ambiguos = 0
-        for n, (cand, fuente) in enumerate(candidatos[:op.max_candidatos], 1):
-            if len(precedentes) >= op.num_precedentes:
-                break
-            yield log(f"\n--- Candidato {n}: {cand.doc_id} | {cand.tipo} | similitud {cand.similitud:.3f} ({fuente})",
-                      "analisis")
-            yield Evento("progreso", "analisis", f"Analizando candidato {n}: {etiqueta_tipo(cand.tipo)}",
-                         {"validos": len(precedentes), "meta": op.num_precedentes})
-            try:
-                veredicto_rel = ""
-                ambiguo_qc1 = ambiguo_qc2 = False
+        try:
+            for n, (cand, fuente) in enumerate(candidatos[:op.max_candidatos], 1):
+                if len(precedentes) >= op.num_precedentes:
+                    break
+                yield log(f"\n--- Candidato {n}: {cand.doc_id} | {cand.tipo} | similitud {cand.similitud:.3f} "
+                          f"({fuente})", "analisis")
+                yield Evento("progreso", "analisis", f"Analizando candidato {n}: {etiqueta_tipo(cand.tipo)}",
+                             {"validos": len(precedentes), "meta": op.num_precedentes})
+                veredicto_rel, ambiguo_qc1 = "", False
                 if op.qc_relevancia:
-                    veredicto_rel = self._llm(prompts.PROMPT_VERIFICACION_RELEVANCIA.format(
+                    veredicto_rel = self._llm(prompts.prompt_qc1().format(
                         texto_consulta=consulta, fragmento_documento=self._contexto_qc1(cand, q_emb)))
                     ok = parse_veredicto(veredicto_rel)
-                    if ok is None:
-                        ambiguos += 1
-                        ambiguo_qc1 = True
                     if ok is False:
-                        yield log("   ❌ QC_1: el contexto del documento NO corresponde a la consulta. Descartado.",
+                        yield log("   ❌ QC_1: el documento no sirve como precedente para la consulta. Descartado.",
                                   "analisis")
                         descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": "QC_1 relevancia"})
+                        rechazados_qc1.append((cand, fuente, veredicto_rel))
                         continue
+                    ambiguo_qc1 = ok is None
+                    ambiguos += ambiguo_qc1
                     yield log("   ✅ QC_1: relevancia confirmada." if ok else
                               "   ⚠️ QC_1: veredicto ambiguo, se continúa.", "analisis")
-
-                p_ext, p_rep = prompts.prompts_para(cand.materia)
-                contexto = recortar_contexto(cand.texto, max_chars)
-                yield log(f"   -> Extrayendo hechos con prompt {cand.materia.upper()} "
-                          f"({len(contexto):,} de {len(cand.texto):,} caracteres)...", "analisis")
-                hechos = self._llm(p_ext.format(contexto=contexto))
-                fallback = False
-                if es_fallo(hechos):
-                    yield log("   ⚠️ Falló la extracción específica. Reintentando con extracción genérica...",
-                              "analisis")
-                    p_ext, p_rep = prompts.PROMPTS_DEFAULT
-                    hechos = self._llm(p_ext.format(contexto=contexto))
-                    fallback = True
-                    if es_fallo(hechos):
-                        yield log("   ❌ Falló también la extracción genérica. Descartado.", "analisis")
-                        descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": "Extracción"})
-                        continue
-
-                yield log("   -> Generando informe...", "analisis")
-                informe = self._llm(p_rep.format(hechos=hechos))
-                if es_fallo(informe):
-                    yield log("   ❌ Falló la generación del informe. Descartado.", "analisis")
-                    descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": "Informe"})
+                prec, motivo, logs = self._analizar_candidato(consulta, cand, fuente, categorias, op)
+                for m in logs:
+                    yield log(m, "analisis")
+                if prec is None:
+                    descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": motivo})
                     continue
+                prec.numero, prec.veredicto_relevancia, prec.ambiguo_qc1 = len(precedentes) + 1, veredicto_rel, ambiguo_qc1
+                ambiguos += prec.ambiguo_qc2
+                precedentes.append(prec)
+                yield log(f"   ✅ Informe válido ({len(precedentes)}/{op.num_precedentes}).", "analisis")
+                yield Evento("precedente", "analisis", datos={"precedente": prec})
 
-                veredicto_rep = ""
-                if op.qc_post_reporte:
-                    veredicto_rep = self._llm(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
-                        texto_consulta=consulta, informe_generado=informe))
-                    ok2 = parse_veredicto(veredicto_rep)
-                    if ok2 is False:
-                        yield log("   ❌ QC_2: el informe no es coherente con la consulta (posible alucinación). "
-                                  "Descartado.", "analisis")
-                        descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": "QC_2 anti-alucinación"})
+            if not precedentes and rechazados_qc1:
+                # QC_1 descartó todo: en lugar de no mostrar nada, se muestran los mejores candidatos marcados.
+                yield log(f"\n   ⚠️ QC_1 descartó todos los candidatos. Se muestran los {op.num_precedentes} mejores "
+                          "marcados como NO VERIFICADOS por QC_1.", "analisis")
+                for cand, fuente, veredicto_rel in rechazados_qc1:
+                    if len(precedentes) >= op.num_precedentes:
+                        break
+                    prec, motivo, logs = self._analizar_candidato(consulta, cand, fuente, categorias, op)
+                    for m in logs:
+                        yield log(m, "analisis")
+                    if prec is None:
                         continue
-                    if ok2 is None:
-                        ambiguos += 1
-                        ambiguo_qc2 = True
-                    yield log("   ✅ QC_2: informe coherente con la consulta." if ok2 else
-                              "   ⚠️ QC_2: veredicto ambiguo, se continúa.", "analisis")
-            except LLMError as e:
-                yield Evento("error", "analisis", str(e))
-                return
-
-            prec = Precedente(len(precedentes) + 1, cand, fuente, informe, hechos, fallback, veredicto_rel, veredicto_rep,
-                              ambiguo_qc1, ambiguo_qc2)
-            precedentes.append(prec)
-            yield log(f"   ✅ Informe válido ({len(precedentes)}/{op.num_precedentes}).", "analisis")
-            yield Evento("precedente", "analisis", datos={"precedente": prec})
+                    prec.numero, prec.veredicto_relevancia, prec.no_verificado_qc1 = (len(precedentes) + 1,
+                                                                                      veredicto_rel, True)
+                    descartados = [d for d in descartados if d["documento"] != cand.doc_id]
+                    precedentes.append(prec)
+                    yield Evento("precedente", "analisis", datos={"precedente": prec})
+        except LLMError as e:
+            yield Evento("error", "analisis", str(e))
+            return
 
         if not precedentes:
-            yield Evento("error", "analisis", "Ningún precedente superó los controles de calidad. "
-                                              "Prueba a reformular la consulta con más detalle.")
+            yield Evento("error", "analisis", "No se pudo generar ninguna ficha válida (fallaron la extracción o los "
+                                              "controles). Prueba a reformular la consulta con más detalle.")
             return
         yield Evento("paso_fin", "analisis", f"{len(precedentes)} informes válidos · {len(descartados)} descartados"
                      + (f" · {ambiguos} veredictos ambiguos" if ambiguos else ""))

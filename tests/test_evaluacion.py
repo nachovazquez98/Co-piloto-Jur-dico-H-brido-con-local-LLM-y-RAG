@@ -284,3 +284,48 @@ def test_reporte_guarda_json_y_md(tmp_path):
     assert "configuracion" in datos and "corpus_fingerprint" in datos
     assert "BORRADOR" in pm.read_text()
     assert ultimo_resultado("prueba", tmp_path)["_archivo"] == pj.name
+
+
+# Fragmentos reales de resolutivos del corpus (texto tal como lo deja la extracción del PDF).
+RESOLUTIVOS_REALES = [
+    ("2025-06-05-110514_penal_violencia-intrafamiliar.pdf", "CONFIRMA",
+     "resuelve en base a las siguientes p r o p o s i c i o n e s primera. - se confirma la resolución pronunciada "
+     "el 06 seis de mayo de 2019 dos mil diecinueve, por el juez déc"),
+    ("2025-10-10-135730_penal_lesiones-a-titulo-de-culpa.pdf", "MODIFICA",
+     "r e s u e l v e primera. - se modifica el auto de vinculación a proceso de fecha 24 veinticuatro de enero de "
+     "2025 dos mil veint"),
+    ("2025-04-10-132125_penal_fraude-especifico.pdf", "REVOCA",
+     "r e s u e l v e  primera. por los motivos y fundamentos cuerpo de la presente, se revoca el auto de vinculación "
+     "a proceso, pronunciado el día 22 veintidós de abril de 2024 dos m"),
+    ("2025-12-08-113827_penal_homicidio-culposo.pdf", "REPONE",
+     "r e s u e l v e  primer o. se ordena la reposición del procedimiento de primera insta ncia, a fin de que se "
+     "desahogue nuevamente la totali"),
+]
+
+
+@pytest.mark.parametrize("doc, esperado, texto", RESOLUTIVOS_REALES)
+def test_sentido_por_reglas_con_resolutivos_reales(doc, esperado, texto):
+    from copiloto_juridico.fichas import sentido_por_reglas
+
+    assert sentido_por_reglas(texto) == esperado
+
+
+def test_sentido_por_reglas_casos_dificiles():
+    from copiloto_juridico.fichas import sentido_por_reglas
+
+    # Revoca y ordena reponer: manda la reposición
+    assert sentido_por_reglas("se resuelve primera. se revoca la sentencia y se ordena la reposición del "
+                              "procedimiento") == "REPONE"
+    # Argumento en el cuerpo (sin sección de resolutivos): no se inventa un sentido
+    assert sentido_por_reglas("en primera instancia no es suficiente para reponer el procedimiento ni para "
+                              "confirmar lo resuelto") is None
+    # Anexo de datos testados al final no impide encontrar los resolutivos
+    anexo = " no.214 eliminadoelnombrecompleto en 1 renglones por ser un dato identificativo lgppicr." * 40
+    assert sentido_por_reglas("x " * 300 + "r e s u e l v e primero. se confirma el auto" + anexo) == "CONFIRMA"
+
+
+def test_articulos_con_ordinal_y_no_encontrados():
+    from copiloto_juridico.fichas import extraer_articulos, verificar_articulos
+
+    assert extraer_articulos("de conformidad con el ordinal 82 fracción i, y los ordinales 261, 263") == {"82", "261", "263"}
+    assert verificar_articulos("Art. 233 y artículo 161", "... el artículo 233 del código ...") == ["161"]
