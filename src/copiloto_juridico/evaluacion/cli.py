@@ -254,7 +254,23 @@ def cmd_regresion(args) -> None:
 def cmd_latencia(args) -> None:
     from .experimentos import experimento_latencia
 
-    env = _entorno(args, "latencia", args.particion)
+    if args.ejemplos:  # los ejemplos penales de la app (no necesita consultas redactadas)
+        from ..clasificador import construir_clasificador
+        from ..vectorstore import SentenciasStore
+        from .conjuntos import Consulta
+        from .experimentos import Entorno
+        from .regresion import EJEMPLOS_PENALES
+        from .reporte import Corrida
+
+        store = SentenciasStore(log=lambda _m: None)
+        consultas = [Consulta(f"E{i:02d}", e.texto, None, None, None, "desarrollo")
+                     for i, e in enumerate(EJEMPLOS_PENALES, 1)]
+        corrida = Corrida("latencia", parametros={"consultas": "ejemplos penales de la app",
+                                                  "ficha": config.FICHA_MODO, "qc2": config.QC2_MODO})
+        env = Entorno(store, construir_clasificador(store.corpus["tipo"].unique().tolist()), {}, consultas, {}, {},
+                      corrida)
+    else:
+        env = _entorno(args, "latencia", args.particion)
     _guardar(experimento_latencia(env, _llm(con_cache=False), max_consultas=args.max, log=_log))
 
 
@@ -298,6 +314,7 @@ def main(argv=None) -> None:
             s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ambas"], default="ambas")
         if nombre == "latencia":
             s.add_argument("--max", type=int, default=10, help="Número de consultas a ejecutar")
+            s.add_argument("--ejemplos", action="store_true", help="Usa los ejemplos penales de la app")
         s.set_defaults(func=func)
 
     s = sub.add_parser("pesos", help="Malla de pesos en desarrollo, resultado en prueba una vez")

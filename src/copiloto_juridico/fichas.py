@@ -181,3 +181,152 @@ def verificar_articulos(texto_ficha: str, texto_sentencia: str) -> list[str]:
     texto disponible"; por eso se marca para verificar en lugar de borrarlo.
     """
     return sorted(extraer_articulos(texto_ficha) - extraer_articulos(texto_sentencia))
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Ficha penal estructurada (una sola llamada al LLM, JSON)
+# --------------------------------------------------------------------------------------------------------------
+
+import json as _json
+from dataclasses import dataclass, field
+
+CALIFICACIONES = ("FUNDADO", "INFUNDADO", "INOPERANTE", "NO DISPONIBLE")
+_CAMPOS_TEXTO = ("tribunal", "fecha_resolucion", "identificador", "etapa_procesal", "acto_impugnado", "apelante",
+                 "delitos", "hechos_clave", "decision", "resumen")
+
+
+def _texto(v) -> str:
+    if v is None:
+        return DATO_NO_DISPONIBLE
+    if isinstance(v, list):
+        return "; ".join(_texto(x) for x in v) or DATO_NO_DISPONIBLE
+    return str(v).strip() or DATO_NO_DISPONIBLE
+
+
+def _lista(v) -> list[str]:
+    if v is None or v == DATO_NO_DISPONIBLE:
+        return []
+    if isinstance(v, str):
+        return [x.strip() for x in re.split(r"[;\n]", v) if x.strip() and x.strip() != DATO_NO_DISPONIBLE]
+    return [_texto(x) for x in v if _texto(x) != DATO_NO_DISPONIBLE]
+
+
+@dataclass
+class FichaPenal:
+    """Ficha de un precedente penal para la defensa. Se valida al construirse desde el JSON del LLM."""
+
+    tribunal: str
+    fecha_resolucion: str
+    identificador: str
+    etapa_procesal: str
+    acto_impugnado: str
+    apelante: str
+    delitos: str
+    hechos_clave: str
+    sentido_fallo: str
+    decision: str
+    resumen: str
+    agravios: list[dict] = field(default_factory=list)
+    fundamento_legal: list[str] = field(default_factory=list)
+    pruebas_decisivas: list[str] = field(default_factory=list)
+
+    @classmethod
+    def desde_json(cls, respuesta: str) -> "FichaPenal":
+        """Valida la respuesta del LLM. Lanza ValueError con un mensaje útil para pedir la corrección.
+
+        Acepta texto alrededor del JSON (toma del primer "{" al último "}"). Obligatorio: un sentido del fallo
+        interpretable y los campos 'delitos' y 'resumen'; el resto, si falta, queda como dato no disponible."""
+        texto = (respuesta or "").strip()
+        ini, fin = texto.find("{"), texto.rfind("}")
+        if ini < 0 or fin <= ini:
+            raise ValueError("la respuesta no contiene un objeto JSON")
+        try:
+            d = _json.loads(texto[ini:fin + 1])
+        except _json.JSONDecodeError as e:
+            raise ValueError(f"JSON inválido ({e.msg}, posición {e.pos})") from e
+        if not isinstance(d, dict):
+            raise ValueError("el JSON no es un objeto")
+        campos = {k: _texto(d.get(k)) for k in _CAMPOS_TEXTO}
+        faltan = [k for k in ("delitos", "resumen") if campos[k] == DATO_NO_DISPONIBLE]
+        if faltan:
+            raise ValueError(f"faltan los campos obligatorios {faltan}")
+        bruto = normalizar(_texto(d.get("sentido_fallo"))).upper()
+        sentido = next((x for x in SENTIDOS if bruto.startswith(x)), None)
+        if sentido is None:
+            raise ValueError("'sentido_fallo' debe ser CONFIRMA, MODIFICA, REVOCA, REPONE u OTRO")
+        agravios = []
+        for a in d.get("agravios") or []:
+            if isinstance(a, dict) and _texto(a.get("agravio")) != DATO_NO_DISPONIBLE:
+                cal = normalizar(_texto(a.get("calificacion"))).upper()
+                cal = next((c for c in CALIFICACIONES if cal.startswith(c[:6])), "NO DISPONIBLE")
+                agravios.append({"agravio": _texto(a.get("agravio")), "calificacion": cal,
+                                 "razon": _texto(a.get("razon"))})
+            elif isinstance(a, str) and a.strip():
+                agravios.append({"agravio": a.strip(), "calificacion": "NO DISPONIBLE", "razon": DATO_NO_DISPONIBLE})
+        return cls(**campos, sentido_fallo=sentido, agravios=agravios,
+                   fundamento_legal=_lista(d.get("fundamento_legal")), pruebas_decisivas=_lista(d.get("pruebas_decisivas")))
+
+    def campos_markdown(self) -> str:
+        """La ficha como lista de campos `- **Campo:** valor`, el mismo formato de la extracción en dos llamadas
+        (así la lectura de campos y las verificaciones funcionan igual en ambos modos)."""
+        agravios = "\n".join(f"  {i}. {a['agravio']}" for i, a in enumerate(self.agravios, 1)) or DATO_NO_DISPONIBLE
+        calif = "\n".join(f"  {i}. {a['calificacion']}: {a['razon']}" for i, a in enumerate(self.agravios, 1)) \
+            or DATO_NO_DISPONIBLE
+        lineas = [
+            f"- **Tribunal:** {self.tribunal}, {self.fecha_resolucion}",
+            f"- **Identificador Judicial:** {self.identificador}",
+            f"- **Etapa Procesal:** {self.etapa_procesal}",
+            f"- **Acto Impugnado:** {self.acto_impugnado}",
+            f"- **Apelante:** {self.apelante}",
+            f"- **Delito(s) Principal(es):** {self.delitos}",
+            f"- **Hechos Clave:** {self.hechos_clave}",
+            f"- **Agravios Planteados:**\n{agravios}",
+            f"- **Calificación de los Agravios:**\n{calif}",
+            f"- **Sentido del Fallo:** {self.sentido_fallo}",
+            f"- **Decisión Específica:** {self.decision}",
+            f"- **Fundamento Legal:** {'; '.join(self.fundamento_legal) or DATO_NO_DISPONIBLE}",
+            f"- **Pruebas Decisivas:** {'; '.join(self.pruebas_decisivas) or DATO_NO_DISPONIBLE}",
+        ]
+        return "\n".join(lineas)
+
+    def informe_markdown(self, articulos_no_encontrados: list[str] | None = None) -> str:
+        """Informe legible (lo que antes redactaba una segunda llamada al LLM), armado con código."""
+        faltan = set(articulos_no_encontrados or [])
+
+        def fundamento(f: str) -> str:
+            ausentes = sorted(extraer_articulos(f) & faltan)
+            return f + (f" _(no encontrado en la sentencia: art. {', '.join(ausentes)})_" if ausentes else "")
+
+        agravios = "\n".join(f"- {a['agravio']} — **{a['calificacion']}**"
+                             + (f": {a['razon']}" if a["razon"] != DATO_NO_DISPONIBLE else "")
+                             for a in self.agravios) or f"- {DATO_NO_DISPONIBLE}"
+        return "\n".join([
+            "#### Resumen", self.resumen, "",
+            "#### Datos del proceso",
+            f"- **Tribunal:** {self.tribunal} · {self.fecha_resolucion}",
+            f"- **Toca / expediente:** {self.identificador}",
+            f"- **Acto impugnado:** {self.acto_impugnado} · **Apelante:** {self.apelante}",
+            f"- **Delito(s):** {self.delitos}",
+            f"- **Sentido del fallo:** {self.sentido_fallo}", "",
+            "#### Agravios y su calificación", agravios, "",
+            "#### Hechos y decisión", f"**Hechos:** {self.hechos_clave}", "", f"**Decisión:** {self.decision}", "",
+            "#### Fundamento legal",
+            "\n".join(f"- {fundamento(f)}" for f in self.fundamento_legal) or f"- {DATO_NO_DISPONIBLE}",
+            "", "#### Pruebas decisivas",
+            "\n".join(f"- {x}" for x in self.pruebas_decisivas) or f"- {DATO_NO_DISPONIBLE}",
+        ])
+
+
+def familia_del_delito(delitos: str) -> str:
+    """Familia de delito del texto libre de la ficha ("Robo calificado, previsto por el art. 233...")."""
+    from .datos.balance import slugify
+    from .evaluacion.familias import FAMILIA_OTROS, _REGLAS_BUSQUEDA, asignar_familia
+
+    slug = re.sub(r"^(?:el-|los-|la-)?(?:delitos?-(?:de-)?)?", "", slugify(delitos or ""))
+    familia = asignar_familia(f"penal/{slug}").familia
+    if familia != FAMILIA_OTROS:
+        return familia
+    for f, patron in _REGLAS_BUSQUEDA:  # el delito no está al inicio: se busca en todo el texto
+        if patron.search(slug):
+            return f
+    return FAMILIA_OTROS

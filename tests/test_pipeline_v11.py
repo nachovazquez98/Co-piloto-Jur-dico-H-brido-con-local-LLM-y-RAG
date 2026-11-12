@@ -48,9 +48,14 @@ class LLMFalso:
     def __init__(self, qc1="1. ...\n2. ...\nVEREDICTO: SI", qc2="VEREDICTO: SI"):
         self.settings = SimpleNamespace(model="falso", max_context_chars=10_000)
         self.qc1, self.qc2, self.prompts = qc1, qc2, []
+        self.ficha = {"delitos": "Robo calificado", "resumen": "La Sala confirmó el auto.", "sentido_fallo": "CONFIRMA",
+                      "acto_impugnado": "Auto de vinculación a proceso", "fundamento_legal": ["artículo 233"],
+                      "agravios": [{"agravio": "Reconocimiento ilegal", "calificacion": "INFUNDADO", "razon": "x"}]}
 
-    def generate(self, prompt):
+    def generate(self, prompt, json_mode=False):
         self.prompts.append(prompt)
+        if json_mode:
+            return json.dumps(self.ficha)
         if "Verificación de Relevancia" in prompt:
             return self.qc1
         if "verificador de CALIDAD" in prompt:
@@ -74,13 +79,46 @@ def _correr(store, clasif, llm_, **op):
     return eventos, res[0].datos["resultado"] if res else None
 
 
-def test_veredictos_ambiguos_se_cuentan():
+def test_veredictos_ambiguos_se_cuentan(monkeypatch):
     store = StoreFalso([_cand(f"d{i}") for i in range(6)], [])
-    _, res = _correr(store, ClasificadorFalso(), LLMFalso(qc1="Depende del contexto.", qc2="Puede ser."), num_precedentes=2)
-    assert res.veredictos_ambiguos == 4  # 2 precedentes × (QC_1 + QC_2)
-    assert all(p.ambiguo_qc1 and p.ambiguo_qc2 for p in res.precedentes)
+    # Flujo v11 (ficha JSON en una llamada + QC_2 determinista): solo QC_1 puede ser ambiguo
+    _, res = _correr(store, ClasificadorFalso(), LLMFalso(qc1="Depende del contexto."), num_precedentes=2)
+    assert res.veredictos_ambiguos == 2 and all(p.ambiguo_qc1 for p in res.precedentes)
+    assert res.llamadas_llm == 1 + 2 * 2 + 1  # conceptos + (QC_1 + ficha) por precedente + síntesis
+    # Flujo de comparación (dos llamadas + QC_2 con LLM)
+    monkeypatch.setattr(config, "FICHA_MODO", "dos_llamadas")
+    monkeypatch.setattr(config, "QC2_MODO", "llm")
+    _, res = _correr(store, ClasificadorFalso(), LLMFalso(qc1="Depende del contexto.", qc2="Puede ser."),
+                     num_precedentes=2)
+    assert res.veredictos_ambiguos == 4 and all(p.ambiguo_qc1 and p.ambiguo_qc2 for p in res.precedentes)
     assert "Veredictos ambiguos:** 4" in res.markdown()
     assert res.llamadas_llm == 1 + 2 * 4 + 1
+
+
+def test_ficha_json_una_llamada_y_qc2_determinista():
+    store = StoreFalso([_cand(f"d{i}") for i in range(4)], [])
+    llm_ = LLMFalso()
+    _, res = _correr(store, ClasificadorFalso(), llm_, num_precedentes=1)
+    p = res.precedentes[0]
+    assert p.ficha.sentido_fallo == "CONFIRMA" and p.ficha.agravios[0]["calificacion"] == "INFUNDADO"
+    assert "#### Agravios y su calificación" in p.informe and "QC_2" not in " ".join(llm_.prompts)
+    assert p.datos_penales["acto_impugnado"].startswith("Auto de vinculación")
+    assert "coherente" in p.veredicto_reporte
+    # Delito de otra familia que la consulta y que la etiqueta de la sentencia: QC_2 lo descarta
+    llm_ = LLMFalso()
+    llm_.ficha = {**llm_.ficha, "delitos": "Fraude genérico"}
+    _, res = _correr(StoreFalso([_cand("d0")], []), ClasificadorFalso(), llm_, num_precedentes=1)
+    assert res is None or not res.precedentes
+
+
+def test_ficha_json_reintenta_y_cae_a_dos_llamadas():
+    class LLMRoto(LLMFalso):
+        def generate(self, prompt, json_mode=False):
+            return "no es json" if json_mode else super().generate(prompt)
+
+    llm_ = LLMRoto()
+    _, res = _correr(StoreFalso([_cand(f"d{i}") for i in range(3)], []), ClasificadorFalso(), llm_, num_precedentes=1)
+    assert res.precedentes[0].ficha is None  # se generó con la extracción en dos llamadas
 
 
 def test_qc1_contexto_configurable(monkeypatch):
@@ -119,6 +157,7 @@ def test_prompt_penal_v11_y_datos_de_la_ficha(monkeypatch):
     for campo in ("Acto Impugnado", "Agravios Planteados", "Calificación de los Agravios", "Sentido del Fallo"):
         assert campo in ext
     assert "CONFIRMA, MODIFICA, REVOCA, REPONE u OTRO" in ext and "Agravios y su Calificación" in rep
+    monkeypatch.setattr(config, "FICHA_MODO", "dos_llamadas")
     store = StoreFalso([_cand(f"d{i}") for i in range(4)], [])
     llm_ = LLMFalso()
     _, res = _correr(store, ClasificadorFalso(), llm_, num_precedentes=1)

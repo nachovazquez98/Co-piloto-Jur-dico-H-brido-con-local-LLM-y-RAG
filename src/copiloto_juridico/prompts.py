@@ -500,6 +500,38 @@ profesional, **detallado y analítico**, útil para un defensor que prepara o co
 **Razonamiento del Tribunal:** [Con base en 'Fundamento Legal' y 'Pruebas Decisivas', **explica** por qué la Sala resolvió así y qué argumentos de la defensa prosperaron o no.]
 """
 
+# v11, una sola llamada: la ficha penal completa como JSON (config.FICHA_MODO = "json"). El informe en Markdown se
+# arma con código a partir del JSON, sin segunda llamada al LLM.
+PROMPT_FICHA_PENAL_JSON = """
+Eres un Analista Legal Penal que apoya a la DEFENSA en segunda instancia. Lee la SENTENCIA PENAL (resolución de un
+recurso de apelación de una Sala Penal) y devuelve su ficha como UN objeto JSON con exactamente estas claves:
+
+{{
+  "tribunal": "Sala que resolvió",
+  "fecha_resolucion": "fecha exacta de la resolución",
+  "identificador": "toca / expediente / causa tal como aparece",
+  "etapa_procesal": "etapa del proceso en que se dictó la resolución apelada",
+  "acto_impugnado": "qué resolución se apeló (auto de vinculación a proceso, prisión preventiva, sentencia definitiva de juicio oral, sobreseimiento, otro)",
+  "apelante": "quién apeló: defensa, Ministerio Público, asesor jurídico de la víctima",
+  "delitos": "delito(s) imputados o acreditados, con su modalidad",
+  "hechos_clave": "2 a 4 frases con la conducta y sus circunstancias de modo, tiempo y lugar",
+  "agravios": [{{"agravio": "argumento del apelante, en una frase", "calificacion": "FUNDADO | INFUNDADO | INOPERANTE | NO DISPONIBLE", "razon": "por qué lo calificó así la Sala, en una frase"}}],
+  "sentido_fallo": "EXACTAMENTE uno de: CONFIRMA, MODIFICA, REVOCA, REPONE, OTRO",
+  "decision": "detalle del fallo (qué se confirma, modifica o revoca; pena final si la hay)",
+  "fundamento_legal": ["cada artículo o jurisprudencia citada como base de la decisión, tal como aparece"],
+  "pruebas_decisivas": ["cada prueba que sustentó el fallo"],
+  "resumen": "2 o 3 frases: delito, acto impugnado, quién apeló y qué resolvió la Sala"
+}}
+
+Reglas:
+- Usa SOLO información del texto. Si un dato no aparece o fue testado ([ELIMINADO], [No.1]...), escribe
+  "[DATO NO DISPONIBLE]" (en listas, deja la lista vacía). No inventes artículos, fechas ni nombres.
+- Responde ÚNICAMENTE con el JSON, en español.
+
+Sentencia:
+{contexto}
+"""
+
 PROMPTS_PENAL_VERSIONES = {
     "v10": (PROMPT_EXTRACCION_PENAL, PROMPT_REPORTE_PENAL),
     "v11": (PROMPT_EXTRACCION_PENAL_V11, PROMPT_REPORTE_PENAL_V11),

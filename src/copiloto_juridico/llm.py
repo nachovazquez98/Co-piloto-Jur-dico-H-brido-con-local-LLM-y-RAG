@@ -29,11 +29,12 @@ class LLMClient:
     def __init__(self, settings: LLMSettings):
         self.settings = settings
 
-    def generate(self, prompt: str) -> str:
-        """Devuelve la respuesta completa (sin alterar mayúsculas ni formato Markdown)."""
-        return "".join(self.stream(prompt)).strip()
+    def generate(self, prompt: str, json_mode: bool = False) -> str:
+        """Devuelve la respuesta completa (sin alterar mayúsculas ni formato Markdown). Con `json_mode`, el
+        servidor restringe la salida a JSON válido (Ollama `format: json`, OpenAI `response_format`)."""
+        return "".join(self.stream(prompt, json_mode)).strip()
 
-    def stream(self, prompt: str) -> Iterator[str]:
+    def stream(self, prompt: str, json_mode: bool = False) -> Iterator[str]:
         raise NotImplementedError
 
     def list_models(self) -> list[str]:
@@ -47,7 +48,7 @@ class OllamaClient(LLMClient):
     def _url(self, path: str) -> str:
         return self.settings.base_url.rstrip("/") + path
 
-    def stream(self, prompt: str) -> Iterator[str]:
+    def stream(self, prompt: str, json_mode: bool = False) -> Iterator[str]:
         s = self.settings
         payload = {
             "model": s.model,
@@ -56,6 +57,8 @@ class OllamaClient(LLMClient):
             "options": {"temperature": s.temperature, "num_predict": s.max_tokens, "num_ctx": s.num_ctx,
                         "seed": s.seed},
         }
+        if json_mode:
+            payload["format"] = "json"
         try:
             with requests.post(self._url("/api/chat"), json=payload, stream=True, timeout=s.timeout) as r:
                 r.raise_for_status()
@@ -103,7 +106,7 @@ class OpenAICompatibleClient(LLMClient):
             h["Authorization"] = f"Bearer {self.settings.api_key}"
         return h
 
-    def stream(self, prompt: str) -> Iterator[str]:
+    def stream(self, prompt: str, json_mode: bool = False) -> Iterator[str]:
         s = self.settings
         payload = {
             "model": s.model,
@@ -113,6 +116,8 @@ class OpenAICompatibleClient(LLMClient):
             "seed": s.seed,
             "stream": True,
         }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
         try:
             with requests.post(self._url("/chat/completions"), json=payload, headers=self._headers(),
                                stream=True, timeout=s.timeout) as r:

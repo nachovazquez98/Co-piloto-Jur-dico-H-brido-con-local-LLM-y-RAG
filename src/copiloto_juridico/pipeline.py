@@ -80,6 +80,7 @@ class Precedente:
     sentido_reglas: str | None = None  # sentido del fallo leído de los resolutivos, sin LLM
     articulos_no_encontrados: list[str] = field(default_factory=list)
     verificar: list[str] = field(default_factory=list)  # marcas "verificar" para el usuario
+    ficha: object | None = None  # FichaPenal cuando se generó en una llamada (FICHA_MODO = "json")
 
     @property
     def datos_penales(self) -> dict:
@@ -140,6 +141,30 @@ class Resultado:
         partes.append("\n---\n_Herramienta de apoyo basada en precedentes públicos del STJ Jalisco. "
                       "No sustituye la asesoría de un profesional del derecho._")
         return "\n".join(partes)
+
+
+def qc2_determinista(prec: "Precedente", familias_clasificadas: set[str]) -> tuple[bool, str]:
+    """QC_2 sin LLM para el alcance penal.
+
+    La familia del delito que reporta la ficha debe ser una de las familias clasificadas para la consulta o la de
+    la etiqueta de la sentencia; si no es ninguna, la ficha trata otro asunto (o el LLM extrajo mal) y se descarta.
+    Si el delito no se reconoce o no coincide con la etiqueta, se acepta con una marca "verificar"."""
+    from .evaluacion.familias import FAMILIA_OTROS, cargar_familias, etiqueta_familia
+    from .fichas import datos_penales, familia_del_delito
+
+    delito = datos_penales(prec.extraccion).get("delito") or ""
+    fam = familia_del_delito(delito)
+    fam_doc = cargar_familias([prec.candidato.tipo])[prec.candidato.tipo]
+    if fam == FAMILIA_OTROS:
+        prec.verificar.append(f"no se reconoció la familia del delito de la ficha ('{delito[:60]}')")
+        return True, "delito no reconocido; se acepta para revisión"
+    if fam not in familias_clasificadas | {fam_doc}:
+        return False, (f"el delito de la ficha ({etiqueta_familia(fam)}) no es de las familias de la consulta ni de "
+                       f"la etiqueta de la sentencia ({etiqueta_familia(fam_doc)})")
+    if fam != fam_doc:
+        prec.verificar.append(f"la ficha reporta {etiqueta_familia(fam)}; la sentencia está etiquetada como "
+                              f"{etiqueta_familia(fam_doc)}")
+    return True, f"delito de la ficha coherente ({etiqueta_familia(fam)})"
 
 
 def verificar_ficha(prec: "Precedente") -> None:
@@ -245,17 +270,44 @@ class Copiloto:
         self.llm = llm
         self.llamadas = 0
 
-    def _llm(self, prompt: str) -> str:
+    def _llm(self, prompt: str, json_mode: bool = False) -> str:
         self.llamadas += 1
-        return self.llm.generate(prompt)
+        return self.llm.generate(prompt, json_mode=True) if json_mode else self.llm.generate(prompt)
+
+    def _ficha_json(self, contexto: str, logs: list[str]):
+        """Ficha penal en una llamada (JSON validado); si no se puede interpretar, un reintento con el error."""
+        from .fichas import FichaPenal
+
+        prompt = prompts.PROMPT_FICHA_PENAL_JSON.format(contexto=contexto)
+        respuesta = self._llm(prompt, json_mode=True)
+        try:
+            return FichaPenal.desde_json(respuesta)
+        except ValueError as e:
+            error = str(e)
+            logs.append(f"   ⚠️ Ficha no válida ({error}). Reintentando una vez...")
+        respuesta = self._llm(prompt + f"\n\nTu respuesta anterior no era válida ({error}). Responde solo con el "
+                              "JSON completo y correcto.", json_mode=True)
+        try:
+            return FichaPenal.desde_json(respuesta)
+        except ValueError as e2:
+            logs.append(f"   ⚠️ Tampoco en el reintento ({e2}); se usa la extracción en dos llamadas.")
+            return None
 
     def _analizar_candidato(self, consulta: str, cand: Candidato, fuente: str, categorias: list[str],
                             op: "Opciones") -> tuple["Precedente | None", str, list[str]]:
         """Ficha de un candidato + verificaciones + QC_2. Devuelve (precedente | None, motivo de descarte, logs)."""
         logs: list[str] = []
         max_chars = self.llm.settings.max_context_chars
-        p_ext, p_rep = prompts.prompts_para(cand.materia)
         contexto = recortar_contexto(cand.texto, max_chars)
+        if cand.materia == "penal" and config.FICHA_MODO == "json":
+            logs.append(f"   -> Ficha penal en una llamada ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
+            ficha = self._ficha_json(contexto, logs)
+            if ficha is not None:
+                prec = Precedente(0, cand, fuente, "", ficha.campos_markdown(), False, ficha=ficha)
+                verificar_ficha(prec)
+                prec.informe = ficha.informe_markdown(prec.articulos_no_encontrados)
+                return self._qc2(consulta, prec, categorias, op, logs)
+        p_ext, p_rep = prompts.prompts_para(cand.materia)
         logs.append(f"   -> Extrayendo hechos con prompt {cand.materia.upper()} "
                     f"({len(contexto):,} de {len(cand.texto):,} caracteres)...")
         hechos = self._llm(p_ext.format(contexto=contexto))
@@ -275,11 +327,16 @@ class Copiloto:
             return None, "Informe", logs
         prec = Precedente(0, cand, fuente, informe, hechos, fallback)
         verificar_ficha(prec)
-        for marca in prec.verificar:
-            logs.append(f"   ⚠️ Verificar: {marca}")
-        if op.qc_post_reporte:
+        return self._qc2(consulta, prec, categorias, op, logs)
+
+    def _qc2(self, consulta: str, prec: "Precedente", categorias: list[str], op: "Opciones",
+             logs: list[str]) -> tuple["Precedente | None", str, list[str]]:
+        """QC_2. Determinista (por defecto): descarta si el delito de la ficha no es de ninguna familia clasificada
+        ni de la etiqueta de la sentencia (la ficha habla de otra cosa o el LLM extrajo mal). Con "llm", el
+        verificador LLM de v10."""
+        if op.qc_post_reporte and config.QC2_MODO == "llm":
             prec.veredicto_reporte = self._llm(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
-                texto_consulta=consulta, informe_generado=informe))
+                texto_consulta=consulta, informe_generado=prec.informe))
             ok2 = parse_veredicto(prec.veredicto_reporte)
             if ok2 is False:
                 logs.append("   ❌ QC_2: el informe no es coherente con la consulta (posible alucinación). Descartado.")
@@ -287,7 +344,22 @@ class Copiloto:
             prec.ambiguo_qc2 = ok2 is None
             logs.append("   ✅ QC_2: informe coherente con la consulta." if ok2 else
                         "   ⚠️ QC_2: veredicto ambiguo, se continúa.")
+        elif op.qc_post_reporte and prec.candidato.materia == "penal":
+            ok2, motivo = qc2_determinista(prec, self._familias_clasificadas(categorias))
+            if not ok2:
+                logs.append(f"   ❌ QC_2: {motivo}. Descartado.")
+                return None, "QC_2 delito de otra familia", logs
+            prec.veredicto_reporte = motivo
+            logs.append(f"   ✅ QC_2: {motivo}.")
+        for marca in prec.verificar:
+            logs.append(f"   ⚠️ Verificar: {marca}")
         return prec, "", logs
+
+    def _familias_clasificadas(self, categorias: list[str]) -> set[str]:
+        from .evaluacion.familias import cargar_familias
+
+        tipos = [t for c in categorias for t in self.clasificador.tipos_de(c)]
+        return set(cargar_familias(tipos).values())
 
     def _contexto_qc1(self, cand: Candidato, q_emb) -> str:
         """Texto de la sentencia que lee QC_1, según `config.QC1_CONTEXTO`."""

@@ -133,6 +133,12 @@ PROMPT_QC1_VERSION = _env("COPILOTO_PROMPT_QC1", "v11")
 QC1_MAX_CHARS = 2500
 # Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).
 PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v11")
+# Ficha penal: "json" (v11: una llamada que devuelve la ficha estructurada; el informe se arma con código) o
+# "dos_llamadas" (extracción + informe, como v10). Con "json" se ahorra una llamada por candidato.
+FICHA_MODO = _env("COPILOTO_FICHA_MODO", "json")
+# QC_2: "determinista" (sin LLM: el delito de la ficha debe ser de una familia clasificada o de la etiqueta de la
+# sentencia; además se marcan sentido del fallo y artículos no encontrados) o "llm" (verificador LLM de v10).
+QC2_MODO = _env("COPILOTO_QC2_MODO", "determinista")
 # Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
 PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija

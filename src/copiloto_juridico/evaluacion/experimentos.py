@@ -240,19 +240,19 @@ class LLMConCache:
                     d = json.loads(linea)
                     self.memoria[d["clave"]] = d["respuesta"]
 
-    def _clave(self, prompt: str) -> str:
+    def _clave(self, prompt: str, json_mode: bool = False) -> str:
         s = self.settings
         base = json.dumps([s.provider, s.model, s.temperature, s.max_tokens, s.num_ctx,
-                           getattr(s, "seed", None), prompt], ensure_ascii=False)
+                           getattr(s, "seed", None), json_mode, prompt], ensure_ascii=False)
         return hashlib.sha256(base.encode()).hexdigest()
 
-    def generate(self, prompt: str) -> str:
-        clave = self._clave(prompt)
+    def generate(self, prompt: str, json_mode: bool = False) -> str:
+        clave = self._clave(prompt, json_mode)
         self.llamadas += 1
         if clave in self.memoria:
             self.aciertos += 1
             return self.memoria[clave]
-        resp = self.cliente.generate(prompt)
+        resp = self.cliente.generate(prompt, json_mode=json_mode) if json_mode else self.cliente.generate(prompt)
         self.memoria[clave] = resp
         if self.path:
             self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -260,8 +260,8 @@ class LLMConCache:
                 f.write(json.dumps({"clave": clave, "respuesta": resp}, ensure_ascii=False) + "\n")
         return resp
 
-    def stream(self, prompt: str):
-        yield self.generate(prompt)
+    def stream(self, prompt: str, json_mode: bool = False):
+        yield self.generate(prompt, json_mode)
 
 
 class LLMContador:
@@ -272,13 +272,13 @@ class LLMContador:
         self.settings = cliente.settings
         self.llamadas = 0
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, json_mode: bool = False) -> str:
         self.llamadas += 1
-        return self.cliente.generate(prompt)
+        return self.cliente.generate(prompt, json_mode=json_mode)
 
-    def stream(self, prompt: str):
+    def stream(self, prompt: str, json_mode: bool = False):
         self.llamadas += 1
-        yield from self.cliente.stream(prompt)
+        yield from self.cliente.stream(prompt, json_mode)
 
 
 # --------------------------------------------------------------------------------------------------------------

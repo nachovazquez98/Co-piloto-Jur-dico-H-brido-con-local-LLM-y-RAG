@@ -24,12 +24,9 @@ def _uses_e5_prefixes(model_name: str) -> bool:
     return "e5" in model_name.lower()
 
 
-@lru_cache(maxsize=2)
-def get_model(model_name: str = config.EMBEDDING_MODEL_NAME):
-    import torch
+def _cargar(model_name: str, device: str):
     from sentence_transformers import SentenceTransformer
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.info("Cargando modelo de embeddings %s en %s...", model_name, device)
     # Primero desde la caché local: evita consultas al Hub (y sus reintentos) si no hay red.
     try:
@@ -42,14 +39,37 @@ def get_model(model_name: str = config.EMBEDDING_MODEL_NAME):
     return model
 
 
+@lru_cache(maxsize=2)
+def get_model(model_name: str = config.EMBEDDING_MODEL_NAME):
+    """Modelo de embeddings en GPU si hay memoria; si la GPU está llena (p. ej. la ocupa Ollama), en CPU."""
+    import torch
+
+    if torch.cuda.is_available():
+        try:
+            return _cargar(model_name, "cuda")
+        except torch.OutOfMemoryError:
+            logger.warning("GPU sin memoria para el modelo de embeddings; se usa la CPU.")
+            torch.cuda.empty_cache()
+    return _cargar(model_name, "cpu")
+
+
 def embed_texts(texts: list[str], kind: str = "passage", model_name: str = config.EMBEDDING_MODEL_NAME,
                 batch_size: int = config.EMBEDDING_BATCH_SIZE, show_progress: bool = False) -> np.ndarray:
     """Devuelve una matriz (n, dim) de embeddings normalizados (float32)."""
+    import torch
+
     if _uses_e5_prefixes(model_name):
         texts = [f"{kind}: {t}" for t in texts]
     model = get_model(model_name)
-    emb = model.encode(texts, batch_size=batch_size, normalize_embeddings=True,
-                       convert_to_numpy=True, show_progress_bar=show_progress)
+    try:
+        emb = model.encode(texts, batch_size=batch_size, normalize_embeddings=True,
+                           convert_to_numpy=True, show_progress_bar=show_progress)
+    except torch.OutOfMemoryError:
+        logger.warning("GPU sin memoria al calcular embeddings; se pasa el modelo a la CPU.")
+        torch.cuda.empty_cache()
+        model.float().to("cpu")
+        emb = model.encode(texts, batch_size=batch_size, normalize_embeddings=True,
+                           convert_to_numpy=True, show_progress_bar=show_progress)
     return emb.astype(np.float32)
 
 

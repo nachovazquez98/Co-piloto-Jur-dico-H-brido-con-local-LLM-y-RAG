@@ -329,3 +329,20 @@ def test_articulos_con_ordinal_y_no_encontrados():
 
     assert extraer_articulos("de conformidad con el ordinal 82 fracción i, y los ordinales 261, 263") == {"82", "261", "263"}
     assert verificar_articulos("Art. 233 y artículo 161", "... el artículo 233 del código ...") == ["161"]
+
+
+def test_ficha_penal_desde_json():
+    from copiloto_juridico.fichas import FichaPenal, familia_del_delito
+
+    f = FichaPenal.desde_json('Aquí está: {"delitos": "Robo calificado", "resumen": "Se confirma.", '
+                              '"sentido_fallo": "confirma", "agravios": [{"agravio": "A", "calificacion": "infundados"}],'
+                              ' "fundamento_legal": "artículo 233; artículo 161"}')
+    assert f.sentido_fallo == "CONFIRMA" and f.agravios[0]["calificacion"] == "INFUNDADO"
+    assert f.fundamento_legal == ["artículo 233", "artículo 161"] and f.tribunal == "[DATO NO DISPONIBLE]"
+    assert "no encontrado en la sentencia: art. 161" in f.informe_markdown(["161"])
+    assert "- **Sentido del Fallo:** CONFIRMA" in f.campos_markdown()
+    for malo in ("sin json", '{"delitos": "x"}', '{"delitos": "x", "resumen": "y", "sentido_fallo": "quizá"}'):
+        with pytest.raises(ValueError):
+            FichaPenal.desde_json(malo)
+    assert familia_del_delito("Delitos contra la salud en su modalidad de narcomenudeo") == "contra-la-salud"
+    assert familia_del_delito("Tocamientos a un menor") == "otros"
