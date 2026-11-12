@@ -154,14 +154,17 @@ class SentenciasStore:
     def fragmento_mas_similar(self, doc_id: str, q: np.ndarray, largo: int = 2500) -> str:
         """Ventana de `largo` caracteres de la sentencia alrededor del fragmento indexado más parecido a la
         consulta. Alternativa a "los primeros 2,500 caracteres" para QC_1 (config.QC1_CONTEXTO)."""
-        from .embeddings import chunk_text
+        from .embeddings import chunks_de
 
         texto = self.corpus.loc[doc_id, "texto"]
         filas = np.flatnonzero(self.chunk_doc == doc_id)
         if not len(filas):
             return texto[:largo]
         mejor = int(np.argmax(self.emb[filas].astype(np.float32) @ q))
-        chunks = chunk_text(texto)
+        # La misma política de fragmentación con que se construyó el índice (índices de v10 no la guardan: 12).
+        chunks = chunks_de(texto, self.corpus.loc[doc_id, "materia"],
+                           self.manifest.get("max_chunks_penal", self.manifest.get("max_chunks_per_doc", 12)),
+                           self.manifest.get("max_chunks_per_doc", 12))
         inicio = texto.find(chunks[mejor]) if mejor < len(chunks) else -1
         if inicio < 0:
             return texto[:largo]

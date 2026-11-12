@@ -28,7 +28,11 @@ def test_select_balanced_aplica_tope_y_reparte_en_el_tiempo():
     assert fechas[0] == "2025-01-01" and fechas[-1] == "2025-01-28"
 
 
-def test_pages_to_read_muestrea_pdfs_largos():
+def test_pages_to_read_muestrea_pdfs_largos(monkeypatch):
+    from copiloto_juridico import config
+
+    assert pages_to_read(200) == list(range(200))  # v11: se leen completos
+    monkeypatch.setattr(config, "PDF_MAX_PAGES_FULL_READ", 50)  # comportamiento de v10
     assert pages_to_read(10) == list(range(10))
     paginas = pages_to_read(200)
     assert len(paginas) == 40 and paginas[:10] == list(range(10)) and paginas[-1] == 199
@@ -53,3 +57,32 @@ def test_es_fallo_y_recorte():
     assert not es_fallo("- **Tribunal:** Primera Sala\n- **Decisión:** Se confirma la sentencia apelada.")
     recortado = recortar_contexto("a" * 1000 + "b" * 1000, 500)
     assert recortado.startswith("a") and recortado.endswith("b") and "omitido" in recortado
+
+
+ANEXO_REAL = (" no.50 eliminadoelnombrecompleto en 1 renglones por ser un dato identificativo de conformidad con el "
+              "lineamiento quincuagésimo octavo fracción i de los lgppicr. no.43 eliminadoelnombrecompleto en 1 renglones "
+              "po r ser un dato identificativo de conformid ad con el lineamiento quincuagésimo octavo fracción i de los "
+              "lgppicr.")
+
+
+def test_limpiar_texto_quita_anexo_y_ruido():
+    from copiloto_juridico.datos.procesamiento import limpiar_texto
+
+    texto = ("r e s u e l v e primera. se confirma el auto dictado a no.207eliminadoelnombrecompleto1 . 15 --- "
+             "tribunal de justicia del estado de jalisco notifíquese." + ANEXO_REAL)
+    limpio = limpiar_texto(texto)
+    assert "lgppicr" not in limpio and "renglones" not in limpio
+    assert limpio.startswith("resuelve primera. se confirma el auto dictado a [eliminado]")
+    assert "tribunal de justicia" not in limpio and "---" not in limpio
+    assert limpiar_texto(limpio) == limpio  # idempotente
+
+
+def test_recortar_contexto_conserva_agravios():
+    relleno = "texto sin interés. " * 2000
+    agravios = "el primer agravio es infundado; el segundo agravio es fundado. " * 20
+    texto = "INICIO " + relleno + agravios + relleno + " RESOLUTIVOS"
+    r = recortar_contexto(texto, 6000)
+    assert len(r) <= 6000 + 10 and r.startswith("INICIO") and r.endswith("RESOLUTIVOS")
+    assert r.count("agravio es infundado") >= 10
+    sin = recortar_contexto("a" * 5000 + "b" * 5000, 4000)  # sin agravios: 55 % / 45 % como en v10
+    assert sin.startswith("a") and sin.endswith("b")

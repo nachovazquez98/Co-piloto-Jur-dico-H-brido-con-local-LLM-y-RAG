@@ -96,6 +96,30 @@ class Precedente:
             d["sentido_fallo"] = self.sentido_reglas
         return d
 
+    def tarjeta(self) -> dict:
+        """Lo que ve el abogado en la tarjeta del precedente (sirve igual para la ficha JSON y la de dos llamadas)."""
+        from .fichas import DATO_NO_DISPONIBLE, campo, parsear_campos
+
+        c, d = self.candidato, self.datos_penales
+        f = self.ficha
+        if f is not None:
+            agravios = [(a["agravio"], a["calificacion"]) for a in f.agravios]
+            fundamento = f.fundamento_legal
+            identificador, delito, acto = f.identificador, f.delitos, f.acto_impugnado
+        else:
+            campos = parsear_campos(self.extraccion)
+            lineas = [x.strip(" -*0123456789.") for x in (d.get("agravios") or "").splitlines() if x.strip()]
+            agravios = [(x, "") for x in lineas if x and x != DATO_NO_DISPONIBLE]
+            fundamento = [x.strip() for x in (campo(campos, "fundamento") or "").split(";") if x.strip()]
+            identificador = campo(campos, "identificador", "expediente") or DATO_NO_DISPONIBLE
+            delito, acto = d.get("delito") or DATO_NO_DISPONIBLE, d.get("acto_impugnado") or DATO_NO_DISPONIBLE
+        return {
+            "documento": c.doc_id, "fecha": c.fecha, "identificador": identificador, "delito": delito,
+            "acto_impugnado": acto, "sentido_fallo": d.get("sentido_fallo") or DATO_NO_DISPONIBLE,
+            "agravios": agravios, "fundamento": fundamento, "verificar": list(self.verificar),
+            "no_verificado_qc1": self.no_verificado_qc1, "articulos_no_encontrados": self.articulos_no_encontrados,
+        }
+
     def markdown(self) -> str:
         c = self.candidato
         avisos = [f"QC_{n} ambiguo" for n, a in ((1, self.ambiguo_qc1), (2, self.ambiguo_qc2)) if a]
@@ -103,6 +127,8 @@ class Precedente:
             f"### Precedente {self.numero}: {etiqueta_tipo(c.tipo)}\n\n"
             f"| Documento | Fecha | Materia | Similitud | Fuente |\n|---|---|---|---|---|\n"
             f"| `{c.doc_id}` | {c.fecha} | {c.materia.upper()} | {c.similitud:.3f} | {self.fuente} |\n\n"
+            + ("> **No verificado por QC_1.**\n\n" if self.no_verificado_qc1 else "")
+            + "".join(f"> Verificar: {v}\n" for v in self.verificar) + ("\n" if self.verificar else "")
             + (f"_Veredictos no interpretables: {', '.join(avisos)}._\n\n" if avisos else "")
             + f"{self.informe}\n"
         )
@@ -208,14 +234,35 @@ def es_fallo(texto: str | None) -> bool:
     return any(k in bajo for k in config.FAILURE_KEYWORDS)
 
 
+_RE_AGRAVIOS = re.compile(r"agravi|infundad|inoperante|fundad")
+_OMITIDO = "\n\n[... texto omitido por longitud ...]\n\n"
+
+
 def recortar_contexto(texto: str, max_chars: int) -> str:
-    """Si la sentencia no cabe en el contexto del LLM, conserva el inicio (antecedentes) y el final
-    (considerandos finales y resolutivos), que es donde están los datos que se extraen."""
+    """Texto de la sentencia que cabe en la ventana del LLM. No se resume: se eligen partes.
+
+    Si no cabe: el inicio (25 %: tribunal, toca, antecedentes), el final (25 %: resolutivos) y, en medio, la
+    ventana del texto intermedio con más menciones a los agravios y su calificación ("agravio", "fundado",
+    "infundado", "inoperante"), que es lo que más le sirve a la defensa y suele estar en los considerandos. Si el
+    texto intermedio no habla de agravios, se usa 55 % inicio / 45 % final como en v10."""
     if len(texto) <= max_chars:
         return texto
-    cabeza = int(max_chars * 0.55)
-    cola = max_chars - cabeza
-    return texto[:cabeza] + "\n\n[... texto intermedio omitido por longitud ...]\n\n" + texto[-cola:]
+    cabeza, cola = int(max_chars * 0.25), int(max_chars * 0.25)
+    medio = max_chars - cabeza - cola - 2 * len(_OMITIDO)
+    ini, fin = cabeza, len(texto) - cola
+    posiciones = [m.start() for m in _RE_AGRAVIOS.finditer(texto, ini, fin)]
+    if not posiciones or medio <= 0:
+        cabeza = int(max_chars * 0.55)
+        return texto[:cabeza] + _OMITIDO + texto[-(max_chars - cabeza):]
+    # Ventana de longitud `medio` que contiene más menciones (dos punteros sobre las posiciones ordenadas).
+    mejor, inicio_mejor, j = 0, posiciones[0], 0
+    for i, p in enumerate(posiciones):
+        while posiciones[j] < p - medio:
+            j += 1
+        if i - j + 1 > mejor:
+            mejor, inicio_mejor = i - j + 1, max(ini, p - medio + 1)
+    inicio_mejor = max(ini, min(inicio_mejor, fin - medio))
+    return (texto[:cabeza] + _OMITIDO + texto[inicio_mejor:inicio_mejor + medio] + _OMITIDO + texto[-cola:])
 
 
 def limpiar_conceptos(respuesta: str, consulta: str) -> tuple[str, bool]:

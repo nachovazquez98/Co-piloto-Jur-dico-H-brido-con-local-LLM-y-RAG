@@ -78,7 +78,7 @@ def embed_query(text: str) -> np.ndarray:
 
 
 def chunk_text(text: str, size: int = config.CHUNK_SIZE_CHARS, overlap: int = config.CHUNK_OVERLAP_CHARS,
-               max_chunks: int = config.MAX_CHUNKS_PER_DOC) -> list[str]:
+               max_chunks: int | None = config.MAX_CHUNKS_PER_DOC) -> list[str]:
     """Divide el texto en fragmentos con traslape y conserva `max_chunks` repartidos
     uniformemente (siempre incluye el inicio y el final, donde están los resolutivos)."""
     text = text.strip()
@@ -86,7 +86,16 @@ def chunk_text(text: str, size: int = config.CHUNK_SIZE_CHARS, overlap: int = co
         return []
     step = max(1, size - overlap)
     chunks = [text[i:i + size] for i in range(0, max(1, len(text) - overlap), step)]
-    if len(chunks) > max_chunks:
+    if max_chunks and len(chunks) > max_chunks:
         idx = np.linspace(0, len(chunks) - 1, num=max_chunks).round().astype(int)
         chunks = [chunks[i] for i in sorted(set(idx))]
     return chunks
+
+
+def chunks_de(texto: str, materia: str, max_penal: int | None = None, max_otras: int | None = None) -> list[str]:
+    """Fragmentos con los que se indexa una sentencia: todos si es penal (el alcance del proyecto), hasta
+    MAX_CHUNKS_PER_DOC repartidos si es de otra materia. El índice y QC_1 deben usar la misma política: la base la
+    toma del manifiesto del índice (`max_penal`, `max_otras`), no de la configuración actual."""
+    max_penal = config.MAX_CHUNKS_PENAL if max_penal is None else max_penal
+    max_otras = config.MAX_CHUNKS_PER_DOC if max_otras is None else max_otras
+    return chunk_text(texto, max_chunks=max_penal if materia == "penal" else max_otras)

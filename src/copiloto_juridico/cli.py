@@ -91,6 +91,28 @@ def cmd_estado(args) -> None:
     rep = balance_report(corpus, load_catalogo())
     _log(f"Tipos del catálogo completos: {int(rep['completo'].sum())}/{len(rep)} | "
          f"Sentencias faltantes para el balance total: {int(rep['faltan'].sum())}")
+    if args.salida:
+        rep.to_csv(args.salida, index=False)
+        _log(f"Reporte de balance por tipo: {args.salida}")
+
+
+def cmd_limpiar_corpus(args) -> None:
+    """Aplica la limpieza v11 al corpus guardado (sin necesidad de los PDFs) y lo vuelve a guardar."""
+    from .datos.corpus import load_corpus, save_corpus
+    from .datos.procesamiento import limpiar_texto
+
+    corpus = load_corpus()
+    antes = corpus["texto"].str.len()
+    corpus["texto"] = corpus["texto"].map(limpiar_texto)
+    despues = corpus["texto"].str.len()
+    save_corpus(corpus)
+    _log(f"Corpus limpio: {len(corpus)} sentencias, {antes.sum():,} -> {despues.sum():,} caracteres "
+         f"({1 - despues.sum() / antes.sum():.0%} de ruido quitado). Sigue con `indexar`.")
+    omitidas = corpus[corpus["texto"].str.contains("págs? omitidas?|pág\\(s\\) omitida", regex=True)]
+    if args.omitidas:
+        omitidas[["id", "materia", "tipo"]].to_csv(args.omitidas, index=False)
+        _log(f"{len(omitidas)} sentencias con páginas omitidas en la ingesta original: {args.omitidas} "
+             "(vuelve a descargar esos PDF y procésalos completos con `construir-corpus --pdfs`).")
 
 
 def cmd_pendientes(args) -> None:
@@ -145,7 +167,13 @@ def main(argv=None) -> None:
     d.add_argument("--destino", default=str(config.RAW_PDF_DIR))
     d.set_defaults(func=cmd_descargar)
 
-    sub.add_parser("estado", help="Muestra el balance del corpus").set_defaults(func=cmd_estado)
+    es = sub.add_parser("estado", help="Muestra el balance del corpus")
+    es.add_argument("--salida", help="CSV con el balance por tipo")
+    es.set_defaults(func=cmd_estado)
+
+    lc = sub.add_parser("limpiar-corpus", help="Limpieza v11 del texto guardado (anexo testado, etiquetas, encabezados)")
+    lc.add_argument("--omitidas", help="CSV con las sentencias que tienen páginas omitidas")
+    lc.set_defaults(func=cmd_limpiar_corpus)
 
     pe = sub.add_parser("pendientes", help="Tipos incompletos por prioridad (para descargar a mano)")
     pe.add_argument("--materia", default="penal")

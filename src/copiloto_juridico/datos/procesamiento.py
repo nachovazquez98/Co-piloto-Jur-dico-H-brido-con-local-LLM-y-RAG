@@ -56,7 +56,7 @@ RE_FINAL_BOILERPLATE_F1 = re.compile(
 
 def pages_to_read(total_pages: int) -> list[int]:
     """Páginas a leer: todas si el PDF es corto; si es largo, inicio + muestra del medio + final."""
-    if total_pages <= config.PDF_MAX_PAGES_FULL_READ:
+    if config.PDF_MAX_PAGES_FULL_READ <= 0 or total_pages <= config.PDF_MAX_PAGES_FULL_READ:
         return list(range(total_pages))
     num_start = min(config.PDF_FIXED_START_PAGES, total_pages)
     num_end = min(config.PDF_FIXED_END_PAGES, max(0, total_pages - num_start))
@@ -137,7 +137,7 @@ def process_single_pdf(pdf_path: str) -> dict | None:
     raw = extract_text_from_pdf(path)
     if not raw:
         return None
-    texto = extract_and_clean_legal_text(raw)
+    texto = limpiar_texto(extract_and_clean_legal_text(raw))
     if len(texto) < 100:
         return None
     return {"id": path.name, **meta, "texto": texto, "origen": "pdf"}
@@ -158,3 +158,58 @@ def process_pdf_folder(folder: Path, log: Callable[[str], None] = print) -> list
             if i % 50 == 0 or i == len(pdfs):
                 log(f"   -> {i}/{len(pdfs)} PDFs procesados ({fallos} fallidos)")
     return resultados
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Limpieza v11 del texto ya extraído (se aplica también al corpus guardado: no hacen falta los PDFs)
+# --------------------------------------------------------------------------------------------------------------
+
+# Cada entrada del anexo de datos testados termina en "LGPPICR" (Lineamientos Generales para la Protección de la
+# Información Confidencial y Reservada); la extracción del PDF puede partir las palabras ("l gppicr", "po r ser").
+_RE_FIN_ANEXO = re.compile(r"l\s?g\s?p\s?p\s?i\s?c\s?r\s?\.?")
+_RE_INICIO_ENTRADA = re.compile(r"no\s?\.\s?[\d\s]{1,8}e\s?l\s?i\s?m\s?i\s?n|el\s?documento\s?fue\s?testad|\.\s")
+_FIRMA_ANEXO = ("lineamiento", "renglon", "porserundato", "quincuagesimo", "testad")
+# Etiquetas de datos testados dentro del texto: "no.207eliminadoelnombrecompleto1", "no.6 eliminadoeldomicilio2".
+_RE_ETIQUETA = re.compile(r"no\s?\.\s?\d+\s?eliminado[a-záéíóúñ0-9]*", re.IGNORECASE)
+# Restos de encabezados y numeración de página: "tribunal de justicia del estado de jalisco 5116 --- 115".
+_RE_ENCABEZADO = re.compile(r"(?:\d+\s*)?---\s*(?:\d+\s+)?|tribunal de j\s?usticia del estado de jalisco"
+                            r"|el documento fu\s?e testad\s?o con el programa elida eliminador de datos judicial"
+                            r"(?: del)?(?: toca[\s\d]+)?", re.IGNORECASE)
+# Palabras deletreadas por la maquetación: "r e s u e l v e" -> "resuelve" (4 o más letras sueltas seguidas).
+_RE_DELETREADA = re.compile(r"\b(?:[a-záéíóúñ] ){3,}[a-záéíóúñ]\b")
+
+
+def _compacto(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def quitar_anexo_testado(texto: str) -> str:
+    """Quita las entradas del anexo de datos testados ("no.50 eliminadoelnombrecompleto en 1 renglones por ser un
+    dato identificativo de conformidad con el lineamiento ... lgppicr."). En el corpus ocupan una mediana de ~40 % del
+    texto en las sentencias que lo tienen, y desplazaban a los resolutivos del final."""
+    partes, previo = [], 0
+    for m in _RE_FIN_ANEXO.finditer(texto):
+        segmento = texto[previo:m.end()]
+        ventana_ini = max(0, len(segmento) - 450)
+        inicios = [x for x in _RE_INICIO_ENTRADA.finditer(segmento, ventana_ini)]
+        corte = inicios[-1].start() if inicios else ventana_ini
+        if segmento[corte:corte + 2] == ". ":
+            corte += 2
+        if any(f in _compacto(segmento[corte:]) for f in _FIRMA_ANEXO):
+            partes.append(segmento[:corte])
+        else:
+            partes.append(segmento)
+        previo = m.end()
+    partes.append(texto[previo:])
+    return "".join(partes)
+
+
+def limpiar_texto(texto: str) -> str:
+    """Limpieza v11, idempotente: anexo de datos testados, etiquetas de testado -> "[eliminado]", restos de
+    encabezados y numeración de página, palabras deletreadas y espacios repetidos. Conserva las marcas
+    "... N págs omitidas ..." (avisan que esa parte del PDF no se leyó)."""
+    t = quitar_anexo_testado(texto)
+    t = _RE_ETIQUETA.sub("[eliminado]", t)
+    t = _RE_ENCABEZADO.sub(" ", t)
+    t = _RE_DELETREADA.sub(lambda m: m.group(0).replace(" ", ""), t)
+    return re.sub(r"\s+", " ", t).strip()

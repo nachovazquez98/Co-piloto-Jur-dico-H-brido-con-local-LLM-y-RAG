@@ -44,8 +44,8 @@ CACHE_DIR = DATA_DIR / "cache"
 EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))
 FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito (lo revisa un abogado)
 CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Conjuntos A y B (consultas)
-JUICIOS_PATH = EVAL_DIR / "juicios.csv"                     # Juicios de relevancia 0/1/2
-FICHAS_ANOTADAS_PATH = EVAL_DIR / "fichas_anotadas.jsonl"   # Conjunto C
+JUICIOS_PATH = EVAL_DIR / "anotacion_juicios.csv"           # Hoja de juicios de relevancia 0/1/2 (la llena el abogado)
+FICHAS_ANOTADAS_PATH = EVAL_DIR / "anotacion_fichas.csv"    # Hoja del conjunto C (la llena el abogado)
 CONCEPTOS_CACHE_PATH = EVAL_DIR / "cache" / "conceptos.json"
 RESULTADOS_DIR = EVAL_DIR / "resultados"
 EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
@@ -60,7 +60,8 @@ EMBEDDING_MODEL_NAME = _env("COPILOTO_EMBEDDING_MODEL", "intfloat/multilingual-e
 EMBEDDING_BATCH_SIZE = _env("COPILOTO_EMBEDDING_BATCH_SIZE", 64)
 CHUNK_SIZE_CHARS = 1500       # ~400 tokens: cabe en la ventana de 512 tokens del modelo
 CHUNK_OVERLAP_CHARS = 200
-MAX_CHUNKS_PER_DOC = 12       # Fragmentos repartidos uniformemente por sentencia (controla el tamaño del índice)
+MAX_CHUNKS_PER_DOC = 12       # Fragmentos repartidos uniformemente por sentencia (materias fuera del alcance)
+MAX_CHUNKS_PENAL = 0          # Sentencias penales: todos los fragmentos (0 = sin tope). Con tope 12 se indexaba ~40 %
 
 # --- Balance del corpus ---
 MAX_SENTENCIAS_POR_TIPO = _env("COPILOTO_MAX_POR_TIPO", 30)
@@ -71,7 +72,9 @@ DOWNLOAD_TIMEOUT = 60
 DOWNLOAD_MAX_RETRIES = 4
 
 # --- Procesamiento de PDFs (Fase 1) ---
-PDF_MAX_PAGES_FULL_READ = 50
+# v11: los PDF se leen completos (0 = sin límite). Antes, los de más de 50 páginas se muestreaban a 40 y se perdía
+# contexto: el 57 % de las sentencias penales del corpus actual tiene páginas omitidas.
+PDF_MAX_PAGES_FULL_READ = _env("COPILOTO_PDF_MAX_PAGINAS", 0)
 PDF_TARGET_TOTAL_PAGES_SAMPLE = 40
 PDF_FIXED_START_PAGES = 10
 PDF_FIXED_END_PAGES = 15

@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from .. import config
-from ..embeddings import chunk_text, embed_texts
+from ..embeddings import chunks_de, embed_texts
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +38,14 @@ def index_params() -> dict:
         "chunk_size": config.CHUNK_SIZE_CHARS,
         "chunk_overlap": config.CHUNK_OVERLAP_CHARS,
         "max_chunks_per_doc": config.MAX_CHUNKS_PER_DOC,
+        "max_chunks_penal": config.MAX_CHUNKS_PENAL,
     }
 
 
 def build_chunks(corpus: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    for doc_id, texto in zip(corpus["id"], corpus["texto"]):
-        for n, chunk in enumerate(chunk_text(texto)):
+    for doc_id, texto, materia in zip(corpus["id"], corpus["texto"], corpus["materia"]):
+        for n, chunk in enumerate(chunks_de(texto, materia)):
             rows.append({"chunk_id": f"{doc_id}#{n}", "doc_id": doc_id, "chunk_idx": n, "texto": chunk})
     return pd.DataFrame(rows)
 
