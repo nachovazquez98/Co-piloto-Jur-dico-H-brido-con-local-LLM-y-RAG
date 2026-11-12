@@ -118,7 +118,8 @@ def _env_lista(name: str, default: list[str]) -> list[str]:
 # para comparar en la evaluación (p. ej. COPILOTO_MATERIAS=penal,civil,familiar,mercantil,laboral). ---
 # Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS ("violacion", "falsedad"...): castigaba delitos
 # reales (penal/violacion tiene 30 sentencias) sin evidencia a favor. Desactivada; en la regresión solo ayudaba a un
-# ejemplo por accidente, y ese caso se resuelve con ENRIQUECER_FAMILIAS (mismo archivo de resultados).
+# ejemplo por accidente, y ese caso se resuelve con ENRIQUECER_FAMILIAS
+# (evaluacion/resultados/20261112-034052_79c80ac_regresion.md).
 USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", False)
 MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", ["penal"])
 NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" | "familia" (solo penal se agrupa)
