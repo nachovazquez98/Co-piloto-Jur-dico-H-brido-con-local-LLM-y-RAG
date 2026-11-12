@@ -229,3 +229,18 @@ def test_ejemplos_penales_existen_en_el_corpus():
             assert e.tipo_corpus in tipos, e.tipo_corpus
     assert {e.etapa for e in EJEMPLOS_PENALES} >= {"Vinculación a proceso", "Prisión preventiva", "Sentencia de juicio oral"}
     assert all(e.materia == "Penal" for e in ejemplos_activos(["penal"]))
+
+
+def test_prompt_conceptos_v11(monkeypatch):
+    from copiloto_juridico.evaluacion import conjuntos as cj
+    from copiloto_juridico.evaluacion import experimentos as ex
+
+    assert prompts.prompt_conceptos() is prompts.PROMPT_EXTRACCION_ENTIDADES  # v10 por defecto
+    c = cj.Consulta("A1", "texto", None, None, None, "prueba")
+    clave_v10 = ex.clave_conceptos(c)
+    monkeypatch.setattr(config, "PROMPT_CONCEPTOS_VERSION", "v11")
+    assert "PRIMER concepto debe ser el delito" in prompts.prompt_conceptos()
+    assert ex.clave_conceptos(c) != clave_v10  # la caché no mezcla versiones
+    llm_ = LLMFalso()
+    _correr(StoreFalso([_cand(f"d{i}") for i in range(4)], []), ClasificadorFalso(), llm_, num_precedentes=1)
+    assert "PRIMER concepto" in llm_.prompts[0]

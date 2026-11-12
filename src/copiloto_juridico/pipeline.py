@@ -233,7 +233,7 @@ class Copiloto:
         yield log("--- PASO 1: EXTRACCIÓN DE ENTIDADES CLAVE ---", "entidades")
         try:
             entidades, ok = limpiar_conceptos(
-                self._llm(prompts.PROMPT_EXTRACCION_ENTIDADES.format(texto_consulta=consulta)), consulta)
+                self._llm(prompts.prompt_conceptos().format(texto_consulta=consulta)), consulta)
         except LLMError as e:
             yield Evento("error", "entidades", str(e))
             return

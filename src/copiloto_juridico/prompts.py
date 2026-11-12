@@ -12,6 +12,28 @@ Consulta del Usuario: "{texto_consulta}"
 Conceptos Clave:
 """
 
+# v11: una consulta de defensa suele centrarse en el problema procesal ("vinculación a proceso", "reconocimiento
+# ilegal") y el LLM extrae solo esos conceptos; entonces Jaccard y KEM valen 0 para todas las categorías (que son
+# delitos). Esta variante pide primero el delito. Se activa con COPILOTO_PROMPT_CONCEPTOS=v11.
+PROMPT_EXTRACCION_ENTIDADES_V11 = """
+Tu única tarea es analizar la Consulta del Usuario y extraer de 1 a 3 conceptos jurídicos clave que sirvan como etiquetas de búsqueda.
+El PRIMER concepto debe ser el delito o la conducta que se discute, con su modalidad si se menciona o se deduce de los hechos (ej: 'robo calificado', 'homicidio a título de culpa', 'violencia familiar'). Los demás, si los hay, son el problema procesal (ej: 'vinculación a proceso', 'prisión preventiva').
+Es FUNDAMENTAL que respondas ÚNICAMENTE con los conceptos separados por comas, sin ningún tipo de explicación, preámbulo, disculpa o texto adicional. Si no puedes extraer, responde solo: 'FALLA'.
+Consulta del Usuario: "{texto_consulta}"
+Conceptos Clave:
+"""
+
+
+def prompt_conceptos(version: str | None = None) -> str:
+    """Prompt del paso 1 (conceptos clave) según `config.PROMPT_CONCEPTOS_VERSION`."""
+    from . import config
+
+    version = version or config.PROMPT_CONCEPTOS_VERSION
+    if version not in ("v10", "v11"):
+        raise ValueError(f"Versión de prompt de conceptos desconocida: {version}")
+    return PROMPT_EXTRACCION_ENTIDADES if version == "v10" else PROMPT_EXTRACCION_ENTIDADES_V11
+
+
 PROMPT_VERIFICACION_RELEVANCIA = """
 Eres un Asistente de Verificación de Relevancia legal. Tu única tarea es ser estricto y literal.
 

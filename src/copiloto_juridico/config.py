@@ -125,6 +125,8 @@ NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "tipo")  # "tipo" | "
 # fragmento más parecido a la consulta).
 QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "inicio")
 QC1_MAX_CHARS = 2500
+# Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).
+PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v10")
 # Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
 PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v10")
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija

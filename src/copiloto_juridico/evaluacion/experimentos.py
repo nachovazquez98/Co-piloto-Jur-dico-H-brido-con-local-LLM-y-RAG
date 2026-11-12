@@ -315,7 +315,8 @@ class Entorno:
 
 
 def clave_conceptos(c: Consulta) -> str:
-    return hashlib.sha256(c.consulta.encode()).hexdigest()[:16]
+    """Clave de caché: texto de la consulta + versión del prompt de conceptos (si cambia cualquiera, se recalcula)."""
+    return hashlib.sha256(f"{config.PROMPT_CONCEPTOS_VERSION}|{c.consulta}".encode()).hexdigest()[:16]
 
 
 def leer_conceptos(path: Path = config.CONCEPTOS_CACHE_PATH) -> dict:
@@ -380,6 +381,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
                          "Corre `conceptos` primero para reproducir la app.")
     corrida.extra["n_consultas"] = len(consultas)
     corrida.extra["nivel_clasificacion"] = config.NIVEL_CLASIFICACION
+    corrida.extra["prompt_conceptos"] = config.PROMPT_CONCEPTOS_VERSION
     corrida.extra["materias_activas"] = list(config.MATERIAS_ACTIVAS)
     return Entorno(store, clasificador, familias, consultas, conceptos, juicios, corrida)
 
@@ -772,10 +774,10 @@ def calcular_conceptos(consultas: list[Consulta], llm, path: Path = config.CONCE
         clave = clave_conceptos(c)
         if not rehacer and cache.get(c.id, {}).get("clave") == clave:
             continue
-        resp = llm.generate(prompts.PROMPT_EXTRACCION_ENTIDADES.format(texto_consulta=c.consulta))
+        resp = llm.generate(prompts.prompt_conceptos().format(texto_consulta=c.consulta))
         conceptos, ok = limpiar_conceptos(resp, c.consulta)
         cache[c.id] = {"clave": clave, "conceptos": conceptos, "ok": ok, "respuesta": resp,
-                       "modelo": llm.settings.model}
+                       "modelo": llm.settings.model, "prompt": config.PROMPT_CONCEPTOS_VERSION}
         nuevos += 1
         log(f"   {c.id}: {conceptos[:90]}{'' if ok else '  (falló: se usa la consulta)'}")
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -893,9 +895,8 @@ def comparar_ficha(extraccion: str, anotada: dict, texto_sentencia: str) -> dict
     artículos contra el texto de la sentencia (automática: un artículo que no aparece en la sentencia es una
     alucinación segura; uno que sí aparece puede seguir siendo el equivocado)."""
     datos = datos_penales(extraccion)
-    campos = parsear_campos(extraccion)
-    arts_ficha = extraer_articulos(" ".join(v for k, v in campos.items() if "fundamento" in k or "articul" in k)
-                                   or extraccion)
+    # Toda la ficha: los artículos también aparecen en "Delito(s)" ("art. 233 en relación con el 236").
+    arts_ficha = extraer_articulos(extraccion)
     arts_texto = extraer_articulos(texto_sentencia)
     out = {"doc_id": anotada["doc_id"],
            "sentido_generado": datos["sentido_fallo"], "sentido_anotado": normalizar_sentido(anotada.get("sentido_fallo")),
