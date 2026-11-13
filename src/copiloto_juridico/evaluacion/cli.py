@@ -18,6 +18,8 @@ Con LLM:
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
     robustez                         Consultas difíciles con la app completa (diagnóstico)
+Estudio de uso (sin LLM):
+    estudio [--plantilla N]          Resumen manual vs. app (o arma casos.jsonl y registro.csv para N participantes)
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 """
@@ -432,6 +434,28 @@ def cmd_robustez(args) -> None:
     _guardar(correr(store, clas, _llm(con_cache=False), log=_log))
 
 
+def cmd_estudio(args) -> None:
+    from . import estudio as E
+
+    if args.plantilla:
+        if E.REGISTRO_PATH.exists() and len(E.leer_registro()):
+            sys.exit(f"❌ {E.REGISTRO_PATH} ya tiene registros llenos; no se sobrescribe.")
+        E.ESTUDIO_DIR.mkdir(parents=True, exist_ok=True)
+        casos = E.leer_casos() or E.casos_desde_ejemplos()
+        if not E.CASOS_PATH.exists():
+            E.CASOS_PATH.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in casos), encoding="utf-8")
+        E.asignacion(args.plantilla, [c["id"] for c in casos]).to_csv(E.REGISTRO_PATH, index=False)
+        _log(f"{len(casos)} casos en {E.CASOS_PATH} y asignación de {args.plantilla} participantes en {E.REGISTRO_PATH}.")
+        return
+    try:
+        df = E.leer_registro()
+    except (FileNotFoundError, ValueError) as e:
+        sys.exit(f"❌ {e}")
+    if df.empty:
+        sys.exit(f"❌ {E.REGISTRO_PATH} no tiene registros con minutos todavía (ver {E.ESTUDIO_DIR / 'README.md'}).")
+    _guardar(E.resumir(df, E.leer_casos()))
+
+
 def cmd_errores(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -545,6 +569,10 @@ def main(argv=None) -> None:
 
     s = sub.add_parser("robustez", help="Consultas difíciles con el LLM real (diagnóstico)")
     s.set_defaults(func=cmd_robustez)
+
+    s = sub.add_parser("estudio", help="Estudio de uso: resumen manual vs. app")
+    s.add_argument("--plantilla", type=int, metavar="N", help="Crea casos.jsonl y registro.csv para N participantes")
+    s.set_defaults(func=cmd_estudio)
 
     s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
     s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")
