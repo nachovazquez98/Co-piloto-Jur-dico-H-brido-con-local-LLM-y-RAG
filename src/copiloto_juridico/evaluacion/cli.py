@@ -139,8 +139,10 @@ def cmd_borradores(args) -> None:
     textos = load_corpus().set_index("id")["texto"]
     if args.solo_atencion:  # v11.1: solo las marcadas por el verificador, con el prompt estricto
         consultas = cargar_consultas(destino, permitir_vacias=True)
-        marcadas = [c for c in consultas if "ATENCIÓN" in c.notas and not c.revisado]
-        _log(f"Regenerando {len(marcadas)} borradores marcados con ATENCIÓN (prompt estricto)...")
+        from ..pipeline import es_fallo
+
+        marcadas = [c for c in consultas if ("ATENCIÓN" in c.notas or es_fallo(c.consulta)) and not c.revisado]
+        _log(f"Regenerando {len(marcadas)} borradores marcados con ATENCIÓN o vacíos (prompt estricto)...")
         redactar_borradores(marcadas, textos, _llm(), intentos=5, estricto=True, log=_log)
     else:
         if destino.exists() and not args.forzar:
@@ -423,7 +425,7 @@ def main(argv=None) -> None:
     s.add_argument("--plantilla", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
     s.add_argument("--forzar", action="store_true")
     s.add_argument("--solo-atencion", action="store_true",
-                   help="Regenera solo los borradores marcados con ATENCIÓN, con el prompt estricto")
+                   help="Regenera solo los marcados con ATENCIÓN (o que no son una consulta), con el prompt estricto")
     s.set_defaults(func=cmd_borradores)
 
     s = sub.add_parser("hojas-anotacion", help="Hojas CSV para el abogado (juicios y fichas)")
