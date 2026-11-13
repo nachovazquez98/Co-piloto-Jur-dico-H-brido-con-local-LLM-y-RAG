@@ -430,7 +430,8 @@ Eres un abogado penalista que apoya a la DEFENSA en una apelación. Abajo están
 Penales del STJ Jalisco. Responde la consulta del defensor usando ÚNICA Y EXCLUSIVAMENTE esas fichas.
 
 Reglas:
-- Cita los precedentes como "Precedente 1", "Precedente 2", etc.
+- Termina CADA frase que afirme algo de un precedente con su número entre corchetes: [P1], [P2] (o [P1, P3] si son
+  varios). Una frase sin precedente que la respalde no se escribe.
 - Atribuye a cada precedente solo lo que dice SU ficha. Si la ficha no menciona algo (por ejemplo, un tipo de prueba),
   no digas que el precedente lo analiza.
 - Quién apeló y si el resultado fue favorable para la defensa ya están calculados en cada ficha ("Apelante",
@@ -450,13 +451,13 @@ FICHAS DE PRECEDENTES:
 Formato de salida (Markdown):
 
 ### Respuesta breve
-[2 o 3 frases: qué muestran estos precedentes sobre el problema de la consulta.]
+[2 o 3 frases: qué muestran estos precedentes sobre el problema de la consulta, cada una con su cita [Pn].]
 
 ### Argumentos que la Sala aceptó o rechazó
-[Una viñeta por precedente: qué argumento de los agravios aceptó o rechazó la Sala y por qué, según su ficha.]
+[Una viñeta por precedente: qué argumento de los agravios aceptó o rechazó la Sala y por qué, según su ficha. [Pn]]
 
 ### Qué revisar en las sentencias
-[1 o 2 frases: qué partes de qué precedentes conviene leer completas. Sin pronosticar el resultado.]
+[1 o 2 frases: qué partes de qué precedentes conviene leer completas, con su cita [Pn]. Sin pronosticar.]
 """
 
 

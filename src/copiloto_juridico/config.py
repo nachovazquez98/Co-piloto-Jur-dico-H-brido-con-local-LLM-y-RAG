@@ -168,6 +168,9 @@ PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
 # impugnarse el reconocimiento por fotografía y concluyó que "es probable que la apelación tenga éxito". v11: dice
 # quién apeló y qué resolvió la Sala, separa precedentes a favor y en contra del argumento, y no predice resultados.
 PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v11")
+# v11.1: la síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
+# fallo o el delito mencionados coincidan con la ficha citada; si no, la frase se marca "verificar".
+VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
 # queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".

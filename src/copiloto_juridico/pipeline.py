@@ -151,6 +151,7 @@ class Resultado:
     veredictos_ambiguos: int = 0          # QC_1/QC_2 con respuesta no interpretable (el sistema continuó)
     aviso_cobertura: str | None = None    # "no hay precedentes del mismo tipo..." cuando aplica
     llamadas_llm: int = 0
+    citas: dict | None = None             # verificación de citas de la síntesis (afirmaciones, válidas, marcadas)
 
     def markdown(self) -> str:
         partes = [
@@ -208,6 +209,62 @@ def balance_para_defensa(precedentes: list["Precedente"]) -> str:
                      f"{t['acto_impugnado'][:1].lower() + t['acto_impugnado'][1:]}; la Sala {t['sentido_fallo']} → "
                      f"{resultado}.")
     return "### Precedentes a favor y en contra\n" + "\n".join(filas) if filas else ""
+
+
+_RE_CITA = re.compile(r"\[\s*P\s?\d+(?:\s*[,;y]\s*P?\s?\d+)*\s*\]|\bprecedente\s+(\d+)\b", re.IGNORECASE)
+_RE_FRASE = re.compile(r"[^.!?\n]+(?:[.!?](?!\d)|$)(?:\s*\[[^\]]*\])*", re.MULTILINE)
+_RE_LINEA = re.compile(r".+")
+_VERBOS_SINTESIS = {"CONFIRMA": r"confirm", "REVOCA": r"revoc", "MODIFICA": r"modific", "REPONE": r"repus|repon|reposici"}
+
+
+def verificar_citas(sintesis: str, precedentes: list["Precedente"]) -> tuple[str, dict]:
+    """Verificación determinista de la síntesis (v11.1). Cada afirmación (viñeta completa, o frase de 30+ caracteres
+    en un párrafo; los títulos no cuentan) debe citar un precedente existente ([P1], "Precedente 1"); si menciona un sentido del fallo
+    (confirmó, revocó...) o una familia de delito, debe coincidir con la ficha de algún precedente citado. Las
+    que fallan se marcan "verificar" (mismo estilo que las fichas). Devuelve (texto marcado, conteos)."""
+    from .evaluacion.familias import FAMILIA_OTROS
+    from .fichas import familia_del_delito
+
+    por_numero = {p.numero: p for p in precedentes}
+    conteo = {"afirmaciones": 0, "con_cita_valida": 0, "sin_cita": 0, "marcadas": 0}
+
+    def revisar(m: re.Match) -> str:
+        frase = m.group(0)
+        texto = _RE_CITA.sub("", frase).strip(" -*•")
+        if len(texto) < 30:
+            return frase
+        conteo["afirmaciones"] += 1
+        numeros = {int(n) for c in _RE_CITA.finditer(frase) for n in re.findall(r"\d+", c.group(0))}
+        if not numeros:
+            conteo["sin_cita"] += 1
+            return frase
+        problemas = [f"no hay precedente {n}" for n in sorted(numeros - set(por_numero))]
+        citados = [por_numero[n] for n in sorted(numeros & set(por_numero))]
+        bajo = texto.lower()
+        sentidos = {s for s, patron in _VERBOS_SINTESIS.items() if re.search(patron, bajo)}
+        reales = {p.tarjeta()["sentido_fallo"] for p in citados}
+        if citados and sentidos and not sentidos & reales:
+            problemas.append(f"la ficha citada dice {', '.join(sorted(reales))}")
+        familia = familia_del_delito(texto)
+        if citados and familia != FAMILIA_OTROS:
+            fams = {familia_del_delito(p.ficha.delitos if p.ficha else p.tarjeta()["delito"]) for p in citados}
+            if familia not in fams:
+                problemas.append("el delito no coincide con la ficha citada")
+        if problemas:
+            conteo["marcadas"] += 1
+            return frase.rstrip() + f" _(verificar: {'; '.join(problemas)})_"
+        conteo["con_cita_valida"] += 1
+        return frase
+
+    lineas = []
+    for linea in sintesis.splitlines():
+        if linea.lstrip().startswith("#"):
+            lineas.append(linea)
+        elif re.match(r"\s*(?:[-*•]|\d+\.)\s", linea):  # una viñeta es una afirmación (la cita suele ir al final)
+            lineas.append(_RE_LINEA.sub(revisar, linea))
+        else:
+            lineas.append(_RE_FRASE.sub(revisar, linea))
+    return "\n".join(lineas), conteo
 
 
 def verificar_ficha(prec: "Precedente") -> None:
@@ -626,6 +683,12 @@ class Copiloto:
                 return
             yield log("   ✅ Síntesis generada." if not es_fallo(sintesis) else
                       "   ⚠️ La síntesis parece incompleta; revisa los informes individuales.", "sintesis")
+        citas = None
+        if config.VERIFICAR_CITAS and len(precedentes) >= 2:
+            sintesis, citas = verificar_citas(sintesis, precedentes)
+            marcadas = f"; {citas['marcadas']} marcadas para verificar" if citas["marcadas"] else ""
+            yield log(f"   -> Citas: {citas['con_cita_valida']}/{citas['afirmaciones']} afirmaciones con cita válida"
+                      f"{marcadas}.", "sintesis")
         balance = balance_para_defensa(precedentes)
         if balance and config.PROMPT_SINTESIS_VERSION == "v11":
             sintesis = balance + "\n\n" + sintesis.strip()
@@ -633,6 +696,6 @@ class Copiloto:
 
         resultado = Resultado(consulta, clasif.tipo, entidades, clasif.tabla, modo, precedentes, sintesis.strip(),
                               descartados, time.time() - t0, self.llm.settings.model, ambiguos, aviso,
-                              self.llamadas + (1 if len(precedentes) >= 2 else 0))
+                              self.llamadas + (1 if len(precedentes) >= 2 else 0), citas)
         yield log(f"\nTiempo total: {resultado.segundos:.1f} s")
         yield Evento("resultado", datos={"resultado": resultado})

@@ -1126,6 +1126,7 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
     corrida.parametros["max_consultas"] = max_consultas
     tiempos = {k: [] for k, _ in PASOS}
     totales, llamadas, descartes, ambiguos, fallidas = [], [], Counter(), [], 0
+    citas = Counter()
     for i, c in enumerate(env.consultas[:max_consultas], 1):
         llm = LLMContador(llm_cliente)
         cop = Copiloto(env.store, env.clasificador, llm)
@@ -1146,6 +1147,8 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
         else:
             descartes.update(d["motivo"] for d in resultado.descartados)
             ambiguos.append(getattr(resultado, "veredictos_ambiguos", 0))
+            citas.update(resultado.citas or {})
+            citas["consultas con síntesis verificada"] += resultado.citas is not None
         log(f"   [{i}] {c.id}: {totales[-1]:.0f} s · {llm.llamadas} llamadas")
     filas = []
     for k, nombre in PASOS:
@@ -1159,6 +1162,18 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
         "llamadas promedio": float(np.mean(llamadas)) if llamadas else 0.0,
         **{f"descartes {k}": v / max(1, len(totales)) for k, v in descartes.items()},
         "veredictos ambiguos por consulta": float(np.mean(ambiguos)) if ambiguos else 0.0}]))
+    if citas["afirmaciones"]:
+        n = citas["afirmaciones"]
+        corrida.tabla("Citas de la síntesis (diagnóstico)",
+                      "Afirmaciones = frases de 30+ caracteres de la síntesis del LLM (sin la lista a favor / en contra, "
+                      "que arma el código). Cita válida = cita un precedente existente y, si menciona un sentido del "
+                      "fallo o un delito, coincide con la ficha citada. Sin anotación: no dice si la afirmación es "
+                      "verdadera, solo si es verificable.", pd.DataFrame([{
+                          "consultas": citas["consultas con síntesis verificada"], "afirmaciones": n,
+                          "con cita válida": f"{citas['con_cita_valida']} ({citas['con_cita_valida'] / n:.1%})",
+                          "sin cita": f"{citas['sin_cita']} ({citas['sin_cita'] / n:.1%})",
+                          "marcadas verificar": f"{citas['marcadas']} ({citas['marcadas'] / n:.1%})"}]),
+                      diagnostico=True)
     import torch
 
     if torch.cuda.is_available():
