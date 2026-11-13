@@ -142,9 +142,12 @@ PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v11")
 # Ficha penal: "json" (v11: una llamada que devuelve la ficha estructurada; el informe se arma con código) o
 # "dos_llamadas" (extracción + informe, como v10). Con "json" se ahorra una llamada por candidato.
 FICHA_MODO = _env("COPILOTO_FICHA_MODO", "json")
-# Orden final de los candidatos: "rrf" (el de la búsqueda) o "familia_acto" (primero misma familia de delito y mismo
-# acto impugnado que la consulta, leídos por reglas; ver metadatos.py). Se decide con la regresión de los 16 ejemplos.
-ORDEN_CANDIDATOS = _env("COPILOTO_ORDEN_CANDIDATOS", "rrf")
+# Orden final de los candidatos: "rrf" (el de la búsqueda) o "familia_acto": si la consulta nombra un acto impugnado
+# (vinculación, prisión preventiva, sentencia...), primero los de la misma familia de delito y el mismo acto, leídos
+# por reglas (metadatos.py). En los 16 ejemplos penales, de los 3 primeros candidatos son de la familia correcta 32/42
+# con RRF y 37/42 por facetas, sin que ningún ejemplo pierda; en prisión preventiva por homicidio pasan de
+# robo, robo, homicidio a homicidio x3 (regresiones 20261113-000836_137c238 y la de este cambio, ver README).
+ORDEN_CANDIDATOS = _env("COPILOTO_ORDEN_CANDIDATOS", "familia_acto")
 # Fichas precalculadas (`evaluacion fichas-batch`): la app usa la ficha guardada de cada sentencia si coinciden su
 # texto y la versión (prompt + modelo); si no, la genera en la consulta. Activado por defecto solo si existe el archivo.
 FICHAS_PRECALCULADAS_PATH = DATA_DIR / "fichas" / "fichas-penal.parquet"

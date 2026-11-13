@@ -299,9 +299,9 @@ def combinar_candidatos(estrictos: list[Candidato], amplios: list[Candidato],
 def ordenar_por_facetas(candidatos: list[tuple[Candidato, str]], familias_doc: dict[str, str],
                         familias_consulta: set[str], acto: str | None,
                         actos_doc: dict[str, str]) -> list[tuple[Candidato, str]]:
-    """Orden por facetas (config.ORDEN_CANDIDATOS = "familia_acto"): primero misma familia de delito Y mismo acto
-    impugnado que la consulta; después misma familia; después mismo acto de otra familia; al final el resto.
-    Dentro de cada nivel se conserva el orden de la búsqueda (RRF)."""
+    """Orden por facetas (config.ORDEN_CANDIDATOS = "familia_acto", solo si la consulta nombra un acto impugnado):
+    primero misma familia de delito (la de la primera categoría) Y mismo acto impugnado que la consulta; después misma
+    familia; después mismo acto de otra familia; al final el resto. Dentro de cada nivel, el orden de la búsqueda."""
     def nivel(c: Candidato) -> int:
         familia = familias_doc.get(c.tipo) in familias_consulta
         mismo_acto = acto is not None and actos_doc.get(c.doc_id) == acto
@@ -335,7 +335,9 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
     estrictos = store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
     candidatos, modo = combinar_candidatos(estrictos, amplios, num_precedentes)
     acto = acto_de_consulta(consulta)
-    if (orden or config.ORDEN_CANDIDATOS) == "familia_acto" and categorias:
+    # Sin acto en la consulta, el orden por facetas solo confiaría en la primera familia clasificada, y eso hizo perder
+    # el caso de narcomenudeo (familia correcta en 2.º lugar): entonces se conserva el orden RRF.
+    if (orden or config.ORDEN_CANDIDATOS) == "familia_acto" and categorias and acto is not None:
         from .evaluacion.familias import cargar_familias
         from .metadatos import cargar as cargar_metadatos
 
