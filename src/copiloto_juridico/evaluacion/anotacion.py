@@ -36,9 +36,13 @@ def palabras_prohibidas(tipo: str | None) -> list[str]:
 
 
 def _problemas(c: Consulta, texto: str, prohibidas: list[str]) -> str:
-    """Por qué un borrador no sirve (vacío si sirve): copia frases, nombra el tipo o trae datos identificables."""
+    """Por qué un borrador no sirve (vacío si sirve): no es una consulta, copia frases, nombra el tipo o trae datos
+    identificables."""
+    from ..pipeline import es_fallo
     from .conjuntos import _palabras
 
+    if es_fallo(c.consulta):
+        return "no era una consulta (el modelo se negó o respondió otra cosa)"
     fuga = ngramas_compartidos(c.consulta, texto)
     usadas = sorted(set(_palabras(c.consulta)) & set(prohibidas))
     detalles = detalles_identificables(c.consulta)
@@ -79,8 +83,7 @@ def redactar_borradores(plantilla: list[Consulta], textos: pd.Series, llm, n: in
             c.extra["intentos"] = intento
             if problema:
                 c.extra["fuga"] = problema
-                c.notas = ("ATENCIÓN: el borrador aún copia frases, nombra el tipo o trae fechas o cifras; "
-                           "reescríbelo. " + c.notas)
+                c.notas = (f"ATENCIÓN: el borrador {problema}; reescríbelo. " + c.notas)
         log(f"   {c.id}: {c.consulta[:100]}{'  ⚠️' if c.extra.get('fuga') else ''}")
         salida.append(c)
     return salida

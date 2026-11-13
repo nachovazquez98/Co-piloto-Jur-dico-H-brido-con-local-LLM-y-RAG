@@ -55,3 +55,5 @@ def test_borrador_estricto_detecta_palabras_del_tipo_y_cifras():
     assert "robo" in _problemas(c, texto, palabras_prohibidas(c.tipo))
     c.consulta = "Mi cliente tomó un celular el 28 de junio de 2024."
     assert "identifican" in _problemas(c, texto, [])
+    c.consulta = "Lo siento, pero no puedo generar contenido relacionado con actividades ilegales."
+    assert "se negó" in _problemas(c, texto, [])
