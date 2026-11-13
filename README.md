@@ -33,9 +33,10 @@ obligatoria.
 1. Instala y abre la app (ver [Instalación](#instalación)): `streamlit run app/Copiloto.py`.
 2. Escribe el caso (hechos, delito, qué resolución se apela y por qué) o elige un ejemplo.
 3. Pulsa **Buscar precedentes** y espera a que terminen los 5 pasos.
-4. Lee la síntesis y las tarjetas. Donde aparezca **verificar** (el sentido del fallo de la ficha no coincide con los
-   resolutivos, o un artículo citado no está en la sentencia) o **no verificado por QC_1**, revisa la sentencia
-   original antes de citarla. Puedes descargar el informe en Markdown.
+4. Lee la síntesis (empieza con qué precedentes fueron favorables o desfavorables para la defensa) y las tarjetas.
+   Donde aparezca **verificar** (el sentido del fallo de la ficha no coincide con los resolutivos, o un artículo
+   citado no está en la sentencia) o **no verificado por QC_1**, revisa la sentencia original antes de citarla.
+   Puedes descargar el informe en Markdown.
 
 La página **Cómo funciona** explica el flujo, los límites de tamaño, un glosario jurídico breve y muestra la última
 evaluación guardada.
