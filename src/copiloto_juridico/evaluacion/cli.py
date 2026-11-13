@@ -5,6 +5,7 @@ Preparación (sin LLM):
     familias                         Exporta evaluacion/familias_penal.csv (tipo -> familia) para revisión
     plantilla                        Borrador estratificado de consultas (evaluacion/consultas_penal_borrador.jsonl)
     validar                          Valida consultas y juicios, detecta fuga y resume el conjunto
+    kappa-piloto                     Acuerdo del piloto de anotación (hacerlo antes de los 300 juicios)
 Experimentos sin LLM (usan los conceptos en caché):
     recuperacion --particion P       Líneas base, filtro, k de RRF, k-NN; métricas con IC 95 %
     ablacion --particion P           Quita un componente del clasificador a la vez
@@ -135,38 +136,72 @@ def cmd_borradores(args) -> None:
     from .conjuntos import cargar_consultas, guardar_consultas
 
     destino = Path(args.consultas)
-    if destino.exists() and not args.forzar:
-        sys.exit(f"❌ {destino} ya existe (puede tener consultas revisadas). Usa --forzar para sobrescribirlo.")
-    plantilla = cargar_consultas(Path(args.plantilla), permitir_vacias=True)
     textos = load_corpus().set_index("id")["texto"]
-    consultas = redactar_borradores(plantilla, textos, _llm(), n=args.n, log=_log)
+    if args.solo_atencion:  # v11.1: solo las marcadas por el verificador, con el prompt estricto
+        consultas = cargar_consultas(destino, permitir_vacias=True)
+        marcadas = [c for c in consultas if "ATENCIÓN" in c.notas and not c.revisado]
+        _log(f"Regenerando {len(marcadas)} borradores marcados con ATENCIÓN (prompt estricto)...")
+        redactar_borradores(marcadas, textos, _llm(), intentos=5, estricto=True, log=_log)
+    else:
+        if destino.exists() and not args.forzar:
+            sys.exit(f"❌ {destino} ya existe (puede tener consultas revisadas). Usa --forzar para sobrescribirlo.")
+        plantilla = cargar_consultas(Path(args.plantilla), permitir_vacias=True)
+        consultas = redactar_borradores(plantilla, textos, _llm(), n=args.n, log=_log)
     guardar_consultas(consultas, destino)
     fugas = sum(1 for c in consultas if c.extra.get("fuga"))
-    _log(f"\n{len(consultas)} borradores en {destino} (borrador: true, revisado: false); {fugas} aún con fuga. "
-         "Revísalos y marca revisado: true; la partición de prueba se rechaza mientras haya sin revisar.")
+    _log(f"\n{len(consultas)} borradores en {destino} (borrador: true, revisado: false); {fugas} aún marcados con "
+         "ATENCIÓN. Revísalos y marca revisado: true; la partición de prueba se rechaza mientras haya sin revisar.")
 
 
 def cmd_hojas(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
-    from .anotacion import hoja_fichas, hoja_juicios
-    from .conjuntos import cargar_consultas
+    from .anotacion import hoja_fichas, hoja_juicios, hoja_piloto
+    from .conjuntos import cargar_juicios, cargar_todas
     from .experimentos import conceptos_de, leer_conceptos
     from .familias import cargar_familias
 
-    for path in (config.JUICIOS_PATH, config.FICHAS_ANOTADAS_PATH):
+    destinos = [config.JUICIOS_PATH, config.FICHAS_ANOTADAS_PATH, config.PILOTO_JUICIOS_PATH]
+    for path in destinos:
         if path.exists() and not args.forzar:
             sys.exit(f"❌ {path} ya existe (puede tener anotaciones). Usa --forzar para sobrescribirlo.")
+    if any(len(cargar_juicios(p)) for p in destinos[:1]) and args.forzar:
+        sys.exit(f"❌ {config.JUICIOS_PATH.name} ya tiene juicios: no se sobrescribe ni con --forzar.")
     store = SentenciasStore(log=lambda _m: None)
     tipos = store.corpus["tipo"].unique().tolist()
-    consultas = cargar_consultas(Path(args.consultas), permitir_vacias=True)
+    clasificador = construir_clasificador(tipos)
+    consultas = cargar_todas(Path(args.consultas), permitir_vacias=True)
     conceptos, _ = conceptos_de(consultas, leer_conceptos())
-    jz = hoja_juicios(store, construir_clasificador(tipos), consultas, conceptos, n_consultas=args.n_consultas)
+    jz = hoja_juicios(store, clasificador, consultas, conceptos, n_consultas=args.n_consultas)
     jz.to_csv(config.JUICIOS_PATH, index=False)
+    piloto = hoja_piloto(store, clasificador, consultas, conceptos, set(jz["consulta_id"]))
+    piloto.to_csv(config.PILOTO_JUICIOS_PATH, index=False)
     fc = hoja_fichas(store.corpus, cargar_familias(tipos), n=args.n_fichas)
     fc.to_csv(config.FICHAS_ANOTADAS_PATH, index=False)
-    _log(f"Hoja de juicios: {config.JUICIOS_PATH} ({jz['consulta_id'].nunique()} consultas, {len(jz)} pares)\n"
-         f"Hoja de fichas: {config.FICHAS_ANOTADAS_PATH} ({len(fc)} sentencias). Instrucciones en evaluacion/README.md.")
+    _log(f"Piloto: {config.PILOTO_JUICIOS_PATH} ({piloto['consulta_id'].nunique()} consultas, {len(piloto)} pares, "
+         "dos anotadores)\n"
+         f"Hoja de juicios: {config.JUICIOS_PATH} ({jz['consulta_id'].nunique()} consultas, {len(jz)} pares)\n"
+         f"Hoja de fichas: {config.FICHAS_ANOTADAS_PATH} ({len(fc)} sentencias, "
+         f"{int(fc['ficha_app'].astype(bool).sum())} con la ficha precalculada que muestra la app). "
+         "Instrucciones en evaluacion/README.md.")
+
+
+def cmd_kappa_piloto(args) -> None:
+    from .anotacion import kappa_piloto
+    from .reporte import Corrida
+
+    if not config.PILOTO_JUICIOS_PATH.exists():
+        sys.exit(f"❌ No existe {config.PILOTO_JUICIOS_PATH}: corre `hojas-anotacion`.")
+    resumen, desacuerdos = kappa_piloto(pd.read_csv(config.PILOTO_JUICIOS_PATH, dtype=str).fillna(""))
+    if not resumen["pares"]:
+        sys.exit("❌ El piloto no tiene pares juzgados por los dos anotadores todavía.")
+    corrida = Corrida("kappa-piloto", parametros={"hoja": config.PILOTO_JUICIOS_PATH.name})
+    corrida.tabla("Acuerdo del piloto", "Kappa de Cohen entre los dos anotadores. Si el de 0/1/2 es menor a 0.6, se "
+                  "ajusta la guía (evaluacion/README.md) antes de los 300 juicios.", pd.DataFrame([resumen]))
+    corrida.tabla("Pares en desacuerdo", "Para discutir entre los anotadores y precisar la guía.", desacuerdos)
+    if resumen["kappa_0_1_2"] < 0.6:
+        corrida.advertir("Kappa < 0.6: ajusta la guía de anotación antes de los 300 juicios.")
+    _guardar(corrida)
 
 
 def cmd_validar(args) -> None:
@@ -387,6 +422,8 @@ def main(argv=None) -> None:
     s.add_argument("--n", type=int, default=None, help="Entradas de la plantilla a redactar (todas por defecto)")
     s.add_argument("--plantilla", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
     s.add_argument("--forzar", action="store_true")
+    s.add_argument("--solo-atencion", action="store_true",
+                   help="Regenera solo los borradores marcados con ATENCIÓN, con el prompt estricto")
     s.set_defaults(func=cmd_borradores)
 
     s = sub.add_parser("hojas-anotacion", help="Hojas CSV para el abogado (juicios y fichas)")
@@ -394,6 +431,9 @@ def main(argv=None) -> None:
     s.add_argument("--n-fichas", type=int, default=40)
     s.add_argument("--forzar", action="store_true")
     s.set_defaults(func=cmd_hojas)
+
+    s = sub.add_parser("kappa-piloto", help="Acuerdo entre los dos anotadores del piloto y pares en desacuerdo")
+    s.set_defaults(func=cmd_kappa_piloto)
 
     s = sub.add_parser("validar", help="Valida consultas/juicios y detecta fuga")
     s.add_argument("--permitir-vacias", action="store_true", help="Acepta consultas aún sin redactar")

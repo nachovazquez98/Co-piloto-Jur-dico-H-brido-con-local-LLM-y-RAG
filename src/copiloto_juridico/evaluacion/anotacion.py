@@ -25,33 +25,60 @@ def _limpiar(texto: str) -> str:
     return texto.strip().strip('"').strip()
 
 
+_GENERICAS = {"delito", "delitos", "otros", "otro", "contra", "para", "como", "entre", "sobre", "modalidad", "grado",
+              "persona", "personas", "comision"}
+
+
+def palabras_prohibidas(tipo: str | None) -> list[str]:
+    """Palabras distintivas del nombre del tipo en el portal ("robo calificado" -> robo, calificado)."""
+    nombre = (tipo or "").split("/", 1)[-1]
+    return [w for w in dict.fromkeys(re.split(r"[-_]", nombre)) if len(w) >= 4 and w not in _GENERICAS]
+
+
+def _problemas(c: Consulta, texto: str, prohibidas: list[str]) -> str:
+    """Por qué un borrador no sirve (vacío si sirve): copia frases, nombra el tipo o trae datos identificables."""
+    from .conjuntos import _palabras
+
+    fuga = ngramas_compartidos(c.consulta, texto)
+    usadas = sorted(set(_palabras(c.consulta)) & set(prohibidas))
+    detalles = detalles_identificables(c.consulta)
+    if fuga:
+        return f"copiaba estas frases de la sentencia: «{'», «'.join(fuga[:3])}»"
+    if nombre_tipo_en_consulta(c) or usadas:
+        return f"usaba palabras del nombre del delito ({', '.join(usadas) or etiqueta_tipo(c.tipo)})"
+    if detalles:
+        return f"incluía datos que identifican la sentencia: {', '.join(detalles[:3])}"
+    return ""
+
+
 def redactar_borradores(plantilla: list[Consulta], textos: pd.Series, llm, n: int | None = None,
-                        intentos: int = 3, log: Callable[[str], None] = print) -> list[Consulta]:
-    """Borrador de consulta para las primeras `n` entradas de la plantilla (todas si n es None)."""
+                        intentos: int = 3, estricto: bool = False, log: Callable[[str], None] = print) -> list[Consulta]:
+    """Borrador de consulta para las primeras `n` entradas de la plantilla (todas si n es None). `estricto`
+    (v11.1): prompt con las palabras del tipo prohibidas y sin números, también verificado."""
     salida = []
     for c in plantilla[:n]:
         c.borrador, c.revisado = True, False
+        c.notas = c.notas.split("reescríbelo. ", 1)[-1]  # sin la marca de una corrida anterior
+        c.extra.pop("fuga", None)
         if c.sin_respuesta:
             c.consulta = _limpiar(llm.generate(prompts.PROMPT_BORRADOR_SIN_RESPUESTA.format(
                 tema=c.extra.get("tema_sugerido", ""))))
         else:
             texto = textos[c.doc_id_fuente]
-            prompt = prompts.PROMPT_BORRADOR_CONSULTA.format(extracto=texto[:6000])
+            prohibidas = palabras_prohibidas(c.tipo) if estricto else []
+            base = (prompts.PROMPT_BORRADOR_CONSULTA_ESTRICTO.format(extracto=texto[:6000],
+                                                                    prohibidas=", ".join(prohibidas) or "ninguna")
+                    if estricto else prompts.PROMPT_BORRADOR_CONSULTA.format(extracto=texto[:6000]))
+            prompt, problema = base, ""
             for intento in range(1, intentos + 1):
                 c.consulta = _limpiar(llm.generate(prompt))
-                fuga = ngramas_compartidos(c.consulta, texto)
-                nombra = nombre_tipo_en_consulta(c)
-                detalles = detalles_identificables(c.consulta)
-                if not fuga and not nombra and not detalles:
+                problema = _problemas(c, texto, prohibidas)
+                if not problema:
                     break
-                problema = (f"copiaba estas frases de la sentencia: «{'», «'.join(fuga[:3])}»" if fuga
-                            else f"usaba el nombre del delito '{etiqueta_tipo(c.tipo)}'" if nombra
-                            else f"incluía datos que identifican la sentencia: {', '.join(detalles[:3])}")
-                prompt = (prompts.PROMPT_BORRADOR_CONSULTA.format(extracto=texto[:6000])
-                          + f"\n(Tu borrador anterior {problema}. Escríbelo de nuevo, con tus palabras.)\nConsulta:")
+                prompt = base + f"\n(Tu borrador anterior {problema}. Escríbelo de nuevo, con tus palabras.)\nConsulta:"
             c.extra["intentos"] = intento
-            if fuga or nombra or detalles:
-                c.extra["fuga"] = fuga + detalles
+            if problema:
+                c.extra["fuga"] = problema
                 c.notas = ("ATENCIÓN: el borrador aún copia frases, nombra el tipo o trae fechas o cifras; "
                            "reescríbelo. " + c.notas)
         log(f"   {c.id}: {c.consulta[:100]}{'  ⚠️' if c.extra.get('fuga') else ''}")
@@ -129,3 +156,29 @@ def hoja_fichas(corpus: pd.DataFrame, familias: dict[str, str], n: int = 40,
                       "version_ficha": version_ficha(settings) if ficha is not None else "",
                       "ficha_app": ficha_app if ficha is not None else ""})
     return pd.DataFrame(filas)
+
+
+def hoja_piloto(store, clasificador, consultas: list[Consulta], conceptos: dict[str, str], ya_en_juicios: set[str],
+                n_consultas: int = 10, k: int = 5) -> pd.DataFrame:
+    """Piloto de anotación: `n_consultas` consultas de desarrollo que NO están en la hoja de juicios, con sus `k`
+    primeros candidatos, para que dos personas juzguen lo mismo antes de los 300 juicios (columnas _a y _b)."""
+    elegibles = [c for c in consultas if c.particion == "desarrollo" and c.id not in ya_en_juicios]
+    base = hoja_juicios(store, clasificador, elegibles, conceptos, n_consultas=n_consultas, k=k)
+    base = base.drop(columns=["relevancia", "mismo_delito", "mismo_problema_procesal", "anotador"])
+    return base.assign(relevancia_a="", anotador_a="", relevancia_b="", anotador_b="", nota="")
+
+
+def kappa_piloto(hoja: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+    """Acuerdo del piloto (kappa de Cohen 0/1/2 y binario relevante/no) y la lista de pares en desacuerdo."""
+    from .metricas import cohen_kappa
+
+    ok = hoja[hoja["relevancia_a"].astype(str).str.strip().isin(["0", "1", "2"])
+              & hoja["relevancia_b"].astype(str).str.strip().isin(["0", "1", "2"])].copy()
+    if ok.empty:
+        return {"pares": 0}, ok
+    a, b = ok["relevancia_a"].astype(int), ok["relevancia_b"].astype(int)
+    resumen = {"pares": len(ok), "kappa_0_1_2": cohen_kappa(a.tolist(), b.tolist()),
+               "kappa_binario": cohen_kappa((a >= 1).tolist(), (b >= 1).tolist()),
+               "acuerdo_exacto": float((a == b).mean())}
+    desacuerdos = ok[a != b][["consulta_id", "doc_id", "consulta", "relevancia_a", "relevancia_b", "nota"]]
+    return resumen, desacuerdos

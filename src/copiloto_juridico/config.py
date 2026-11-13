@@ -42,7 +42,9 @@ CHROMA_DIR = Path(_env("COPILOTO_CHROMA_DIR", str(DATA_DIR / "chroma")))       #
 # --- Evaluación (v11) ---
 EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))
 FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito (lo revisa un abogado)
-CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Conjuntos A y B (consultas)
+CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Consultas derivadas de sentencias (borradores revisados)
+CONSULTAS_REALES_PATH = EVAL_DIR / "consultas_reales.jsonl"  # Escritas por abogados sin ver sentencias
+PILOTO_JUICIOS_PATH = EVAL_DIR / "piloto_juicios.csv"       # Piloto de anotación: 10 consultas x 5, dos anotadores
 JUICIOS_PATH = EVAL_DIR / "anotacion_juicios.csv"           # Hoja de juicios de relevancia 0/1/2 (la llena el abogado)
 FICHAS_ANOTADAS_PATH = EVAL_DIR / "anotacion_fichas.csv"    # Hoja del conjunto C (la llena el abogado)
 CONCEPTOS_CACHE_PATH = EVAL_DIR / "cache" / "conceptos.json"

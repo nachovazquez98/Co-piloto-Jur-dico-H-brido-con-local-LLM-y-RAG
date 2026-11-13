@@ -151,9 +151,11 @@ def _fila_promedio(nombre_col: str, valores: list[float]) -> dict:
 
 def _fila_diferencia(a: list[float], b: list[float]) -> dict:
     d = m.bootstrap_diferencia_pareada(a, b, config.EVAL_BOOTSTRAP, config.EVAL_SEED)
+    mde = m.efecto_minimo_detectable(a, b)
     return {"Δ": d["diferencia"], "Δ IC95": f"[{d['ic_inf']:+.3f}, {d['ic_sup']:+.3f}]",
             "¿significativa?": "sí" if d["significativa"] else "no", "gana A / B / empate":
-            f"{d['gana_a']} / {d['gana_b']} / {d['empates']}"}
+            f"{d['gana_a']} / {d['gana_b']} / {d['empates']}",
+            "efecto mínimo detectable": f"±{mde:.3f}" if mde is not None else "— (sin variación)"}
 
 
 def auc_roc(positivos: list[float], negativos: list[float]) -> float:
@@ -353,7 +355,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     """Carga consultas (validadas contra el corpus), familias, juicios, conceptos en caché, la base y el
     clasificador. Marca la corrida como borrador si alguna consulta lo es."""
     from ..datos.corpus import load_corpus
-    from .conjuntos import cargar_consultas, cargar_juicios, facetas_por_par, relevancia_por_par, verificar_fuga
+    from .conjuntos import cargar_juicios, cargar_todas, facetas_por_par, relevancia_por_par, verificar_fuga
     from .familias import cargar_familias
 
     corrida = Corrida(comando, parametros={"particion": particion, **(parametros or {})})
@@ -370,7 +372,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     else:
         corpus = load_corpus()
     familias = cargar_familias(corpus["tipo"].unique().tolist())
-    todas = cargar_consultas(ruta_consultas, corpus=corpus, familias=familias, permitir_vacias=True)
+    todas = cargar_todas(ruta_consultas, corpus=corpus, familias=familias, permitir_vacias=True)
     vacias = [c.id for c in todas if not c.consulta.strip()]
     if vacias:
         corrida.advertir(f"{len(vacias)} consultas sin redactar se omiten: {', '.join(vacias[:10])}"
@@ -575,9 +577,12 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         fila.update(_fila_promedio("nDCG@5 (metadatos)", [f["ndcg5_meta"] for f in doc]))
         fila["P@5 mismo tipo"] = float(np.mean([f["p5_meta"] for f in doc])) if doc else float("nan")
         tabla_doc.append(fila)
-        jz = [f for f in filas if "ndcg5" in f]
-        if jz:
-            fj = {"variante": nombre, "n": len(jz)}
+        origen = {p.consulta.id: p.consulta.origen for p in preparadas}
+        for subconjunto in ("derivadas", "reales"):
+            jz = [f for f in filas if "ndcg5" in f and origen[f["id"]] == subconjunto[:-1]]
+            if not jz:
+                continue
+            fj = {"variante": nombre, "consultas": subconjunto, "n": len(jz)}
             fj.update(_fila_promedio("nDCG@5", [f["ndcg5"] for f in jz]))
             fj.update(_fila_promedio("P@5", [f["p5"] for f in jz]))
             fj["cobertura juicios top-5"] = float(np.mean([f["cobertura"] for f in jz]))
@@ -593,7 +598,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         "IC95: Wilson para Hit, bootstrap (1,000) para MRR y nDCG.", pd.DataFrame(tabla_doc))
     if tabla_juicios:
         corrida.tabla("Relevancia juzgada por humanos",
-                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0. P@5 por "
+                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0. Por "
+                      "separado: consultas derivadas de sentencias y consultas reales de abogados (la diferencia "
+                      "estima el sesgo de las derivadas). P@5 por "
                       "faceta: fracción del top 5 que el abogado marcó con el mismo delito o el mismo problema "
                       "procesal (columnas opcionales de la hoja).",
                       pd.DataFrame(tabla_juicios))
@@ -628,7 +635,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
     if comparaciones:
         corrida.tabla("Comparaciones pareadas",
                       "Δ = media(A − B) sobre las mismas consultas, IC95 bootstrap pareado. Una mejora se acepta solo "
-                      "si el intervalo no incluye 0.", pd.DataFrame(comparaciones))
+                      "si el intervalo no incluye 0. Efecto mínimo detectable: la Δ más pequeña que esta n detectaría "
+                      "(alfa 5 %, potencia 80 %); una Δ menor no significativa no prueba que no haya diferencia.",
+                      pd.DataFrame(comparaciones))
 
     # --- Consultas sin respuesta ---
     sin_resp = [p for p in preparadas if p.consulta.sin_respuesta]
@@ -719,6 +728,8 @@ def experimento_ablacion(env: Entorno, log: Callable[[str], None] = print) -> Co
             d = m.bootstrap_diferencia_pareada(r[k], base[k], config.EVAL_BOOTSTRAP, config.EVAL_SEED)
             fila[f"Δ {k} [IC95]"] = f"{d['diferencia']:+.3f} [{d['ic_inf']:+.3f}, {d['ic_sup']:+.3f}]"
             fila[f"Δ {k} significativa"] = "sí" if d["significativa"] else "no"
+            mde = m.efecto_minimo_detectable(r[k], base[k])
+            fila[f"Δ {k} mínima detectable"] = f"±{mde:.3f}" if mde is not None else "—"
         filas.append(fila)
     corrida.tabla(
         "Ablación del clasificador",

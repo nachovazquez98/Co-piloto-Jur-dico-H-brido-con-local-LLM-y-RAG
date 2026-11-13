@@ -622,6 +622,27 @@ Extracto de la sentencia:
 Consulta:
 """
 
+# v11.1: para regenerar los borradores que el verificador marcó (copiaban frases, nombraban el delito o traían cifras).
+PROMPT_BORRADOR_CONSULTA_ESTRICTO = """
+Eres un defensor penal en Jalisco. A partir del extracto de una sentencia de segunda instancia, escribe la consulta
+que harías a un buscador de precedentes sobre TU caso, ANTES de conocer esa sentencia: en 2 a 4 frases, en primera
+persona ("Mi cliente...", "Represento a..."), cuenta qué hizo o qué se le atribuye a tu cliente y qué resolución
+quieres apelar y por qué. Si apeló el Ministerio Público o la víctima, escribe como el defensor que contesta.
+
+Reglas obligatorias (si rompes una, la consulta se descarta):
+- PALABRAS PROHIBIDAS: {prohibidas}. Describe la conducta con otras palabras.
+- NINGÚN número, ni con cifras ni con letra: sin fechas, años, cantidades, montos, números de toca ni duraciones
+  de pena.
+- Escribe con tus palabras: ni una frase del extracto, ni siquiera 5 palabras seguidas iguales.
+- Sin nombres de personas, lugares, juzgados ni el resultado de la apelación.
+Responde ÚNICAMENTE con el texto de la consulta.
+
+Extracto de la sentencia:
+{extracto}
+
+Consulta:
+"""
+
 PROMPT_BORRADOR_SIN_RESPUESTA = """
 Eres un defensor penal en Jalisco. Escribe en 2 a 4 frases la consulta que harías a un buscador de precedentes sobre
 este tema: "{tema}". En primera persona ("Mi cliente..."), describe un caso concreto y verosímil (hechos y qué

@@ -264,6 +264,17 @@ def bootstrap_diferencia_pareada(a: Sequence[float], b: Sequence[float], n_remue
             "gana_a": int((dif > 0).sum()), "gana_b": int((dif < 0).sum()), "empates": int((dif == 0).sum())}
 
 
+def efecto_minimo_detectable(a: Sequence[float], b: Sequence[float], alfa: float = 0.05,
+                             potencia: float = 0.80) -> float | None:
+    """Diferencia pareada más pequeña que esta muestra detectaría (prueba de dos colas, alfa 5 %, potencia 80 %):
+    (z₁₋α/₂ + z_potencia) · sd(a − b) / √n. Si la diferencia observada es menor que esto, "no significativa" no
+    quiere decir "no hay diferencia": la muestra no alcanza para verla. None si no hay variación entre pares."""
+    dif = np.asarray(a, dtype=float) - np.asarray(b, dtype=float)
+    if len(dif) < 2 or float(dif.std(ddof=1)) == 0.0:
+        return None
+    return (_z(1 - alfa) + NormalDist().inv_cdf(potencia)) * float(dif.std(ddof=1)) / math.sqrt(len(dif))
+
+
 def proporcion_con_ic(aciertos: Sequence[float], confianza: float = 0.95) -> dict[str, float]:
     """Resumen de una métrica 0/1 por consulta: valor, IC de Wilson y n."""
     x = [float(v) for v in aciertos]

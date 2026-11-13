@@ -22,6 +22,20 @@ Son borradores escritos por el LLM a partir de cada sentencia (comando `borrador
 Las líneas `S…` (`sin_respuesta: true`) son temas sin sentencias en el corpus; sirven para medir si el sistema lo
 reconoce. Al terminar: `validar`.
 
+## 2b. Consultas reales — `consultas_reales.jsonl`
+
+Al menos 20 consultas escritas por abogados penalistas **sin ver sentencias del corpus**, tal como las escribirían
+en la app (el esquema está en las primeras líneas del archivo). Las consultas derivadas de sentencias facilitan la
+búsqueda (comparten vocabulario con su sentencia); `recuperacion` reporta por separado derivadas y reales para medir
+ese sesgo. Después de agregarlas, vuelve a correr `conceptos` y `hojas-anotacion`.
+
+## 3a. Piloto de anotación — `piloto_juicios.csv` (primero)
+
+10 consultas × 5 resultados que juzgan **dos personas por separado** (`relevancia_a`/`anotador_a` y
+`relevancia_b`/`anotador_b`) con la guía de abajo. `kappa-piloto` calcula el acuerdo y lista los pares en desacuerdo.
+Si kappa (0/1/2) es menor a 0.6, discutan los desacuerdos, precisen la guía en este archivo y repitan el piloto
+**antes** de los 300 juicios.
+
 ## 3. Abogado: juzgar la relevancia — `anotacion_juicios.csv`
 
 Una fila por par consulta–sentencia, en orden aleatorio (no muestra el puntaje del sistema). Lee la consulta y el
@@ -32,6 +46,9 @@ resumen de la sentencia (si hay duda, la sentencia completa) y escribe en `relev
 | **2** | Mismo delito y contexto compatible; útil como precedente directo. | Robo calificado con violencia a un transeúnte. |
 | **1** | Misma familia de delito, o mismo problema procesal con hechos distintos. | Robo equiparado; robo a casa habitación. |
 | **0** | Otro delito, o coincidencia solo de palabras. | Violencia familiar donde se menciona un celular. |
+
+Opcional, pero útil para separar las dos cosas que mezcla el grado 1: `mismo_delito` (sí/no) y
+`mismo_problema_procesal` (sí/no; mismo acto impugnado o mismo argumento). `recuperacion` reporta P@5 por cada una.
 
 Escribe tu nombre en `anotador`. Una segunda persona juzga el 20 % de los pares en filas duplicadas con su propio
 nombre; `validar` calcula el acuerdo (kappa de Cohen). Si es menor a 0.6, se revisa este criterio.
@@ -49,10 +66,12 @@ cuál), y escribe `ficha_aceptable` (si/no) y, en `errores_ficha`, qué dato est
 familias            # 1. tabla tipo -> familia (no sobrescribe una revisada)
 plantilla           #    muestreo estratificado de sentencias (consultas_penal_borrador.jsonl)
 borradores          # 2. el LLM redacta los borradores (consultas_penal.jsonl)
+borradores --solo-atencion  # regenera los marcados ATENCIÓN con el prompt estricto
 validar             #    fuga, nombres de tipo, acuerdo entre anotadores
 conceptos           #    conceptos clave con el LLM, una vez
 fichas-batch        #    ficha de cada sentencia penal, una vez (reanudable; ~8 h) + diagnóstico sin anotación
-hojas-anotacion     # 3-4. hojas para el abogado
+hojas-anotacion     # 3-4. piloto, hoja de juicios y hoja de fichas
+kappa-piloto        #    acuerdo del piloto (si < 0.6, ajustar la guía antes de los 300 juicios)
 recuperacion --particion desarrollo
 ablacion --particion desarrollo
 pesos               #    elige en desarrollo; mide en prueba una sola vez

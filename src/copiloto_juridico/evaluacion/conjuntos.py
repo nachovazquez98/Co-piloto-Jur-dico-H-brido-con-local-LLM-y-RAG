@@ -51,6 +51,11 @@ class Consulta:
     extra: dict = field(default_factory=dict)
 
     @property
+    def origen(self) -> str:
+        """"derivada" (redactada a partir de una sentencia) o "real" (escrita por un abogado sin ver sentencias)."""
+        return self.extra.get("origen", "derivada")
+
+    @property
     def documento_conocido(self) -> bool:
         return bool(self.doc_id_fuente) and not self.sin_respuesta
 
@@ -114,7 +119,7 @@ def cargar_consultas(path: Path = config.CONSULTAS_PATH, corpus: pd.DataFrame | 
                                 "`python -m copiloto_juridico.evaluacion plantilla` y redacta las consultas.")
     consultas, problemas = [], []
     for n, linea in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-        if not linea.strip():
+        if not linea.strip() or linea.lstrip().startswith("#"):  # comentarios (p. ej. el esquema)
             continue
         try:
             d = json.loads(linea)
@@ -129,6 +134,21 @@ def cargar_consultas(path: Path = config.CONSULTAS_PATH, corpus: pd.DataFrame | 
     problemas += validar_consultas(consultas, corpus, familias, permitir_vacias)
     if problemas:
         raise ErrorValidacion(f"{path.name}: {len(problemas)} problema(s):\n  - " + "\n  - ".join(problemas))
+    return consultas
+
+
+def cargar_todas(path: Path = config.CONSULTAS_PATH, reales: Path = config.CONSULTAS_REALES_PATH,
+                 **kw) -> list[Consulta]:
+    """Consultas derivadas + consultas reales (si hay). Los ids deben ser únicos entre ambos archivos."""
+    consultas = cargar_consultas(path, **kw)
+    if reales.exists():
+        extra = cargar_consultas(reales, **kw)
+        for c in extra:
+            c.extra["origen"] = "real"
+        repetidos = {c.id for c in consultas} & {c.id for c in extra}
+        if repetidos:
+            raise ErrorValidacion(f"ids repetidos entre {path.name} y {reales.name}: {sorted(repetidos)[:5]}")
+        consultas += extra
     return consultas
 
 
