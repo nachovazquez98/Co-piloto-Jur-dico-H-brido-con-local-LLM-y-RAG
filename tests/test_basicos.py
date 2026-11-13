@@ -88,6 +88,10 @@ def test_limpiar_texto_encabezados_con_palabras_partidas():
     limpio = limpiar_texto(texto)
     assert limpio == "toca 202025 apelación contra la sentencia. primer agravio fundado. segundo agravio infundado. vistos"
     assert limpiar_texto(limpio) == limpio
+    # etiquetas en femenino, plural y con espacios metidos por la extracción
+    etiquetas = ("la víctima no.12eliminadalaedad3 , con domicilio no.62eli minadoeldomicilio2 y "
+                 "no.14eliminadalainformacióncorrespondienteaunapersonarelacion adaconunprocedimientopenal79 declaró")
+    assert limpiar_texto(etiquetas) == "la víctima [eliminado] , con domicilio [eliminado] y [eliminado] declaró"
 
 
 def test_recortar_contexto_conserva_agravios():

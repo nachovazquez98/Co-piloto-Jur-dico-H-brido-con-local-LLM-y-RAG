@@ -167,10 +167,8 @@ def process_pdf_folder(folder: Path, log: Callable[[str], None] = print) -> list
 # Cada entrada del anexo de datos testados termina en "LGPPICR" (Lineamientos Generales para la Protección de la
 # Información Confidencial y Reservada); la extracción del PDF puede partir las palabras ("l gppicr", "po r ser").
 _RE_FIN_ANEXO = re.compile(r"l\s?g\s?p\s?p\s?i\s?c\s?r\s?\.?")
-_RE_INICIO_ENTRADA = re.compile(r"no\s?\.\s?[\d\s]{1,8}e\s?l\s?i\s?m\s?i\s?n|el\s?documento\s?fue\s?testad|\.\s")
+_RE_INICIO_ENTRADA = re.compile(r"no\s?\.\s?[\d\s]{1,8}e\s?l\s?i\s?m\s?i\s?n|\[eliminado\]|el\s?documento\s?fue\s?testad|\.\s")
 _FIRMA_ANEXO = ("lineamiento", "renglon", "porserundato", "quincuagesimo", "testad")
-# Etiquetas de datos testados dentro del texto: "no.207eliminadoelnombrecompleto1", "no.6 eliminadoeldomicilio2".
-_RE_ETIQUETA = re.compile(r"no\s?\.\s?\d+\s?eliminado[a-záéíóúñ0-9]*", re.IGNORECASE)
 _ACENTOS = {"a": "[aá]", "e": "[eé]", "i": "[ií]", "o": "[oó]", "u": "[uú]"}
 
 
@@ -180,6 +178,11 @@ def _tolerante(frase: str) -> str:
     return r"\s?".join(_ACENTOS.get(ch, re.escape(ch)) for ch in frase.replace(" ", ""))
 
 
+# Etiquetas de datos testados dentro del texto: "no.207eliminadoelnombrecompleto1", "no.6 eliminadoeldomicilio2",
+# "no.12eliminadalaedad3", "no.5eliminadalainformacióncorrespondienteauna personarelacionada...penal79" (femenino,
+# plural y hasta dos espacios metidos por la extracción; la etiqueta termina en su número).
+_RE_ETIQUETA = re.compile(r"no\s?\.\s?\d+\s?" + _tolerante("eliminad") + r"\s?[oa]s?"
+                          r"(?:[a-záéíóúñ]+(?: [a-záéíóúñ]+){0,2}?\d+|[a-záéíóúñ0-9]*)", re.IGNORECASE)
 # Encabezados y pies de página que se repiten en cada hoja: "tribunal de justicia del estado de jalisco 5116 --- 115",
 # la nota del programa de testado, "documento para versión electrónica", "página -12-".
 _RE_ENCABEZADO = re.compile("|".join([
@@ -188,7 +191,7 @@ _RE_ENCABEZADO = re.compile("|".join([
     r"(?:supremo\s?)?" + _tolerante("tribunal de justicia") + r"\s?(?:del|en\s?el)\s?" + _tolerante("estado de jalisco"),
     _tolerante("justicia del estado de jalisco sistema acusatorio adversarial"),
     _tolerante("documento para versión electrónica"),
-    r"\bp[aá]gina\s?-\s?\d+\s?-|\bp[aá]gina \d+\b(?= toca)",
+    r"\bp[aá]gina\s?-\s?\d+\s?-|\bp[aá]gina \d+\b(?= toca)|\bp[aá]g\s?\.\s?\d+\b",
 ]), re.IGNORECASE)
 # Número de expediente que el encabezado repite en cada hoja: "toca penal 582025", "carpeta administrativa 1234".
 _RE_EXPEDIENTE = re.compile(r"\b(?:toca(?: penal| de juicio oral electr[oó]nico| juicio oral| tradicional)?"
@@ -241,6 +244,7 @@ def _quitar_expedientes_repetidos(texto: str, minimo: int = 3) -> str:
 
 
 def _limpiar_una_vez(t: str) -> str:
+    t = quitar_anexo_testado(t)
     t = _RE_ETIQUETA.sub("[eliminado]", t)
     t = re.sub(r"\s+", " ", t)
     t = _RE_DELETREADA.sub(lambda m: m.group(0).replace(" ", ""), t)
@@ -254,7 +258,7 @@ def limpiar_texto(texto: str) -> str:
     numeración de página, palabras deletreadas y espacios repetidos. Conserva las marcas "... N págs omitidas ..."
     (avisan que esa parte del PDF no se leyó). Se repite hasta que el texto no cambia, porque unir palabras o
     quitar un encabezado puede dejar completo otro."""
-    t = quitar_anexo_testado(texto)
+    t = texto
     for _ in range(4):
         nuevo = _limpiar_una_vez(t)
         if nuevo == t:

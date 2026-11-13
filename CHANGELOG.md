@@ -22,8 +22,9 @@ explicación de cada número. Ningún resultado se reporta si no está en una co
 - Síntesis v11: la lista de precedentes favorables o desfavorables para la defensa se calcula con reglas (quién
   apeló + sentido del fallo; también en cada tarjeta); el LLM resume los argumentos aceptados o rechazados y no
   pronostica el resultado (la v10 leyó al revés un precedente en una consulta real).
-- Limpieza del texto: anexo de datos testados, etiquetas de testado, encabezados y pies de página aunque la
-  extracción parta las palabras, números de expediente repetidos en cada hoja y palabras deletreadas; idempotente
+- Limpieza del texto: anexo de datos testados, etiquetas de testado (también en femenino, plural o partidas),
+  encabezados y pies de página aunque la extracción parta las palabras, números de expediente repetidos en cada
+  hoja y palabras deletreadas; idempotente
   (`cli limpiar-corpus`, 16 % menos caracteres en el corpus guardado). Las sentencias penales se indexan completas.
   Comandos `cli pendientes` y `estado --salida`; lista de sentencias con páginas omitidas en
   `evaluacion/paginas_omitidas.csv`.
