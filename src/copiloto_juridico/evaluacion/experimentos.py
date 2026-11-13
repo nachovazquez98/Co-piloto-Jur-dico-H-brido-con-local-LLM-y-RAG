@@ -927,19 +927,36 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
     if not fichas:
         corrida.advertir("No hay fichas anotadas con consulta_id y ficha_aceptable: QC_2 por medir.")
         return corrida
-    log(f"QC_2 sobre {len(fichas)} fichas anotadas...")
+    log(f"QC_2 ({config.QC2_MODO}) sobre {len(fichas)} fichas anotadas...")
     humano, sistema = [], []
     for f in fichas:
-        informe = generar_ficha(env.store.corpus.loc[f["doc_id"], "texto"], llm)["informe"]
-        resp = llm.generate(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
-            texto_consulta=consultas[f["consulta_id"]].consulta, informe_generado=informe))
         humano.append(bool(f["ficha_aceptable"]))
-        sistema.append(parse_veredicto(resp))
+        sistema.append(_qc2_como_la_app(env, consultas[f["consulta_id"]], f["doc_id"], llm))
     r = resumen_binario(humano, sistema)
-    corrida.tabla("QC_2 (anti-alucinación) contra el juicio humano",
-                  "Positivo = QC_2 acepta la ficha; verdad = el anotador la marcó como aceptable.",
+    corrida.tabla("QC_2 contra el juicio humano",
+                  f"QC_2 {config.QC2_MODO} (el de la app) sobre la ficha que muestra la app. Positivo = QC_2 acepta "
+                  "la ficha; verdad = el anotador la marcó como aceptable.",
                   pd.DataFrame([_filas_qc("QC_2", r, r["VP"], r["VP"] + r["FN"])]))
     return corrida
+
+
+def _qc2_como_la_app(env: Entorno, consulta: Consulta, doc_id: str, llm) -> bool | None:
+    """Veredicto de QC_2 para (consulta, sentencia) con el mismo control y la misma ficha que la app."""
+    from ..embeddings import embed_query
+    from ..pipeline import Precedente, buscar_candidatos, parse_veredicto, qc2_determinista
+    from ..vectorstore import Candidato
+
+    row = env.store.corpus.loc[doc_id]
+    g = generar_ficha(row["texto"], llm, doc_id=doc_id)
+    if config.QC2_MODO == "llm":
+        return parse_veredicto(llm.generate(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
+            texto_consulta=consulta.consulta, informe_generado=g["informe"])))
+    b = buscar_candidatos(env.store, env.clasificador, consulta.consulta, env.conceptos.get(consulta.id, consulta.consulta),
+                          embed_query(consulta.consulta), config.RAG_NUM_RESULTS_DESIRED)
+    tipos = [t for c in b.categorias for t in env.clasificador.tipos_de(c)]
+    cand = Candidato(doc_id, row["materia"], row["delito_o_accion"], row["tipo"], row["fecha"], 0.0, 0.0, row["texto"])
+    prec = Precedente(0, cand, "", g["informe"], g["extraccion"], False, ficha=g["ficha"])
+    return qc2_determinista(prec, {env.familias.get(t, t) for t in tipos})[0]
 
 
 def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callable[[str], None] = print) -> Corrida:
@@ -988,15 +1005,30 @@ def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callab
 # --------------------------------------------------------------------------------------------------------------
 
 
-def generar_ficha(texto: str, llm, version_prompt: str | None = None) -> dict:
-    """Extracción + informe penal de una sentencia, como en el paso 4 de la app (sin QC)."""
+def generar_ficha(texto: str, llm, version_prompt: str | None = None, doc_id: str | None = None) -> dict:
+    """La ficha de una sentencia como la produce la app (paso 4, sin QC): con FICHA_MODO "json", la precalculada si
+    está vigente o una llamada JSON (con reintento); si falla, o si se pide una versión de prompt penal concreta
+    (comparación v10/v11), la extracción + informe en dos llamadas."""
+    from ..fichas import generar_ficha_json, verificaciones
+    from ..fichas_precalculadas import ficha_guardada
     from ..pipeline import recortar_contexto
 
-    p_ext, p_rep = prompts.prompts_penal(version_prompt)
     contexto = recortar_contexto(texto, llm.settings.max_context_chars)
+    base = {"chars_leidos": len(contexto), "chars_total": len(texto)}
+    if version_prompt is None and config.FICHA_MODO == "json":
+        ficha = ficha_guardada(doc_id, texto, llm.settings) if doc_id and config.FICHAS_PRECALCULADAS else None
+        origen = "precalculada"
+        if ficha is None:
+            ficha, _ = generar_ficha_json(llm.generate, contexto)
+            origen = "generada"
+        if ficha is not None:
+            v = verificaciones(ficha.campos_markdown(), texto)
+            return {**base, "extraccion": ficha.campos_markdown(), "origen": origen, "ficha": ficha,
+                    "informe": ficha.informe_markdown(v["articulos_no_encontrados"], v["sentido_reglas"])}
+    p_ext, p_rep = prompts.prompts_penal(version_prompt)
     extraccion = llm.generate(p_ext.format(contexto=contexto))
     informe = llm.generate(p_rep.format(hechos=extraccion))
-    return {"extraccion": extraccion, "informe": informe, "chars_leidos": len(contexto), "chars_total": len(texto)}
+    return {**base, "extraccion": extraccion, "informe": informe, "origen": "dos llamadas", "ficha": None}
 
 
 def comparar_ficha(extraccion: str, anotada: dict, texto_sentencia: str) -> dict:
@@ -1039,8 +1071,8 @@ def experimento_generacion(fichas_anotadas: list[dict], corpus: pd.DataFrame, ll
                            version_prompt: str | None = None, n_afirmaciones: int = 100,
                            log: Callable[[str], None] = print) -> tuple[Corrida, pd.DataFrame, list[dict]]:
     """Genera las fichas del conjunto C, las compara campo por campo y prepara la muestra de afirmaciones."""
-    corrida.parametros.update(version_prompt=version_prompt or getattr(config, "PROMPT_PENAL_VERSION", "v10"),
-                              n_afirmaciones=n_afirmaciones)
+    corrida.parametros.update(ficha=f"dos llamadas, prompt {version_prompt}" if version_prompt else
+                              f"{config.FICHA_MODO} (precalculada si está vigente)", n_afirmaciones=n_afirmaciones)
     textos = corpus.set_index("id")["texto"]
     filas, generadas, todas_af = [], [], []
     for i, f in enumerate(fichas_anotadas, 1):
@@ -1048,11 +1080,12 @@ def experimento_generacion(fichas_anotadas: list[dict], corpus: pd.DataFrame, ll
             corrida.advertir(f"{f['doc_id']} no está en el corpus; se omite.")
             continue
         log(f"   [{i}/{len(fichas_anotadas)}] {f['doc_id']}")
-        g = generar_ficha(textos[f["doc_id"]], llm, version_prompt)
-        generadas.append({"doc_id": f["doc_id"], **g})
+        g = generar_ficha(textos[f["doc_id"]], llm, version_prompt, doc_id=f["doc_id"])
+        generadas.append({"doc_id": f["doc_id"], **{k: v for k, v in g.items() if k != "ficha"}})
         filas.append(comparar_ficha(g["extraccion"], f, textos[f["doc_id"]]))
         todas_af += afirmaciones(f["doc_id"], g["informe"])
     df = pd.DataFrame(filas)
+    corrida.extra["origen_fichas"] = dict(Counter(g["origen"] for g in generadas))
     resumen = []
     for col, nombre in (("sentido_ok", "Sentido del fallo"), ("etapa_ok", "Etapa procesal"), ("delito_ok", "Delito")):
         vals = [float(v) for v in df.get(col, pd.Series(dtype=object)).dropna()] if len(df) else []
