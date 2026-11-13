@@ -222,6 +222,18 @@ def test_clasificador_a_nivel_familia(monkeypatch):
     assert cl.etiqueta_tipo("penal/familia/delitos-sexuales") == "PENAL · familia: delitos sexuales"
 
 
+def test_familia_sin_palabras_de_relleno(monkeypatch):
+    """El embedding de la familia no lleva "y otros" ni nombres compuestos con otro delito; con una sola materia,
+    "penal" no cuenta para Jaccard."""
+    monkeypatch.setattr(cl, "embed_texts", _emb_falsos)
+    tipos = ["penal/armas", "penal/portacion-de-arma-de-fuego-y-otros", "penal/portacion-de-arma-de-fuego-sin-licencia",
+             "penal/disparo-de-arma-de-fuego-y-abuso-sexual-infantil"]
+    c = cl.ClasificadorHibrido(tipos, nivel="familia", familias={t: "armas" for t in tipos}, enriquecer=True)
+    texto = c._texto_embedding("penal/familia/armas", "penal armas")
+    assert "otros" not in texto and "abuso" not in texto and "portacion de arma de fuego sin licencia" in texto
+    assert c.tokens == [{"arma"}]
+
+
 def test_lista_de_tokens_desactivada_por_defecto(monkeypatch):
     assert cl.PesosClasificador.desde_config().penal_tokens is False
     assert config.KEM_WEIGHT == 0 and config.JACCARD_WEIGHT == 0.40

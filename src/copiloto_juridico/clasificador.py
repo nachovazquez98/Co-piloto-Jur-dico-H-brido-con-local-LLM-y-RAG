@@ -12,6 +12,7 @@ El cálculo se separa en dos pasos para poder evaluarlo:
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, replace
 from functools import lru_cache
 
@@ -67,6 +68,7 @@ def key_entity_match(category_tokens: set, entity_tokens: set, high_importance_t
 
 
 PREFIJO_FAMILIA = "familia/"
+_SUFIJO_OTROS = re.compile(r"\s+y\s+otros?$")
 
 
 def etiqueta_tipo(tipo: str) -> str:
@@ -159,15 +161,25 @@ class ClasificadorHibrido:
         # El embedding de una familia incluye los nombres de sus tipos más generales (los más cortos): "penal
         # contra la salud" solo no dice "narcomenudeo". Jaccard sigue usando solo el nombre de la familia.
         self.embeddings = embed_texts([self._texto_embedding(c, t) for c, t in zip(self.tipos, textos)], kind="query")
-        self.tokens = [lemmatized_tokens(t) for t in textos]
+        # Con una sola materia, su nombre ("penal") está en todas las categorías y no distingue ninguna: solo
+        # sumaría Jaccard a las de nombre corto cuando los conceptos dicen "apelación penal".
+        materias = {t.split("/", 1)[0] for t in self.tipos}
+        self.tokens = [lemmatized_tokens(t) - (materias if len(materias) == 1 else set()) for t in textos]
         self.indice = {t: i for i, t in enumerate(self.tipos)}
 
     def _texto_embedding(self, categoria: str, texto: str, max_tipos: int = 6) -> str:
+        """Nombre de la categoría y, en una familia, los nombres de sus tipos más cortos.
+
+        Los nombres del portal traen ruido: "y otro(s)" (la sentencia juzgó más delitos) y nombres compuestos
+        ("disparo de arma de fuego ... y abuso sexual infantil", en la familia armas) que mezclarían otra familia
+        en el embedding. Se quita el sufijo y se prefieren los nombres sin " y ".
+        """
         if PREFIJO_FAMILIA not in categoria or not self.enriquecer:
             return texto
-        nombres = sorted({t.split("/", 1)[1].replace("_", " ").replace("-", " ") for t in self.miembros[categoria]},
-                         key=len)[:max_tipos]
-        return f"{texto}: {', '.join(nombres)}"
+        nombres = sorted({_SUFIJO_OTROS.sub("", t.split("/", 1)[1].replace("_", " ").replace("-", " "))
+                          for t in self.miembros[categoria]}, key=len)
+        simples = [n for n in nombres if " y " not in n]
+        return f"{texto}: {', '.join((simples if len(simples) >= 2 else nombres)[:max_tipos])}"
 
     def tipos_de(self, categoria: str) -> list[str]:
         """Tipos del corpus que cubre una categoría (a nivel tipo, la propia categoría)."""

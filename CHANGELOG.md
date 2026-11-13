@@ -26,7 +26,9 @@ explicación de cada número. Ningún resultado se reporta si no está en una co
 - Por defecto: solo materia penal, clasificación por familia de delito, prompts v11; las opciones de v10 quedan por
   variable de entorno para comparar.
 - Clasificador: Jaccard 0.40 y KEM 0 (eran redundantes); sin la lista fija de tokens penalizados; el embedding de
-  cada familia incluye los nombres de sus tipos. Decisiones respaldadas por la regresión guardada.
+  cada familia incluye los nombres de sus tipos, sin el sufijo "y otro(s)" del portal ni nombres compuestos con
+  otro delito; con una sola materia, "penal" ya no cuenta para Jaccard. Decisiones respaldadas por la regresión
+  guardada.
 - QC_1: lee el fragmento más parecido a la consulta y acepta mismo delito, misma familia o mismo problema
   procesal; si descarta todo, se muestran los mejores candidatos marcados "no verificado".
 - Evaluación del conjunto A con *leave-one-out*: la sentencia fuente no vota por su propio tipo.

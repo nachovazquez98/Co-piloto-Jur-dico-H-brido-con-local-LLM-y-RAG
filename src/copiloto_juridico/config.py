@@ -126,7 +126,9 @@ def _env_lista(name: str, default: list[str]) -> list[str]:
 USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", False)
 MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", ["penal"])
 NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" | "familia" (solo penal se agrupa)
-# El embedding de una familia incluye los nombres de sus tipos más generales ("contra la salud: narcomenudeo...").
+# El embedding de una familia incluye los nombres de sus tipos más generales ("contra la salud: narcomenudeo..."),
+# sin "y otro(s)" ni nombres compuestos. Con esa limpieza, la familia correcta queda primera en 13 de 14 ejemplos
+# penales (antes 12): regresiones 20261112-180034_139bfe6 (antes) y la siguiente (después).
 ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
 # QC_1. En una consulta real de defensa, la versión v10 (inicio del documento + "mismo tema Y contexto") descartó
 # 14 de 15 candidatos. v11: lee la ventana alrededor del fragmento más parecido a la consulta y acepta mismo delito,
