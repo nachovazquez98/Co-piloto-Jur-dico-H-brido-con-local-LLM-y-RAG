@@ -80,7 +80,16 @@ generacion
 latencia --ejemplos --max 10
 regresion           #    diagnóstico rápido con los ejemplos de la app (no es evaluación)
 qc-diagnostico      #    tasa de descarte de QC_1 sin anotaciones (no es evaluación)
+errores --corrida ID [ID ...]  # un caso por fallo con su tipo (evaluacion/errores/) y casos_presentacion.md
+modelos             #    modelos de Ollama ya instalados: latencia, fichas sin anotación, VRAM (córrelo solo)
+robustez            #    consultas difíciles con la app completa (diagnóstico)
+estudio             #    estudio de uso manual vs. app (instrucciones en estudio_uso/README.md)
 ```
+
+`errores` clasifica cada fallo en el primer paso del pipeline que falla: `cobertura` (no hay sentencias de ese tipo),
+`clasificacion` (la familia correcta quedó fuera del top 3), `orden` (la familia estaba, pero el precedente relevante
+quedó fuera del top k), `qc1_descarte` (QC_1 eliminó un candidato relevante), `ficha` (sentido, delito o artículos
+no coinciden) u `otro`. Sin juicios humanos, "relevante" es "de la familia correcta".
 
 ## Corrida final: congelar y medir una sola vez
 

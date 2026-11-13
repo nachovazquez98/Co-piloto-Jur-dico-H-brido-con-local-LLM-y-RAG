@@ -2,6 +2,60 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y versionado [SemVer](https://semver.org/lang/es/).
 
+## [11.1.0] - 2026-11-13
+
+Preparación de la evaluación final: lo evaluado queda congelado, la partición de prueba se usa una sola vez y las
+fichas que ve la app son las mismas que anota el abogado. Ningún número nuevo sale de fuera de
+`evaluacion/resultados/`.
+
+### Añadido
+- `evaluacion congelar` y control de la partición de prueba: huella de código, corpus, índice, fichas, configuración
+  efectiva, texto de cada prompt y digest del modelo; las corridas de prueba se niegan a correr si algo cambió y solo
+  corren una vez por comando (`--forzar "motivo"`, que queda en el reporte). Todos los reportes llevan el digest del
+  modelo y las semillas.
+- Fichas penales precalculadas (`evaluacion fichas-batch`, reanudable): la app usa la ficha guardada si coinciden el
+  texto y la versión; la hoja de fichas muestra esa misma ficha al abogado. Diagnóstico sin anotación de las 1,412
+  fichas (JSON inválido, sentido LLM vs. reglas, artículos no encontrados, "dato no disponible" por campo).
+- Metadatos procesales por reglas para todo el corpus penal (acto impugnado, quién apeló, sentido del fallo), con su
+  cobertura, y orden de candidatos por facetas: si la consulta nombra el acto impugnado, primero los de la misma
+  familia y el mismo acto (en prisión preventiva por homicidio, los 3 primeros pasan de robo, robo, homicidio a
+  homicidio x3).
+- Conjunto de evaluación: regeneración estricta de los borradores marcados, `consultas_reales.jsonl` (consultas de
+  abogados sin ver sentencias, reportadas aparte), piloto de anotación con `kappa-piloto`, columnas de faceta
+  (mismo delito / mismo problema procesal) y efecto mínimo detectable en cada comparación pareada.
+- Re-ranking con cross-encoder (`BAAI/bge-reranker-v2-m3`) como variante de `recuperacion`; apagado por defecto.
+- Síntesis verificable: cada afirmación cita su precedente ([P1], [P2]...) y el código marca "verificar" si la cita no
+  existe o el sentido del fallo o el delito no coinciden con la ficha citada.
+- `copiloto-datos redescarga` (`evaluacion/redescarga_penal.csv`, ordenada por familia con menos sentencias); al
+  reintegrar los PDF, la versión completa reemplaza a la muestreada.
+- GitHub Actions: pyflakes y pytest en cada push, sin GPU ni Ollama, con una prueba de punta a punta (corpus mínimo,
+  índice, Chroma, BM25, clasificador y pipeline) con embeddings y LLM simulados.
+- `evaluacion errores --corrida ID`: un caso por fallo, clasificado en el primer paso que falla (cobertura,
+  clasificación, orden, descarte de QC_1, ficha, otro), con su conteo y `evaluacion/errores/casos_presentacion.md`.
+- `evaluacion modelos`: compara los modelos de Ollama ya instalados (lista en `MODELOS_COMPARACION`; los que faltan se
+  omiten, no se descargan) con la misma semilla, temperatura 0 y las mismas consultas y sentencias: latencia, llamadas,
+  fichas sin anotación y VRAM máxima.
+- `evaluacion robustez`: consultas con faltas de ortografía, muy cortas y muy largas, de otra materia o tema, con datos
+  personales inventados (que no deben quedar en ningún archivo) y con instrucciones inyectadas.
+- Resultados guardados para la demo (`CACHE_RESULTADOS`, `cli demo --ejemplos`): la app muestra "Resultado guardado
+  el <fecha>" si la consulta ya se analizó con la misma configuración, modelo, índice, fichas y código.
+- Estudio de uso manual vs. app (`evaluacion/estudio_uso/`, `evaluacion estudio`): 5 casos en borrador, registro con
+  asignación balanceada e instrucciones; con menos de 10 participantes se reporta como exploratorio.
+- `fichas-batch` reintenta si el servidor de Ollama se cae y guarda el avance antes de rendirse.
+
+### Corridas (diagnóstico, commit `fb1f3fe`)
+- Fichas: `20261113-105003_fb1f3fe_fichas-diagnostico`. Latencia sin y con fichas precalculadas:
+  `20261113-111047_fb1f3fe`, `20261113-111602_fb1f3fe`, `20261113-112440_fb1f3fe`. QC_1:
+  `20261113-114412_fb1f3fe_qc-diagnostico`. Regresión: `20261113-114442_fb1f3fe`. Robustez:
+  `20261113-115133_fb1f3fe`. Demo: `20261113-120016_fb1f3fe`. Modelos: `20261113-125326_fb1f3fe`. Recuperación en
+  desarrollo (consultas en borrador, no reportable): `20261113-130208_fb1f3fe`.
+
+### Cambiado
+- Limpieza del texto: restos del encabezado del tribunal intercalados con el expediente, entradas del anexo cortadas
+  por páginas omitidas y encabezados repetidos al final; corpus e índice regenerados.
+- `generacion` y QC_2 en `qc` juzgan la ficha y el control que usa la app (antes, los de v10).
+- La búsqueda de candidatos (clasificación + búsqueda adaptativa) es una sola función para la app y la evaluación.
+
 ## [11.0.0] - 2026-11-12
 
 Respuesta a la evaluación del jurado: alcance acotado a la defensa penal en apelación, evaluación reproducible y
