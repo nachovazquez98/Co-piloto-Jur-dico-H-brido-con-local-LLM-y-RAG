@@ -191,11 +191,49 @@ def correr_regresion(store, log=print):
                             "top-3": " · ".join(etiqueta_familia(f) for f in fams)})
         resumen.append({"variante": nombre, "Hit@3 tipo (v10, 18)": f"{sum(hits_v10)}/{len(hits_v10)}",
                         "Hit@3 familia (penal, 16)": f"{sum(hits_pen)}/{len(hits_pen)}"})
+    log("   Candidatos: orden RRF vs. orden por facetas (familia + acto impugnado)...")
+    orden = candidatos_por_orden(store, clas_fam[config.ENRIQUECER_FAMILIAS], familias, cache, embed_query)
     corrida = Corrida("regresion", parametros={"conceptos_v10": "v10", "conceptos_penal": "v11"})
     corrida.tabla("Resumen por variante",
                   "Aciertos en el top-3 de categorías (sin LLM; conceptos precalculados). Los temas sin tipo en el "
                   "corpus no cuentan. No es una evaluación: son consultas de ejemplo, no independientes, y se usaron "
                   "para decidir la configuración.", pd.DataFrame(resumen))
     corrida.tabla("Detalle por ejemplo", "Top-3 de cada ejemplo y variante.", pd.DataFrame(detalle))
+    det = pd.DataFrame(orden)
+    con = det[det["aciertos rrf"].notna()]
+    corrida.tabla("Candidatos: orden RRF vs. orden por facetas",
+                  "Configuración actual. Aciertos = de los 3 primeros candidatos (antes de QC_1), cuántos son de la "
+                  "familia correcta. 'Pierde' = ejemplos con menos aciertos con el orden por facetas. Acto de la "
+                  "consulta y de cada candidato leídos por reglas (metadatos.py).", pd.DataFrame([{
+                      "aciertos RRF": f"{int(con['aciertos rrf'].sum())}/{3 * len(con)}",
+                      "aciertos facetas": f"{int(con['aciertos facetas'].sum())}/{3 * len(con)}",
+                      "ejemplos que pierden": int((con["aciertos facetas"] < con["aciertos rrf"]).sum()),
+                      "ejemplos que ganan": int((con["aciertos facetas"] > con["aciertos rrf"]).sum())}]))
+    corrida.tabla("Candidatos por ejemplo", "Top-3 de candidatos (familia · acto impugnado) con cada orden.", det)
     corrida.extra["aciertos"] = {r["variante"]: r for r in resumen}
     return corrida
+
+
+def candidatos_por_orden(store, clasificador, familias: dict[str, str], cache: dict, embed_query, k: int = 3):
+    """Top-k de candidatos de cada ejemplo penal con el orden RRF y con el orden por facetas."""
+    from ..metadatos import cargar as cargar_metadatos
+    from ..pipeline import buscar_candidatos
+    from .familias import etiqueta_familia
+
+    actos = {d: m["acto_impugnado"] for d, m in cargar_metadatos().items()}
+    filas = []
+    for e in EJEMPLOS_PENALES:
+        q = embed_query(e.texto)
+        conceptos = conceptos_para(e.texto, "v11", cache)
+        fila = {"ejemplo": e.etiqueta}
+        for orden in ("rrf", "familia_acto"):
+            b = buscar_candidatos(store, clasificador, e.texto, conceptos, q, config.RAG_NUM_RESULTS_DESIRED, orden)
+            top = [c for c, _ in b.candidatos[:k]]
+            fila["acto consulta"] = b.acto_consulta or "—"
+            clave = "rrf" if orden == "rrf" else "facetas"
+            fila[f"top-{k} {clave}"] = " · ".join(f"{etiqueta_familia(familias.get(c.tipo, c.tipo))} ({actos.get(c.doc_id, '?')})"
+                                               for c in top)
+            fila[f"aciertos {clave}"] = None if e.sin_tipo_en_corpus else \
+                sum(familias.get(c.tipo) == familias[e.tipo_corpus] for c in top)
+        filas.append(fila)
+    return filas

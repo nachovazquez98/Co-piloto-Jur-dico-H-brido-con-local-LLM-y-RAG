@@ -105,6 +105,16 @@ def metricas_graduadas(ids: list[str], juicios: dict[str, int], k: int = 5) -> d
             "cobertura": sum(1 for d in ids[:k] if d in juicios) / k}
 
 
+def precision_por_faceta(ids: list[str], facetas: dict[str, dict[str, bool]], k: int = 5) -> dict:
+    """P@k por faceta del juicio humano: fracción del top k marcada "sí" en mismo delito y, por separado, en mismo
+    problema procesal (lo no marcado cuenta como "no"). None si el anotador no marcó esa faceta en esta consulta."""
+    out = {}
+    for faceta in ("mismo_delito", "mismo_problema_procesal"):
+        if any(faceta in v for v in facetas.values()):
+            out[f"p5_{faceta}"] = sum(bool(facetas.get(d, {}).get(faceta)) for d in ids[:k]) / k
+    return out
+
+
 def ranking_knn(vecinos: list, n: int = 10) -> list[str]:
     """Línea base k-NN: tipos ordenados por cuántas de las n sentencias más cercanas (búsqueda densa) los
     tienen; empates por similitud acumulada. El primero es el "tipo mayoritario"."""
@@ -303,6 +313,7 @@ class Entorno:
     juicios: dict[str, dict[str, int]]
     corrida: Corrida
     preparadas: list[Preparada] = field(default_factory=list)
+    facetas: dict[str, dict[str, dict[str, bool]]] = field(default_factory=dict)  # mismo delito / problema procesal
 
     @property
     def doc_tipo(self) -> dict[str, str]:
@@ -342,7 +353,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     """Carga consultas (validadas contra el corpus), familias, juicios, conceptos en caché, la base y el
     clasificador. Marca la corrida como borrador si alguna consulta lo es."""
     from ..datos.corpus import load_corpus
-    from .conjuntos import cargar_consultas, cargar_juicios, relevancia_por_par, verificar_fuga
+    from .conjuntos import cargar_consultas, cargar_juicios, facetas_por_par, relevancia_por_par, verificar_fuga
     from .familias import cargar_familias
 
     corrida = Corrida(comando, parametros={"particion": particion, **(parametros or {})})
@@ -377,7 +388,8 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(fugas)} consultas comparten más de 6 palabras seguidas con su sentencia fuente "
                          f"(fuga): {', '.join(sorted(fugas)[:10])}. Corre `validar` para verlas.")
     ids = {c.id for c in todas}
-    juicios = relevancia_por_par(cargar_juicios(config.JUICIOS_PATH, ids))
+    tabla_juicios = cargar_juicios(config.JUICIOS_PATH, ids)
+    juicios = relevancia_por_par(tabla_juicios)
     conceptos, faltan = conceptos_de(consultas, leer_conceptos())
     if faltan:
         corrida.advertir(f"{len(faltan)} consultas sin conceptos en caché (se usa la consulta completa). "
@@ -386,7 +398,8 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     corrida.extra["nivel_clasificacion"] = config.NIVEL_CLASIFICACION
     corrida.extra["prompt_conceptos"] = config.PROMPT_CONCEPTOS_VERSION
     corrida.extra["materias_activas"] = list(config.MATERIAS_ACTIVAS)
-    return Entorno(store, clasificador, familias, consultas, conceptos, juicios, corrida)
+    return Entorno(store, clasificador, familias, consultas, conceptos, juicios, corrida,
+                   facetas=facetas_por_par(tabla_juicios))
 
 
 def preparar(env: Entorno) -> list[Preparada]:
@@ -545,7 +558,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
                 fila["ndcg5_meta"] = m.ndcg_at_k(rels, 5, ideales)
                 fila["p5_meta"] = m.precision_at_k(rels, 5, umbral=2)
             if c.id in env.juicios:
-                fila.update(metricas_graduadas(lista(None), env.juicios[c.id]))
+                ids_jz = lista(None)
+                fila.update(metricas_graduadas(ids_jz, env.juicios[c.id]))
+                fila.update(precision_por_faceta(ids_jz, env.facetas.get(c.id, {})))
             filas.append(fila)
         res_rec[nombre] = filas
 
@@ -566,6 +581,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
             fj.update(_fila_promedio("nDCG@5", [f["ndcg5"] for f in jz]))
             fj.update(_fila_promedio("P@5", [f["p5"] for f in jz]))
             fj["cobertura juicios top-5"] = float(np.mean([f["cobertura"] for f in jz]))
+            for faceta in ("mismo_delito", "mismo_problema_procesal"):
+                vals = [f[f"p5_{faceta}"] for f in jz if f.get(f"p5_{faceta}") is not None]
+                fj[f"P@5 {faceta.replace('_', ' ')}"] = float(np.mean(vals)) if vals else float("nan")
             tabla_juicios.append(fj)
     corrida.tabla(
         "Recuperación (conjunto A)",
@@ -575,7 +593,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         "IC95: Wilson para Hit, bootstrap (1,000) para MRR y nDCG.", pd.DataFrame(tabla_doc))
     if tabla_juicios:
         corrida.tabla("Relevancia juzgada por humanos",
-                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0.",
+                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0. P@5 por "
+                      "faceta: fracción del top 5 que el abogado marcó con el mismo delito o el mismo problema "
+                      "procesal (columnas opcionales de la hoja).",
                       pd.DataFrame(tabla_juicios))
     else:
         corrida.advertir("Sin juicios de relevancia anotados: nDCG@5 y P@5 humanos quedan por medir.")
@@ -894,21 +914,16 @@ def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callab
     No mide calidad (no sabemos cuáles descartes son correctos): solo muestra qué tan estricto es el control.
     La calidad se mide con `qc` contra juicios humanos."""
     from ..embeddings import embed_query
-    from ..pipeline import combinar_candidatos, parse_veredicto
+    from ..pipeline import buscar_candidatos, parse_veredicto
     from .regresion import EJEMPLOS_PENALES, conceptos_para, leer_conceptos
 
     cache = leer_conceptos()
     pares = []
     for e in EJEMPLOS_PENALES:
-        conceptos = conceptos_para(e.texto, "v11", cache)
         q = embed_query(e.texto)
-        lexica = f"{e.texto} {conceptos}"
-        amplios = store.buscar(e.texto, query_embedding=q, consulta_lexica=lexica)
-        tabla = clasificador.clasificar(e.texto, conceptos, q, recuperados=amplios).tabla
-        filtro = [t for c in tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO) for t in clasificador.tipos_de(c)]
-        estrictos = store.buscar(e.texto, tipos=filtro, query_embedding=q, consulta_lexica=lexica)
-        candidatos, _ = combinar_candidatos(estrictos, amplios, config.RAG_NUM_RESULTS_DESIRED)
-        pares += [(e, q, c) for c, _ in candidatos[:k]]
+        b = buscar_candidatos(store, clasificador, e.texto, conceptos_para(e.texto, "v11", cache), q,
+                              config.RAG_NUM_RESULTS_DESIRED)
+        pares += [(e, q, c) for c, _ in b.candidatos[:k]]
     filas = []
     for version in ("v10", "v11"):
         for contexto in ("inicio", "fragmento_similar"):

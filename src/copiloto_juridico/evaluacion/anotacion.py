@@ -77,7 +77,7 @@ def hoja_juicios(store, clasificador, consultas: list[Consulta], conceptos: dict
     """Hoja de juicios de relevancia: para `n_consultas` consultas (repartidas entre familias), los `k` primeros
     candidatos que ve la app, en orden aleatorio (el anotador no debe ver el rango ni el puntaje)."""
     from ..embeddings import embed_query
-    from ..pipeline import combinar_candidatos
+    from ..pipeline import buscar_candidatos
 
     rng = np.random.default_rng(semilla)
     elegibles = sorted([c for c in consultas if c.consulta.strip() and not c.sin_respuesta],
@@ -87,18 +87,14 @@ def hoja_juicios(store, clasificador, consultas: list[Consulta], conceptos: dict
     corpus = store.corpus
     filas = []
     for c in elegidas:
-        q = embed_query(c.consulta)
-        lexica = f"{c.consulta} {conceptos.get(c.id, '')}"
-        amplios = store.buscar(c.consulta, query_embedding=q, consulta_lexica=lexica)
-        tabla = clasificador.clasificar(c.consulta, conceptos.get(c.id, c.consulta), q, recuperados=amplios).tabla
-        filtro = [t for cat in tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO) for t in clasificador.tipos_de(cat)]
-        estrictos = store.buscar(c.consulta, tipos=filtro, query_embedding=q, consulta_lexica=lexica)
-        ids = [x.doc_id for x, _ in combinar_candidatos(estrictos, amplios, config.RAG_NUM_RESULTS_DESIRED)[0][:k]]
+        b = buscar_candidatos(store, clasificador, c.consulta, conceptos.get(c.id, c.consulta),
+                              embed_query(c.consulta), config.RAG_NUM_RESULTS_DESIRED)
+        ids = [x.doc_id for x, _ in b.candidatos[:k]]
         for d in rng.permutation(ids):
             r = corpus.loc[d]
             filas.append({"consulta_id": c.id, "consulta": c.consulta, "doc_id": d,
                           "resumen": resumen_sentencia(r["texto"], r["tipo"], r["fecha"]),
-                          "relevancia": "", "anotador": ""})
+                          "relevancia": "", "mismo_delito": "", "mismo_problema_procesal": "", "anotador": ""})
     return pd.DataFrame(filas)
 
 

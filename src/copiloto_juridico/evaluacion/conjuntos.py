@@ -169,6 +169,11 @@ def cargar_juicios(path: Path = config.JUICIOS_PATH, ids_consultas: set[str] | N
     if ids_consultas is not None:
         for cid in sorted(set(df["consulta_id"]) - ids_consultas):
             problemas.append(f"consulta_id '{cid}' no existe en las consultas")
+    for faceta in FACETAS:  # columnas opcionales: sí / no / vacío
+        if faceta in df.columns:
+            df[faceta] = df[faceta].map(_si_no)
+            for _, r in df[df[faceta].map(lambda v: v == "inválido")].iterrows():
+                problemas.append(f"{faceta} debe ser sí/no en ({r['consulta_id']}, {r['doc_id']})")
     dup = df.duplicated(["consulta_id", "doc_id", "anotador"], keep=False)
     if dup.any():
         problemas.append(f"{int(dup.sum())} filas repiten el mismo (consulta_id, doc_id, anotador)")
@@ -176,6 +181,24 @@ def cargar_juicios(path: Path = config.JUICIOS_PATH, ids_consultas: set[str] | N
         raise ErrorValidacion(f"{path.name}: {len(problemas)} problema(s):\n  - " + "\n  - ".join(problemas))
     df["relevancia"] = df["relevancia"].astype(int)
     return df
+
+
+FACETAS = ("mismo_delito", "mismo_problema_procesal")
+
+
+def _si_no(v) -> bool | None | str:
+    t = str(v).strip().lower() if v is not None and not (isinstance(v, float) and np.isnan(v)) else ""
+    return True if t in ("si", "sí", "s", "1") else False if t in ("no", "n", "0") else None if not t else "inválido"
+
+
+def facetas_por_par(juicios: pd.DataFrame) -> dict[str, dict[str, dict[str, bool]]]:
+    """{consulta_id: {doc_id: {faceta: bool}}} con las facetas que el anotador sí marcó (primer anotador)."""
+    out: dict[str, dict[str, dict[str, bool]]] = {}
+    for r in juicios.to_dict("records"):
+        marcas = {f: r[f] for f in FACETAS if isinstance(r.get(f), bool)}
+        if marcas:
+            out.setdefault(r["consulta_id"], {}).setdefault(r["doc_id"], marcas)
+    return out
 
 
 def relevancia_por_par(juicios: pd.DataFrame, anotador_principal: str | None = None) -> dict[str, dict[str, int]]:

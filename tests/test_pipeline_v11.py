@@ -267,7 +267,7 @@ def test_ejemplos_penales_existen_en_el_corpus():
     from copiloto_juridico.evaluacion.regresion import EJEMPLOS_V10
 
     tipos = set(pd.concat([pd.read_parquet(f, columns=["tipo"])
-                           for f in sorted(glob.glob(str(config.CORPUS_DIR / "*.parquet")))])["tipo"])
+                           for f in sorted(glob.glob(str(config.CORPUS_DIR / "sentencias-*.parquet")))])["tipo"])
     assert len(EJEMPLOS_PENALES) >= 12 and len(EJEMPLOS_V10) == 18
     for e in EJEMPLOS_PENALES:
         if e.sin_tipo_en_corpus:

@@ -296,6 +296,56 @@ def combinar_candidatos(estrictos: list[Candidato], amplios: list[Candidato],
     return candidatos, modo
 
 
+def ordenar_por_facetas(candidatos: list[tuple[Candidato, str]], familias_doc: dict[str, str],
+                        familias_consulta: set[str], acto: str | None,
+                        actos_doc: dict[str, str]) -> list[tuple[Candidato, str]]:
+    """Orden por facetas (config.ORDEN_CANDIDATOS = "familia_acto"): primero misma familia de delito Y mismo acto
+    impugnado que la consulta; después misma familia; después mismo acto de otra familia; al final el resto.
+    Dentro de cada nivel se conserva el orden de la búsqueda (RRF)."""
+    def nivel(c: Candidato) -> int:
+        familia = familias_doc.get(c.tipo) in familias_consulta
+        mismo_acto = acto is not None and actos_doc.get(c.doc_id) == acto
+        return 0 if familia and mismo_acto else 1 if familia else 2 if mismo_acto else 3
+
+    return sorted(candidatos, key=lambda cf: nivel(cf[0]))
+
+
+@dataclass
+class Busqueda:
+    clasificacion: object                   # resultado de ClasificadorHibrido.clasificar (tabla, tipo, tokens_kem)
+    categorias: list[str]                   # las que entran al filtro estricto
+    filtro: list[str]                       # tipos que cubren esas categorías
+    estrictos: list[Candidato]
+    amplios: list[Candidato]
+    candidatos: list[tuple[Candidato, str]]
+    modo: str
+    acto_consulta: str | None = None
+
+
+def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb, num_precedentes: int,
+                      orden: str | None = None) -> Busqueda:
+    """Pasos 2 y 3 de la app (clasificación y búsqueda adaptativa), compartidos con la evaluación."""
+    from .metadatos import acto_de_consulta
+
+    lexica = f"{consulta} {entidades}"
+    amplios = store.buscar(consulta, query_embedding=q_emb, consulta_lexica=lexica)
+    clasif = clasificador.clasificar(consulta, entidades, q_emb, recuperados=amplios)
+    categorias = clasif.tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO).tolist()
+    filtro = [t for c in categorias for t in clasificador.tipos_de(c)]
+    estrictos = store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
+    candidatos, modo = combinar_candidatos(estrictos, amplios, num_precedentes)
+    acto = acto_de_consulta(consulta)
+    if (orden or config.ORDEN_CANDIDATOS) == "familia_acto" and categorias:
+        from .evaluacion.familias import cargar_familias
+        from .metadatos import cargar as cargar_metadatos
+
+        familias = cargar_familias(sorted({c.tipo for c, _ in candidatos} | set(filtro)))
+        top1 = {familias.get(t, t) for t in clasificador.tipos_de(categorias[0])}
+        actos = {d: m["acto_impugnado"] for d, m in cargar_metadatos().items()}
+        candidatos = ordenar_por_facetas(candidatos, familias, top1, acto, actos)
+    return Busqueda(clasif, categorias, filtro, estrictos, amplios, candidatos, modo, acto)
+
+
 AVISO_SIN_MISMO_TIPO = "No hay precedentes del mismo tipo en el corpus; se muestran los más cercanos."
 AVISO_COINCIDENCIA_DEBIL = ("Ninguna categoría coincide bien con la consulta (señal {senal} = {valor:.3f} < "
                             "{umbral:.3f}); es probable que no haya precedentes del mismo tipo.")
@@ -444,9 +494,9 @@ class Copiloto:
         yield Evento("paso_inicio", "clasificacion")
         yield log("--- PASO 2: RE-RANKING HÍBRIDO Y SELECCIÓN DE CATEGORÍA ---", "clasificacion")
         q_emb = embed_query(consulta)
-        lexica = f"{consulta} {entidades}"
-        amplios = self.store.buscar(consulta, query_embedding=q_emb, consulta_lexica=lexica)
-        clasif = self.clasificador.clasificar(consulta, entidades, q_emb, recuperados=amplios)
+        b = buscar_candidatos(self.store, self.clasificador, consulta, entidades, q_emb, op.num_precedentes)
+        clasif, categorias, filtro, estrictos = b.clasificacion, b.categorias, b.filtro, b.estrictos
+        candidatos, modo = b.candidatos, b.modo
         yield log(f"   -> KEM Tokens dinámicos: {clasif.tokens_kem}", "clasificacion")
         for i, r in clasif.tabla.iterrows():
             yield log(f"      {i + 1}. '{r['tipo']}' | Híbrido:{r['score_híbrido']:.4f} | Coseno:{r['coseno']:.3f} "
@@ -460,16 +510,15 @@ class Copiloto:
         # 3. Búsqueda adaptativa
         yield Evento("paso_inicio", "busqueda")
         yield log("--- PASO 3: BÚSQUEDA ADAPTATIVA (embeddings + BM25, fusión RRF) ---", "busqueda")
-        categorias = clasif.tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO).tolist()
-        filtro = [t for c in categorias for t in self.clasificador.tipos_de(c)]
-        estrictos = self.store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
         yield log(f"Filtro estricto (top {len(categorias)} categorías: {', '.join(categorias)}"
                   f"{f'; {len(filtro)} tipos' if len(filtro) != len(categorias) else ''}): "
                   f"{len(estrictos)} sentencias candidatas.", "busqueda")
-        candidatos, modo = combinar_candidatos(estrictos, amplios, op.num_precedentes)
         if len(candidatos) > len(estrictos):
             yield log(f"   ⚠️ Pocos candidatos con el filtro. La búsqueda amplia añade "
                       f"{len(candidatos) - len(estrictos)}.", "busqueda")
+        if config.ORDEN_CANDIDATOS == "familia_acto":
+            yield log(f"   -> Orden por facetas: misma familia y acto impugnado ({b.acto_consulta or 'no detectado'}).",
+                      "busqueda")
         for c, fuente in candidatos[:8]:
             yield log(f"   · {c.doc_id} | RRF {c.relevancia:.4f} | coseno {c.similitud:.3f} | {fuente}", "busqueda")
         if not candidatos:

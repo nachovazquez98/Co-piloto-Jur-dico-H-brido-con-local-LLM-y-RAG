@@ -1,7 +1,7 @@
 """Línea de comandos para preparar los datos.
 
     python -m copiloto_juridico.cli construir-corpus --chroma ../chroma_db_juridica_8.2 --pdfs ruta/a/pdfs
-    python -m copiloto_juridico.cli indexar
+    python -m copiloto_juridico.cli indexar            # embeddings + metadatos procesales por reglas
     python -m copiloto_juridico.cli descargar          # descarga balanceada (si la API lo permite)
     python -m copiloto_juridico.cli estado
     python -m copiloto_juridico.cli pendientes --materia penal   # qué descargar a mano, por prioridad
@@ -68,6 +68,27 @@ def cmd_indexar(args) -> None:
     if corpus.empty:
         sys.exit("El corpus está vacío. Ejecuta primero 'construir-corpus'.")
     build_index(corpus, log=_log)
+    cmd_metadatos(args, corpus)  # los metadatos procesales van siempre con el corpus indexado
+
+
+def cmd_metadatos(args, corpus=None) -> None:
+    """Acto impugnado, apelante y sentido por reglas para el corpus penal, y su cobertura (diagnóstico)."""
+    from . import metadatos
+    from .datos.corpus import load_corpus
+    from .evaluacion.reporte import Corrida
+
+    tabla = metadatos.calcular(load_corpus() if corpus is None else corpus)
+    path = metadatos.guardar(tabla)
+    corrida = Corrida("metadatos-cobertura", parametros={"sentencias_penales": len(tabla)})
+    corrida.tabla("Cobertura de los metadatos procesales (reglas)",
+                  "Valores leídos por reglas del párrafo inicial (acto impugnado, quién apeló) y de los puntos "
+                  "resolutivos (sentido). 'no determinado' = las reglas no lo encontraron. Sin anotación: no mide "
+                  "exactitud.", metadatos.cobertura(tabla), diagnostico=True)
+    pj, _ = corrida.guardar()
+    for campo in ("acto_impugnado", "apelante", "sentido"):
+        nd = int((tabla[campo] == metadatos.NO_DETERMINADO).sum())
+        _log(f"   {campo}: {len(tabla) - nd}/{len(tabla)} determinados ({nd} no determinados)")
+    _log(f"Metadatos procesales: {path} · cobertura en {pj.name}")
 
 
 def cmd_descargar(args) -> None:
@@ -161,7 +182,10 @@ def main(argv=None) -> None:
     c.add_argument("--reiniciar", action="store_true", help="Ignora el corpus actual")
     c.set_defaults(func=cmd_construir_corpus)
 
-    sub.add_parser("indexar", help="Genera los embeddings del corpus en data/indice").set_defaults(func=cmd_indexar)
+    sub.add_parser("indexar", help="Genera los embeddings del corpus en data/indice (y los metadatos procesales)"
+                   ).set_defaults(func=cmd_indexar)
+    sub.add_parser("metadatos", help="Solo los metadatos procesales por reglas y su cobertura"
+                   ).set_defaults(func=cmd_metadatos)
 
     d = sub.add_parser("descargar", help="Descarga balanceada desde la API del STJ Jalisco")
     d.add_argument("--destino", default=str(config.RAW_PDF_DIR))
