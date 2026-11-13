@@ -1,9 +1,9 @@
 {
  "A001": {
-  "clave": "55a370d3d3c36fad",
-  "conceptos": "Abandono de menores, Apelación, Incompetencia por inhibitoria.",
+  "clave": "ec57f599a1c2f927",
+  "conceptos": "Abandono de menores, Vinculación a proceso.",
   "ok": true,
-  "respuesta": "Abandono de menores, Apelación, Incompetencia por inhibitoria.",
+  "respuesta": "Abandono de menores, Vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -16,26 +16,26 @@
   "prompt": "v11"
  },
  "A003": {
-  "clave": "105a76ae6abb5ca6",
-  "conceptos": "Abandono de familiares, Vinculación a proceso.",
+  "clave": "04f9cb698fea602e",
+  "conceptos": "Dejadez a menores, resistencia a las autoridades, apelación contra sobreseimiento.",
   "ok": true,
-  "respuesta": "Abandono de familiares, Vinculación a proceso.",
+  "respuesta": "Dejadez a menores, resistencia a las autoridades, apelación contra sobreseimiento.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A004": {
-  "clave": "c4b564c802fa1fb6",
-  "conceptos": "Abandono de menores, Vinculación a proceso.",
+  "clave": "f186331b9ab4a39c",
+  "conceptos": "Dejadez de menores, Vinculación a proceso.",
   "ok": true,
-  "respuesta": "Abandono de menores, Vinculación a proceso.",
+  "respuesta": "Dejadez de menores, Vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A005": {
-  "clave": "2fd4a02bbf127e31",
-  "conceptos": "Abandono de familiares, Vinculación a proceso, Presunción de inocencia.",
+  "clave": "8d66ca07a9cb1343",
+  "conceptos": "Vinculación a proceso, Desvinculación de proceso, Responsabilidad parental.",
   "ok": true,
-  "respuesta": "Abandono de familiares, Vinculación a proceso, Presunción de inocencia.",
+  "respuesta": "Vinculación a proceso, Desvinculación de proceso, Responsabilidad parental.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -72,10 +72,10 @@
   "prompt": "v11"
  },
  "A010": {
-  "clave": "ea5aa27c91e3f4c1",
-  "conceptos": "Chantaje, Recusación, Ley Orgánica del Supremo Tribunal de Justicia de Jalisco.",
+  "clave": "a1deedc7411944e1",
+  "conceptos": "Coacción, Apelación, Legalidad de las actuaciones procesales.",
   "ok": true,
-  "respuesta": "Chantaje, Recusación, Ley Orgánica del Supremo Tribunal de Justicia de Jalisco.",
+  "respuesta": "Coacción, Apelación, Legalidad de las actuaciones procesales.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -104,26 +104,26 @@
   "prompt": "v11"
  },
  "A014": {
-  "clave": "d956d2042acd8cbc",
-  "conceptos": "Homicidio calificado, Apelación de sentencia, Indemnización por daño a menores.",
+  "clave": "fbb4c9f020578b6b",
+  "conceptos": "Violencia contra menores, Apelación en segunda instancia, Prisión preventiva",
   "ok": true,
-  "respuesta": "Homicidio calificado, Apelación de sentencia, Indemnización por daño a menores.",
+  "respuesta": "Violencia contra menores, Apelación en segunda instancia, Prisión preventiva",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A015": {
-  "clave": "4ffab126aa016762",
-  "conceptos": "Porte de arma de fuego sin autorización, vinculación a proceso, detención ilegal.",
-  "ok": true,
-  "respuesta": "Porte de arma de fuego sin autorización, vinculación a proceso, detención ilegal.",
+  "clave": "6fb52189b666f3c6",
+  "conceptos": "Represento a un joven cuya edad se discute en este caso. Mi cliente se le atribuye haber llevado consigo un tipo de arma de uso exclusivo para el ejército y la fuerza aérea nacional. Quiero apelar la resolución que impuso medidas en su contra, ya que creo que no se tuvieron en cuenta ciertas circunstancias relevantes al momento de dictarla.",
+  "ok": false,
+  "respuesta": "FALLA",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A016": {
-  "clave": "575d7553ea67fd12",
-  "conceptos": "Insultar y humillar públicamente, vinculación a proceso.",
+  "clave": "05b26bc1018ca429",
+  "conceptos": "Vinculación a proceso, Apelación.",
   "ok": true,
-  "respuesta": "Insultar y humillar públicamente, vinculación a proceso.",
+  "respuesta": "Vinculación a proceso, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -152,10 +152,10 @@
   "prompt": "v11"
  },
  "A020": {
-  "clave": "88b6f2e52b8f3304",
-  "conceptos": "Agresión a una mujer, Vinculación a proceso, Recurso de revocación.",
+  "clave": "f29b44d5e0e65c5b",
+  "conceptos": "Lesiones, Vinculación a proceso",
   "ok": true,
-  "respuesta": "Agresión a una mujer, Vinculación a proceso, Recurso de revocación.",
+  "respuesta": "Lesiones, Vinculación a proceso",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -216,10 +216,10 @@
   "prompt": "v11"
  },
  "A028": {
-  "clave": "b9032d61ded7b208",
-  "conceptos": "Daño calificado, Vinculación a proceso, Prescripción de la acción penal.",
+  "clave": "d7f7ae466c9e6fd1",
+  "conceptos": "Vinculación a proceso, prescripción de la acción penal, falta de notificación y defensa.",
   "ok": true,
-  "respuesta": "Daño calificado, Vinculación a proceso, Prescripción de la acción penal.",
+  "respuesta": "Vinculación a proceso, prescripción de la acción penal, falta de notificación y defensa.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -264,18 +264,18 @@
   "prompt": "v11"
  },
  "A034": {
-  "clave": "d371b9b915259441",
-  "conceptos": "Homicidio a título de culpa, Apelación, Suspensión condicional de la pena.",
+  "clave": "e5c0a283fbfb0bfc",
+  "conceptos": "Homicidio, Apelación, Prisión preventiva",
   "ok": true,
-  "respuesta": "Homicidio a título de culpa, Apelación, Suspensión condicional de la pena.",
+  "respuesta": "Homicidio, Apelación, Prisión preventiva",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A035": {
-  "clave": "493d135cda3be956",
-  "conceptos": "Homicidio culposo, Apelación, Daño a las cosas.",
+  "clave": "c76af5ed17660dd1",
+  "conceptos": "Homicidio, Apelación, Prisión preventiva.",
   "ok": true,
-  "respuesta": "Homicidio culposo, Apelación, Daño a las cosas.",
+  "respuesta": "Homicidio, Apelación, Prisión preventiva.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -288,10 +288,10 @@
   "prompt": "v11"
  },
  "A037": {
-  "clave": "962a1e806a3b628e",
-  "conceptos": "Abuso sexual infantil, Apelación, Prisión preventiva",
-  "ok": true,
-  "respuesta": "Abuso sexual infantil, Apelación, Prisión preventiva",
+  "clave": "9f5415f3fd86c782",
+  "conceptos": "Represento a un hombre que se le atribuye haber cometido actos sexuales inapropiados contra menores de edad. Mi cliente apela la resolución que dicta su formal prisión y solicito información sobre si existen precedentes en casos similares en el estado de Jalisco.",
+  "ok": false,
+  "respuesta": "FALLA",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -304,10 +304,10 @@
   "prompt": "v11"
  },
  "A039": {
-  "clave": "55f35c45c9a881ac",
-  "conceptos": "Libertad anticipada, libertad condicional, apelación de resolución.",
+  "clave": "9bffa2535e75d24a",
+  "conceptos": "Acceso carnal no consentido a un menor de edad, libertad anticipada, apelación de resolución.",
   "ok": true,
-  "respuesta": "Libertad anticipada, libertad condicional, apelación de resolución.",
+  "respuesta": "Acceso carnal no consentido a un menor de edad, libertad anticipada, apelación de resolución.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -328,10 +328,10 @@
   "prompt": "v11"
  },
  "A042": {
-  "clave": "d8894678422daa15",
-  "conceptos": "Desaparición forzada, tortura, vinculación a proceso.",
+  "clave": "32708cf031a7b13d",
+  "conceptos": "Ocultación de personas, abuso de autoridad, vinculación a proceso.",
   "ok": true,
-  "respuesta": "Desaparición forzada, tortura, vinculación a proceso.",
+  "respuesta": "Ocultación de personas, abuso de autoridad, vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -392,10 +392,10 @@
   "prompt": "v11"
  },
  "A050": {
-  "clave": "249df8116da59187",
-  "conceptos": "Vinculación a proceso, Prisión preventiva, Legalidad de la decisión del juez de control.",
+  "clave": "75e49a75e0d29066",
+  "conceptos": "robo calificado, vinculación a proceso, resolución del juez de control",
   "ok": true,
-  "respuesta": "Vinculación a proceso, Prisión preventiva, Legalidad de la decisión del juez de control.",
+  "respuesta": "robo calificado, vinculación a proceso, resolución del juez de control",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -416,10 +416,10 @@
   "prompt": "v11"
  },
  "A053": {
-  "clave": "380e61943061c78d",
-  "conceptos": "Administración fraudulenta, vinculación a proceso.",
+  "clave": "b26970080eddefa4",
+  "conceptos": "Falsificación de documentos, Vinculación a proceso, Prisión preventiva.",
   "ok": true,
-  "respuesta": "Administración fraudulenta, vinculación a proceso.",
+  "respuesta": "Falsificación de documentos, Vinculación a proceso, Prisión preventiva.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -456,18 +456,18 @@
   "prompt": "v11"
  },
  "A058": {
-  "clave": "f7d7939ca675b0c3",
-  "conceptos": "Tentativa de feminicidio, vinculación a proceso, reparación del daño.",
+  "clave": "98a3bb375e05b122",
+  "conceptos": "Lesiones, Apelación, Prisión preventiva.",
   "ok": true,
-  "respuesta": "Tentativa de feminicidio, vinculación a proceso, reparación del daño.",
+  "respuesta": "Lesiones, Apelación, Prisión preventiva.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A059": {
-  "clave": "3057f9fcef2464ea",
-  "conceptos": "feminicidio, robo calificado, admisibilidad de medios de prueba",
+  "clave": "ec2b223c43845081",
+  "conceptos": "Homicidio, Exclusión de pruebas, Apelación.",
   "ok": true,
-  "respuesta": "feminicidio, robo calificado, admisibilidad de medios de prueba",
+  "respuesta": "Homicidio, Exclusión de pruebas, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -496,10 +496,10 @@
   "prompt": "v11"
  },
  "A063": {
-  "clave": "9b406538ca40f5d5",
-  "conceptos": "fraude en perjuicio, vinculación a proceso, prisión preventiva",
+  "clave": "b2111ad9d6851c0b",
+  "conceptos": "Engaño y manipulación financiera, vinculación a proceso, reparación del daño.",
   "ok": true,
-  "respuesta": "fraude en perjuicio, vinculación a proceso, prisión preventiva",
+  "respuesta": "Engaño y manipulación financiera, vinculación a proceso, reparación del daño.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -512,18 +512,18 @@
   "prompt": "v11"
  },
  "A065": {
-  "clave": "f12fbb8adcafd67c",
-  "conceptos": "Fraude procesal, vinculación a proceso, apelación.",
+  "clave": "e89f83522f76263f",
+  "conceptos": "Vinculación a proceso, manipulación del proceso judicial.",
   "ok": true,
-  "respuesta": "Fraude procesal, vinculación a proceso, apelación.",
+  "respuesta": "Vinculación a proceso, manipulación del proceso judicial.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A066": {
-  "clave": "e84f0c2820b7cbb9",
-  "conceptos": "robo calificado, vinculación a proceso, prisión preventiva",
+  "clave": "c59750ad5738779e",
+  "conceptos": "Homicidio calificado, Apelación, Anulación de sentencia.",
   "ok": true,
-  "respuesta": "robo calificado, vinculación a proceso, prisión preventiva",
+  "respuesta": "Homicidio calificado, Apelación, Anulación de sentencia.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -544,18 +544,18 @@
   "prompt": "v11"
  },
  "A069": {
-  "clave": "c5dfe20d49bc17aa",
-  "conceptos": "homicidio calificado, violación, maltrato a menores, apelación de sentencia.",
+  "clave": "07fb16e1c9a206cd",
+  "conceptos": "Homicidio, Apelación, Excesividad de pena.",
   "ok": true,
-  "respuesta": "homicidio calificado, violación, maltrato a menores, apelación de sentencia.",
+  "respuesta": "Homicidio, Apelación, Excesividad de pena.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A070": {
-  "clave": "c99b1f1f91b25bb7",
-  "conceptos": "Homicidio, Apelación, Suspensión de Derechos Políticos.",
+  "clave": "158c24d447135fa2",
+  "conceptos": "Homicidio a título de dolo, Apelación, Reparación Integral del Daño.",
   "ok": true,
-  "respuesta": "Homicidio, Apelación, Suspensión de Derechos Políticos.",
+  "respuesta": "Homicidio a título de dolo, Apelación, Reparación Integral del Daño.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -568,10 +568,10 @@
   "prompt": "v11"
  },
  "A072": {
-  "clave": "3ac95b2a74c56ea5",
-  "conceptos": "Vinculación a proceso, Apelación de resolución, Probabilidad de participación.",
+  "clave": "47350c26e7e250a1",
+  "conceptos": "menoscabo a la salud, vinculación a proceso, apelación",
   "ok": true,
-  "respuesta": "Vinculación a proceso, Apelación de resolución, Probabilidad de participación.",
+  "respuesta": "menoscabo a la salud, vinculación a proceso, apelación",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -584,10 +584,10 @@
   "prompt": "v11"
  },
  "A074": {
-  "clave": "8d3e65a1561b7007",
-  "conceptos": "causas de daño, lesiones, recurso de apelación.",
+  "clave": "4d369afd4e37ad65",
+  "conceptos": "Daño a las personas y Daño a los bienes, Apelación.",
   "ok": true,
-  "respuesta": "causas de daño, lesiones, recurso de apelación.",
+  "respuesta": "Daño a las personas y Daño a los bienes, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -608,10 +608,10 @@
   "prompt": "v11"
  },
  "A077": {
-  "clave": "7ab4c6be7f95cd84",
-  "conceptos": "Secuestro agravado, Vinculación a proceso.",
+  "clave": "24882252d77114e0",
+  "conceptos": "Privación ilegal de la libertad, Vinculación a proceso.",
   "ok": true,
-  "respuesta": "Secuestro agravado, Vinculación a proceso.",
+  "respuesta": "Privación ilegal de la libertad, Vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -632,18 +632,18 @@
   "prompt": "v11"
  },
  "A080": {
-  "clave": "5b79f8d5f2f4befd",
-  "conceptos": "Privación ilegal de libertad, robo calificado, vinculación a proceso, prisión preventiva.",
+  "clave": "d4184cf03da5915f",
+  "conceptos": "Prisión preventiva, detención ilegal, vinculación a proceso",
   "ok": true,
-  "respuesta": "Privación ilegal de libertad, robo calificado, vinculación a proceso, prisión preventiva.",
+  "respuesta": "Prisión preventiva, detención ilegal, vinculación a proceso",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A081": {
-  "clave": "fbdb578a374edf02",
-  "conceptos": "Vinculación a proceso, falta de pruebas, juicio justo.",
+  "clave": "b1707dcc264339d4",
+  "conceptos": "Falta grave, Vinculación a proceso",
   "ok": true,
-  "respuesta": "Vinculación a proceso, falta de pruebas, juicio justo.",
+  "respuesta": "Falta grave, Vinculación a proceso",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -696,42 +696,42 @@
   "prompt": "v11"
  },
  "A088": {
-  "clave": "9b1f1265d78721c4",
-  "conceptos": "robo, vinculación a proceso, medidas cautelares.",
+  "clave": "d2fa1fa786be1767",
+  "conceptos": "Apropiación indebida, vinculación a proceso, prisión preventiva.",
   "ok": true,
-  "respuesta": "robo, vinculación a proceso, medidas cautelares.",
+  "respuesta": "Apropiación indebida, vinculación a proceso, prisión preventiva.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A089": {
-  "clave": "c8cb49a0b2be2807",
-  "conceptos": "robo calificado, vinculación a proceso",
+  "clave": "ece0c775502dccbf",
+  "conceptos": "Hurtos, Apropiación indebida de bienes ajenos, Apelación.",
   "ok": true,
-  "respuesta": "robo calificado, vinculación a proceso",
+  "respuesta": "Hurtos, Apropiación indebida de bienes ajenos, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A090": {
-  "clave": "c8a9482efaf57f15",
-  "conceptos": "robo calificado, apelación, revisión de resolución",
+  "clave": "07d677a3ee793d69",
+  "conceptos": "hurto, asociación delictuosa, apelación",
   "ok": true,
-  "respuesta": "robo calificado, apelación, revisión de resolución",
+  "respuesta": "hurto, asociación delictuosa, apelación",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A091": {
-  "clave": "3675f17644bb6157",
-  "conceptos": "Abuso de autoridad, Apelación del Ministerio Público, Vinculación a proceso.",
+  "clave": "4a0212e8372c13fa",
+  "conceptos": "Ejercicio irregular de funciones, Apelación, Prisión preventiva",
   "ok": true,
-  "respuesta": "Abuso de autoridad, Apelación del Ministerio Público, Vinculación a proceso.",
+  "respuesta": "Ejercicio irregular de funciones, Apelación, Prisión preventiva",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A092": {
-  "clave": "9b2a94978f0ecc75",
-  "conceptos": "cohecho, vinculación a proceso, falta de pruebas",
+  "clave": "02ba974a40961a56",
+  "conceptos": "Corrupción, Apelación de sentencia condenatoria, Falta de pruebas.",
   "ok": true,
-  "respuesta": "cohecho, vinculación a proceso, falta de pruebas",
+  "respuesta": "Corrupción, Apelación de sentencia condenatoria, Falta de pruebas.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -760,18 +760,18 @@
   "prompt": "v11"
  },
  "A096": {
-  "clave": "e91a82598d803d3a",
-  "conceptos": "violencia familiar, lesiones, vinculación a proceso",
+  "clave": "3bbf8daab9f212d1",
+  "conceptos": "Lesiones, Vinculación a proceso",
   "ok": true,
-  "respuesta": "violencia familiar, lesiones, vinculación a proceso",
+  "respuesta": "Lesiones, Vinculación a proceso",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A097": {
-  "clave": "b57261641dcb20ac",
-  "conceptos": "Violencia familiar, Vinculación a proceso",
+  "clave": "d372c0c9f34b2a36",
+  "conceptos": "Vinculación a proceso, Prisión preventiva, Maltrato hacia la pareja.",
   "ok": true,
-  "respuesta": "Violencia familiar, Vinculación a proceso",
+  "respuesta": "Vinculación a proceso, Prisión preventiva, Maltrato hacia la pareja.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -792,10 +792,10 @@
   "prompt": "v11"
  },
  "A100": {
-  "clave": "af67661d8406d5bc",
-  "conceptos": "Vinculación a proceso, Sobreseimiento de la causa, Apelación.",
+  "clave": "bc7ed53aba918df5",
+  "conceptos": "Homicidio, Apelación, Vinculación a proceso",
   "ok": true,
-  "respuesta": "Vinculación a proceso, Sobreseimiento de la causa, Apelación.",
+  "respuesta": "Homicidio, Apelación, Vinculación a proceso",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -808,26 +808,26 @@
   "prompt": "v11"
  },
  "A102": {
-  "clave": "f09c12347ae1c6fb",
-  "conceptos": "Acoso sexual, Vinculación a proceso.",
+  "clave": "c22ed541f0b95759",
+  "conceptos": "Vinculación a proceso, falta de vinculación a proceso.",
   "ok": true,
-  "respuesta": "Acoso sexual, Vinculación a proceso.",
+  "respuesta": "Vinculación a proceso, falta de vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A103": {
-  "clave": "54302aed543e81e0",
-  "conceptos": "Envenenamiento, Vinculación a proceso, Recurso de apelación",
+  "clave": "e94cb210c5f09134",
+  "conceptos": "Deterioro al medio ambiente, Vinculación a proceso.",
   "ok": true,
-  "respuesta": "Envenenamiento, Vinculación a proceso, Recurso de apelación",
+  "respuesta": "Deterioro al medio ambiente, Vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
  "A104": {
-  "clave": "1abbb6a90b8cf96d",
-  "conceptos": "Corrupción de menores, Vinculación a proceso, Robo calificado",
+  "clave": "2d9a5bd4c0fdb460",
+  "conceptos": "Abuso sexual infantil, Vinculación a proceso, Apelación.",
   "ok": true,
-  "respuesta": "Corrupción de menores, Vinculación a proceso, Robo calificado",
+  "respuesta": "Abuso sexual infantil, Vinculación a proceso, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -840,10 +840,10 @@
   "prompt": "v11"
  },
  "A106": {
-  "clave": "822b1085d37fb2b1",
-  "conceptos": "Recusación, competencia judicial, apego procesal.",
+  "clave": "1add2b7fcb321ee8",
+  "conceptos": "Recusación, Vinculación a proceso.",
   "ok": true,
-  "respuesta": "Recusación, competencia judicial, apego procesal.",
+  "respuesta": "Recusación, Vinculación a proceso.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -872,10 +872,10 @@
   "prompt": "v11"
  },
  "A110": {
-  "clave": "5dc06694505d88d6",
-  "conceptos": "Lenocinio, Prescripción de la sanción penal, Apelación tardía.",
-  "ok": true,
-  "respuesta": "Lenocinio, Prescripción de la sanción penal, Apelación tardía.",
+  "clave": "8310a40aa14534d0",
+  "conceptos": "Represento a un hombre que se le atribuye haber participado en actividades ilícitas relacionadas con el tráfico sexual. Mi cliente apeló la resolución definitiva que lo condenó a una pena de prisión y al pago de una multa, dictada en abril de 1998. Quiero conocer si hay algún precedente sobre la prescripción de la sanción penal en casos similares.",
+  "ok": false,
+  "respuesta": "FALLA",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
@@ -944,10 +944,10 @@
   "prompt": "v11"
  },
  "A119": {
-  "clave": "1ed235178a460dd6",
-  "conceptos": "Violación, Vinculación a proceso",
+  "clave": "b5ea1d2ab149c3e5",
+  "conceptos": "Falta de consentimiento, Vinculación a proceso, Apelación.",
   "ok": true,
-  "respuesta": "Violación, Vinculación a proceso",
+  "respuesta": "Falta de consentimiento, Vinculación a proceso, Apelación.",
   "modelo": "llama3.1:8b",
   "prompt": "v11"
  },
