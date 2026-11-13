@@ -151,6 +151,10 @@ FICHA_MODO = _env("COPILOTO_FICHA_MODO", "json")
 # robo, robo, homicidio a homicidio x3 (regresiones 20261113-000836_137c238, sin la condición del acto, y
 # 20261113-001214_a5c476b, con ella).
 ORDEN_CANDIDATOS = _env("COPILOTO_ORDEN_CANDIDATOS", "familia_acto")
+# Re-ranking con cross-encoder (experimento, apagado): p. ej. "BAAI/bge-reranker-v2-m3". Se activa solo si en
+# `recuperacion` la diferencia pareada en nDCG@5 con juicios humanos es positiva y su IC 95 % no incluye 0.
+RERANKER = _env("COPILOTO_RERANKER", "") or None
+RERANKER_DISPOSITIVO = _env("COPILOTO_RERANKER_DISPOSITIVO", "auto")  # "auto" | "cuda" | "cpu"
 # Fichas precalculadas (`evaluacion fichas-batch`): la app usa la ficha guardada de cada sentencia si coinciden su
 # texto y la versión (prompt + modelo); si no, la genera en la consulta. Activado por defecto solo si existe el archivo.
 FICHAS_PRECALCULADAS_PATH = DATA_DIR / "fichas" / "fichas-penal.parquet"

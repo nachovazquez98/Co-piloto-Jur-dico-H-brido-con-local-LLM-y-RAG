@@ -334,6 +334,10 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
     filtro = [t for c in categorias for t in clasificador.tipos_de(c)]
     estrictos = store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
     candidatos, modo = combinar_candidatos(estrictos, amplios, num_precedentes)
+    if config.RERANKER:  # experimento: reordena con el cross-encoder antes de las facetas
+        from .reranker import reordenar
+
+        candidatos = reordenar(consulta, candidatos, lambda d: store.fragmento_mas_similar(d, q_emb, 1500))
     acto = acto_de_consulta(consulta)
     # Sin acto en la consulta, el orden por facetas solo confiaría en la primera familia clasificada, y eso hizo perder
     # el caso de narcomenudeo (familia correcta en 2.º lugar): entonces se conserva el orden RRF.

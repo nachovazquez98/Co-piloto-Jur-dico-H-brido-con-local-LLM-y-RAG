@@ -316,6 +316,7 @@ class Entorno:
     corrida: Corrida
     preparadas: list[Preparada] = field(default_factory=list)
     facetas: dict[str, dict[str, dict[str, bool]]] = field(default_factory=dict)  # mismo delito / problema procesal
+    tiempos_reranker: list[float] = field(default_factory=list)
 
     @property
     def doc_tipo(self) -> dict[str, str]:
@@ -432,9 +433,10 @@ def _clasificacion(env: Entorno, p: Preparada, rrf_k: int | None = None, excluir
 
 
 def _lista_pipeline(env: Entorno, p: Preparada, ranking: list[str], amplios: list, n_filtro: int,
-                    rrf_k: int | None, excluir: set | None = None) -> list[str]:
+                    rrf_k: int | None, excluir: set | None = None, reranker: str | None = None) -> list[str]:
     """Lista final de candidatos como la arma la app: filtro con las `n_filtro` primeras categorías y, si da
-    pocos, se completa con la búsqueda amplia (`amplios`). 0 = sin filtro."""
+    pocos, se completa con la búsqueda amplia (`amplios`). 0 = sin filtro. `reranker`: reordena con el
+    cross-encoder (y anota su tiempo en `env.tiempos_reranker`)."""
     from ..pipeline import combinar_candidatos
 
     if n_filtro == 0:
@@ -443,8 +445,21 @@ def _lista_pipeline(env: Entorno, p: Preparada, ranking: list[str], amplios: lis
     estrictos = env.store.buscar(p.consulta.consulta, tipos=filtro, query_embedding=p.q, consulta_lexica=p.lexica,
                                  rrf_k=rrf_k, excluir=excluir)
     candidatos, _ = combinar_candidatos(estrictos, amplios, config.RAG_NUM_RESULTS_DESIRED)
-    return [c.doc_id for c, _ in candidatos][:config.RAG_NUM_DOCS_TO_FETCH]
+    candidatos = candidatos[:config.RAG_NUM_DOCS_TO_FETCH]
+    if reranker:
+        from ..reranker import reordenar
 
+        t0 = time.time()
+        candidatos = reordenar(p.consulta.consulta, candidatos,
+                               lambda d: env.store.fragmento_mas_similar(d, p.q, 1500), nombre=reranker)
+        env.tiempos_reranker.append(time.time() - t0)
+    return [c.doc_id for c, _ in candidatos]
+
+
+# Variante experimental: la app + re-ranking con cross-encoder (bloque 5). El modelo se puede cambiar con
+# COPILOTO_RERANKER; si está vacío se usa este.
+RERANKER_EXPERIMENTO = "BAAI/bge-reranker-v2-m3"
+VARIANTE_RERANKER = "RRF k=60 + filtro top-3 + re-ranker"
 
 VARIANTES_RECUPERACION = [
     # (nombre, modo, rrf_k, categorías en el filtro; 0 = sin filtro)
@@ -458,6 +473,7 @@ VARIANTES_RECUPERACION = [
     ("RRF k=60 + filtro top-5", "hibrida", 60, 5),
     ("RRF k=20 + filtro top-3", "hibrida", 20, 3),
     ("RRF k=100 + filtro top-3", "hibrida", 100, 3),
+    (VARIANTE_RERANKER, "hibrida", 60, 3),
 ]
 
 
@@ -548,7 +564,8 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
                 amplios = env.store.buscar(c.consulta, query_embedding=p.q, consulta_lexica=p.lexica, rrf_k=k,
                                            excluir=excluir)
                 _, _, rk = _clasificacion(env, p, rrf_k=k, excluir=sin)  # el voto nunca incluye la fuente
-                return _lista_pipeline(env, p, rk, amplios, n_filtro, k, excluir)
+                rr = (config.RERANKER or RERANKER_EXPERIMENTO) if nombre == VARIANTE_RERANKER else None
+                return _lista_pipeline(env, p, rk, amplios, n_filtro, k, excluir, reranker=rr)
 
             fila = {"id": c.id}
             if c.documento_conocido:
@@ -626,6 +643,13 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
     for metrica, etiqueta in (("hit5", "Hit@5 (documento fuente)"), ("ndcg5_meta", "nDCG@5 (metadatos)"),
                               ("ndcg5", "nDCG@5 (juicios)")):
         comparar("RRF k=60 + filtro top-3 (app)", "RRF k=60, sin filtro", metrica, etiqueta)
+        comparar(VARIANTE_RERANKER, "RRF k=60 + filtro top-3 (app)", metrica, etiqueta)  # criterio: nDCG@5 juicios
+    if env.tiempos_reranker:
+        corrida.tabla("Latencia del re-ranker (segundos por consulta)",
+                      f"Cross-encoder {config.RERANKER or RERANKER_EXPERIMENTO} sobre hasta "
+                      f"{config.RAG_NUM_DOCS_TO_FETCH} candidatos; incluye la carga del modelo en la primera consulta.",
+                      pd.DataFrame([{"n": len(env.tiempos_reranker), **m.percentiles(env.tiempos_reranker),
+                                     "máximo": max(env.tiempos_reranker)}]))
     a, b = {r["id"]: r for r in res["hib"]}, {r["id"]: r for r in res["knn"]}
     for metrica in ("hit3_tipo", "hit3_familia"):
         comunes = sorted(set(a) & set(b))
