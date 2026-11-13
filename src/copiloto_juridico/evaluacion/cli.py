@@ -17,6 +17,7 @@ Con LLM:
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
+    robustez                         Consultas difíciles con la app completa (diagnóstico)
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 """
@@ -420,6 +421,17 @@ def cmd_modelos(args) -> None:
     _guardar(corrida)
 
 
+def cmd_robustez(args) -> None:
+    from ..clasificador import construir_clasificador
+    from ..vectorstore import SentenciasStore
+    from .robustez import correr
+
+    store = SentenciasStore(log=lambda _m: None)
+    clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
+    # sin la caché de respuestas del LLM: guardaría en disco los prompts con los datos personales inventados
+    _guardar(correr(store, clas, _llm(con_cache=False), log=_log))
+
+
 def cmd_errores(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -529,6 +541,9 @@ def main(argv=None) -> None:
     s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite la comparación contra el conjunto C anotado")
     s.set_defaults(func=cmd_modelos)
+
+    s = sub.add_parser("robustez", help="Consultas difíciles con el LLM real (diagnóstico)")
+    s.set_defaults(func=cmd_robustez)
 
     s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
     s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")
