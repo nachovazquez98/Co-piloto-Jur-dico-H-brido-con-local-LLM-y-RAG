@@ -30,6 +30,19 @@ def save_corpus(df: pd.DataFrame, directory: Path = config.CORPUS_DIR) -> list[P
     return paths
 
 
+_RE_OMITIDAS = r"págs? omitidas?"
+
+
+def unir_fuentes(fuentes: list[pd.DataFrame]) -> pd.DataFrame:
+    """Une corpus de varias fuentes sin repetir sentencias. Si una sentencia aparece más de una vez, gana la versión
+    completa (sin "págs omitidas": p. ej. el PDF vuelto a descargar) y, entre iguales, la de la primera fuente
+    (corpus actual > ChromaDB > PDFs)."""
+    todo = pd.concat(fuentes, ignore_index=True)
+    incompleta = todo["texto"].str.contains(_RE_OMITIDAS, regex=True)
+    todo = todo.assign(_incompleta=incompleta).sort_values("_incompleta", kind="stable")
+    return todo.drop_duplicates(subset="id", keep="first").drop(columns="_incompleta").sort_index()
+
+
 def load_corpus(directory: Path = config.CORPUS_DIR) -> pd.DataFrame:
     files = sorted(directory.glob("sentencias-*.parquet"))
     if not files:

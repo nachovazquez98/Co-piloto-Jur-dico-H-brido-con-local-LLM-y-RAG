@@ -26,7 +26,7 @@ def _log(msg: str) -> None:
 
 def cmd_construir_corpus(args) -> None:
     from .datos.balance import balance_report, load_catalogo, select_balanced
-    from .datos.corpus import import_from_chroma_sqlite, load_corpus, save_corpus
+    from .datos.corpus import import_from_chroma_sqlite, load_corpus, save_corpus, unir_fuentes
     from .datos.procesamiento import process_pdf_folder
 
     fuentes = []
@@ -46,9 +46,9 @@ def cmd_construir_corpus(args) -> None:
     if not fuentes:
         sys.exit("No hay fuentes: usa --chroma y/o --pdfs.")
 
-    todo = pd.concat(fuentes, ignore_index=True)
-    # Si una sentencia viene de varias fuentes se conserva la primera (corpus actual > chroma > PDFs).
-    todo = todo.drop_duplicates(subset="id", keep="first")
+    # Una sentencia repetida: gana la versión sin páginas omitidas (el PDF vuelto a descargar reemplaza a la
+    # muestreada); entre iguales, la primera fuente (corpus actual > chroma > PDFs).
+    todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
     balanceado = select_balanced(todo, args.max_por_tipo)
     save_corpus(balanceado)
@@ -136,6 +136,44 @@ def cmd_limpiar_corpus(args) -> None:
              "(vuelve a descargar esos PDF y procésalos completos con `construir-corpus --pdfs`).")
 
 
+def cmd_redescarga(args) -> None:
+    """Sentencias penales con páginas omitidas en la ingesta original, para volver a bajarlas a mano (la API pide
+    reCAPTCHA). Orden: primero las familias con menos sentencias (cada una pesa más en la evaluación)."""
+    import re
+
+    from .datos.corpus import load_corpus
+    from .evaluacion.familias import cargar_familias, etiqueta_familia
+
+    corpus = load_corpus()
+    penal = corpus[corpus["materia"] == "penal"].copy()
+    familias = cargar_familias(penal["tipo"].unique().tolist())
+    penal["familia"] = penal["tipo"].map(familias)
+    por_familia = penal["familia"].value_counts()
+    faltan = penal[penal["texto"].str.contains("págs? omitidas?", regex=True)].copy()
+
+    def toca(texto: str) -> str:
+        m = re.search(r"toca[^0-9]{0,40}?(\d[\d ]{1,10}\d)", texto[:3000])
+        if not m:
+            return ""
+        n = m.group(1).replace(" ", "")
+        return f"{n[:-4]}/{n[-4:]}" if len(n) > 4 and n[-4:-2] in ("19", "20") else n
+
+    filas = pd.DataFrame({
+        "id": faltan["id"], "fecha": faltan["fecha"], "tipo": faltan["tipo"],
+        "familia": faltan["familia"].map(etiqueta_familia), "sentencias_familia": faltan["familia"].map(por_familia),
+        "toca": faltan["texto"].map(toca),
+        "paginas_omitidas": faltan["texto"].map(lambda t: sum(map(int, re.findall(r"(\d+) págs? omitidas?", t)))),
+        "enlace": ""})  # el corpus vino de una base anterior sin el id de la API: se busca por toca y fecha
+    filas = filas.sort_values(["sentencias_familia", "familia", "fecha", "id"])
+    filas.to_csv(args.salida, index=False)
+    _log(f"{len(filas)} sentencias penales por volver a descargar: {args.salida}\n"
+         "Guarda cada PDF con el nombre de la columna id en una carpeta y corre:\n"
+         "  copiloto-datos construir-corpus --pdfs CARPETA   (la versión completa reemplaza a la muestreada)\n"
+         "  copiloto-datos indexar                          (embeddings + metadatos procesales)\n"
+         "  python -m copiloto_juridico.evaluacion fichas-batch   (regenera solo las fichas cuyo texto cambió)\n"
+         "  python -m copiloto_juridico.evaluacion congelar       (lo congelado ya no coincide)")
+
+
 def cmd_pendientes(args) -> None:
     """Tipos que aún no llegan a su meta, ordenados por prioridad para la descarga manual.
 
@@ -198,6 +236,10 @@ def main(argv=None) -> None:
     lc = sub.add_parser("limpiar-corpus", help="Limpieza v11 del texto guardado (anexo testado, etiquetas, encabezados)")
     lc.add_argument("--omitidas", help="CSV con las sentencias que tienen páginas omitidas")
     lc.set_defaults(func=cmd_limpiar_corpus)
+
+    rd = sub.add_parser("redescarga", help="Sentencias penales con páginas omitidas, para volver a descargarlas")
+    rd.add_argument("--salida", default=str(config.EVAL_DIR / "redescarga_penal.csv"))
+    rd.set_defaults(func=cmd_redescarga)
 
     pe = sub.add_parser("pendientes", help="Tipos incompletos por prioridad (para descargar a mano)")
     pe.add_argument("--materia", default="penal")

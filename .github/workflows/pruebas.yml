@@ -1,0 +1,24 @@
+# Pruebas en cada push: sin GPU ni Ollama. Las que necesitan el modelo de embeddings real se saltan solas; la de punta
+# a punta usa embeddings y LLM simulados sobre un corpus mínimo.
+name: pruebas
+
+on: [push, pull_request]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Dependencias (torch para CPU)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]" pyflakes
+          python -m spacy download es_core_news_sm
+      - name: pyflakes
+        run: python -m pyflakes src tests app
+      - name: pytest
+        run: python -m pytest -q

@@ -121,3 +121,15 @@ def test_recortar_contexto_conserva_agravios():
     assert r.count("agravio es infundado") >= 10
     sin = recortar_contexto("a" * 5000 + "b" * 5000, 4000)  # sin agravios: 55 % / 45 % como en v10
     assert sin.startswith("a") and sin.endswith("b")
+
+
+def test_pdf_completo_reemplaza_la_version_muestreada():
+    """Bloque 7: al reintegrar los PDF vueltos a descargar, gana la versión sin páginas omitidas."""
+    from copiloto_juridico.datos.corpus import unir_fuentes
+
+    actual = pd.DataFrame({"id": ["a.pdf", "b.pdf"], "texto": ["inicio ... 12 págs omitidas ... fin", "completo b"],
+                           "origen": "chroma"})
+    pdfs = pd.DataFrame({"id": ["a.pdf", "b.pdf"], "texto": ["inicio medio fin", "otra versión de b"], "origen": "pdf"})
+    unido = unir_fuentes([actual, pdfs]).set_index("id")
+    assert unido.loc["a.pdf", "origen"] == "pdf"     # la completa reemplaza a la muestreada
+    assert unido.loc["b.pdf", "origen"] == "chroma"  # entre completas, la primera fuente
