@@ -12,7 +12,8 @@ con un aviso y **no se descargan**. Cada modelo corre con la misma semilla, temp
 - Si el conjunto C ya está anotado: exactitud por campo y F1 de artículos contra la anotación. Eso usa la hoja
   de evaluación final, así que pasa por el control del congelado (una vez por congelado).
 
-Antes de cada modelo se descargan de la memoria de Ollama los que estén cargados, para medir cada uno solo.
+Antes de cada modelo se descargan de la memoria de Ollama los que estén cargados, para medir cada uno solo: córrelo
+sin otra tarea usando Ollama (cortaría sus peticiones en curso).
 """
 
 from __future__ import annotations

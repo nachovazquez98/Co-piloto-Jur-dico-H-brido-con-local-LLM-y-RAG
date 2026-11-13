@@ -59,12 +59,15 @@ def ficha_guardada(doc_id: str, texto: str, settings: config.LLMSettings,
     return FichaPenal.desde_guardada(r["ficha"])
 
 
+REINTENTOS_SERVIDOR, ESPERA_REINTENTO = 3, 30
+
+
 def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCULADAS_PATH,
                   limite: int | None = None, guardar_cada: int = 10,
                   log: Callable[[str], None] = print) -> pd.DataFrame:
     """Genera la ficha de cada sentencia penal que no la tenga vigente. Reanudable: guarda cada `guardar_cada`
     fichas y, al volver a correr, salta las que ya están (misma huella de texto y versión)."""
-    from .llm import digest_modelo
+    from .llm import LLMError, digest_modelo
     from .pipeline import recortar_contexto
 
     version, digest = version_ficha(llm.settings), digest_modelo(llm.settings)
@@ -79,7 +82,16 @@ def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCU
     for i, (doc_id, texto) in enumerate(pendientes[:limite], 1):
         t0 = time.time()
         contexto = recortar_contexto(texto, llm.settings.max_context_chars)
-        ficha, info = generar_ficha_json(llm.generate, contexto)
+        for intento in range(1, REINTENTOS_SERVIDOR + 1):
+            try:
+                ficha, info = generar_ficha_json(llm.generate, contexto)
+                break
+            except LLMError as e:  # el servidor del LLM se cayó o se reinició: no se pierde el lote
+                if intento == REINTENTOS_SERVIDOR:
+                    _guardar(filas, path)
+                    raise
+                log(f"   ⚠️ {doc_id}: {e} · reintento {intento} en {ESPERA_REINTENTO} s")
+                time.sleep(ESPERA_REINTENTO)
         v = verificaciones(ficha.campos_markdown(), texto) if ficha else {
             "sentido_reglas": None, "sentido_llm": None, "articulos_no_encontrados": [], "verificar": []}
         filas[doc_id] = {

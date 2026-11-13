@@ -75,3 +75,18 @@ def test_generacion_evalua_la_ficha_de_la_app(monkeypatch, tmp_path):
     assert g["origen"] == "precalculada" and llm.llamadas == 1 and "Resultado para la defensa" in g["informe"]
     monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", False)
     assert generar_ficha(TEXTO, llm, doc_id="a")["origen"] == "generada" and llm.llamadas == 2
+
+
+def test_fichas_batch_sobrevive_a_una_caida_del_servidor(tmp_path, monkeypatch):
+    from copiloto_juridico.llm import LLMError
+
+    class LLMCaido(LLMFicha):
+        def generate(self, prompt, json_mode=False):
+            self.llamadas += 1
+            if self.llamadas == 1:
+                raise LLMError('POST predict: Post "http://127.0.0.1/completion": EOF')
+            return json.dumps(FICHA)
+
+    monkeypatch.setattr(fp.time, "sleep", lambda s: None)
+    tabla = fp.generar_todas(_corpus(("a", TEXTO)), LLMCaido([]), tmp_path / "f.parquet", log=lambda m: None)
+    assert tabla["json_valido"].all()
