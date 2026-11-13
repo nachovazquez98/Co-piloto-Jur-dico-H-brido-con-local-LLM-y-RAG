@@ -18,8 +18,11 @@ explicación de cada número. Ningún resultado se reporta si no está en una co
   valores cerrados; generada en una sola llamada (JSON validado con reintento).
 - Verificaciones deterministas de la ficha: sentido del fallo leído de los resolutivos, artículos citados contra el
   texto de la sentencia y QC_2 por familia del delito; las discrepancias se marcan "verificar".
-- Limpieza del texto: anexo de datos testados, etiquetas de testado, encabezados y palabras deletreadas
-  (`cli limpiar-corpus`); comandos `cli pendientes` y `estado --salida`.
+- Limpieza del texto: anexo de datos testados, etiquetas de testado, encabezados y pies de página aunque la
+  extracción parta las palabras, números de expediente repetidos en cada hoja y palabras deletreadas; idempotente
+  (`cli limpiar-corpus`, 16 % menos caracteres en el corpus guardado). Las sentencias penales se indexan completas.
+  Comandos `cli pendientes` y `estado --salida`; lista de sentencias con páginas omitidas en
+  `evaluacion/paginas_omitidas.csv`.
 - Página "Cómo funciona" con el flujo, los límites de tamaño, glosario y la última evaluación guardada.
 
 ### Cambiado

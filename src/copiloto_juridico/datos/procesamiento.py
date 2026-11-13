@@ -171,10 +171,29 @@ _RE_INICIO_ENTRADA = re.compile(r"no\s?\.\s?[\d\s]{1,8}e\s?l\s?i\s?m\s?i\s?n|el\
 _FIRMA_ANEXO = ("lineamiento", "renglon", "porserundato", "quincuagesimo", "testad")
 # Etiquetas de datos testados dentro del texto: "no.207eliminadoelnombrecompleto1", "no.6 eliminadoeldomicilio2".
 _RE_ETIQUETA = re.compile(r"no\s?\.\s?\d+\s?eliminado[a-záéíóúñ0-9]*", re.IGNORECASE)
-# Restos de encabezados y numeración de página: "tribunal de justicia del estado de jalisco 5116 --- 115".
-_RE_ENCABEZADO = re.compile(r"(?:\d+\s*)?---\s*(?:\d+\s+)?|tribunal de j\s?usticia del estado de jalisco"
-                            r"|el documento fu\s?e testad\s?o con el programa elida eliminador de datos judicial"
-                            r"(?: del)?(?: toca[\s\d]+)?", re.IGNORECASE)
+_ACENTOS = {"a": "[aá]", "e": "[eé]", "i": "[ií]", "o": "[oó]", "u": "[uú]"}
+
+
+def _tolerante(frase: str) -> str:
+    """Regex de una frase que admite un espacio entre cualquier par de letras y vocales con o sin acento: la
+    extracción del PDF parte las palabras al azar ("el p rograma", "del esta do")."""
+    return r"\s?".join(_ACENTOS.get(ch, re.escape(ch)) for ch in frase.replace(" ", ""))
+
+
+# Encabezados y pies de página que se repiten en cada hoja: "tribunal de justicia del estado de jalisco 5116 --- 115",
+# la nota del programa de testado, "documento para versión electrónica", "página -12-".
+_RE_ENCABEZADO = re.compile("|".join([
+    r"(?:\d+\s*)?---\s*(?:\d+\s+)?",
+    _tolerante("el documento fue testado con el programa elida eliminador de datos judicial") + r"(?:\s?del\b)?",
+    r"(?:supremo\s?)?" + _tolerante("tribunal de justicia") + r"\s?(?:del|en\s?el)\s?" + _tolerante("estado de jalisco"),
+    _tolerante("justicia del estado de jalisco sistema acusatorio adversarial"),
+    _tolerante("documento para versión electrónica"),
+    r"\bp[aá]gina\s?-\s?\d+\s?-|\bp[aá]gina \d+\b(?= toca)",
+]), re.IGNORECASE)
+# Número de expediente que el encabezado repite en cada hoja: "toca penal 582025", "carpeta administrativa 1234".
+_RE_EXPEDIENTE = re.compile(r"\b(?:toca(?: penal| de juicio oral electr[oó]nico| juicio oral| tradicional)?"
+                            r"|carpeta administrativa(?: digitalizada)?|carpeta de investigaci[oó]n|causa penal"
+                            r"|averiguaci[oó]n previa)\s?\.?\s?(?:no\.\s?)?[\w./-]*\d[\w./-]*", re.IGNORECASE)
 # Palabras deletreadas por la maquetación: "r e s u e l v e" -> "resuelve" (4 o más letras sueltas seguidas).
 _RE_DELETREADA = re.compile(r"\b(?:[a-záéíóúñ] ){3,}[a-záéíóúñ]\b")
 
@@ -204,12 +223,41 @@ def quitar_anexo_testado(texto: str) -> str:
     return "".join(partes)
 
 
-def limpiar_texto(texto: str) -> str:
-    """Limpieza v11, idempotente: anexo de datos testados, etiquetas de testado -> "[eliminado]", restos de
-    encabezados y numeración de página, palabras deletreadas y espacios repetidos. Conserva las marcas
-    "... N págs omitidas ..." (avisan que esa parte del PDF no se leyó)."""
-    t = quitar_anexo_testado(texto)
+def _quitar_expedientes_repetidos(texto: str, minimo: int = 3) -> str:
+    """Un número de expediente que aparece `minimo` veces o más es encabezado de página: se deja la primera
+    aparición (de ahí se lee el identificador) y se quitan las demás."""
+    claves = [re.sub(r"\s", "", m.group(0).lower()) for m in _RE_EXPEDIENTE.finditer(texto)]
+    repetidas = {k for k in set(claves) if claves.count(k) >= minimo}
+    vistas: set[str] = set()
+
+    def _sub(m: re.Match) -> str:
+        k = re.sub(r"\s", "", m.group(0).lower())
+        if k not in repetidas or k not in vistas:
+            vistas.add(k)
+            return m.group(0)
+        return " "
+
+    return _RE_EXPEDIENTE.sub(_sub, texto) if repetidas else texto
+
+
+def _limpiar_una_vez(t: str) -> str:
     t = _RE_ETIQUETA.sub("[eliminado]", t)
-    t = _RE_ENCABEZADO.sub(" ", t)
+    t = re.sub(r"\s+", " ", t)
     t = _RE_DELETREADA.sub(lambda m: m.group(0).replace(" ", ""), t)
+    t = _RE_ENCABEZADO.sub(" ", t)
+    t = _quitar_expedientes_repetidos(t)
     return re.sub(r"\s+", " ", t).strip()
+
+
+def limpiar_texto(texto: str) -> str:
+    """Limpieza v11, idempotente: anexo de datos testados, etiquetas de testado -> "[eliminado]", encabezados y
+    numeración de página, palabras deletreadas y espacios repetidos. Conserva las marcas "... N págs omitidas ..."
+    (avisan que esa parte del PDF no se leyó). Se repite hasta que el texto no cambia, porque unir palabras o
+    quitar un encabezado puede dejar completo otro."""
+    t = quitar_anexo_testado(texto)
+    for _ in range(4):
+        nuevo = _limpiar_una_vez(t)
+        if nuevo == t:
+            break
+        t = nuevo
+    return t

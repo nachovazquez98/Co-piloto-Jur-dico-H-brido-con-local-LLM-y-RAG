@@ -132,7 +132,8 @@ cita la corrida que la respalda).
 - **Cobertura:** muchos tipos penales tienen una o ninguna sentencia; cuando ningún precedente sale de las familias
   detectadas, la app lo dice.
 - **Páginas omitidas:** parte del corpus se procesó con una versión anterior que muestreaba los PDF largos; esas
-  sentencias lo indican en el texto. La ingesta actual lee los PDF completos.
+  sentencias lo indican en el texto (lista en `evaluacion/paginas_omitidas.csv`, para volver a descargarlas). La
+  ingesta actual lee los PDF completos.
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.

@@ -77,6 +77,19 @@ def test_limpiar_texto_quita_anexo_y_ruido():
     assert limpiar_texto(limpio) == limpio  # idempotente
 
 
+def test_limpiar_texto_encabezados_con_palabras_partidas():
+    """Fragmentos reales del corpus: la nota de testado con palabras partidas y el número de expediente que el
+    encabezado repite en cada hoja (se conserva la primera aparición)."""
+    from copiloto_juridico.datos.procesamiento import limpiar_texto
+
+    hoja = "34 --- toca 202025 el documento fue testado con el programa elid a eliminador de datos judicial del "
+    texto = ("toca 202025 apelación contra la sentencia. " + hoja + "primer agravio fundado. " + hoja
+             + "segundo agravio infundado. " + hoja + "v i s t o s")
+    limpio = limpiar_texto(texto)
+    assert limpio == "toca 202025 apelación contra la sentencia. primer agravio fundado. segundo agravio infundado. vistos"
+    assert limpiar_texto(limpio) == limpio
+
+
 def test_recortar_contexto_conserva_agravios():
     relleno = "texto sin interés. " * 2000
     agravios = "el primer agravio es infundado; el segundo agravio es fundado. " * 20
