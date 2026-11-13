@@ -1,0 +1,237 @@
+{
+  "comando": "metadatos-cobertura",
+  "fecha": "2026-11-13T00:07:25",
+  "commit": "137c238",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "sentencias_penales": 1412
+  },
+  "corpus_fingerprint": "bea10929ce634a58",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHAS_PRECALCULADAS": false,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "rrf",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "tablas": {
+    "Cobertura de los metadatos procesales (reglas)": {
+      "descripcion": "Valores leídos por reglas del párrafo inicial (acto impugnado, quién apeló) y de los puntos resolutivos (sentido). 'no determinado' = las reglas no lo encontraron. Sin anotación: no mide exactitud.",
+      "columnas": [
+        "campo",
+        "valor",
+        "sentencias",
+        "fracción"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "campo": "acto_impugnado",
+          "valor": "otro",
+          "sentencias": 355,
+          "fracción": 0.2514164305949009
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "no vinculación",
+          "sentencias": 264,
+          "fracción": 0.18696883852691218
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "no determinado",
+          "sentencias": 254,
+          "fracción": 0.17988668555240794
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "sentencia definitiva",
+          "sentencias": 216,
+          "fracción": 0.1529745042492918
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "vinculación",
+          "sentencias": 210,
+          "fracción": 0.14872521246458922
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "medida cautelar",
+          "sentencias": 74,
+          "fracción": 0.05240793201133145
+        },
+        {
+          "campo": "acto_impugnado",
+          "valor": "sobreseimiento",
+          "sentencias": 39,
+          "fracción": 0.02762039660056657
+        },
+        {
+          "campo": "apelante",
+          "valor": "varios",
+          "sentencias": 370,
+          "fracción": 0.26203966005665724
+        },
+        {
+          "campo": "apelante",
+          "valor": "ministerio público",
+          "sentencias": 324,
+          "fracción": 0.22946175637393768
+        },
+        {
+          "campo": "apelante",
+          "valor": "defensa",
+          "sentencias": 323,
+          "fracción": 0.22875354107648727
+        },
+        {
+          "campo": "apelante",
+          "valor": "no determinado",
+          "sentencias": 280,
+          "fracción": 0.19830028328611898
+        },
+        {
+          "campo": "apelante",
+          "valor": "asesor de la víctima",
+          "sentencias": 115,
+          "fracción": 0.08144475920679886
+        },
+        {
+          "campo": "sentido",
+          "valor": "no determinado",
+          "sentencias": 855,
+          "fracción": 0.6055240793201133
+        },
+        {
+          "campo": "sentido",
+          "valor": "CONFIRMA",
+          "sentencias": 254,
+          "fracción": 0.17988668555240794
+        },
+        {
+          "campo": "sentido",
+          "valor": "REVOCA",
+          "sentencias": 144,
+          "fracción": 0.10198300283286119
+        },
+        {
+          "campo": "sentido",
+          "valor": "REPONE",
+          "sentencias": 108,
+          "fracción": 0.0764872521246459
+        },
+        {
+          "campo": "sentido",
+          "valor": "MODIFICA",
+          "sentencias": 51,
+          "fracción": 0.03611898016997167
+        }
+      ]
+    }
+  }
+}
