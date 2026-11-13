@@ -448,6 +448,7 @@ def cmd_errores(args) -> None:
 
 def main(argv=None) -> None:
     logging.basicConfig(level=logging.WARNING, format="%(message)s")
+    config.CACHE_RESULTADOS = False  # la evaluación nunca usa resultados guardados de la app
     p = argparse.ArgumentParser(prog="python -m copiloto_juridico.evaluacion", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--consultas", default=str(config.CONSULTAS_PATH), help="JSONL de consultas")

@@ -202,6 +202,64 @@ def cmd_pendientes(args) -> None:
          "`construir-corpus --pdfs <carpeta>` y luego `indexar`. Congela el corpus antes de medir.")
 
 
+def cmd_demo(args) -> None:
+    """Precalcula los ejemplos penales de la app para que la demostración no espere al LLM, y guarda el tiempo de
+    cada uno sin caché (análisis completo) y con caché (lectura del resultado guardado)."""
+    import time
+
+    from . import cache_resultados
+    from .clasificador import construir_clasificador
+    from .ejemplos import EJEMPLOS_PENALES
+    from .evaluacion import metricas as m
+    from .evaluacion.reporte import Corrida
+    from .llm import get_client
+    from .pipeline import Copiloto
+    from .vectorstore import SentenciasStore
+
+    if not config.CACHE_RESULTADOS:
+        sys.exit("❌ CACHE_RESULTADOS está apagado (COPILOTO_CACHE_RESULTADOS=false): no hay dónde guardar la demo.")
+    settings = config.LLMSettings()
+    cliente = get_client(settings)
+    ok, msg = cliente.health()
+    if not ok:
+        sys.exit(f"❌ {msg}")
+    store = SentenciasStore(log=lambda _m: None)
+    clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
+    filas = []
+    for i, e in enumerate(EJEMPLOS_PENALES[:args.max], 1):
+        previo = cache_resultados.buscar(e.texto, settings)
+        t0 = time.time()
+        if previo is None or args.rehacer:
+            logs, resultado = [], None
+            for ev in Copiloto(store, clas, cliente).analizar(e.texto):
+                if ev.tipo == "log":
+                    logs.append(ev.mensaje)
+                elif ev.tipo == "resultado":
+                    resultado = ev.datos["resultado"]
+            sin = time.time() - t0
+            if resultado is not None:
+                cache_resultados.guardar(resultado, logs, settings)
+        else:
+            sin = previo["resultado"].segundos  # ya estaba guardado: el tiempo del análisis original
+        t1 = time.time()
+        con = cache_resultados.buscar(e.texto, settings)
+        filas.append({"ejemplo": e.etiqueta, "sin caché (s)": round(sin, 1),
+                      "con caché (s)": round(time.time() - t1, 3) if con else None,
+                      "guardado": "sí" if con else "no (sin resultado)"})
+        _log(f"[{i}] {e.etiqueta}: {sin:.0f} s sin caché · {filas[-1]['con caché (s)']} s con caché")
+    df = pd.DataFrame(filas)
+    corrida = Corrida("demo", parametros={"ejemplos": len(filas), "rehacer": args.rehacer})
+    corrida.tabla("Tiempo de la demo", "Por ejemplo penal de la app. Sin caché = análisis completo con el LLM (o el "
+                  "tiempo del análisis original si ya estaba guardado); con caché = leer el resultado guardado, que "
+                  "es lo que espera la app en la demo (sin contar el dibujado de Streamlit).", df, diagnostico=True)
+    validos = df.dropna(subset=["con caché (s)"])
+    corrida.tabla("Resumen", "p50 / p95 en segundos.", pd.DataFrame([
+        {"modo": "sin caché", **m.percentiles(validos["sin caché (s)"].tolist())},
+        {"modo": "con caché", **m.percentiles(validos["con caché (s)"].tolist())}]), diagnostico=True)
+    pj, pm = corrida.guardar()
+    _log(corrida.markdown() + f"\nGuardado en {pj}")
+
+
 def main(argv=None) -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     p = argparse.ArgumentParser(prog="copiloto_juridico", description="Preparación de datos del Co-piloto Jurídico")
@@ -240,6 +298,12 @@ def main(argv=None) -> None:
     pe.add_argument("--top", type=int, default=30)
     pe.add_argument("--salida", help="CSV con la lista completa")
     pe.set_defaults(func=cmd_pendientes)
+
+    dm = sub.add_parser("demo", help="Precalcula los ejemplos penales para la demostración (caché de resultados)")
+    dm.add_argument("--ejemplos", action="store_true", required=True, help="Los ejemplos penales de la app")
+    dm.add_argument("--max", type=int, default=None, help="Solo los primeros N ejemplos")
+    dm.add_argument("--rehacer", action="store_true", help="Vuelve a analizar aunque ya estén guardados")
+    dm.set_defaults(func=cmd_demo)
 
     args = p.parse_args(argv)
     args.func(args)

@@ -173,6 +173,9 @@ PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v11")
 # v11.1: la síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
 # fallo o el delito mencionados coincidan con la ficha citada; si no, la frase se marca "verificar".
 VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)
+# Resultados guardados para la demo (cache_resultados.py): la app muestra al instante una consulta ya analizada con
+# la misma configuración. Guarda la consulta en data/cache/resultados (local). La evaluación nunca la usa.
+CACHE_RESULTADOS = _env("COPILOTO_CACHE_RESULTADOS", True)
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
 # queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".

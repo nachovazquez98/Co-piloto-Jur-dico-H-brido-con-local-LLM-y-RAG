@@ -13,6 +13,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from copiloto_juridico import cache_resultados
 from copiloto_juridico.ayudas import AYUDA, AVISO_LEGAL
 from copiloto_juridico.ejemplos import EJEMPLOS
 from copiloto_juridico.fichas import extraer_articulos
@@ -87,13 +88,19 @@ def ejecutar(texto: str) -> None:
             st.error(ev.mensaje)
         elif ev.tipo == "resultado":
             st.session_state["resultado"] = ev.datos["resultado"]
+            cache_resultados.guardar(ev.datos["resultado"], logs, settings, opciones)
         st.session_state["logs"] = logs
         ph_pasos.markdown(render_pasos(estado), unsafe_allow_html=True)
 
 
 if buscar:
     st.session_state.pop("resultado", None)
-    ejecutar(consulta.strip())
+    st.session_state.pop("guardado_el", None)
+    guardado = cache_resultados.buscar(consulta.strip(), settings, opciones)
+    if guardado:
+        st.session_state.update(resultado=guardado["resultado"], logs=guardado["logs"], guardado_el=guardado["fecha"])
+    else:
+        ejecutar(consulta.strip())
     if "resultado" in st.session_state:
         st.rerun()
 
@@ -131,6 +138,8 @@ def tarjeta(p) -> None:
 
 res: Resultado | None = st.session_state.get("resultado")
 if res:
+    if st.session_state.get("guardado_el"):
+        st.caption(f"Resultado guardado el {st.session_state['guardado_el'].replace('T', ' ')}")
     st.subheader("Síntesis")
     if res.aviso_cobertura:
         st.warning(res.aviso_cobertura)

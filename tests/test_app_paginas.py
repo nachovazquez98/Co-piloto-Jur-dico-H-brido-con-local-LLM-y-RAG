@@ -79,3 +79,7 @@ def test_pantalla_principal_con_resultado():
     textos = " ".join(m.value for m in at.markdown)
     assert "Reconocimiento ilegal" in textos and "no encontrado en la sentencia" in textos
     assert any(AVISO_SIN_MISMO_TIPO in w.value for w in at.warning)
+    assert not any("Resultado guardado" in c.value for c in at.caption)
+    at.session_state["guardado_el"] = "2026-11-13T10:00"  # v11.1: resultado de la caché, una sola línea discreta
+    at.run()
+    assert [c.value for c in at.caption if "Resultado guardado" in c.value] == ["Resultado guardado el 2026-11-13 10:00"]
