@@ -17,7 +17,11 @@ explicación de cada número. Ningún resultado se reporta si no está en una co
 - Ficha penal orientada a la defensa: acto impugnado, apelante, agravios y su calificación, sentido del fallo con
   valores cerrados; generada en una sola llamada (JSON validado con reintento).
 - Verificaciones deterministas de la ficha: sentido del fallo leído de los resolutivos, artículos citados contra el
-  texto de la sentencia y QC_2 por familia del delito; las discrepancias se marcan "verificar".
+  texto de la sentencia y QC_2 por familia del delito; las discrepancias se marcan "verificar". Si los
+  resolutivos contradicen a la ficha, la ficha completa y el informe usan el sentido de los resolutivos.
+- Síntesis v11: la lista de precedentes favorables o desfavorables para la defensa se calcula con reglas (quién
+  apeló + sentido del fallo; también en cada tarjeta); el LLM resume los argumentos aceptados o rechazados y no
+  pronostica el resultado (la v10 leyó al revés un precedente en una consulta real).
 - Limpieza del texto: anexo de datos testados, etiquetas de testado, encabezados y pies de página aunque la
   extracción parta las palabras, números de expediente repetidos en cada hoja y palabras deletreadas; idempotente
   (`cli limpiar-corpus`, 16 % menos caracteres en el corpus guardado). Las sentencias penales se indexan completas.

@@ -425,6 +425,52 @@ Formato de Salida Requerido (Markdown):
 [Conclusión final de 1-2 frases basada SÓLO en la evidencia combinada de los informes.]
 """
 
+PROMPT_SINTESIS_FINAL_V11 = """
+Eres un abogado penalista que apoya a la DEFENSA en una apelación. Abajo están las fichas de precedentes de las Salas
+Penales del STJ Jalisco. Responde la consulta del defensor usando ÚNICA Y EXCLUSIVAMENTE esas fichas.
+
+Reglas:
+- Cita los precedentes como "Precedente 1", "Precedente 2", etc.
+- Atribuye a cada precedente solo lo que dice SU ficha. Si la ficha no menciona algo (por ejemplo, un tipo de prueba),
+  no digas que el precedente lo analiza.
+- Quién apeló y si el resultado fue favorable para la defensa ya están calculados en cada ficha ("Apelante",
+  "Resultado para la defensa"); el sistema los muestra aparte. No los repitas ni los contradigas.
+- NO predigas el resultado del caso del defensor ni digas que su apelación "tendrá éxito". Di qué argumentos acogió
+  o rechazó la Sala y por qué.
+""" + _INSTRUCCION_FORMATO + """
+
+Consulta del defensor:
+{text_consulta}
+
+---
+FICHAS DE PRECEDENTES:
+{informes_precedentes}
+---
+
+Formato de salida (Markdown):
+
+### Respuesta breve
+[2 o 3 frases: qué muestran estos precedentes sobre el problema de la consulta.]
+
+### Argumentos que la Sala aceptó o rechazó
+[Una viñeta por precedente: qué argumento de los agravios aceptó o rechazó la Sala y por qué, según su ficha.]
+
+### Qué revisar en las sentencias
+[1 o 2 frases: qué partes de qué precedentes conviene leer completas. Sin pronosticar el resultado.]
+"""
+
+
+def prompt_sintesis(version: str | None = None) -> str:
+    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v10" o "v11": a favor / en contra, sin
+    pronosticar)."""
+    from . import config
+
+    version = version or config.PROMPT_SINTESIS_VERSION
+    if version not in ("v10", "v11"):
+        raise ValueError(f"Versión de síntesis desconocida: {version}")
+    return PROMPT_SINTESIS_FINAL if version == "v10" else PROMPT_SINTESIS_FINAL_V11
+
+
 PROMPTS_POR_MATERIA = {
     "penal": (PROMPT_EXTRACCION_PENAL, PROMPT_REPORTE_PENAL),
     "civil": (PROMPT_EXTRACCION_CIVIL, PROMPT_REPORTE_CIVIL),

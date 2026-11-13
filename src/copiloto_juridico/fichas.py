@@ -288,9 +288,15 @@ class FichaPenal:
         ]
         return "\n".join(lineas)
 
-    def informe_markdown(self, articulos_no_encontrados: list[str] | None = None) -> str:
-        """Informe legible (lo que antes redactaba una segunda llamada al LLM), armado con código."""
+    def informe_markdown(self, articulos_no_encontrados: list[str] | None = None,
+                         sentido_resolutivos: str | None = None) -> str:
+        """Informe legible (lo que antes redactaba una segunda llamada al LLM), armado con código. Si el sentido
+        leído de los resolutivos difiere del de la ficha, manda el de los resolutivos y se marca."""
         faltan = set(articulos_no_encontrados or [])
+        sentido = self.sentido_fallo
+        if sentido_resolutivos and sentido_resolutivos != sentido:
+            sentido = f"{sentido_resolutivos} (según los puntos resolutivos; el modelo leyó {sentido}: verificar)"
+        para_defensa = resultado_para_defensa(self.apelante, sentido_resolutivos or self.sentido_fallo)
 
         def fundamento(f: str) -> str:
             ausentes = sorted(extraer_articulos(f) & faltan)
@@ -306,7 +312,8 @@ class FichaPenal:
             f"- **Toca / expediente:** {self.identificador}",
             f"- **Acto impugnado:** {self.acto_impugnado} · **Apelante:** {self.apelante}",
             f"- **Delito(s):** {self.delitos}",
-            f"- **Sentido del fallo:** {self.sentido_fallo}", "",
+            f"- **Sentido del fallo:** {sentido}",
+            f"- **Resultado para la defensa:** {para_defensa or DATO_NO_DISPONIBLE}", "",
             "#### Agravios y su calificación", agravios, "",
             "#### Hechos y decisión", f"**Hechos:** {self.hechos_clave}", "", f"**Decisión:** {self.decision}", "",
             "#### Fundamento legal",
@@ -314,6 +321,25 @@ class FichaPenal:
             "", "#### Pruebas decisivas",
             "\n".join(f"- {x}" for x in self.pruebas_decisivas) or f"- {DATO_NO_DISPONIBLE}",
         ])
+
+
+_DEFENSA = ("defens", "imputad", "procesad", "sentenciad", "acusad", "inculpad")
+_ACUSACION = ("ministerio", "fiscal", "victima", "ofendid", "asesor")
+_RESULTADO_APELANTE = {"CONFIRMA": "desfavorable", "REVOCA": "favorable", "MODIFICA": "parcialmente favorable",
+                       "REPONE": "favorable (se repone el procedimiento)"}
+_RESULTADO_CONTRARIO = {"CONFIRMA": "favorable", "REVOCA": "desfavorable", "MODIFICA": "parcialmente desfavorable",
+                        "REPONE": "desfavorable (se repone el procedimiento)"}
+
+
+def resultado_para_defensa(apelante: str, sentido: str | None) -> str | None:
+    """¿El precedente le fue bien o mal a la defensa? Se deduce con reglas, no con el LLM: si apeló la defensa,
+    CONFIRMA es desfavorable y REVOCA favorable; si apeló el Ministerio Público o la víctima, al revés. None si no
+    se sabe quién apeló, apelaron ambos o el sentido es OTRO."""
+    a = normalizar(apelante or "")
+    defensa, acusacion = any(x in a for x in _DEFENSA), any(x in a for x in _ACUSACION)
+    if defensa == acusacion or sentido not in _RESULTADO_APELANTE:
+        return None
+    return (_RESULTADO_APELANTE if defensa else _RESULTADO_CONTRARIO)[sentido]
 
 
 def familia_del_delito(delitos: str) -> str:

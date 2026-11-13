@@ -396,3 +396,15 @@ def test_hojas_de_anotacion_csv(tmp_path):
     p.write_text("consulta_id,consulta,doc_id,resumen,relevancia,anotador\nB1,c,d1,r,2,\nB1,c,d2,r,,\n")
     j = cj.cargar_juicios(p)
     assert len(j) == 1 and j.iloc[0]["anotador"] == "anotador1"
+
+
+def test_resultado_para_defensa():
+    """Quién ganó se deduce con reglas (apelante + sentido), no con el LLM."""
+    from copiloto_juridico.fichas import resultado_para_defensa as r
+
+    assert r("Defensa del imputado", "CONFIRMA") == "desfavorable"
+    assert r("el sentenciado", "REVOCA") == "favorable"
+    assert r("Ministerio Público", "CONFIRMA") == "favorable"
+    assert r("Asesor jurídico de la víctima", "MODIFICA") == "parcialmente desfavorable"
+    assert r("el imputado y el fiscal", "CONFIRMA") is None  # apelaron ambos
+    assert r("Defensa", "OTRO") is None and r("[DATO NO DISPONIBLE]", "CONFIRMA") is None

@@ -20,6 +20,8 @@ AYUDA = {
     "ambiguos": "El control respondió algo que no se pudo leer como SI/NO y el sistema continuó.",
     "sentido_fallo": ("Leído de los puntos resolutivos de la sentencia cuando es posible; 'verificar' = la ficha del "
                       "modelo dice otra cosa."),
+    "para_defensa": ("Se deduce de quién apeló y del sentido del fallo: si apeló la defensa y la Sala confirmó, es "
+                     "desfavorable; si apeló el Ministerio Público y la Sala confirmó, es favorable."),
 }
 
 GLOSARIO = {

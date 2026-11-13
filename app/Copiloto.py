@@ -112,6 +112,8 @@ def tarjeta(p) -> None:
         verificar_sentido = any(v.startswith("sentido") for v in t["verificar"])
         c.metric("Sentido del fallo", t["sentido_fallo"] + (" · verificar" if verificar_sentido else ""),
                  help=AYUDA["sentido_fallo"])
+        if t["para_defensa"]:
+            c.markdown(f"**Para la defensa:** {t['para_defensa']}", help=AYUDA["para_defensa"])
         if t["agravios"]:
             st.markdown("**Agravios y cómo los calificó la Sala**")
             st.markdown("\n".join(f"- {ag}" + (f" — **{cal}**" if cal else "") for ag, cal in t["agravios"]))

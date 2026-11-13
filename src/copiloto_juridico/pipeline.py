@@ -43,8 +43,9 @@ DESCRIPCION_PASOS = {
                 "(embeddings) y léxica (BM25) con RRF; si el filtro da pocas, completa sin filtro.",
     "analisis": "Por candidato: QC_1 (¿es relevante?), extracción de hechos, ficha e QC_2 (¿la ficha es coherente?), "
                 "hasta tener N fichas válidas. El LLM lee la sentencia recortada a su ventana de contexto.",
-    "sintesis": "Entran las fichas válidas; sale una comparación que responde la consulta usando solo esas fichas "
-                "(RAG: el LLM no usa conocimiento propio).",
+    "sintesis": "Entran las fichas válidas. Con reglas: qué precedentes fueron favorables o desfavorables para la "
+                "defensa (quién apeló y sentido del fallo). Con el LLM, solo con esas fichas (RAG): qué argumentos "
+                "aceptó o rechazó la Sala. No pronostica el resultado del caso.",
 }
 
 
@@ -98,7 +99,7 @@ class Precedente:
 
     def tarjeta(self) -> dict:
         """Lo que ve el abogado en la tarjeta del precedente (sirve igual para la ficha JSON y la de dos llamadas)."""
-        from .fichas import DATO_NO_DISPONIBLE, campo, parsear_campos
+        from .fichas import DATO_NO_DISPONIBLE, campo, parsear_campos, resultado_para_defensa
 
         c, d = self.candidato, self.datos_penales
         f = self.ficha
@@ -118,6 +119,7 @@ class Precedente:
             "acto_impugnado": acto, "sentido_fallo": d.get("sentido_fallo") or DATO_NO_DISPONIBLE,
             "agravios": agravios, "fundamento": fundamento, "verificar": list(self.verificar),
             "no_verificado_qc1": self.no_verificado_qc1, "articulos_no_encontrados": self.articulos_no_encontrados,
+            "para_defensa": resultado_para_defensa(f.apelante, d.get("sentido_fallo")) if f is not None else None,
         }
 
     def markdown(self) -> str:
@@ -191,6 +193,21 @@ def qc2_determinista(prec: "Precedente", familias_clasificadas: set[str]) -> tup
         prec.verificar.append(f"la ficha reporta {etiqueta_familia(fam)}; la sentencia está etiquetada como "
                               f"{etiqueta_familia(fam_doc)}")
     return True, f"delito de la ficha coherente ({etiqueta_familia(fam)})"
+
+
+def balance_para_defensa(precedentes: list["Precedente"]) -> str:
+    """Lista "a favor / en contra" armada con código a partir de cada ficha (quién apeló, qué se apeló, sentido del
+    fallo): el LLM de 8B confundía al apelante al redactarla. Vacía si ninguna ficha es estructurada."""
+    filas = []
+    for p in precedentes:
+        if p.ficha is None:
+            continue
+        t = p.tarjeta()
+        resultado = f"**{t['para_defensa']} para la defensa**" if t["para_defensa"] else "resultado para la defensa no determinado"
+        filas.append(f"- **Precedente {p.numero}:** apeló {p.ficha.apelante.lower()} contra "
+                     f"{t['acto_impugnado'][:1].lower() + t['acto_impugnado'][1:]}; la Sala {t['sentido_fallo']} → "
+                     f"{resultado}.")
+    return "### Precedentes a favor y en contra\n" + "\n".join(filas) if filas else ""
 
 
 def verificar_ficha(prec: "Precedente") -> None:
@@ -352,7 +369,7 @@ class Copiloto:
             if ficha is not None:
                 prec = Precedente(0, cand, fuente, "", ficha.campos_markdown(), False, ficha=ficha)
                 verificar_ficha(prec)
-                prec.informe = ficha.informe_markdown(prec.articulos_no_encontrados)
+                prec.informe = ficha.informe_markdown(prec.articulos_no_encontrados, prec.sentido_reglas)
                 return self._qc2(consulta, prec, categorias, op, logs)
         p_ext, p_rep = prompts.prompts_para(cand.materia)
         logs.append(f"   -> Extrayendo hechos con prompt {cand.materia.upper()} "
@@ -556,7 +573,7 @@ class Copiloto:
             informes = "\n\n---\n\n".join(
                 f"Precedente {p.numero} ({p.candidato.doc_id}):\n{p.informe}" for p in precedentes)
             try:
-                for token in self.llm.stream(prompts.PROMPT_SINTESIS_FINAL.format(
+                for token in self.llm.stream(prompts.prompt_sintesis().format(
                         text_consulta=consulta, informes_precedentes=informes)):
                     sintesis += token
                     yield Evento("token", "sintesis", token)
@@ -565,6 +582,9 @@ class Copiloto:
                 return
             yield log("   ✅ Síntesis generada." if not es_fallo(sintesis) else
                       "   ⚠️ La síntesis parece incompleta; revisa los informes individuales.", "sintesis")
+        balance = balance_para_defensa(precedentes)
+        if balance and config.PROMPT_SINTESIS_VERSION == "v11":
+            sintesis = balance + "\n\n" + sintesis.strip()
         yield Evento("paso_fin", "sintesis")
 
         resultado = Resultado(consulta, clasif.tipo, entidades, clasif.tabla, modo, precedentes, sintesis.strip(),

@@ -147,6 +147,10 @@ FICHA_MODO = _env("COPILOTO_FICHA_MODO", "json")
 QC2_MODO = _env("COPILOTO_QC2_MODO", "determinista")
 # Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
 PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
+# Síntesis (paso 5). En una consulta real, la v10 leyó al revés un precedente que confirmó la vinculación pese a
+# impugnarse el reconocimiento por fotografía y concluyó que "es probable que la apelación tenga éxito". v11: dice
+# quién apeló y qué resolvió la Sala, separa precedentes a favor y en contra del argumento, y no predice resultados.
+PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v11")
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
 # queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".
