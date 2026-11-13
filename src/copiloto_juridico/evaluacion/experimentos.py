@@ -31,11 +31,10 @@ import pandas as pd
 
 from .. import config, prompts
 from ..clasificador import COMPONENTES, PENALIZACIONES, PesosClasificador, puntuar
-from ..fichas import (coincide_texto, datos_penales, extraer_articulos, f1_conjuntos, normalizar,
-                      normalizar_sentido, parsear_campos)
+from ..fichas import coincide_texto, datos_penales, extraer_articulos, f1_conjuntos, normalizar_sentido
 from . import metricas as m
 from .conjuntos import Consulta
-from .reporte import Corrida, fmt_ic
+from .reporte import Corrida
 
 # --------------------------------------------------------------------------------------------------------------
 # Utilidades de métricas por consulta
@@ -1084,6 +1083,3 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
         corrida.extra["vram_pico_embeddings_gb"] = round(torch.cuda.max_memory_allocated() / 1e9, 2)
     return corrida
 
-
-def fmt(r: dict) -> str:  # reexport de conveniencia
-    return fmt_ic(r)

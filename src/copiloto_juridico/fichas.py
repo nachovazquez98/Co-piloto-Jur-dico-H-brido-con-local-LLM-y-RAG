@@ -11,7 +11,6 @@ import re
 import unicodedata
 
 SENTIDOS = ("CONFIRMA", "MODIFICA", "REVOCA", "REPONE", "OTRO")
-CALIFICACIONES_AGRAVIOS = ("FUNDADOS", "INFUNDADOS", "INOPERANTES")
 DATO_NO_DISPONIBLE = "[DATO NO DISPONIBLE]"
 
 _RE_CAMPO = re.compile(r"^\s*[-*•]?\s*\*\*(?P<campo>[^*]+?)\s*:?\s*\*\*\s*:?\s*(?P<valor>.*)$")

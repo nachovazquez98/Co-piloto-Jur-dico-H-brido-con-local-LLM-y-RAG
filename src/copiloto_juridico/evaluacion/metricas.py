@@ -38,19 +38,6 @@ def precision_at_k(relevancias: Sequence[float], k: int, umbral: float = 1) -> f
     return sum(1 for r in list(relevancias)[:k] if r >= umbral) / k
 
 
-def recall_at_k(relevancias: Sequence[float], k: int, num_relevantes: int, umbral: float = 1) -> float:
-    """Recall@k: fracción de *todos* los documentos relevantes que existen que aparecen en los k primeros.
-
-    Requiere saber cuántos relevantes hay en total (`num_relevantes`). Con "documento conocido" hay uno solo y
-    Recall@k coincide con Hit@k. Con relevancia por tipo puede haber hasta 30 relevantes, así que el valor
-    máximo alcanzable es k/30: hay que leerlo con esa cota en mente.
-    """
-    if num_relevantes <= 0:
-        return 0.0
-    encontrados = sum(1 for r in list(relevancias)[:k] if r >= umbral)
-    return min(1.0, encontrados / num_relevantes)
-
-
 def hit_at_k(relevancias: Sequence[float], k: int, umbral: float = 1) -> float:
     """Hit@k: 1 si al menos un documento relevante aparece en los k primeros, 0 si no.
 
@@ -74,18 +61,6 @@ def reciprocal_rank(relevancias: Sequence[float], umbral: float = 1) -> float:
     """
     rango = rango_primer_acierto(relevancias, umbral)
     return 1.0 / rango if rango else 0.0
-
-
-def mrr(rangos: Sequence[int | None]) -> float:
-    """MRR (Mean Reciprocal Rank): promedio entre consultas de 1 / rango del primer acierto.
-
-    `rangos` trae, por consulta, la posición del primer acierto (empezando en 1) o None si no apareció.
-    Ejemplo del informe: rangos [1, 3, None, 2] -> (1 + 1/3 + 0 + 1/2) / 4 = 0.458, es decir, en promedio el
-    primer acierto aparece cerca del segundo lugar.
-    """
-    if not rangos:
-        return 0.0
-    return sum(1.0 / r if r else 0.0 for r in rangos) / len(rangos)
 
 
 def dcg_at_k(relevancias: Sequence[float], k: int) -> float:
@@ -115,17 +90,6 @@ def ndcg_at_k(relevancias: Sequence[float], k: int, ideales: Sequence[float] | N
 # --------------------------------------------------------------------------------------------------------------
 # Clasificación multiclase
 # --------------------------------------------------------------------------------------------------------------
-
-
-def accuracy_top_k(verdaderos: Sequence[Hashable], rankings: Sequence[Sequence[Hashable]], k: int = 1) -> float:
-    """Exactitud top-k: fracción de casos cuya clase verdadera está entre las k primeras predichas.
-
-    Con k = 1 es la exactitud usual. Con k = 3 es el "Hit@3 de categoría": como el filtro estricto usa las
-    3 primeras categorías, si la correcta queda fuera ninguna etapa posterior puede recuperarla.
-    """
-    if not verdaderos:
-        return 0.0
-    return sum(1 for v, r in zip(verdaderos, rankings) if v in list(r)[:k]) / len(verdaderos)
 
 
 def matriz_confusion(verdaderos: Sequence[Hashable], predichos: Sequence[Hashable],

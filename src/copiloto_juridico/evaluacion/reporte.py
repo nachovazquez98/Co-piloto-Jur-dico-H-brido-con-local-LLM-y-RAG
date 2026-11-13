@@ -67,11 +67,6 @@ def _limpio(v):
     return v
 
 
-def fmt_ic(r: dict) -> str:
-    """'0.83 [0.61, 0.94]' a partir de {valor, ic_inf, ic_sup}."""
-    return f"{r['valor']:.3f} [{r['ic_inf']:.3f}, {r['ic_sup']:.3f}]"
-
-
 @dataclass
 class Corrida:
     comando: str

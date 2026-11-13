@@ -166,6 +166,3 @@ def cargar_familias(tipos: list[str], path: Path = config.FAMILIAS_CSV) -> dict[
     revisado = _leer_csv(str(path), path.stat().st_mtime) if path.exists() else {}
     return {t: revisado.get(t) or asignar_familia(t).familia for t in tipos}
 
-
-def familia_de(tipo: str, path: Path = config.FAMILIAS_CSV) -> str:
-    return cargar_familias([tipo], path)[tipo]

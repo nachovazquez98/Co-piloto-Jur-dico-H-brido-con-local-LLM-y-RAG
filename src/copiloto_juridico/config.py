@@ -38,7 +38,6 @@ CORPUS_DIR = DATA_DIR / "corpus"          # Texto limpio de las sentencias (vers
 INDICE_DIR = DATA_DIR / "indice"          # Embeddings precalculados (versionados en git)
 RAW_PDF_DIR = Path(_env("COPILOTO_PDF_DIR", str(DATA_DIR / "raw" / "pdfs")))  # PDFs descargados (no versionados)
 CHROMA_DIR = Path(_env("COPILOTO_CHROMA_DIR", str(DATA_DIR / "chroma")))       # DB vectorial local (se reconstruye)
-CACHE_DIR = DATA_DIR / "cache"
 
 # --- Evaluación (v11) ---
 EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))

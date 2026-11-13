@@ -80,7 +80,6 @@ class SentenciasStore:
         self.collection = self._abrir_chroma(chunks, emb, log)
         log("Construyendo índice léxico BM25...")
         self.doc_ids = self.corpus["id"].to_numpy()
-        self.doc_pos = {d: i for i, d in enumerate(self.doc_ids)}
         self.doc_tipos = self.corpus["tipo"].to_numpy()
         self.doc_materias = self.corpus["materia"].to_numpy()
         self.bm25 = BM25(self.corpus["texto"].tolist())
