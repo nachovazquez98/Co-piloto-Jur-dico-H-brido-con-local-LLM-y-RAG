@@ -362,6 +362,26 @@ def ngramas_compartidos(consulta: str, texto_fuente: str, n: int = N_GRAMA_FUGA)
     return sorted(grams_q & grams_d)
 
 
+_MESES = "enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre"
+_RE_DETALLE = re.compile(rf"\b\d{{1,2}} de (?:{_MESES})(?: de \d{{4}})?|\b(?:19|20)\d{{2}}\b|\b\d{{3,}}\b"
+                         r"|\b(?:\d+|un|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+(?:años?|meses|días)\b",
+                         re.IGNORECASE)
+
+
+def detalles_identificables(consulta: str) -> list[str]:
+    """Fechas, años, números largos y duraciones de pena ("28 de junio de 2024", "tres años de prisión"): con ellos
+    la consulta apunta a una sola sentencia aunque no copie frases, y la búsqueda se vuelve trivial. Una edad
+    ("una menor de 14 años") describe el caso sin identificarlo y no cuenta."""
+    salida = []
+    for m in _RE_DETALLE.finditer(consulta):
+        despues = consulta[m.end():m.end() + 30].lower()
+        es_edad = consulta[max(0, m.start() - 3):m.start()].lower() == "de " and "años" in m.group(0).lower()
+        if es_edad and not re.search(r"prisi|intern|c[aá]rcel|condena|pena", despues):
+            continue
+        salida.append(m.group(0))
+    return salida
+
+
 def verificar_fuga(consultas: list[Consulta], corpus: pd.DataFrame, n: int = N_GRAMA_FUGA) -> dict[str, list[str]]:
     """{consulta_id: n-gramas compartidos} para las consultas con fuga (vacío si no hay ninguna)."""
     textos = corpus.set_index("id")["texto"]

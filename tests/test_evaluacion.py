@@ -408,3 +408,14 @@ def test_resultado_para_defensa():
     assert r("Asesor jurídico de la víctima", "MODIFICA") == "parcialmente desfavorable"
     assert r("el imputado y el fiscal", "CONFIRMA") is None  # apelaron ambos
     assert r("Defensa", "OTRO") is None and r("[DATO NO DISPONIBLE]", "CONFIRMA") is None
+
+
+def test_detalles_identificables():
+    from copiloto_juridico.evaluacion.conjuntos import detalles_identificables as d
+
+    assert d("en la audiencia del 28 de junio de 2024 lo condenaron a tres años de prisión") == [
+        "28 de junio de 2024", "tres años"]
+    assert d("la carpeta 52192024") == ["52192024"]
+    assert d("Mi cliente fue detenido sin orden y apelo la vinculación a proceso") == []
+    assert d("abusó de una menor de 14 años") == []
+    assert d("le impusieron una pena de 8 años de prisión") == ["8 años"]

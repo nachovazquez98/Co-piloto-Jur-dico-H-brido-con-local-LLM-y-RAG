@@ -14,7 +14,9 @@ archivo tal como quede.
 Son borradores escritos por el LLM a partir de cada sentencia (comando `borradores`). Para cada línea:
 
 - Léela como defensor: ¿así describirías tu caso? Corrige lo que haga falta.
-- No debe copiar frases de la sentencia ni nombrar el delito tal como lo etiqueta el portal (`validar` lo comprueba).
+- No debe copiar frases de la sentencia, nombrar el delito tal como lo etiqueta el portal ni traer fechas, años,
+  cifras o duraciones de pena que identifiquen la sentencia (`validar` lo comprueba). Las líneas con
+  "ATENCIÓN" en `notas` tienen alguno de estos problemas.
 - Cambia `"revisado": false` por `"revisado": true`.
 
 Las líneas `S…` (`sin_respuesta: true`) son temas sin sentencias en el corpus; sirven para medir si el sistema lo

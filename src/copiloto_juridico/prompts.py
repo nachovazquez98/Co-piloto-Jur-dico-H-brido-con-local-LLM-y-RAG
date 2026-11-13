@@ -604,13 +604,16 @@ def prompts_para(materia: str) -> tuple[str, str]:
 # --- Solo para la evaluación: borrador de consulta a partir de una sentencia (lo revisa una persona) ---
 PROMPT_BORRADOR_CONSULTA = """
 Eres un defensor penal en Jalisco. A partir del extracto de una sentencia de segunda instancia, escribe la consulta
-que harías a un buscador de precedentes ANTES de conocer esa sentencia: describe en 2 a 4 frases los hechos del
-caso y el problema procesal que te interesa (qué se apela y por qué), en tus propias palabras.
+que harías a un buscador de precedentes sobre TU caso, ANTES de conocer esa sentencia: en 2 a 4 frases, en primera
+persona ("Mi cliente...", "Represento a..."), cuenta los hechos y qué resolución quieres apelar y por qué.
+Si en la sentencia apeló el Ministerio Público o la víctima, escribe como el defensor que contesta esa apelación.
 
 Reglas obligatorias:
+- Describe un caso, no hagas preguntas generales ("¿Qué sucede cuando...?").
 - NO copies frases del extracto (nunca más de 5 palabras seguidas iguales).
 - NO escribas el nombre técnico del delito tal como aparece en la sentencia; describe la conducta.
-- NO incluyas nombres, números de toca, fechas ni el resultado de la apelación.
+- NO incluyas nombres, números de toca o carpeta, fechas, años, cantidades exactas, años o meses de pena, ni el
+  resultado de la apelación.
 Responde ÚNICAMENTE con el texto de la consulta.
 
 Extracto de la sentencia:
@@ -621,7 +624,8 @@ Consulta:
 
 PROMPT_BORRADOR_SIN_RESPUESTA = """
 Eres un defensor penal en Jalisco. Escribe en 2 a 4 frases la consulta que harías a un buscador de precedentes sobre
-este tema: "{tema}". Describe un caso concreto y verosímil (hechos y qué resolución quieres apelar), sin nombres.
+este tema: "{tema}". En primera persona ("Mi cliente..."), describe un caso concreto y verosímil (hechos y qué
+resolución quieres apelar), sin nombres, fechas, años ni cantidades exactas.
 Responde ÚNICAMENTE con el texto de la consulta.
 
 Consulta:

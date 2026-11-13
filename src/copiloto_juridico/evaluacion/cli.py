@@ -140,7 +140,7 @@ def cmd_hojas(args) -> None:
 def cmd_validar(args) -> None:
     from ..datos.corpus import load_corpus
     from .conjuntos import (ErrorValidacion, acuerdo_entre_anotadores, cargar_consultas, cargar_juicios,
-                            nombre_tipo_en_consulta, verificar_fuga)
+                            detalles_identificables, nombre_tipo_en_consulta, verificar_fuga)
     from .familias import cargar_familias
 
     corpus = load_corpus()
@@ -162,6 +162,8 @@ def cmd_validar(args) -> None:
     for c in consultas:
         if nombre_tipo_en_consulta(c):
             _log(f"⚠️ {c.id} menciona literalmente el nombre del tipo ({c.tipo}); facilita la clasificación.")
+        if detalles := detalles_identificables(c.consulta):
+            _log(f"⚠️ {c.id} trae datos que identifican la sentencia ({', '.join(detalles[:3])}); quítalos.")
     try:
         juicios = cargar_juicios(config.JUICIOS_PATH, {c.id for c in consultas})
     except ErrorValidacion as e:

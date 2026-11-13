@@ -16,7 +16,7 @@ import pandas as pd
 
 from .. import config, prompts
 from ..clasificador import etiqueta_tipo
-from .conjuntos import Consulta, ngramas_compartidos, nombre_tipo_en_consulta
+from .conjuntos import Consulta, detalles_identificables, ngramas_compartidos, nombre_tipo_en_consulta
 
 _RE_RESOLUTIVOS = re.compile(r"r\s?e\s?s\s?u\s?e\s?l\s?v\s?e|p\s?r\s?o\s?p\s?o\s?s\s?i\s?c\s?i\s?o\s?n\s?e\s?s|resolutivos")
 
@@ -41,16 +41,19 @@ def redactar_borradores(plantilla: list[Consulta], textos: pd.Series, llm, n: in
                 c.consulta = _limpiar(llm.generate(prompt))
                 fuga = ngramas_compartidos(c.consulta, texto)
                 nombra = nombre_tipo_en_consulta(c)
-                if not fuga and not nombra:
+                detalles = detalles_identificables(c.consulta)
+                if not fuga and not nombra and not detalles:
                     break
                 problema = (f"copiaba estas frases de la sentencia: «{'», «'.join(fuga[:3])}»" if fuga
-                            else f"usaba el nombre del delito '{etiqueta_tipo(c.tipo)}'")
+                            else f"usaba el nombre del delito '{etiqueta_tipo(c.tipo)}'" if nombra
+                            else f"incluía datos que identifican la sentencia: {', '.join(detalles[:3])}")
                 prompt = (prompts.PROMPT_BORRADOR_CONSULTA.format(extracto=texto[:6000])
                           + f"\n(Tu borrador anterior {problema}. Escríbelo de nuevo, con tus palabras.)\nConsulta:")
             c.extra["intentos"] = intento
-            if fuga or nombra:
-                c.extra["fuga"] = fuga
-                c.notas = "ATENCIÓN: el borrador aún copia frases o nombra el tipo; reescríbelo. " + c.notas
+            if fuga or nombra or detalles:
+                c.extra["fuga"] = fuga + detalles
+                c.notas = ("ATENCIÓN: el borrador aún copia frases, nombra el tipo o trae fechas o cifras; "
+                           "reescríbelo. " + c.notas)
         log(f"   {c.id}: {c.consulta[:100]}{'  ⚠️' if c.extra.get('fuga') else ''}")
         salida.append(c)
     return salida
@@ -62,9 +65,11 @@ def resumen_sentencia(texto: str, tipo: str, fecha: str) -> str:
     inicio = re.sub(r"\s+", " ", texto[:260]).strip()
     mitad = len(texto) // 2
     marcas = list(_RE_RESOLUTIVOS.finditer(texto, mitad))
-    resol = re.sub(r"\s+", " ", texto[marcas[-1].start():marcas[-1].start() + 260]).strip() if marcas \
-        else "(no se identificaron los resolutivos en el texto disponible)"
-    return f"{etiqueta_tipo(tipo)} · publicada {fecha}\nInicio: {inicio}…\nResolutivos: {resol}…"
+    if marcas:
+        final = "Resolutivos: " + re.sub(r"\s+", " ", texto[marcas[-1].start():marcas[-1].start() + 260]).strip()
+    else:  # sin marca, el final del texto (tras quitar el anexo de testado suelen ser los resolutivos)
+        final = "Final del texto: …" + re.sub(r"\s+", " ", texto[-260:]).strip()
+    return f"{etiqueta_tipo(tipo)} · publicada {fecha}\nInicio: {inicio}…\n{final}…"
 
 
 def hoja_juicios(store, clasificador, consultas: list[Consulta], conceptos: dict[str, str], n_consultas: int = 30,
