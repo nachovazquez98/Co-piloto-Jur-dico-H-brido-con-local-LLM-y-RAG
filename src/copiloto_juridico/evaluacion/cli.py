@@ -16,6 +16,8 @@ Con LLM:
     generacion                       Fichas del conjunto C vs. anotación; CSV para marcar alucinaciones
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
+Análisis (sin LLM):
+    errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 """
 
 from __future__ import annotations
@@ -397,6 +399,20 @@ def cmd_latencia(args) -> None:
     _guardar(experimento_latencia(env, _llm(con_cache=False), max_consultas=args.max, log=_log))
 
 
+def cmd_errores(args) -> None:
+    from ..clasificador import construir_clasificador
+    from ..vectorstore import SentenciasStore
+    from .errores import ejecutar
+
+    store = SentenciasStore(log=lambda _m: None)
+    clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
+    try:
+        escritos = ejecutar(args.corrida, store, clas, log=_log)
+    except (FileNotFoundError, ValueError) as e:
+        sys.exit(f"❌ {e}")
+    _log("Reportes:\n" + "\n".join(f"  {p}" for p in escritos))
+
+
 def main(argv=None) -> None:
     logging.basicConfig(level=logging.WARNING, format="%(message)s")
     p = argparse.ArgumentParser(prog="python -m copiloto_juridico.evaluacion", description=__doc__,
@@ -485,6 +501,10 @@ def main(argv=None) -> None:
     s.add_argument("--n-afirmaciones", type=int, default=100)
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite la corrida (es evaluación final; queda en el reporte)")
     s.set_defaults(func=cmd_generacion)
+
+    s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
+    s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")
+    s.set_defaults(func=cmd_errores)
 
     args = p.parse_args(argv)
     args.func(args)

@@ -897,7 +897,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
         corrida.advertir("No hay pares juzgados (juicios.csv) para las consultas de esta partición: QC_1 por medir.")
     else:
         embs: dict[str, np.ndarray] = {}
-        filas = []
+        filas, detalle = [], []
         humano = [rel >= 1 for _, _, rel in pares]
         for variante in variantes:
             log(f"QC_1 ({variante}) sobre {len(pares)} pares...")
@@ -916,12 +916,17 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
                     log(f"   {i}/{len(pares)}")
             r = resumen_binario(humano, sistema)
             filas.append(_filas_qc(f"QC_1 · {variante}", r, r["VP"], r["VP"] + r["FN"]))
+            detalle += [{"variante": variante, "consulta": cid, "doc_id": d, "relevancia": rel,
+                         "veredicto": "—" if v is None else ("SI" if v else "NO")}
+                        for (cid, d, rel), v in zip(pares, sistema)]
         corrida.tabla(
             "QC_1 (relevancia) contra el juicio humano",
             "Positivo = QC_1 deja pasar el documento. Recall = fracción de documentos relevantes que conserva (lo que "
             "falta son descartes injustos; es el criterio principal para la defensa). Los veredictos no "
             "interpretables cuentan como SI (así se comporta la app) y su tasa se reporta aparte.",
             pd.DataFrame(filas))
+        corrida.tabla("Veredictos de QC_1 por par", "Lo usa el comando `errores` (descartes de pares relevantes).",
+                      pd.DataFrame(detalle), diagnostico=True)
 
     fichas = [f for f in cargar_fichas_anotadas() if f.get("consulta_id") in consultas and "ficha_aceptable" in f]
     if not fichas:
@@ -976,16 +981,22 @@ def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callab
         b = buscar_candidatos(store, clasificador, e.texto, conceptos_para(e.texto, "v11", cache), q,
                               config.RAG_NUM_RESULTS_DESIRED)
         pares += [(e, q, c) for c, _ in b.candidatos[:k]]
-    filas = []
+    filas, detalle = [], []
     for version in ("v10", "v11"):
         for contexto in ("inicio", "fragmento_similar"):
             log(f"   QC_1 {version} · {contexto} ({len(pares)} pares)...")
             veredictos: dict[str, list] = {}
+            app = version == config.PROMPT_QC1_VERSION and contexto == config.QC1_CONTEXTO
             for e, q, c in pares:
                 frag = (store.fragmento_mas_similar(c.doc_id, q, config.QC1_MAX_CHARS) if contexto == "fragmento_similar"
                         else c.texto[:config.QC1_MAX_CHARS])
                 resp = llm.generate(prompts.prompt_qc1(version).format(texto_consulta=e.texto, fragmento_documento=frag))
                 veredictos.setdefault(e.etiqueta, []).append(parse_veredicto(resp))
+                if app:  # para `errores`: qué candidato descartó la configuración de la app
+                    v = veredictos[e.etiqueta][-1]
+                    detalle.append({"ejemplo": e.etiqueta, "posición": len(veredictos[e.etiqueta]),
+                                    "doc_id": c.doc_id, "tipo": c.tipo,
+                                    "veredicto": "—" if v is None else ("SI" if v else "NO")})
             todos = [v for vs in veredictos.values() for v in vs]
             filas.append({"prompt QC_1": version, "contexto": contexto, "pares": len(todos),
                           "descartados (NO)": sum(v is False for v in todos) / len(todos),
@@ -997,6 +1008,9 @@ def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callab
                   f"Para los {k} primeros candidatos de cada uno de los 16 ejemplos penales. Solo diagnóstico: un "
                   "descarte puede ser correcto o injusto; la calidad se mide con `qc` contra juicios humanos.",
                   pd.DataFrame(filas), diagnostico=True)
+    corrida.tabla("Veredictos de QC_1 por candidato (configuración de la app)",
+                  f"Prompt {config.PROMPT_QC1_VERSION} · contexto {config.QC1_CONTEXTO}. Lo usa el comando `errores`.",
+                  pd.DataFrame(detalle), diagnostico=True)
     return corrida
 
 

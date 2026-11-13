@@ -97,6 +97,15 @@ def metadatos_de_sentencia(texto: str, inicio: int = 5000) -> dict[str, str]:
     return {"acto_impugnado": acto, "apelante": apelante, "sentido": sentido_por_reglas(texto) or NO_DETERMINADO}
 
 
+def toca_de(texto: str) -> str:
+    """Número de toca del encabezado ("toca penal 58/2025"; la extracción suele perder la diagonal); "" si no está."""
+    m = re.search(r"toca[^0-9]{0,40}?(\d[\d ]{1,10}\d)", texto[:3000])
+    if not m:
+        return ""
+    n = m.group(1).replace(" ", "")
+    return f"{n[:-4]}/{n[-4:]}" if len(n) > 4 and n[-4:-2] in ("19", "20") else n
+
+
 def acto_de_consulta(consulta: str) -> str | None:
     """Acto impugnado que describe la consulta del abogado ("me vincularon a proceso", "prisión preventiva"); None
     si no menciona ninguno de los actos reconocidos."""

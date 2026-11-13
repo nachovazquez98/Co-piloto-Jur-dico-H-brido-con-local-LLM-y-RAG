@@ -143,6 +143,7 @@ def cmd_redescarga(args) -> None:
 
     from .datos.corpus import load_corpus
     from .evaluacion.familias import cargar_familias, etiqueta_familia
+    from .metadatos import toca_de
 
     corpus = load_corpus()
     penal = corpus[corpus["materia"] == "penal"].copy()
@@ -151,17 +152,10 @@ def cmd_redescarga(args) -> None:
     por_familia = penal["familia"].value_counts()
     faltan = penal[penal["texto"].str.contains("págs? omitidas?", regex=True)].copy()
 
-    def toca(texto: str) -> str:
-        m = re.search(r"toca[^0-9]{0,40}?(\d[\d ]{1,10}\d)", texto[:3000])
-        if not m:
-            return ""
-        n = m.group(1).replace(" ", "")
-        return f"{n[:-4]}/{n[-4:]}" if len(n) > 4 and n[-4:-2] in ("19", "20") else n
-
     filas = pd.DataFrame({
         "id": faltan["id"], "fecha": faltan["fecha"], "tipo": faltan["tipo"],
         "familia": faltan["familia"].map(etiqueta_familia), "sentencias_familia": faltan["familia"].map(por_familia),
-        "toca": faltan["texto"].map(toca),
+        "toca": faltan["texto"].map(toca_de),
         "paginas_omitidas": faltan["texto"].map(lambda t: sum(map(int, re.findall(r"(\d+) págs? omitidas?", t)))),
         "enlace": ""})  # el corpus vino de una base anterior sin el id de la API: se busca por toca y fecha
     filas = filas.sort_values(["sentencias_familia", "familia", "fecha", "id"])
