@@ -1202,35 +1202,52 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
 # --------------------------------------------------------------------------------------------------------------
 
 
+CAMPOS_TEXTO_FICHA = ["tribunal", "fecha_resolucion", "identificador", "etapa_procesal", "acto_impugnado", "apelante",
+                      "delitos", "hechos_clave", "decision", "resumen"]
+CAMPOS_LISTA_FICHA = ["agravios", "fundamento_legal", "pruebas_decisivas"]
+
+
+def indicadores_fichas(t: pd.DataFrame) -> dict:
+    """Conteos sin anotación de una tabla de fichas (formato de `fichas_precalculadas`): JSON válido, reintentos,
+    sentido LLM vs. reglas, artículos no encontrados y "dato no disponible" (campos de texto y listas vacías)."""
+    from ..fichas import DATO_NO_DISPONIBLE, FichaPenal, extraer_articulos
+
+    validas = t[t["json_valido"].astype(bool)]
+    fichas = [FichaPenal.desde_guardada(j) for j in validas["ficha"]]
+    ambos = validas.dropna(subset=["sentido_llm", "sentido_reglas"])
+    faltan = [len(json.loads(a)) for a in validas["articulos_no_encontrados"]]
+    vacios = {c: sum(getattr(f, c) == DATO_NO_DISPONIBLE for f in fichas) for c in CAMPOS_TEXTO_FICHA}
+    vacios.update({c: sum(not getattr(f, c) for f in fichas) for c in CAMPOS_LISTA_FICHA})
+    return {"n": len(t), "validas": len(validas), "reintento": int((validas["intentos"] > 1).sum()),
+            "con_reglas": int(validas["sentido_reglas"].notna().sum()), "ambos": len(ambos),
+            "coinciden": int((ambos["sentido_llm"] == ambos["sentido_reglas"]).sum()),
+            "fichas_con_faltan": sum(f > 0 for f in faltan), "faltan": sum(faltan),
+            "citados": sum(len(extraer_articulos(f.campos_markdown())) for f in fichas),
+            "vacios_por_campo": vacios, "vacios": sum(vacios.values()),
+            "campos": len(fichas) * len(vacios), "sentido_otro": sum(f.sentido_fallo == "OTRO" for f in fichas),
+            "segundos": t["segundos"].tolist(), "cruce": ambos[["sentido_llm", "sentido_reglas"]], "fichas": fichas}
+
+
 def diagnostico_fichas(tabla: pd.DataFrame, version: str) -> Corrida:
     """Qué tan confiables parecen las fichas precalculadas, SIN anotación humana: concordancia del sentido del
     fallo entre el LLM y los resolutivos (reglas), artículos citados que no aparecen en la sentencia, JSON inválido
     tras el reintento y "dato no disponible" por campo. No mide exactitud: dice dónde mirar primero al anotar."""
-    from ..fichas import DATO_NO_DISPONIBLE, FichaPenal, extraer_articulos
-
     corrida = Corrida("fichas-diagnostico", parametros={"version_ficha": version})
     t = tabla[tabla["version"] == version]
-    n = len(t)
-    validas = t[t["json_valido"]]
-    fichas = [FichaPenal.desde_guardada(j) for j in validas["ficha"]]
-    ambos = validas.dropna(subset=["sentido_llm", "sentido_reglas"])
-    citados = [len(extraer_articulos(f.campos_markdown())) for f in fichas]
-    faltan = [len(json.loads(a)) for a in validas["articulos_no_encontrados"]]
+    i = indicadores_fichas(t)
+    n, ambos, fichas = i["n"], i["cruce"], i["fichas"]
     p = lambda k, d: f"{k}/{d} ({k / d:.1%})" if d else "—"  # noqa: E731
     corrida.tabla("Resumen", "Diagnóstico sin anotación: un desacuerdo o un artículo ausente no es necesariamente un "
                   "error del LLM (las reglas también fallan y hay sentencias con páginas omitidas).", pd.DataFrame([
                       {"indicador": "Fichas de esta versión", "valor": str(n)},
-                      {"indicador": "JSON inválido tras el reintento", "valor": p(n - len(validas), n)},
-                      {"indicador": "Necesitaron reintento (y quedaron válidas)",
-                       "valor": p(int((validas["intentos"] > 1).sum()), len(validas))},
-                      {"indicador": "Sentido leído por reglas (cobertura)",
-                       "valor": p(int(validas["sentido_reglas"].notna().sum()), len(validas))},
-                      {"indicador": "Sentido LLM = reglas (donde hay ambos)",
-                       "valor": p(int((ambos["sentido_llm"] == ambos["sentido_reglas"]).sum()), len(ambos))},
+                      {"indicador": "JSON inválido tras el reintento", "valor": p(n - i["validas"], n)},
+                      {"indicador": "Necesitaron reintento (y quedaron válidas)", "valor": p(i["reintento"], i["validas"])},
+                      {"indicador": "Sentido leído por reglas (cobertura)", "valor": p(i["con_reglas"], i["validas"])},
+                      {"indicador": "Sentido LLM = reglas (donde hay ambos)", "valor": p(i["coinciden"], i["ambos"])},
                       {"indicador": "Fichas con algún artículo no encontrado en la sentencia",
-                       "valor": p(sum(f > 0 for f in faltan), len(faltan))},
+                       "valor": p(i["fichas_con_faltan"], i["validas"])},
                       {"indicador": "Artículos citados no encontrados en la sentencia",
-                       "valor": p(sum(faltan), sum(citados))},
+                       "valor": p(i["faltan"], i["citados"])},
                       {"indicador": "Segundos por ficha (p50 / p95)",
                        "valor": " / ".join(f"{v:.0f}" for v in m.percentiles(t["segundos"].tolist()).values()) if n else "—"},
                   ]), diagnostico=True)
@@ -1239,14 +1256,8 @@ def diagnostico_fichas(tabla: pd.DataFrame, version: str) -> Corrida:
         corrida.tabla("Sentido del fallo: LLM (filas) vs. resolutivos por reglas (columnas)",
                       "La diagonal son coincidencias.", cruce.rename(columns={"sentido_llm": "LLM \\ reglas"}),
                       diagnostico=True)
-    campos = ["tribunal", "fecha_resolucion", "identificador", "etapa_procesal", "acto_impugnado", "apelante",
-              "delitos", "hechos_clave", "decision", "resumen"]
-    filas = [{"campo": c, "dato no disponible": p(sum(getattr(f, c) == DATO_NO_DISPONIBLE for f in fichas), len(fichas))}
-             for c in campos]
-    filas += [{"campo": c, "dato no disponible": p(sum(not getattr(f, c) for f in fichas), len(fichas))}
-              for c in ("agravios", "fundamento_legal", "pruebas_decisivas")]
-    filas.append({"campo": "sentido_fallo = OTRO", "dato no disponible": p(sum(f.sentido_fallo == "OTRO" for f in fichas),
-                                                                         len(fichas))})
+    filas = [{"campo": c, "dato no disponible": p(v, len(fichas))} for c, v in i["vacios_por_campo"].items()]
+    filas.append({"campo": "sentido_fallo = OTRO", "dato no disponible": p(i["sentido_otro"], len(fichas))})
     corrida.tabla("Dato no disponible por campo", "Listas: vacías. Un campo muy vacío es el primero a revisar al "
                   "anotar (o el texto lo testó).", pd.DataFrame(filas), diagnostico=True)
     corrida.extra["n_fichas"] = n

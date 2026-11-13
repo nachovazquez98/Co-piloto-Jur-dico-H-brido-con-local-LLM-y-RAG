@@ -51,6 +51,8 @@ CONCEPTOS_CACHE_PATH = EVAL_DIR / "cache" / "conceptos.json"
 RESULTADOS_DIR = EVAL_DIR / "resultados"
 EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
 EVAL_BOOTSTRAP = 1000
+# Modelos de Ollama que compara `evaluacion modelos` (solo los ya instalados; los demás se omiten, no se descargan).
+MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
 
 COLLECTION_NAME = "sentencias_judiciales"
 MATERIAS = ["penal", "civil", "familiar", "mercantil", "laboral"]

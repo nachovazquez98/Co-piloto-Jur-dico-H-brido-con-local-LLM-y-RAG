@@ -16,6 +16,7 @@ Con LLM:
     generacion                       Fichas del conjunto C vs. anotación; CSV para marcar alucinaciones
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
+    modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 """
@@ -399,6 +400,26 @@ def cmd_latencia(args) -> None:
     _guardar(experimento_latencia(env, _llm(con_cache=False), max_consultas=args.max, log=_log))
 
 
+def cmd_modelos(args) -> None:
+    from ..clasificador import construir_clasificador
+    from ..vectorstore import SentenciasStore
+    from .conjuntos import cargar_fichas_anotadas
+    from .modelos import comparar
+    from .reporte import Corrida
+
+    anotadas = cargar_fichas_anotadas()
+    previo = Corrida("modelos")
+    # con el conjunto C anotado, la comparación toca la hoja de evaluación final: una vez por congelado
+    _control(previo, "prueba" if anotadas else None, "modelos", args.forzar)
+    store = SentenciasStore(log=lambda _m: None)
+    clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
+    corrida = comparar(store, clas, args.modelos or config.MODELOS_COMPARACION, args.max, args.fichas, anotadas,
+                       log=_log)
+    corrida.advertencias[:0] = previo.advertencias
+    corrida.extra.update(previo.extra)
+    _guardar(corrida)
+
+
 def cmd_errores(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -501,6 +522,13 @@ def main(argv=None) -> None:
     s.add_argument("--n-afirmaciones", type=int, default=100)
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite la corrida (es evaluación final; queda en el reporte)")
     s.set_defaults(func=cmd_generacion)
+
+    s = sub.add_parser("modelos", help="Compara los modelos de Ollama ya instalados (no descarga ninguno)")
+    s.add_argument("--max", type=int, default=10, help="Ejemplos penales para la latencia")
+    s.add_argument("--fichas", type=int, default=20, help="Sentencias penales (las mismas para cada modelo)")
+    s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
+    s.add_argument("--forzar", metavar="MOTIVO", help="Repite la comparación contra el conjunto C anotado")
+    s.set_defaults(func=cmd_modelos)
 
     s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
     s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")
