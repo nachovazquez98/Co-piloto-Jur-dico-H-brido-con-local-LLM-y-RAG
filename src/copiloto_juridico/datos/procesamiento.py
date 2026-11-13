@@ -197,6 +197,22 @@ _RE_ENCABEZADO = re.compile("|".join([
 _RE_EXPEDIENTE = re.compile(r"\b(?:toca(?: penal| de juicio oral electr[oó]nico| juicio oral| tradicional)?"
                             r"|carpeta administrativa(?: digitalizada)?|carpeta de investigaci[oó]n|causa penal"
                             r"|averiguaci[oó]n previa)\s?\.?\s?(?:no\.\s?)?[\w./-]*\d[\w./-]*", re.IGNORECASE)
+# Resto del encabezado "supremo tribunal de justicia del estado de jalisco" cuando la extracción intercala el número
+# de expediente ("... 3592025 de justicia en el estado de jalisco"), y el de las salas con número de página
+# ("décima tribunal de justicia del estado sistema acusatorio adversarial", "tribunal de justicia del estado 81").
+# No se toca "procuraduría (general) de justicia del estado de jalisco", que sí es texto.
+_RE_RESTO_ENCABEZADO = re.compile(
+    r"(?P<previa>\b[a-záéíóúñ]+\s)?\bde\s?justicia\s?(?:del|en\s?el)\s?estado\s?de\s?jalisco\b"
+    r"|\btribunal de justicia del estado(?: sistema acusatorio adversarial| \d{1,3}\b)", re.IGNORECASE)
+# Entradas del anexo de testado que quedaron cortadas por una marca de páginas omitidas (sin "lgppicr" al final).
+_RE_ANEXO_CORTADO = re.compile(r"(?:exp\.\s?)?\[eliminado\]\s?(?:[a-záéíóúñ]+\s)?en \d+ renglon(?:es)? por ser un dato "
+                               r"identificativo(?: de conformidad con el lineamiento(?: [a-záéíóúñ]+){0,3})?")
+# Encabezado repetido seguido (3 veces o más), con o sin número de página: "décima prime ra sala en mate ria penal 80
+# décima prime ra sala en mate ria penal 81 ...". Se deja una vez. No se aplica a listas de "[eliminado]".
+_RE_REPETIDO_SEGUIDO = re.compile(r"(?P<frase>(?:[^\s\[\]]+ ){1,10}?[^\s\[\]\d]{3,})(?: \d{1,4})?"
+                                  r"(?: (?P=frase)(?: \d{1,4})?){2,}")
+# Marcas de páginas omitidas seguidas (tras quitar el ruido entre ellas) se unen en una sola, sumando las páginas.
+_RE_OMITIDAS_SEGUIDAS = re.compile(r"\.\.\. \d+ págs omitidas \.\.\.(?: \.\.\. \d+ págs omitidas \.\.\.)+")
 # Palabras deletreadas por la maquetación: "r e s u e l v e" -> "resuelve" (4 o más letras sueltas seguidas).
 _RE_DELETREADA = re.compile(r"\b(?:[a-záéíóúñ] ){3,}[a-záéíóúñ]\b")
 
@@ -243,14 +259,28 @@ def _quitar_expedientes_repetidos(texto: str, minimo: int = 3) -> str:
     return _RE_EXPEDIENTE.sub(_sub, texto) if repetidas else texto
 
 
+def _resto_encabezado(m: re.Match) -> str:
+    previa = m.group("previa") or ""
+    return m.group(0) if previa.lower().startswith(("procura", "general")) else previa + " "
+
+
+def _sumar_omitidas(m: re.Match) -> str:
+    return f"... {sum(map(int, re.findall(r'(\d+) págs', m.group(0))))} págs omitidas ..."
+
+
 def _limpiar_una_vez(t: str) -> str:
     t = quitar_anexo_testado(t)
     t = _RE_ETIQUETA.sub("[eliminado]", t)
     t = re.sub(r"\s+", " ", t)
     t = _RE_DELETREADA.sub(lambda m: m.group(0).replace(" ", ""), t)
     t = _RE_ENCABEZADO.sub(" ", t)
+    t = _RE_RESTO_ENCABEZADO.sub(_resto_encabezado, t)
+    t = _RE_ANEXO_CORTADO.sub(" ", t)
     t = _quitar_expedientes_repetidos(t)
-    return re.sub(r"\s+", " ", t).strip()
+    t = re.sub(r"\s+", " ", t)
+    t = _RE_REPETIDO_SEGUIDO.sub(lambda m: m.group("frase"), t)
+    t = _RE_OMITIDAS_SEGUIDAS.sub(_sumar_omitidas, t)
+    return t.strip()
 
 
 def limpiar_texto(texto: str) -> str:

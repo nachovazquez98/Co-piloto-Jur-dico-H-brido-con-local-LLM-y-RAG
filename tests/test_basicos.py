@@ -94,6 +94,24 @@ def test_limpiar_texto_encabezados_con_palabras_partidas():
     assert limpiar_texto(etiquetas) == "la víctima [eliminado] , con domicilio [eliminado] y [eliminado] declaró"
 
 
+def test_limpiar_texto_restos_de_encabezado_y_colas_repetidas():
+    """Fragmentos reales del corpus (v11.1): resto del encabezado del tribunal intercalado con el expediente,
+    entradas del anexo cortadas por páginas omitidas y el encabezado de la sala repetido al final."""
+    from copiloto_juridico.datos.procesamiento import limpiar_texto
+
+    assert limpiar_texto("oral electrónico 3592025 de justicia en el estado de jalisco por su nombre") == \
+        "oral electrónico 3592025 por su nombre"
+    assert limpiar_texto("la procuraduría general de justicia del estado de jalisco informó") == \
+        "la procuraduría general de justicia del estado de jalisco informó"
+    assert limpiar_texto("fin. ... 6 págs omitidas ... exp. [eliminado] en 1 renglones por ser un dato identificativo "
+                         "de conformidad con el lineamiento quincuagésimo ... 2 págs omitidas ... sigue") == \
+        "fin. ... 8 págs omitidas ... sigue"
+    cola = " ".join(f"décima prime ra sala en mate ria penal {n}" for n in range(80, 90))
+    assert limpiar_texto("se confirma. " + cola) == "se confirma. décima prime ra sala en mate ria penal"
+    victimas = "las víctimas [eliminado] , [eliminado] , [eliminado] declararon"
+    assert limpiar_texto(victimas) == victimas  # las listas de datos testados no son encabezados
+
+
 def test_recortar_contexto_conserva_agravios():
     relleno = "texto sin interés. " * 2000
     agravios = "el primer agravio es infundado; el segundo agravio es fundado. " * 20
