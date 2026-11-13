@@ -1,0 +1,235 @@
+{
+  "comando": "latencia",
+  "fecha": "2026-11-13T11:24:40",
+  "commit": "fb1f3fe",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "consultas": "ejemplos penales de la app",
+    "ficha": "json",
+    "qc2": "determinista",
+    "max_consultas": 16
+  },
+  "corpus_fingerprint": "bea10929ce634a58",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Sin congelado: corrida de desarrollo no atada a una versión."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CONSULTAS_REALES_PATH": "evaluacion/consultas_reales.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PILOTO_JUICIOS_PATH": "evaluacion/piloto_juicios.csv",
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "vram_pico_embeddings_gb": 1.5,
+  "congelado": null,
+  "tablas": {
+    "Latencia (segundos)": {
+      "descripcion": "p50 = experiencia típica; p95 = la peor razonable.",
+      "columnas": [
+        "etapa",
+        "n",
+        "p50",
+        "p95"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "etapa": "Extracción de conceptos clave",
+          "n": 16,
+          "p50": 0.863131046295166,
+          "p95": 1.1659082174301147
+        },
+        {
+          "etapa": "Clasificación híbrida de la consulta",
+          "n": 16,
+          "p50": 0.18478155136108398,
+          "p95": 0.21825313568115234
+        },
+        {
+          "etapa": "Búsqueda adaptativa de precedentes",
+          "n": 16,
+          "p50": 1.2040138244628906e-05,
+          "p95": 1.5497207641601562e-05
+        },
+        {
+          "etapa": "Análisis de precedentes (verificación, extracción e informe)",
+          "n": 16,
+          "p50": 13.56545901298523,
+          "p95": 25.078735172748566
+        },
+        {
+          "etapa": "Síntesis comparativa final",
+          "n": 16,
+          "p50": 14.868119955062866,
+          "p95": 18.60520178079605
+        },
+        {
+          "etapa": "Total por consulta",
+          "n": 16,
+          "p50": 31.055569887161255,
+          "p95": 41.02661955356598
+        }
+      ]
+    },
+    "Llamadas al LLM y descartes": {
+      "descripcion": "Por consulta ejecutada.",
+      "columnas": [
+        "consultas",
+        "sin resultado",
+        "llamadas p50",
+        "llamadas p95",
+        "llamadas promedio",
+        "descartes QC_1 relevancia",
+        "veredictos ambiguos por consulta"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "consultas": 16,
+          "sin resultado": 0,
+          "llamadas p50": 5.0,
+          "llamadas p95": 7.25,
+          "llamadas promedio": 5.5,
+          "descartes QC_1 relevancia": 0.5,
+          "veredictos ambiguos por consulta": 0.0
+        }
+      ]
+    },
+    "Citas de la síntesis (diagnóstico)": {
+      "descripcion": "Afirmaciones = frases de 30+ caracteres de la síntesis del LLM (sin la lista a favor / en contra, que arma el código). Cita válida = cita un precedente existente y, si menciona un sentido del fallo o un delito, coincide con la ficha citada. Sin anotación: no dice si la afirmación es verdadera, solo si es verificable.",
+      "columnas": [
+        "consultas",
+        "afirmaciones",
+        "con cita válida",
+        "sin cita",
+        "marcadas verificar"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "consultas": 16,
+          "afirmaciones": 105,
+          "con cita válida": "85 (81.0%)",
+          "sin cita": "12 (11.4%)",
+          "marcadas verificar": "8 (7.6%)"
+        }
+      ]
+    }
+  }
+}

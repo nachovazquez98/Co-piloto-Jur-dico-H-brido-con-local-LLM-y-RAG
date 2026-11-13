@@ -1,0 +1,1565 @@
+{
+  "comando": "regresion",
+  "fecha": "2026-11-13T11:44:42",
+  "commit": "fb1f3fe",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "conceptos_v10": "v10",
+    "conceptos_penal": "v11"
+  },
+  "corpus_fingerprint": "bea10929ce634a58",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Sin congelado: corrida de desarrollo no atada a una versión."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CONSULTAS_REALES_PATH": "evaluacion/consultas_reales.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PILOTO_JUICIOS_PATH": "evaluacion/piloto_juicios.csv",
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "aciertos": {
+    "v10: Jaccard 0.20 + KEM 0.20, lista de tokens": {
+      "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+      "Hit@3 tipo (v10, 18)": "14/14",
+      "Hit@3 familia (penal, 16)": "14/14"
+    },
+    "Jaccard 0.40 sin KEM, lista de tokens": {
+      "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+      "Hit@3 tipo (v10, 18)": "14/14",
+      "Hit@3 familia (penal, 16)": "14/14"
+    },
+    "Jaccard 0.40 sin KEM, sin lista": {
+      "variante": "Jaccard 0.40 sin KEM, sin lista",
+      "Hit@3 tipo (v10, 18)": "14/14",
+      "Hit@3 familia (penal, 16)": "14/14"
+    },
+    "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas": {
+      "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+      "Hit@3 tipo (v10, 18)": "14/14",
+      "Hit@3 familia (penal, 16)": "14/14"
+    },
+    "Configuración actual (config.py)": {
+      "variante": "Configuración actual (config.py)",
+      "Hit@3 tipo (v10, 18)": "14/14",
+      "Hit@3 familia (penal, 16)": "14/14"
+    }
+  },
+  "congelado": null,
+  "tablas": {
+    "Resumen por variante": {
+      "descripcion": "Aciertos en el top-3 de categorías (sin LLM; conceptos precalculados). Los temas sin tipo en el corpus no cuentan. No es una evaluación: son consultas de ejemplo, no independientes, y se usaron para decidir la configuración.",
+      "columnas": [
+        "variante",
+        "Hit@3 tipo (v10, 18)",
+        "Hit@3 familia (penal, 16)"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "Hit@3 tipo (v10, 18)": "14/14",
+          "Hit@3 familia (penal, 16)": "14/14"
+        },
+        {
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "Hit@3 tipo (v10, 18)": "14/14",
+          "Hit@3 familia (penal, 16)": "14/14"
+        },
+        {
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "Hit@3 tipo (v10, 18)": "14/14",
+          "Hit@3 familia (penal, 16)": "14/14"
+        },
+        {
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "Hit@3 tipo (v10, 18)": "14/14",
+          "Hit@3 familia (penal, 16)": "14/14"
+        },
+        {
+          "variante": "Configuración actual (config.py)",
+          "Hit@3 tipo (v10, 18)": "14/14",
+          "Hit@3 familia (penal, 16)": "14/14"
+        }
+      ]
+    },
+    "Detalle por ejemplo": {
+      "descripcion": "Top-3 de cada ejemplo y variante.",
+      "columnas": [
+        "conjunto",
+        "variante",
+        "ejemplo",
+        "acierto",
+        "top-3"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Robo calificado",
+          "acierto": "sí",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-en-grado-de-tentativa · penal/robo-calificado-y-otro"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Lesiones dolosas (riña)",
+          "acierto": "sí",
+          "top-3": "penal/lesiones-dolosas · penal/lesiones-calificadas · penal/violencia-familiar-y-lesiones-dolosas"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Homicidio culposo",
+          "acierto": "sí",
+          "top-3": "penal/homicidio-culposo · penal/homicidio-a-titulo-de-culpa · penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Fraude",
+          "acierto": "sí",
+          "top-3": "penal/fraude · penal/fraude-especifico · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Justicia para adolescentes (robo)",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/lesiones-calificadas · penal/robo-calificado-y-corrupcion-de-menores"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Orden de aprehensión (amparo)",
+          "acierto": "—",
+          "top-3": "penal/robo-equiparado-en-su-modalidad-de-utilizacion · penal/tentativa-de-feminicidio · penal/fraude-especifico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Acción cambiaria directa (pagaré)",
+          "acierto": "sí",
+          "top-3": "mercantil/accion-cambiaria-directa · mercantil/accion-cambiaria-directa_cobro-titulo-de-credito · mercantil/accion-de-pago"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Incumplimiento de contrato de suministro",
+          "acierto": "—",
+          "top-3": "mercantil/accion-de-cumplimiento-de-contrato · civil/pago-danos-y-perjuicios · civil/accion-rescision-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Pago de cheque devuelto",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-y-otro · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Rescisión de contrato de arrendamiento",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-arrendamiento · civil/accion-de-terminacion-de-contrato-de-arrendamiento · civil/accion-rescision-de-contrato_arrendamiento"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Acción reivindicatoria",
+          "acierto": "sí",
+          "top-3": "civil/accion-reivindicatoria · civil/accion-de-usucapion · civil/diligencias-de-informacion-ad-perpetuam"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Daños y perjuicios (accidente vehicular)",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-responsabilidad-civil-objetiva · civil/pago-danos-y-perjuicios · civil/accion-de-dano-moral"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Rescisión de compraventa (vicios ocultos)",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-compraventa · civil/accion-rescision-de-contrato · civil/accion-de-cumplimiento-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Información ad perpetuam / usucapión",
+          "acierto": "sí",
+          "top-3": "civil/diligencias-de-informacion-ad-perpetuam · civil/diligencia-informacion-ad-perpetuam · civil/acreditar-propiedad-de-vehiculo"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Divorcio",
+          "acierto": "sí",
+          "top-3": "familiar/divorcio_contencioso · civil/accion-de-divorcio · familiar/divorcio_contencioso_otras"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Aumento de pensión alimenticia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-pago-de-pension-alimenticia · familiar/alimentos · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Modificación de guarda y custodia",
+          "acierto": "sí",
+          "top-3": "familiar/guarda-y-custodia · civil/accion-de-fijacion-de-visitas-y-convivencia · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Régimen de convivencias",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/visitas-y-convivencias_menor_otras · familiar/guarda-y-custodia_menor"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · delitos sexuales · homicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "robo · servidores publicos y administracion de justicia · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acierto": "sí",
+          "top-3": "homicidio · robo · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "homicidio · lesiones · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "violencia familiar · abandono de familiares · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · sustraccion de menores · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · violencia familiar · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acierto": "sí",
+          "top-3": "fraude y abuso de confianza · servidores publicos y administracion de justicia · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "despojo · privacion de la libertad y secuestro · desaparicion de personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos culposos · homicidio · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · contra la salud · privacion de la libertad y secuestro"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "abandono de familiares · violencia familiar · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "privacion de la libertad y secuestro · delitos sexuales · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "lesiones · homicidio · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "robo · privacion de la libertad y secuestro · delitos sexuales"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "v10: Jaccard 0.20 + KEM 0.20, lista de tokens",
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "privacion de la libertad y secuestro · robo · lesiones"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Robo calificado",
+          "acierto": "sí",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-en-grado-de-tentativa · penal/robo-calificado-y-otro"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Lesiones dolosas (riña)",
+          "acierto": "sí",
+          "top-3": "penal/lesiones-dolosas · penal/lesiones-calificadas · penal/violencia-familiar-y-lesiones-dolosas"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Homicidio culposo",
+          "acierto": "sí",
+          "top-3": "penal/homicidio-culposo · penal/homicidio-a-titulo-de-culpa · penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Fraude",
+          "acierto": "sí",
+          "top-3": "penal/fraude · penal/fraude-especifico · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Justicia para adolescentes (robo)",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/lesiones-calificadas · penal/robo-calificado-y-corrupcion-de-menores"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Orden de aprehensión (amparo)",
+          "acierto": "—",
+          "top-3": "penal/robo-equiparado-en-su-modalidad-de-utilizacion · penal/tentativa-de-feminicidio · penal/fraude-especifico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Acción cambiaria directa (pagaré)",
+          "acierto": "sí",
+          "top-3": "mercantil/accion-cambiaria-directa · mercantil/accion-cambiaria-directa_cobro-titulo-de-credito · mercantil/accion-de-pago"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Incumplimiento de contrato de suministro",
+          "acierto": "—",
+          "top-3": "mercantil/accion-de-cumplimiento-de-contrato · civil/pago-danos-y-perjuicios · civil/accion-rescision-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Pago de cheque devuelto",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-y-otro · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Rescisión de contrato de arrendamiento",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-arrendamiento · civil/accion-de-terminacion-de-contrato-de-arrendamiento · civil/accion-rescision-de-contrato_arrendamiento"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Acción reivindicatoria",
+          "acierto": "sí",
+          "top-3": "civil/accion-reivindicatoria · civil/accion-de-usucapion · civil/diligencias-de-informacion-ad-perpetuam"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Daños y perjuicios (accidente vehicular)",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-responsabilidad-civil-objetiva · civil/pago-danos-y-perjuicios · civil/accion-de-dano-moral"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Rescisión de compraventa (vicios ocultos)",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-compraventa · civil/accion-rescision-de-contrato · civil/accion-de-cumplimiento-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Información ad perpetuam / usucapión",
+          "acierto": "sí",
+          "top-3": "civil/diligencias-de-informacion-ad-perpetuam · civil/diligencia-informacion-ad-perpetuam · civil/informacion-testimonial_posesion-de-un-bien-mueble"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Divorcio",
+          "acierto": "sí",
+          "top-3": "familiar/divorcio_contencioso · civil/accion-de-divorcio · familiar/divorcio_contencioso_otras"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Aumento de pensión alimenticia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-pago-de-pension-alimenticia · familiar/alimentos · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Modificación de guarda y custodia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/guarda-y-custodia · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Régimen de convivencias",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/visitas-y-convivencias_menor_otras · familiar/guarda-y-custodia_menor"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · delitos sexuales · homicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "robo · servidores publicos y administracion de justicia · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acierto": "sí",
+          "top-3": "homicidio · robo · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "homicidio · lesiones · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "violencia familiar · abandono de familiares · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · sustraccion de menores · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · violencia familiar · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acierto": "sí",
+          "top-3": "fraude y abuso de confianza · servidores publicos y administracion de justicia · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "despojo · privacion de la libertad y secuestro · desaparicion de personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos culposos · homicidio · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · contra la salud · privacion de la libertad y secuestro"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "abandono de familiares · violencia familiar · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "privacion de la libertad y secuestro · delitos sexuales · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "lesiones · homicidio · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "robo · privacion de la libertad y secuestro · delitos sexuales"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, lista de tokens",
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "privacion de la libertad y secuestro · robo · lesiones"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Robo calificado",
+          "acierto": "sí",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-en-grado-de-tentativa · penal/robo-calificado-y-otro"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Lesiones dolosas (riña)",
+          "acierto": "sí",
+          "top-3": "penal/lesiones-dolosas · penal/lesiones-calificadas · penal/violencia-familiar-y-lesiones-dolosas"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Homicidio culposo",
+          "acierto": "sí",
+          "top-3": "penal/homicidio-culposo · penal/homicidio-a-titulo-de-culpa · penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Fraude",
+          "acierto": "sí",
+          "top-3": "penal/fraude · penal/fraude-especifico · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Justicia para adolescentes (robo)",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/lesiones-calificadas · penal/robo-calificado-y-corrupcion-de-menores"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Orden de aprehensión (amparo)",
+          "acierto": "—",
+          "top-3": "penal/robo-equiparado-en-su-modalidad-de-utilizacion · penal/violacion-y-abuso-sexual-infantil · penal/tentativa-de-feminicidio"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Acción cambiaria directa (pagaré)",
+          "acierto": "sí",
+          "top-3": "mercantil/accion-cambiaria-directa · mercantil/accion-cambiaria-directa_cobro-titulo-de-credito · mercantil/accion-de-pago"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Incumplimiento de contrato de suministro",
+          "acierto": "—",
+          "top-3": "mercantil/accion-de-cumplimiento-de-contrato · civil/pago-danos-y-perjuicios · civil/accion-rescision-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Pago de cheque devuelto",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-y-otro · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Rescisión de contrato de arrendamiento",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-arrendamiento · civil/accion-de-terminacion-de-contrato-de-arrendamiento · civil/accion-rescision-de-contrato_arrendamiento"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Acción reivindicatoria",
+          "acierto": "sí",
+          "top-3": "civil/accion-reivindicatoria · civil/accion-de-usucapion · civil/diligencias-de-informacion-ad-perpetuam"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Daños y perjuicios (accidente vehicular)",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-responsabilidad-civil-objetiva · civil/pago-danos-y-perjuicios · civil/accion-de-dano-moral"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Rescisión de compraventa (vicios ocultos)",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-compraventa · civil/accion-rescision-de-contrato · civil/accion-de-cumplimiento-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Información ad perpetuam / usucapión",
+          "acierto": "sí",
+          "top-3": "civil/diligencias-de-informacion-ad-perpetuam · civil/diligencia-informacion-ad-perpetuam · civil/informacion-testimonial_posesion-de-un-bien-mueble"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Divorcio",
+          "acierto": "sí",
+          "top-3": "familiar/divorcio_contencioso · civil/accion-de-divorcio · familiar/divorcio_contencioso_otras"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Aumento de pensión alimenticia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-pago-de-pension-alimenticia · familiar/alimentos · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Modificación de guarda y custodia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/guarda-y-custodia · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Régimen de convivencias",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/visitas-y-convivencias_menor_otras · familiar/guarda-y-custodia_menor"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · delitos sexuales · homicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "robo · falsedad y falsificacion · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acierto": "sí",
+          "top-3": "homicidio · robo · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "homicidio · lesiones · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "violencia familiar · abandono de familiares · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · sustraccion de menores · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · violencia familiar · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acierto": "sí",
+          "top-3": "fraude y abuso de confianza · falsedad y falsificacion · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "despojo · privacion de la libertad y secuestro · desaparicion de personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos culposos · homicidio · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · contra la salud · falsedad y falsificacion"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "abandono de familiares · violencia familiar · servidores publicos y administracion de justicia"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "privacion de la libertad y secuestro · delitos sexuales · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "lesiones · homicidio · violencia familiar"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "robo · privacion de la libertad y secuestro · delitos sexuales"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista",
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "privacion de la libertad y secuestro · robo · lesiones"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Robo calificado",
+          "acierto": "sí",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-en-grado-de-tentativa · penal/robo-calificado-y-otro"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Lesiones dolosas (riña)",
+          "acierto": "sí",
+          "top-3": "penal/lesiones-dolosas · penal/lesiones-calificadas · penal/violencia-familiar-y-lesiones-dolosas"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Homicidio culposo",
+          "acierto": "sí",
+          "top-3": "penal/homicidio-culposo · penal/homicidio-a-titulo-de-culpa · penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Fraude",
+          "acierto": "sí",
+          "top-3": "penal/fraude · penal/fraude-especifico · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Justicia para adolescentes (robo)",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/lesiones-calificadas · penal/robo-calificado-y-corrupcion-de-menores"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Orden de aprehensión (amparo)",
+          "acierto": "—",
+          "top-3": "penal/robo-equiparado-en-su-modalidad-de-utilizacion · penal/violacion-y-abuso-sexual-infantil · penal/tentativa-de-feminicidio"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Acción cambiaria directa (pagaré)",
+          "acierto": "sí",
+          "top-3": "mercantil/accion-cambiaria-directa · mercantil/accion-cambiaria-directa_cobro-titulo-de-credito · mercantil/accion-de-pago"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Incumplimiento de contrato de suministro",
+          "acierto": "—",
+          "top-3": "mercantil/accion-de-cumplimiento-de-contrato · civil/pago-danos-y-perjuicios · civil/accion-rescision-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Pago de cheque devuelto",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-y-otro · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Rescisión de contrato de arrendamiento",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-arrendamiento · civil/accion-de-terminacion-de-contrato-de-arrendamiento · civil/accion-rescision-de-contrato_arrendamiento"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Acción reivindicatoria",
+          "acierto": "sí",
+          "top-3": "civil/accion-reivindicatoria · civil/accion-de-usucapion · civil/diligencias-de-informacion-ad-perpetuam"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Daños y perjuicios (accidente vehicular)",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-responsabilidad-civil-objetiva · civil/pago-danos-y-perjuicios · civil/accion-de-dano-moral"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Rescisión de compraventa (vicios ocultos)",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-compraventa · civil/accion-rescision-de-contrato · civil/accion-de-cumplimiento-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Información ad perpetuam / usucapión",
+          "acierto": "sí",
+          "top-3": "civil/diligencias-de-informacion-ad-perpetuam · civil/diligencia-informacion-ad-perpetuam · civil/informacion-testimonial_posesion-de-un-bien-mueble"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Divorcio",
+          "acierto": "sí",
+          "top-3": "familiar/divorcio_contencioso · civil/accion-de-divorcio · familiar/divorcio_contencioso_otras"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Aumento de pensión alimenticia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-pago-de-pension-alimenticia · familiar/alimentos · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Modificación de guarda y custodia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/guarda-y-custodia · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Régimen de convivencias",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/visitas-y-convivencias_menor_otras · familiar/guarda-y-custodia_menor"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · homicidio · delitos sexuales"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "robo · delitos culposos · trata de personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acierto": "sí",
+          "top-3": "homicidio · robo · privacion de la libertad y secuestro"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "homicidio · lesiones · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "violencia familiar · contra la dignidad de las personas · abandono de familiares"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · trata de personas · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · violencia familiar · responsabilidad profesional"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acierto": "sí",
+          "top-3": "fraude y abuso de confianza · falsedad y falsificacion · otros"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "despojo · dano en las cosas · abandono de familiares"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos culposos · homicidio · responsabilidad profesional"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · contra la salud · armas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "abandono de familiares · contra la dignidad de las personas · otros"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "privacion de la libertad y secuestro · delitos sexuales · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "lesiones · homicidio · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "robo · privacion de la libertad y secuestro · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Jaccard 0.40 sin KEM, sin lista, familias enriquecidas",
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "privacion de la libertad y secuestro · robo · lesiones"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Robo calificado",
+          "acierto": "sí",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-en-grado-de-tentativa · penal/robo-calificado-y-otro"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Lesiones dolosas (riña)",
+          "acierto": "sí",
+          "top-3": "penal/lesiones-dolosas · penal/lesiones-calificadas · penal/violencia-familiar-y-lesiones-dolosas"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Homicidio culposo",
+          "acierto": "sí",
+          "top-3": "penal/homicidio-culposo · penal/homicidio-a-titulo-de-culpa · penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Fraude",
+          "acierto": "sí",
+          "top-3": "penal/fraude · penal/fraude-especifico · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Justicia para adolescentes (robo)",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/lesiones-calificadas · penal/robo-calificado-y-corrupcion-de-menores"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Orden de aprehensión (amparo)",
+          "acierto": "—",
+          "top-3": "penal/robo-equiparado-en-su-modalidad-de-utilizacion · penal/violacion-y-abuso-sexual-infantil · penal/tentativa-de-feminicidio"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Acción cambiaria directa (pagaré)",
+          "acierto": "sí",
+          "top-3": "mercantil/accion-cambiaria-directa · mercantil/accion-cambiaria-directa_cobro-titulo-de-credito · mercantil/accion-de-pago"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Incumplimiento de contrato de suministro",
+          "acierto": "—",
+          "top-3": "mercantil/accion-de-cumplimiento-de-contrato · civil/pago-danos-y-perjuicios · civil/accion-rescision-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Pago de cheque devuelto",
+          "acierto": "—",
+          "top-3": "penal/robo-calificado · penal/robo-calificado-y-otro · penal/fraude-generico"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Rescisión de contrato de arrendamiento",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-arrendamiento · civil/accion-de-terminacion-de-contrato-de-arrendamiento · civil/accion-rescision-de-contrato_arrendamiento"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Acción reivindicatoria",
+          "acierto": "sí",
+          "top-3": "civil/accion-reivindicatoria · civil/accion-de-usucapion · civil/diligencias-de-informacion-ad-perpetuam"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Daños y perjuicios (accidente vehicular)",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-responsabilidad-civil-objetiva · civil/pago-danos-y-perjuicios · civil/accion-de-dano-moral"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Rescisión de compraventa (vicios ocultos)",
+          "acierto": "sí",
+          "top-3": "civil/accion-rescision-de-contrato-de-compraventa · civil/accion-rescision-de-contrato · civil/accion-de-cumplimiento-de-contrato-de-compraventa"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Información ad perpetuam / usucapión",
+          "acierto": "sí",
+          "top-3": "civil/diligencias-de-informacion-ad-perpetuam · civil/diligencia-informacion-ad-perpetuam · civil/informacion-testimonial_posesion-de-un-bien-mueble"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Divorcio",
+          "acierto": "sí",
+          "top-3": "familiar/divorcio_contencioso · civil/accion-de-divorcio · familiar/divorcio_contencioso_otras"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Aumento de pensión alimenticia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-pago-de-pension-alimenticia · familiar/alimentos · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Modificación de guarda y custodia",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/guarda-y-custodia · civil/accion-de-custodia-y-alimentos"
+        },
+        {
+          "conjunto": "v10 (18)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Régimen de convivencias",
+          "acierto": "sí",
+          "top-3": "civil/accion-de-fijacion-de-visitas-y-convivencia · familiar/visitas-y-convivencias_menor_otras · familiar/guarda-y-custodia_menor"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · homicidio · delitos sexuales"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "robo · delitos culposos · trata de personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acierto": "sí",
+          "top-3": "homicidio · robo · privacion de la libertad y secuestro"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "homicidio · lesiones · feminicidio"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "violencia familiar · contra la dignidad de las personas · abandono de familiares"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · trata de personas · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "delitos sexuales · violencia familiar · responsabilidad profesional"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acierto": "sí",
+          "top-3": "fraude y abuso de confianza · falsedad y falsificacion · otros"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "despojo · dano en las cosas · abandono de familiares"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "delitos culposos · homicidio · responsabilidad profesional"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acierto": "sí",
+          "top-3": "robo · contra la salud · armas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "abandono de familiares · contra la dignidad de las personas · otros"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "privacion de la libertad y secuestro · delitos sexuales · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acierto": "sí",
+          "top-3": "lesiones · homicidio · delitos culposos"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "robo · privacion de la libertad y secuestro · contra la dignidad de las personas"
+        },
+        {
+          "conjunto": "penal (16)",
+          "variante": "Configuración actual (config.py)",
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acierto": "—",
+          "top-3": "privacion de la libertad y secuestro · robo · lesiones"
+        }
+      ]
+    },
+    "Candidatos: orden RRF vs. orden por facetas": {
+      "descripcion": "Configuración actual. Aciertos = de los 3 primeros candidatos (antes de QC_1), cuántos son de la familia correcta. 'Pierde' = ejemplos con menos aciertos con el orden por facetas. Acto de la consulta y de cada candidato leídos por reglas (metadatos.py).",
+      "columnas": [
+        "aciertos RRF",
+        "aciertos facetas",
+        "ejemplos que pierden",
+        "ejemplos que ganan"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "aciertos RRF": "32/42",
+          "aciertos facetas": "37/42",
+          "ejemplos que pierden": 0,
+          "ejemplos que ganan": 3
+        }
+      ]
+    },
+    "Candidatos por ejemplo": {
+      "descripcion": "Top-3 de candidatos (familia · acto impugnado) con cada orden.",
+      "columnas": [
+        "ejemplo",
+        "acto consulta",
+        "top-3 rrf",
+        "aciertos rrf",
+        "top-3 facetas",
+        "aciertos facetas"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "acto consulta": "vinculación",
+          "top-3 rrf": "homicidio (sentencia definitiva) · delitos sexuales (otro) · robo (otro)",
+          "aciertos rrf": 1.0,
+          "top-3 facetas": "robo (vinculación) · robo (vinculación) · robo (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "acto consulta": "sentencia definitiva",
+          "top-3 rrf": "robo (vinculación) · robo (vinculación) · robo (vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "robo (sentencia definitiva) · robo (vinculación) · robo (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "acto consulta": "medida cautelar",
+          "top-3 rrf": "robo (medida cautelar) · robo (medida cautelar) · homicidio (medida cautelar)",
+          "aciertos rrf": 1.0,
+          "top-3 facetas": "homicidio (medida cautelar) · homicidio (medida cautelar) · homicidio (medida cautelar)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "lesiones (sentencia definitiva) · homicidio (sentencia definitiva) · homicidio (vinculación)",
+          "aciertos rrf": 2.0,
+          "top-3 facetas": "lesiones (sentencia definitiva) · homicidio (sentencia definitiva) · homicidio (vinculación)",
+          "aciertos facetas": 2.0
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "violencia familiar (no vinculación) · violencia familiar (no vinculación) · violencia familiar (no vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "violencia familiar (no vinculación) · violencia familiar (no vinculación) · violencia familiar (no vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "acto consulta": "sentencia definitiva",
+          "top-3 rrf": "delitos sexuales (no vinculación) · delitos sexuales (sobreseimiento) · delitos sexuales (no vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "delitos sexuales (sentencia definitiva) · delitos sexuales (sentencia definitiva) · delitos sexuales (sentencia definitiva)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "acto consulta": "vinculación",
+          "top-3 rrf": "violencia familiar (no vinculación) · delitos sexuales (vinculación) · delitos sexuales (no determinado)",
+          "aciertos rrf": 2.0,
+          "top-3 facetas": "delitos sexuales (vinculación) · delitos sexuales (vinculación) · delitos sexuales (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "acto consulta": "no vinculación",
+          "top-3 rrf": "fraude y abuso de confianza (no vinculación) · fraude y abuso de confianza (no vinculación) · fraude y abuso de confianza (no determinado)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "fraude y abuso de confianza (no vinculación) · fraude y abuso de confianza (no vinculación) · fraude y abuso de confianza (no vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "acto consulta": "vinculación",
+          "top-3 rrf": "despojo (sentencia definitiva) · despojo (vinculación) · despojo (no vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "despojo (vinculación) · despojo (vinculación) · despojo (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "delitos culposos (sentencia definitiva) · delitos culposos (sentencia definitiva) · delitos culposos (vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "delitos culposos (sentencia definitiva) · delitos culposos (sentencia definitiva) · delitos culposos (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "acto consulta": "—",
+          "top-3 rrf": "contra la salud (otro) · contra la salud (otro) · robo (otro)",
+          "aciertos rrf": 2.0,
+          "top-3 facetas": "contra la salud (otro) · contra la salud (otro) · robo (otro)",
+          "aciertos facetas": 2.0
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "abandono de familiares (sentencia definitiva) · abandono de familiares (no vinculación) · abandono de familiares (vinculación)",
+          "aciertos rrf": 3.0,
+          "top-3 facetas": "abandono de familiares (sentencia definitiva) · abandono de familiares (no vinculación) · abandono de familiares (vinculación)",
+          "aciertos facetas": 3.0
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "privacion de la libertad y secuestro (no determinado) · privacion de la libertad y secuestro (vinculación) · delitos sexuales (vinculación)",
+          "aciertos rrf": 2.0,
+          "top-3 facetas": "privacion de la libertad y secuestro (no determinado) · privacion de la libertad y secuestro (vinculación) · delitos sexuales (vinculación)",
+          "aciertos facetas": 2.0
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "acto consulta": "—",
+          "top-3 rrf": "homicidio (sentencia definitiva) · lesiones (vinculación) · homicidio (no vinculación)",
+          "aciertos rrf": 1.0,
+          "top-3 facetas": "homicidio (sentencia definitiva) · lesiones (vinculación) · homicidio (no vinculación)",
+          "aciertos facetas": 1.0
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "acto consulta": "—",
+          "top-3 rrf": "robo (no determinado) · robo (otro) · robo (medida cautelar)",
+          "aciertos rrf": null,
+          "top-3 facetas": "robo (no determinado) · robo (otro) · robo (medida cautelar)",
+          "aciertos facetas": null
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "acto consulta": "—",
+          "top-3 rrf": "lesiones (otro) · lesiones (otro) · robo (sentencia definitiva)",
+          "aciertos rrf": null,
+          "top-3 facetas": "lesiones (otro) · lesiones (otro) · robo (sentencia definitiva)",
+          "aciertos facetas": null
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,758 @@
+{
+  "comando": "qc-diagnostico",
+  "fecha": "2026-11-13T11:44:12",
+  "commit": "fb1f3fe",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "k": 5,
+    "consultas": "16 ejemplos penales de la app"
+  },
+  "corpus_fingerprint": "bea10929ce634a58",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Sin congelado: corrida de desarrollo no atada a una versión."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CONSULTAS_REALES_PATH": "evaluacion/consultas_reales.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PILOTO_JUICIOS_PATH": "evaluacion/piloto_juicios.csv",
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "congelado": null,
+  "tablas": {
+    "Tasa de descarte de QC_1 por versión y contexto": {
+      "descripcion": "Para los 5 primeros candidatos de cada uno de los 16 ejemplos penales. Solo diagnóstico: un descarte puede ser correcto o injusto; la calidad se mide con `qc` contra juicios humanos.",
+      "columnas": [
+        "prompt QC_1",
+        "contexto",
+        "pares",
+        "descartados (NO)",
+        "ambiguos",
+        "consultas con los 5 descartados"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "prompt QC_1": "v10",
+          "contexto": "inicio",
+          "pares": 80,
+          "descartados (NO)": 0.5125,
+          "ambiguos": 0.0,
+          "consultas con los 5 descartados": 2
+        },
+        {
+          "prompt QC_1": "v10",
+          "contexto": "fragmento_similar",
+          "pares": 80,
+          "descartados (NO)": 0.55,
+          "ambiguos": 0.0,
+          "consultas con los 5 descartados": 1
+        },
+        {
+          "prompt QC_1": "v11",
+          "contexto": "inicio",
+          "pares": 80,
+          "descartados (NO)": 0.1625,
+          "ambiguos": 0.0,
+          "consultas con los 5 descartados": 1
+        },
+        {
+          "prompt QC_1": "v11",
+          "contexto": "fragmento_similar",
+          "pares": 80,
+          "descartados (NO)": 0.1375,
+          "ambiguos": 0.0,
+          "consultas con los 5 descartados": 0
+        }
+      ]
+    },
+    "Veredictos de QC_1 por candidato (configuración de la app)": {
+      "descripcion": "Prompt v11 · contexto fragmento_similar. Lo usa el comando `errores`.",
+      "columnas": [
+        "ejemplo",
+        "posición",
+        "doc_id",
+        "tipo",
+        "veredicto"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "posición": 1,
+          "doc_id": "2025-05-13-100223_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "posición": 2,
+          "doc_id": "2025-04-24-105911_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "posición": 3,
+          "doc_id": "2025-08-14-131843_penal_robo-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/robo-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "posición": 4,
+          "doc_id": "2025-04-23-132527_penal_robo-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/robo-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
+          "posición": 5,
+          "doc_id": "2025-11-05-140542_penal_robo-calificado-y-otro.pdf",
+          "tipo": "penal/robo-calificado-y-otro",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-04-10-130540_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "tipo": "penal/robo-equiparado-en-su-modalidad-de-utilizacion",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-11-04-143146_penal_robo-calificado-y-portacion-de-armas-y-objetos-prohibidos.pdf",
+          "tipo": "penal/robo-calificado-y-portacion-de-armas-y-objetos-prohibidos",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-05-13-100223_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-07-01-095837_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-08-25-132412_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "posición": 1,
+          "doc_id": "2025-06-10-111734_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "posición": 2,
+          "doc_id": "2025-10-06-113638_penal_instigacion-o-ayuda-al-suicidio.pdf",
+          "tipo": "penal/instigacion-o-ayuda-al-suicidio",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "posición": 3,
+          "doc_id": "2025-09-09-135130_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "posición": 4,
+          "doc_id": "2025-11-27-144957_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
+          "posición": 5,
+          "doc_id": "2025-08-22-123252_penal_homicidio-simple-intencional-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-simple-intencional-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-11-10-103321_penal_lesiones-calificadas.pdf",
+          "tipo": "penal/lesiones-calificadas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-07-07-184748_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-08-06-102352_penal_tentativa-de-homicidio-calificado.pdf",
+          "tipo": "penal/tentativa-de-homicidio-calificado",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-11-27-135349_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-04-18-112111_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-04-08-154222_penal_violencia-intrafamiliar.pdf",
+          "tipo": "penal/violencia-intrafamiliar",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-03-31-113456_penal_maltrato-infantil.pdf",
+          "tipo": "penal/maltrato-infantil",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-12-11-145211_penal_violencia-familiar.pdf",
+          "tipo": "penal/violencia-familiar",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-12-12-142128_penal_violencia-familiar-y-amenazas.pdf",
+          "tipo": "penal/violencia-familiar-y-amenazas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-09-18-140956_penal_violencia-familiar-y-otros.pdf",
+          "tipo": "penal/violencia-familiar-y-otros",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-10-07-091955_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-05-12-113442_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-06-13-130122_penal_abuso-sexual-infantil.pdf",
+          "tipo": "penal/abuso-sexual-infantil",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-03-21-142930_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-10-01-125656_penal_abuso-sexual-infantil-agravado-y-corrupcion-de-menores.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado-y-corrupcion-de-menores",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "posición": 1,
+          "doc_id": "2025-08-07-164051_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "posición": 2,
+          "doc_id": "2025-08-26-120921_penal_abuso-sexual.pdf",
+          "tipo": "penal/abuso-sexual",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "posición": 3,
+          "doc_id": "2025-07-11-121010_penal_violacion.pdf",
+          "tipo": "penal/violacion",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "posición": 4,
+          "doc_id": "2025-03-31-094135_penal_violacion.pdf",
+          "tipo": "penal/violacion",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Violación · Vinculación a proceso",
+          "posición": 5,
+          "doc_id": "2026-01-06-151037_penal_violacion.pdf",
+          "tipo": "penal/violacion",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "posición": 1,
+          "doc_id": "2025-08-12-112910_penal_fraude-especifico.pdf",
+          "tipo": "penal/fraude-especifico",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "posición": 2,
+          "doc_id": "2025-12-19-142059_penal_fraude-especifico.pdf",
+          "tipo": "penal/fraude-especifico",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "posición": 3,
+          "doc_id": "2025-04-03-120507_penal_fraude-generico.pdf",
+          "tipo": "penal/fraude-generico",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "posición": 4,
+          "doc_id": "2025-11-26-125922_penal_fraude-procesal.pdf",
+          "tipo": "penal/fraude-procesal",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
+          "posición": 5,
+          "doc_id": "2025-04-21-130659_penal_fraude-generico.pdf",
+          "tipo": "penal/fraude-generico",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "posición": 1,
+          "doc_id": "2025-10-01-133313_penal_despojo-de-inmueble.pdf",
+          "tipo": "penal/despojo-de-inmueble",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "posición": 2,
+          "doc_id": "2025-04-09-094938_penal_despojo-y-dano-en-las-cosas.pdf",
+          "tipo": "penal/despojo-y-dano-en-las-cosas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "posición": 3,
+          "doc_id": "2025-09-11-145653_penal_despojo-de-inmuebles-y-aguas.pdf",
+          "tipo": "penal/despojo-de-inmuebles-y-aguas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "posición": 4,
+          "doc_id": "2025-09-12-105626_penal_despojo-de-inmuebles.pdf",
+          "tipo": "penal/despojo-de-inmuebles",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
+          "posición": 5,
+          "doc_id": "2025-05-30-120851_penal_despojo-de-inmueble.pdf",
+          "tipo": "penal/despojo-de-inmueble",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-06-10-100359_penal_homicidio-a-titulo-de-culpa.pdf",
+          "tipo": "penal/homicidio-a-titulo-de-culpa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-07-08-143912_penal_homicidio-culposo.pdf",
+          "tipo": "penal/homicidio-culposo",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-06-13-100453_penal_homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa.pdf",
+          "tipo": "penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-03-21-144847_penal_homicidio-culposo.pdf",
+          "tipo": "penal/homicidio-culposo",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-09-26-113100_penal_homicidio-y-dano-en-las-cosas-a-titulo-de-culpa.pdf",
+          "tipo": "penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "posición": 1,
+          "doc_id": "2025-06-04-110914_penal_contra-la-salud-en-su-modalidad-de-narcomenudeo.pdf",
+          "tipo": "penal/contra-la-salud-en-su-modalidad-de-narcomenudeo",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "posición": 2,
+          "doc_id": "2025-06-30-100657_penal_narcomenudeo.pdf",
+          "tipo": "penal/narcomenudeo",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "posición": 3,
+          "doc_id": "2025-09-23-091959_penal_robo-equiparado-en-su-modalidad-de-desmantelamiento.pdf",
+          "tipo": "penal/robo-equiparado-en-su-modalidad-de-desmantelamiento",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "posición": 4,
+          "doc_id": "2025-06-30-101727_penal_robo-equiparado.pdf",
+          "tipo": "penal/robo-equiparado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Narcomenudeo · Vinculación a proceso",
+          "posición": 5,
+          "doc_id": "2025-05-30-133029_penal_narcomenudeo.pdf",
+          "tipo": "penal/narcomenudeo",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-09-10-114715_penal_abandono-de-familiares.pdf",
+          "tipo": "penal/abandono-de-familiares",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-08-28-115114_penal_abandono-de-familiares.pdf",
+          "tipo": "penal/abandono-de-familiares",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-08-12-104417_penal_abandono-de-familiares.pdf",
+          "tipo": "penal/abandono-de-familiares",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-10-29-130912_penal_abandono-de-familiares.pdf",
+          "tipo": "penal/abandono-de-familiares",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-07-15-134339_penal_abandono-de-familiares.pdf",
+          "tipo": "penal/abandono-de-familiares",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-12-12-141255_penal_secuestro-agravado-y-otro.pdf",
+          "tipo": "penal/secuestro-agravado-y-otro",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-06-05-135030_penal_secuestro-express.pdf",
+          "tipo": "penal/secuestro-express",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-08-29-152021_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-10-07-133710_penal_secuestro-agravado.pdf",
+          "tipo": "penal/secuestro-agravado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-04-01-132512_penal_abuso-sexual-infantil-agravado.pdf",
+          "tipo": "penal/abuso-sexual-infantil-agravado",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "posición": 1,
+          "doc_id": "2025-03-17-124454_penal_homicidio-en-rina.pdf",
+          "tipo": "penal/homicidio-en-rina",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "posición": 2,
+          "doc_id": "2025-04-01-181604_penal_lesiones-calificadas.pdf",
+          "tipo": "penal/lesiones-calificadas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "posición": 3,
+          "doc_id": "2025-04-08-110423_penal_homicidio-simple.pdf",
+          "tipo": "penal/homicidio-simple",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "posición": 4,
+          "doc_id": "2025-07-07-184748_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/homicidio-calificado-en-grado-de-tentativa",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
+          "posición": 5,
+          "doc_id": "2025-06-03-123253_penal_tentativa-de-homicidio-calificado-y-tentativa-de-robo-calificado.pdf",
+          "tipo": "penal/tentativa-de-homicidio-calificado-y-tentativa-de-robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "posición": 1,
+          "doc_id": "2025-03-31-114853_penal_tentativa-de-robo-calificado.pdf",
+          "tipo": "penal/tentativa-de-robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "posición": 2,
+          "doc_id": "2025-09-23-132730_penal_robo-calificado-tentado.pdf",
+          "tipo": "penal/robo-calificado-tentado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "posición": 3,
+          "doc_id": "2025-09-10-141345_penal_robo-calificado-y-otro.pdf",
+          "tipo": "penal/robo-calificado-y-otro",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "posición": 4,
+          "doc_id": "2025-04-24-122020_penal_robo-simple.pdf",
+          "tipo": "penal/robo-simple",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
+          "posición": 5,
+          "doc_id": "2025-04-16-122721_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "posición": 1,
+          "doc_id": "2025-10-03-212533_penal_lesiones-calificadas.pdf",
+          "tipo": "penal/lesiones-calificadas",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "posición": 2,
+          "doc_id": "2025-09-23-131006_penal_lesiones-y-amenazas.pdf",
+          "tipo": "penal/lesiones-y-amenazas",
+          "veredicto": "NO"
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "posición": 3,
+          "doc_id": "2025-04-16-122721_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "posición": 4,
+          "doc_id": "2025-10-03-214656_penal_robo-calificado-en-grado-de-tentativa.pdf",
+          "tipo": "penal/robo-calificado-en-grado-de-tentativa",
+          "veredicto": "SI"
+        },
+        {
+          "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
+          "posición": 5,
+          "doc_id": "2025-04-28-114153_penal_robo-calificado.pdf",
+          "tipo": "penal/robo-calificado",
+          "veredicto": "SI"
+        }
+      ]
+    }
+  }
+}
