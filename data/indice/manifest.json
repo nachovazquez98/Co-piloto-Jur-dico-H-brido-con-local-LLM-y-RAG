@@ -3,8 +3,9 @@
   "chunk_size": 1500,
   "chunk_overlap": 200,
   "max_chunks_per_doc": 12,
-  "corpus_fingerprint": "038dbf986378b548",
+  "max_chunks_penal": 0,
+  "corpus_fingerprint": "73ea2d91d4787d96",
   "num_docs": 3544,
-  "num_chunks": 41333,
+  "num_chunks": 66372,
   "dim": 768
 }
