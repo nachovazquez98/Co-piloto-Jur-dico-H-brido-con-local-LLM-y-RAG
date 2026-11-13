@@ -1,21 +1,20 @@
 {
   "comando": "qc-diagnostico",
-  "fecha": "2026-11-12T15:57:44",
-  "commit": "14638af",
-  "sucio": true,
+  "fecha": "2026-11-12T18:41:23",
+  "commit": "2c7be47",
+  "sucio": false,
   "semilla": 42,
   "parametros": {
     "k": 5,
     "consultas": "16 ejemplos penales de la app"
   },
-  "corpus_fingerprint": "038dbf986378b548",
+  "corpus_fingerprint": "73ea2d91d4787d96",
   "modelo_embeddings": "intfloat/multilingual-e5-base",
   "modelo_llm": "llama3.1:8b",
   "borrador": false,
   "advertencias": [],
   "configuracion": {
     "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
-    "CACHE_DIR": "data/cache",
     "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
     "CHROMA_DIR": "data/chroma",
     "CHUNK_OVERLAP_CHARS": 200,
@@ -49,7 +48,8 @@
       "no puedo analizar"
     ],
     "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
-    "FICHAS_ANOTADAS_PATH": "evaluacion/fichas_anotadas.jsonl",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHA_MODO": "json",
     "INDICE_DIR": "data/indice",
     "IRRELEVANT_TOKENS": [
       "desmantelamiento",
@@ -61,7 +61,7 @@
     ],
     "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
     "JACCARD_WEIGHT": 0.4,
-    "JUICIOS_PATH": "evaluacion/juicios.csv",
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
     "KEM_THRESHOLD_FOR_PENALTY": 0.6,
     "KEM_WEIGHT": 0.0,
     "MATERIAS": [
@@ -74,6 +74,7 @@
     "MATERIAS_ACTIVAS": [
       "penal"
     ],
+    "MAX_CHUNKS_PENAL": 0,
     "MAX_CHUNKS_PER_DOC": 12,
     "MAX_SENTENCIAS_POR_TIPO": 30,
     "MAX_TOKENS_FOR_PENALTY": 5,
@@ -82,13 +83,14 @@
     "NUM_CATEGORIAS_FILTRO": 3,
     "PDF_FIXED_END_PAGES": 15,
     "PDF_FIXED_START_PAGES": 10,
-    "PDF_MAX_PAGES_FULL_READ": 50,
+    "PDF_MAX_PAGES_FULL_READ": 0,
     "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
     "PROMPT_CONCEPTOS_VERSION": "v11",
     "PROMPT_PENAL_VERSION": "v11",
     "PROMPT_QC1_VERSION": "v11",
     "QC1_CONTEXTO": "fragmento_similar",
     "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
     "RAG_NUM_CHUNKS_TO_FETCH": 300,
     "RAG_NUM_DOCS_TO_FETCH": 30,
     "RAG_NUM_RESULTS_DESIRED": 3,
@@ -128,7 +130,7 @@
           "prompt QC_1": "v10",
           "contexto": "inicio",
           "pares": 80,
-          "descartados (NO)": 0.5375,
+          "descartados (NO)": 0.55,
           "ambiguos": 0.0,
           "consultas con los 5 descartados": 4
         },
@@ -136,23 +138,23 @@
           "prompt QC_1": "v10",
           "contexto": "fragmento_similar",
           "pares": 80,
-          "descartados (NO)": 0.575,
+          "descartados (NO)": 0.5625,
           "ambiguos": 0.0,
-          "consultas con los 5 descartados": 1
+          "consultas con los 5 descartados": 2
         },
         {
           "prompt QC_1": "v11",
           "contexto": "inicio",
           "pares": 80,
-          "descartados (NO)": 0.2125,
+          "descartados (NO)": 0.225,
           "ambiguos": 0.0,
-          "consultas con los 5 descartados": 0
+          "consultas con los 5 descartados": 1
         },
         {
           "prompt QC_1": "v11",
           "contexto": "fragmento_similar",
           "pares": 80,
-          "descartados (NO)": 0.15,
+          "descartados (NO)": 0.1375,
           "ambiguos": 0.0,
           "consultas con los 5 descartados": 0
         }

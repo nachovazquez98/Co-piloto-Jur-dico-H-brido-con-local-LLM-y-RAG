@@ -131,7 +131,9 @@ NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" 
 ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
 # QC_1. En una consulta real de defensa, la versión v10 (inicio del documento + "mismo tema Y contexto") descartó
 # 14 de 15 candidatos. v11: lee la ventana alrededor del fragmento más parecido a la consulta y acepta mismo delito,
-# misma familia o mismo problema procesal. Comparación sin anotaciones: `evaluacion qc-diagnostico`.
+# misma familia o mismo problema procesal. Sin anotaciones (`qc-diagnostico`, corrida 20261112-184123_2c7be47): en
+# los 5 primeros candidatos de los 16 ejemplos penales, v10 descarta 55 % y v11 + fragmento 14 %, ninguna consulta
+# se queda sin candidatos. Si esos descartes son correctos lo mide `qc` contra juicios humanos.
 QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "fragmento_similar")  # "inicio" | "fragmento_similar"
 PROMPT_QC1_VERSION = _env("COPILOTO_PROMPT_QC1", "v11")
 QC1_MAX_CHARS = 2500
