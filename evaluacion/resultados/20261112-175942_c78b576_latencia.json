@@ -1,0 +1,193 @@
+{
+  "comando": "latencia",
+  "fecha": "2026-11-12T17:59:42",
+  "commit": "c78b576",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "consultas": "ejemplos penales de la app",
+    "ficha": "json",
+    "qc2": "determinista",
+    "max_consultas": 10
+  },
+  "corpus_fingerprint": "038dbf986378b548",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "borrador": false,
+  "advertencias": [],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "CACHE_DIR": "data/cache",
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_ANOTADAS_PATH": "evaluacion/anotacion_fichas.csv",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUICIOS_PATH": "evaluacion/anotacion_juicios.csv",
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "vram_pico_embeddings_gb": 1.5,
+  "tablas": {
+    "Latencia (segundos)": {
+      "descripcion": "p50 = experiencia típica; p95 = la peor razonable.",
+      "columnas": [
+        "etapa",
+        "n",
+        "p50",
+        "p95"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "etapa": "Extracción de conceptos clave",
+          "n": 10,
+          "p50": 0.9344509840011597,
+          "p95": 1.637820303440093
+        },
+        {
+          "etapa": "Clasificación híbrida de la consulta",
+          "n": 10,
+          "p50": 0.08676540851593018,
+          "p95": 0.09951995611190795
+        },
+        {
+          "etapa": "Búsqueda adaptativa de precedentes",
+          "n": 10,
+          "p50": 0.04159986972808838,
+          "p95": 0.04994468688964843
+        },
+        {
+          "etapa": "Análisis de precedentes (verificación, extracción e informe)",
+          "n": 10,
+          "p50": 113.88315665721893,
+          "p95": 140.7617874264717
+        },
+        {
+          "etapa": "Síntesis comparativa final",
+          "n": 10,
+          "p50": 22.525314569473267,
+          "p95": 25.434378218650817
+        },
+        {
+          "etapa": "Total por consulta",
+          "n": 10,
+          "p50": 137.91946685314178,
+          "p95": 167.70326524972913
+        }
+      ]
+    },
+    "Llamadas al LLM y descartes": {
+      "descripcion": "Por consulta ejecutada.",
+      "columnas": [
+        "consultas",
+        "sin resultado",
+        "llamadas p50",
+        "llamadas p95",
+        "llamadas promedio",
+        "veredictos ambiguos por consulta"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "consultas": 10,
+          "sin resultado": 0,
+          "llamadas p50": 8.0,
+          "llamadas p95": 8.549999999999999,
+          "llamadas promedio": 8.1,
+          "veredictos ambiguos por consulta": 0.0
+        }
+      ]
+    }
+  }
+}

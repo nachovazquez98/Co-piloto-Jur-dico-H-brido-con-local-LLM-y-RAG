@@ -90,7 +90,15 @@ orden de trabajo están en [`evaluacion/README.md`](evaluacion/README.md).
 Hit@3 = 0.83, IC 95 % [0.61, 0.94], n = 18. Son consultas de cinco materias (no un conjunto penal) y los pesos se
 ajustaron mirando esas mismas consultas, así que es una estimación optimista y no independiente del ajuste.
 
-**Latencia medida** (`latencia --ejemplos --max 10`, RTX 4060 Laptop 8 GB, `llama3.1:8b`): PENDIENTE_LATENCIA
+**Latencia medida** (`latencia --ejemplos --max 10`, 10 ejemplos penales de la app, RTX 4060 Laptop 8 GB,
+`llama3.1:8b`; corridas `20261112-173610_0a20152` y `20261112-175942_c78b576` en `evaluacion/resultados/`):
+
+| Versión | Total p50 | Total p95 | Llamadas al LLM p50 (p95) |
+|---|---|---|---|
+| Antes: ficha en dos llamadas + QC_2 con el LLM | 321 s | 847 s | 17 (45) |
+| Ahora: ficha en una llamada JSON + QC_2 determinista | 138 s | 168 s | 8 (9) |
+
+Casi todo el tiempo es el paso 4 (fichas); clasificación y búsqueda tardan menos de 0.2 s.
 
 Lo que hace falta para completar la evaluación (trabajo de una persona): revisar los borradores de consultas,
 llenar las hojas `evaluacion/anotacion_juicios.csv` y `evaluacion/anotacion_fichas.csv`, y que un abogado revise
