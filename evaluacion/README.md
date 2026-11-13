@@ -53,12 +53,24 @@ hojas-anotacion     # 3-4. hojas para el abogado
 recuperacion --particion desarrollo
 ablacion --particion desarrollo
 pesos               #    elige en desarrollo; mide en prueba una sola vez
-qc --particion todas
+qc --particion desarrollo
 generacion
 latencia --ejemplos --max 10
 regresion           #    diagnóstico rápido con los ejemplos de la app (no es evaluación)
 qc-diagnostico      #    tasa de descarte de QC_1 sin anotaciones (no es evaluación)
 ```
 
-Para el número final se repiten `recuperacion`, `qc` y `generacion` con `--particion prueba`, **una sola vez**, con la
-configuración elegida en desarrollo.
+## Corrida final: congelar y medir una sola vez
+
+Cuando la configuración está elegida en desarrollo y las anotaciones están completas:
+
+```bash
+congelar                                  # evaluacion/congelado.json: código, corpus, índice, fichas, configuración, prompts, digest del modelo
+recuperacion --particion prueba
+qc --particion prueba
+generacion                                # la hoja de fichas no tiene particiones: siempre es evaluación final
+```
+
+Cada corrida final se niega a empezar si algo no coincide con `congelado.json` (lo dice en una línea) y solo se
+permite **una vez** por comando y congelado (`prueba_corridas.jsonl` guarda la marca). Repetirla exige
+`--forzar "motivo"`, y el motivo queda en el reporte. Las corridas de desarrollo solo avisan si algo cambió.

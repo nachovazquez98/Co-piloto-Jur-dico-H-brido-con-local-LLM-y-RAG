@@ -56,6 +56,12 @@ def snapshot_config() -> dict:
     return out
 
 
+def _digest() -> str | None:
+    from ..llm import digest_modelo
+
+    return digest_modelo(config.LLMSettings())
+
+
 def _limpio(v):
     if isinstance(v, (np.integer,)):
         return int(v)
@@ -99,7 +105,8 @@ class Corrida:
                 "semilla": config.EVAL_SEED, "parametros": self.parametros,
                 "corpus_fingerprint": manifest.get("corpus_fingerprint"),
                 "modelo_embeddings": manifest.get("embedding_model"),
-                "modelo_llm": config.LLMSettings().model, "borrador": self.borrador,
+                "modelo_llm": config.LLMSettings().model, "modelo_llm_digest": _digest(),
+                "semilla_llm": config.LLMSettings().seed, "borrador": self.borrador,
                 "advertencias": self.advertencias, "configuracion": snapshot_config(), **self.extra}
 
     def guardar(self, directorio: Path = config.RESULTADOS_DIR) -> tuple[Path, Path]:
@@ -123,7 +130,10 @@ class Corrida:
             lineas += ["> **BORRADOR — no reportable.** Hay consultas marcadas `borrador: true`.", ""]
         lineas += [f"- Fecha: {meta['fecha']}", f"- Commit: `{meta['commit']}`{' (con cambios sin confirmar)' if meta['sucio'] else ''}",
                    f"- Huella del corpus: `{meta['corpus_fingerprint']}` · embeddings `{meta['modelo_embeddings']}`",
-                   f"- LLM: `{meta['modelo_llm']}` · semilla {meta['semilla']}",
+                   f"- LLM: `{meta['modelo_llm']}` · digest `{meta['modelo_llm_digest'] or 'no disponible'}` · "
+                   f"semilla del LLM {meta['semilla_llm']} · semilla de evaluación {meta['semilla']}",
+                   f"- Congelado: `{meta.get('congelado') or 'sin congelar'}`"
+                   + (f" · **repetida con --forzar:** {meta['motivo_forzar']}" if meta.get("motivo_forzar") else ""),
                    f"- Parámetros: `{json.dumps(self.parametros, ensure_ascii=False)}`", ""]
         for a in self.advertencias:
             lineas.append(f"> ⚠️ {a}")

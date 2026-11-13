@@ -155,6 +155,22 @@ PROVIDERS: dict[str, tuple[str, type[LLMClient]]] = {
     "openai": ("API compatible con OpenAI (remota o local)", OpenAICompatibleClient),
 }
 
+def digest_modelo(settings: LLMSettings) -> str | None:
+    """Digest del modelo servido por Ollama (`/api/tags`): identifica los pesos exactos, no solo el nombre.
+    None si el proveedor no es Ollama o no responde (se reporta como "no disponible")."""
+    if settings.provider != "ollama":
+        return None
+    try:
+        r = requests.get(settings.base_url.rstrip("/") + "/api/tags", timeout=3)
+        r.raise_for_status()
+        for m in r.json().get("models", []):
+            if settings.model in (m.get("name"), m.get("model")):
+                return m.get("digest")
+    except (requests.RequestException, ValueError):
+        pass
+    return None
+
+
 PROVIDER_DEFAULT_URLS = {
     "ollama": "http://localhost:11434",
     "openai": "https://api.openai.com/v1",

@@ -1,6 +1,7 @@
 """Línea de comandos de la evaluación:  python -m copiloto_juridico.evaluacion <comando>
 
 Preparación (sin LLM):
+    congelar                         Huella de código, corpus, índice, fichas, configuración, prompts y modelo
     familias                         Exporta evaluacion/familias_penal.csv (tipo -> familia) para revisión
     plantilla                        Borrador estratificado de consultas (evaluacion/consultas_penal_borrador.jsonl)
     validar                          Valida consultas y juicios, detecta fuga y resume el conjunto
@@ -34,6 +35,8 @@ def _log(msg: str) -> None:
 
 
 def _guardar(corrida) -> None:
+    if "congelado" not in corrida.extra:  # corridas de diagnóstico: solo dejan constancia
+        _control(corrida, None, corrida.comando, None)
     pj, pm = corrida.guardar()
     print()
     print(corrida.markdown())
@@ -53,6 +56,34 @@ def _llm(con_cache: bool = True):
         sys.exit(f"❌ {msg}")
     _log(f"LLM: {msg} · semilla {getattr(settings, 'seed', None)} · temperatura {settings.temperature}")
     return LLMConCache(cliente) if con_cache else cliente
+
+
+def _control(corrida, particion: str | None, comando: str, motivo: str | None) -> None:
+    """Congelado: la partición de prueba exige lo congelado y una sola corrida; desarrollo solo avisa."""
+    from .congelado import ErrorCongelado, controlar
+
+    try:
+        info = controlar(particion, comando, motivo)
+    except ErrorCongelado as e:
+        sys.exit(f"❌ {e}")
+    for a in info.pop("advertencias"):
+        corrida.advertir(a)
+    corrida.extra.update(info)
+
+
+def cmd_congelar(args) -> None:
+    from .congelado import congelar
+    from .reporte import info_commit
+
+    if info_commit()["sucio"]:
+        sys.exit("❌ Hay cambios sin confirmar en src/ o app/: confírmalos antes de congelar (si no, no se puede "
+                 "reproducir lo evaluado).")
+    datos = congelar()
+    _log(f"✅ Congelado {datos['id']} en evaluacion/congelado.json:")
+    for k, v in datos.items():
+        if k not in ("id", "fecha"):
+            _log(f"   {k}: {v}")
+    _log("Las corridas con --particion prueba exigirán exactamente esto y correrán una sola vez por comando.")
 
 
 def cmd_familias(args) -> None:
@@ -191,8 +222,14 @@ def cmd_conceptos(args) -> None:
 
 def _entorno(args, comando: str, particion: str | None, **parametros):
     from .experimentos import cargar_entorno
+    from .reporte import Corrida
 
-    return cargar_entorno(comando, particion, Path(args.consultas), parametros, log=_log)
+    previo = Corrida(comando)
+    _control(previo, particion, comando, getattr(args, "forzar", None))  # antes de cargar nada
+    env = cargar_entorno(comando, particion, Path(args.consultas), parametros, log=_log)
+    env.corrida.advertencias[:0] = previo.advertencias
+    env.corrida.extra.update(previo.extra)
+    return env
 
 
 def cmd_recuperacion(args) -> None:
@@ -225,6 +262,7 @@ def cmd_pesos(args) -> None:
             exigir_revisadas(prueba)
         except ErrorValidacion as e:
             sys.exit(f"❌ {e} (o usa --sin-prueba)")
+        _control(env_dev.corrida, "prueba", "pesos", args.forzar)
         env_prueba = env_dev.__class__(env_dev.store, env_dev.clasificador, env_dev.familias, prueba,
                                        {**env_dev.conceptos}, env_dev.juicios, env_dev.corrida)
         from .experimentos import conceptos_de, leer_conceptos
@@ -251,6 +289,8 @@ def cmd_generacion(args) -> None:
     if not fichas:
         sys.exit(f"❌ No hay fichas anotadas en {config.FICHAS_ANOTADAS_PATH} (ver evaluacion/README.md).")
     corrida = Corrida("generacion")
+    # La hoja de fichas no se divide en particiones: toda corrida contra ella es evaluación final.
+    _control(corrida, "prueba", "generacion", args.forzar)
     corrida, muestra, generadas = experimento_generacion(fichas, load_corpus(), _llm(), corrida,
                                                          version_prompt=args.prompt_penal,
                                                          n_afirmaciones=args.n_afirmaciones, log=_log)
@@ -315,6 +355,9 @@ def main(argv=None) -> None:
     p.add_argument("--consultas", default=str(config.CONSULTAS_PATH), help="JSONL de consultas")
     sub = p.add_subparsers(dest="cmd", required=True)
 
+    s = sub.add_parser("congelar", help="Guarda la huella de lo que se evalúa (evaluacion/congelado.json)")
+    s.set_defaults(func=cmd_congelar)
+
     s = sub.add_parser("familias", help="Exporta el CSV tipo -> familia para revisión")
     s.add_argument("--forzar", action="store_true", help="Sobrescribe el CSV (se pierde la revisión)")
     s.set_defaults(func=cmd_familias)
@@ -354,6 +397,7 @@ def main(argv=None) -> None:
                                 ("latencia", cmd_latencia, "Latencia de punta a punta")):
         s = sub.add_parser(nombre, help=ayuda)
         s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
+        s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
         if nombre == "qc":
             s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ambas"], default="ambas")
         if nombre == "latencia":
@@ -366,6 +410,7 @@ def main(argv=None) -> None:
                    default="hit3_familia")
     s.add_argument("--paso", type=float, default=0.05)
     s.add_argument("--sin-prueba", action="store_true", help="Solo desarrollo (no toca la partición de prueba)")
+    s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
     s.set_defaults(func=cmd_pesos)
 
     s = sub.add_parser("qc-diagnostico", help="Tasa de descarte de QC_1 por versión y contexto (sin anotaciones)")
@@ -379,6 +424,7 @@ def main(argv=None) -> None:
     s = sub.add_parser("generacion", help="Fichas del conjunto C vs. anotación")
     s.add_argument("--prompt-penal", choices=["v10", "v11"], default=None)
     s.add_argument("--n-afirmaciones", type=int, default=100)
+    s.add_argument("--forzar", metavar="MOTIVO", help="Repite la corrida (es evaluación final; queda en el reporte)")
     s.set_defaults(func=cmd_generacion)
 
     args = p.parse_args(argv)
