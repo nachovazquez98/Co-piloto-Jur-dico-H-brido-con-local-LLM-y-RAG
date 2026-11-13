@@ -1083,3 +1083,59 @@ def experimento_latencia(env: Entorno, llm_cliente, max_consultas: int = 10,
         corrida.extra["vram_pico_embeddings_gb"] = round(torch.cuda.max_memory_allocated() / 1e9, 2)
     return corrida
 
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Diagnóstico de las fichas precalculadas (sin anotación)
+# --------------------------------------------------------------------------------------------------------------
+
+
+def diagnostico_fichas(tabla: pd.DataFrame, version: str) -> Corrida:
+    """Qué tan confiables parecen las fichas precalculadas, SIN anotación humana: concordancia del sentido del
+    fallo entre el LLM y los resolutivos (reglas), artículos citados que no aparecen en la sentencia, JSON inválido
+    tras el reintento y "dato no disponible" por campo. No mide exactitud: dice dónde mirar primero al anotar."""
+    from ..fichas import DATO_NO_DISPONIBLE, FichaPenal, extraer_articulos
+
+    corrida = Corrida("fichas-diagnostico", parametros={"version_ficha": version})
+    t = tabla[tabla["version"] == version]
+    n = len(t)
+    validas = t[t["json_valido"]]
+    fichas = [FichaPenal.desde_guardada(j) for j in validas["ficha"]]
+    ambos = validas.dropna(subset=["sentido_llm", "sentido_reglas"])
+    citados = [len(extraer_articulos(f.campos_markdown())) for f in fichas]
+    faltan = [len(json.loads(a)) for a in validas["articulos_no_encontrados"]]
+    p = lambda k, d: f"{k}/{d} ({k / d:.1%})" if d else "—"  # noqa: E731
+    corrida.tabla("Resumen", "Diagnóstico sin anotación: un desacuerdo o un artículo ausente no es necesariamente un "
+                  "error del LLM (las reglas también fallan y hay sentencias con páginas omitidas).", pd.DataFrame([
+                      {"indicador": "Fichas de esta versión", "valor": str(n)},
+                      {"indicador": "JSON inválido tras el reintento", "valor": p(n - len(validas), n)},
+                      {"indicador": "Necesitaron reintento (y quedaron válidas)",
+                       "valor": p(int((validas["intentos"] > 1).sum()), len(validas))},
+                      {"indicador": "Sentido leído por reglas (cobertura)",
+                       "valor": p(int(validas["sentido_reglas"].notna().sum()), len(validas))},
+                      {"indicador": "Sentido LLM = reglas (donde hay ambos)",
+                       "valor": p(int((ambos["sentido_llm"] == ambos["sentido_reglas"]).sum()), len(ambos))},
+                      {"indicador": "Fichas con algún artículo no encontrado en la sentencia",
+                       "valor": p(sum(f > 0 for f in faltan), len(faltan))},
+                      {"indicador": "Artículos citados no encontrados en la sentencia",
+                       "valor": p(sum(faltan), sum(citados))},
+                      {"indicador": "Segundos por ficha (p50 / p95)",
+                       "valor": " / ".join(f"{v:.0f}" for v in m.percentiles(t["segundos"].tolist()).values()) if n else "—"},
+                  ]), diagnostico=True)
+    if len(ambos):
+        cruce = pd.crosstab(ambos["sentido_llm"], ambos["sentido_reglas"]).reset_index()
+        corrida.tabla("Sentido del fallo: LLM (filas) vs. resolutivos por reglas (columnas)",
+                      "La diagonal son coincidencias.", cruce.rename(columns={"sentido_llm": "LLM \\ reglas"}),
+                      diagnostico=True)
+    campos = ["tribunal", "fecha_resolucion", "identificador", "etapa_procesal", "acto_impugnado", "apelante",
+              "delitos", "hechos_clave", "decision", "resumen"]
+    filas = [{"campo": c, "dato no disponible": p(sum(getattr(f, c) == DATO_NO_DISPONIBLE for f in fichas), len(fichas))}
+             for c in campos]
+    filas += [{"campo": c, "dato no disponible": p(sum(not getattr(f, c) for f in fichas), len(fichas))}
+              for c in ("agravios", "fundamento_legal", "pruebas_decisivas")]
+    filas.append({"campo": "sentido_fallo = OTRO", "dato no disponible": p(sum(f.sentido_fallo == "OTRO" for f in fichas),
+                                                                         len(fichas))})
+    corrida.tabla("Dato no disponible por campo", "Listas: vacías. Un campo muy vacío es el primero a revisar al "
+                  "anotar (o el texto lo testó).", pd.DataFrame(filas), diagnostico=True)
+    corrida.extra["n_fichas"] = n
+    return corrida

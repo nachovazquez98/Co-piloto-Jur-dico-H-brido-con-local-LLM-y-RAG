@@ -265,6 +265,16 @@ class FichaPenal:
         return cls(**campos, sentido_fallo=sentido, agravios=agravios,
                    fundamento_legal=_lista(d.get("fundamento_legal")), pruebas_decisivas=_lista(d.get("pruebas_decisivas")))
 
+    def a_json(self) -> str:
+        """La ficha validada como JSON (así se guarda precalculada)."""
+        from dataclasses import asdict
+
+        return _json.dumps(asdict(self), ensure_ascii=False)
+
+    @classmethod
+    def desde_guardada(cls, texto_json: str) -> "FichaPenal":
+        return cls(**_json.loads(texto_json))
+
     def campos_markdown(self) -> str:
         """La ficha como lista de campos `- **Campo:** valor`, el mismo formato de la extracción en dos llamadas
         (así la lectura de campos y las verificaciones funcionan igual en ambos modos)."""
@@ -355,3 +365,37 @@ def familia_del_delito(delitos: str) -> str:
         if patron.search(slug):
             return f
     return FAMILIA_OTROS
+
+
+def generar_ficha_json(generate, contexto: str) -> tuple["FichaPenal | None", dict]:
+    """Ficha penal en una llamada (JSON validado); si no se puede interpretar, un reintento que le dice al LLM el
+    error. `generate(prompt, json_mode=True)` es la función del cliente. Devuelve (ficha | None, info) con
+    info = {"intentos": 1 | 2, "error": mensaje del último error}."""
+    from . import prompts
+
+    prompt = prompts.PROMPT_FICHA_PENAL_JSON.format(contexto=contexto)
+    try:
+        return FichaPenal.desde_json(generate(prompt, json_mode=True)), {"intentos": 1, "error": ""}
+    except ValueError as e:
+        error = str(e)
+    respuesta = generate(prompt + f"\n\nTu respuesta anterior no era válida ({error}). Responde solo con el JSON "
+                         "completo y correcto.", json_mode=True)
+    try:
+        return FichaPenal.desde_json(respuesta), {"intentos": 2, "error": error}
+    except ValueError as e2:
+        return None, {"intentos": 2, "error": str(e2)}
+
+
+def verificaciones(texto_ficha: str, texto_sentencia: str) -> dict:
+    """Chequeos deterministas de una ficha contra su sentencia (sin LLM): sentido del fallo leído de los
+    resolutivos, sentido que dio el LLM, artículos citados que no aparecen en el texto y las marcas "verificar"
+    que ve el abogado."""
+    reglas = sentido_por_reglas(texto_sentencia)
+    llm = datos_penales(texto_ficha).get("sentido_fallo")
+    faltan = verificar_articulos(texto_ficha, texto_sentencia)
+    marcas = []
+    if reglas and llm and llm != reglas:
+        marcas.append(f"sentido del fallo: la ficha dice {llm}, los resolutivos dicen {reglas}")
+    if faltan:
+        marcas.append("artículos no encontrados en la sentencia: " + ", ".join(faltan))
+    return {"sentido_reglas": reglas, "sentido_llm": llm, "articulos_no_encontrados": faltan, "verificar": marcas}

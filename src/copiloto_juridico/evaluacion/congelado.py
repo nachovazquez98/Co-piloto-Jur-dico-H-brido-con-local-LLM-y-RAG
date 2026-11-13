@@ -1,7 +1,7 @@
 """Congelar lo que se evalúa (v11.1).
 
 `congelar` guarda en `evaluacion/congelado.json` la huella de todo lo que cambia los resultados: código, corpus,
-índice, configuración efectiva (config.py + variables de entorno), texto de cada prompt y
+índice, fichas precalculadas, configuración efectiva (config.py + variables de entorno), texto de cada prompt y
 digest del modelo de Ollama. Después:
 
 - Una corrida con la partición de **prueba** (o "todas", que la incluye) se niega a correr si algo no coincide, y
@@ -55,6 +55,11 @@ def huella_indice() -> str:
     return _archivos((config.INDICE_DIR, "*"))
 
 
+def huella_fichas() -> str:
+    p = config.FICHAS_PRECALCULADAS_PATH
+    return _sha(p.read_bytes()) if p.exists() and config.FICHAS_PRECALCULADAS else "sin fichas precalculadas"
+
+
 def hash_configuracion() -> str:
     from .reporte import snapshot_config
 
@@ -81,7 +86,7 @@ def estado_actual() -> dict:
 
     s = config.LLMSettings()
     return {"codigo": huella_codigo(), "corpus": huella_corpus(), "indice": huella_indice(),
-            "configuracion": hash_configuracion(),
+            "fichas_precalculadas": huella_fichas(), "configuracion": hash_configuracion(),
             "prompts": versiones_prompts(), "modelo": s.model, "digest_modelo": digest_modelo(s) or "no disponible"}
 
 

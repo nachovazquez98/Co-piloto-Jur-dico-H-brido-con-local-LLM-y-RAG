@@ -211,24 +211,15 @@ def balance_para_defensa(precedentes: list["Precedente"]) -> str:
 
 
 def verificar_ficha(prec: "Precedente") -> None:
-    """Chequeos deterministas de la ficha contra el texto de la sentencia (sin LLM).
-
-    - Sentido del fallo: el de los resolutivos (por reglas) contra el del LLM; si difieren, se marca.
-    - Artículos citados que no aparecen en el texto de la sentencia: se marcan y se cuentan.
-    """
-    from .fichas import datos_penales, sentido_por_reglas, verificar_articulos
+    """Chequeos deterministas de la ficha contra el texto de la sentencia (`fichas.verificaciones`): sentido del
+    fallo de los resolutivos contra el del LLM y artículos citados que no aparecen en el texto."""
+    from .fichas import verificaciones
 
     if prec.candidato.materia != "penal":
         return
-    prec.sentido_reglas = sentido_por_reglas(prec.candidato.texto)
-    sentido_llm = datos_penales(prec.extraccion).get("sentido_fallo")
-    if prec.sentido_reglas and sentido_llm and sentido_llm != prec.sentido_reglas:
-        prec.verificar.append(f"sentido del fallo: la ficha dice {sentido_llm}, los resolutivos dicen "
-                              f"{prec.sentido_reglas}")
-    prec.articulos_no_encontrados = verificar_articulos(prec.extraccion, prec.candidato.texto)
-    if prec.articulos_no_encontrados:
-        prec.verificar.append("artículos no encontrados en la sentencia: "
-                              + ", ".join(prec.articulos_no_encontrados))
+    v = verificaciones(prec.extraccion, prec.candidato.texto)
+    prec.sentido_reglas, prec.articulos_no_encontrados = v["sentido_reglas"], v["articulos_no_encontrados"]
+    prec.verificar += v["verificar"]
 
 
 _RE_VEREDICTO = re.compile(r"veredicto[^a-záéíóú]*\b(s[ií]|no)\b", re.IGNORECASE)
@@ -338,24 +329,23 @@ class Copiloto:
         self.llamadas += 1
         return self.llm.generate(prompt, json_mode=True) if json_mode else self.llm.generate(prompt)
 
-    def _ficha_json(self, contexto: str, logs: list[str]):
-        """Ficha penal en una llamada (JSON validado); si no se puede interpretar, un reintento con el error."""
-        from .fichas import FichaPenal
+    def _ficha_json(self, cand: Candidato, contexto: str, logs: list[str]):
+        """Ficha penal estructurada: la precalculada si existe para esta sentencia, este texto y esta versión del
+        prompt y del modelo (`fichas-batch`); si no, una llamada al LLM (JSON validado, con un reintento)."""
+        from .fichas import generar_ficha_json
+        from .fichas_precalculadas import ficha_guardada
 
-        prompt = prompts.PROMPT_FICHA_PENAL_JSON.format(contexto=contexto)
-        respuesta = self._llm(prompt, json_mode=True)
-        try:
-            return FichaPenal.desde_json(respuesta)
-        except ValueError as e:
-            error = str(e)
-            logs.append(f"   ⚠️ Ficha no válida ({error}). Reintentando una vez...")
-        respuesta = self._llm(prompt + f"\n\nTu respuesta anterior no era válida ({error}). Responde solo con el "
-                              "JSON completo y correcto.", json_mode=True)
-        try:
-            return FichaPenal.desde_json(respuesta)
-        except ValueError as e2:
-            logs.append(f"   ⚠️ Tampoco en el reintento ({e2}); se usa la extracción en dos llamadas.")
-            return None
+        if config.FICHAS_PRECALCULADAS:
+            guardada = ficha_guardada(cand.doc_id, cand.texto, self.llm.settings)
+            if guardada is not None:
+                logs.append("   -> Ficha penal precalculada (sin llamar al LLM).")
+                return guardada
+        logs.append(f"   -> Ficha penal en una llamada ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
+        ficha, info = generar_ficha_json(self._llm, contexto)
+        if info["intentos"] > 1:
+            logs.append(f"   ⚠️ Ficha no válida ({info['error'] if ficha is None else 'primer intento'}); "
+                        + ("se usa la extracción en dos llamadas." if ficha is None else "se reintentó una vez."))
+        return ficha
 
     def _analizar_candidato(self, consulta: str, cand: Candidato, fuente: str, categorias: list[str],
                             op: "Opciones") -> tuple["Precedente | None", str, list[str]]:
@@ -364,8 +354,7 @@ class Copiloto:
         max_chars = self.llm.settings.max_context_chars
         contexto = recortar_contexto(cand.texto, max_chars)
         if cand.materia == "penal" and config.FICHA_MODO == "json":
-            logs.append(f"   -> Ficha penal en una llamada ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
-            ficha = self._ficha_json(contexto, logs)
+            ficha = self._ficha_json(cand, contexto, logs)
             if ficha is not None:
                 prec = Precedente(0, cand, fuente, "", ficha.campos_markdown(), False, ficha=ficha)
                 verificar_ficha(prec)

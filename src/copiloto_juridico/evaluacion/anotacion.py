@@ -115,10 +115,21 @@ def hoja_fichas(corpus: pd.DataFrame, familias: dict[str, str], n: int = 40,
         for f in orden:
             if grupos[f] and len(elegidos) < n:
                 elegidos.append(grupos[f].pop())
+    from ..fichas_precalculadas import ficha_guardada, version_ficha
+
+    settings = config.LLMSettings()
     filas = []
     for d in elegidos:
         r = penal.set_index("id").loc[d]
+        ficha = ficha_guardada(d, r["texto"], settings)
+        if ficha is not None:  # lo mismo que muestra la app en "Ficha completa"
+            from ..fichas import verificaciones
+
+            v = verificaciones(ficha.campos_markdown(), r["texto"])
+            ficha_app = ficha.informe_markdown(v["articulos_no_encontrados"], v["sentido_reglas"])
         filas.append({"doc_id": d, "familia": r["familia"], "resumen": resumen_sentencia(r["texto"], r["tipo"], r["fecha"]),
                       "sentido_fallo": "", "etapa": "", "acto_impugnado": "", "delito": "", "articulos": "",
-                      "agravios": "", "consulta_id": "", "ficha_aceptable": ""})
+                      "agravios": "", "consulta_id": "", "ficha_aceptable": "", "errores_ficha": "",
+                      "version_ficha": version_ficha(settings) if ficha is not None else "",
+                      "ficha_app": ficha_app if ficha is not None else ""})
     return pd.DataFrame(filas)

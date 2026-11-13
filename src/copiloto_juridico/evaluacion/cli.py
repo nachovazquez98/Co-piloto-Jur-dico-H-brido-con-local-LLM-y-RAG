@@ -14,6 +14,7 @@ Con LLM:
     qc --particion P                 QC_1 vs. juicios humanos (inicio vs. fragmento similar) y QC_2
     generacion                       Fichas del conjunto C vs. anotación; CSV para marcar alucinaciones
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
+    fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
 """
 
 from __future__ import annotations
@@ -304,6 +305,17 @@ def cmd_generacion(args) -> None:
     _log(f"\nResultados: {pj}\nAfirmaciones para marcar alucinaciones: {base}_afirmaciones.csv")
 
 
+def cmd_fichas_batch(args) -> None:
+    from ..datos.corpus import load_corpus
+    from ..fichas_precalculadas import cargar, generar_todas, version_ficha
+    from .experimentos import diagnostico_fichas
+
+    settings = config.LLMSettings()
+    if not args.solo_diagnostico:
+        generar_todas(load_corpus(), _llm(con_cache=False), limite=args.max, log=_log)
+    _guardar(diagnostico_fichas(cargar(), version_ficha(settings)))
+
+
 def cmd_qc_diagnostico(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -412,6 +424,11 @@ def main(argv=None) -> None:
     s.add_argument("--sin-prueba", action="store_true", help="Solo desarrollo (no toca la partición de prueba)")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
     s.set_defaults(func=cmd_pesos)
+
+    s = sub.add_parser("fichas-batch", help="Ficha JSON de cada sentencia penal, una sola vez (reanudable)")
+    s.add_argument("--max", type=int, default=None, help="Fichas a generar en esta corrida (todas por defecto)")
+    s.add_argument("--solo-diagnostico", action="store_true", help="Solo el reporte, sin llamar al LLM")
+    s.set_defaults(func=cmd_fichas_batch)
 
     s = sub.add_parser("qc-diagnostico", help="Tasa de descarte de QC_1 por versión y contexto (sin anotaciones)")
     s.add_argument("--k", type=int, default=5, help="Candidatos por consulta")

@@ -38,8 +38,10 @@ nombre; `validar` calcula el acuerdo (kappa de Cohen). Si es menor a 0.6, se rev
 
 ## 4. Abogado: anotar fichas — `anotacion_fichas.csv`
 
-Para cada sentencia, leyéndola completa: `sentido_fallo` (CONFIRMA / MODIFICA / REVOCA / REPONE / OTRO), `etapa`,
-`acto_impugnado`, `delito`, `articulos` (números separados por `;`) y `agravios`. Las filas vacías se ignoran.
+Para cada sentencia, leyéndola completa **antes de mirar la ficha del sistema**: `sentido_fallo` (CONFIRMA /
+MODIFICA / REVOCA / REPONE / OTRO), `etapa`, `acto_impugnado`, `delito`, `articulos` (números separados por `;`) y
+`agravios`. Después lee `ficha_app`, que es exactamente la ficha precalculada que muestra la app (`version_ficha` dice
+cuál), y escribe `ficha_aceptable` (si/no) y, en `errores_ficha`, qué dato está mal. Las filas vacías se ignoran.
 
 ## Orden de los comandos
 
@@ -49,6 +51,7 @@ plantilla           #    muestreo estratificado de sentencias (consultas_penal_b
 borradores          # 2. el LLM redacta los borradores (consultas_penal.jsonl)
 validar             #    fuga, nombres de tipo, acuerdo entre anotadores
 conceptos           #    conceptos clave con el LLM, una vez
+fichas-batch        #    ficha de cada sentencia penal, una vez (reanudable; ~8 h) + diagnóstico sin anotación
 hojas-anotacion     # 3-4. hojas para el abogado
 recuperacion --particion desarrollo
 ablacion --particion desarrollo
