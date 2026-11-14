@@ -166,3 +166,51 @@ def cargar_familias(tipos: list[str], path: Path = config.FAMILIAS_CSV) -> dict[
     revisado = _leer_csv(str(path), path.stat().st_mtime) if path.exists() else {}
     return {t: revisado.get(t) or asignar_familia(t).familia for t in tipos}
 
+
+
+def coherencia(doc_ids, emb, doc_tipo: dict[str, str], familias: dict[str, str], min_docs: int = 3):
+    """Sustituye a la revisión del abogado (v11.2) con una comprobación sin LLM: para cada tipo con al menos
+    `min_docs` sentencias, a qué familia se parece más su centroide de embeddings (el promedio de los fragmentos de
+    sus sentencias, centrado). La familia de comparación se calcula SIN ese tipo. Un tipo más cercano a otra familia que a la
+    suya es un posible error de agrupación (o un tipo con varios delitos): diagnóstico, no una decisión."""
+    import numpy as np
+    import pandas as pd
+
+    doc_ids = np.asarray(doc_ids)
+    e = np.asarray(emb, dtype=np.float32)
+    e = e - e.mean(axis=0)  # sin el componente común (los embeddings de e5 tienen todos coseno ~0.99 entre sí)
+    df = pd.DataFrame({"doc": doc_ids, "i": np.arange(len(doc_ids))})
+    df = df[df["doc"].map(lambda d: d in doc_tipo)]
+    vec_doc = {d: e[g["i"].to_numpy()].mean(axis=0) for d, g in df.groupby("doc")}
+    por_tipo: dict[str, list] = {}
+    for d, v in vec_doc.items():
+        por_tipo.setdefault(doc_tipo[d], []).append(v)
+    suma = {t: np.sum(vs, axis=0) for t, vs in por_tipo.items()}
+    n = {t: len(vs) for t, vs in por_tipo.items()}
+    fam_suma: dict[str, np.ndarray] = {}
+    fam_n: dict[str, int] = {}
+    for t in suma:
+        f = familias[t]
+        fam_suma[f] = fam_suma.get(f, 0) + suma[t]
+        fam_n[f] = fam_n.get(f, 0) + n[t]
+
+    def cos(a, b):
+        return float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+    filas = []
+    for t in sorted(suma):
+        if n[t] < min_docs:
+            continue
+        c = suma[t] / n[t]
+        sims = {}
+        for f in fam_suma:
+            s, k = (fam_suma[f] - suma[t], fam_n[f] - n[t]) if f == familias[t] else (fam_suma[f], fam_n[f])
+            if k > 0:
+                sims[f] = cos(c, s / k)
+        if familias[t] not in sims:
+            continue  # el tipo es toda su familia: no hay con qué comparar
+        cercana = max(sims, key=sims.get)
+        filas.append({"tipo": t, "sentencias": n[t], "familia asignada": familias[t], "familia más cercana": cercana,
+                      "similitud asignada": sims[familias[t]], "similitud más cercana": sims[cercana],
+                      "coincide": cercana == familias[t]})
+    return pd.DataFrame(filas)

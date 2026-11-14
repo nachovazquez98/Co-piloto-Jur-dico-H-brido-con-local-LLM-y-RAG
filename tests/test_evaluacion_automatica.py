@@ -135,3 +135,20 @@ def test_fichas_contra_la_referencia():
     assert fila["familia_ok"] and fila["acto_impugnado_ok"] and fila["apelante_ok"] and not fila["sentido_ok"]
     t = R.tabla_exactitud_fichas(comp).set_index("campo")
     assert t.loc["sentido", "exactitud"] == 0 and t.loc["familia", "exactitud"] == 1
+
+
+def test_coherencia_de_familias_con_embeddings():
+    import numpy as np
+
+    from copiloto_juridico.evaluacion.familias import coherencia
+
+    # tipos a1, a2 (familia A) cerca de (1, 0); b1 (familia B) cerca de (0, 1); x (asignado a B) está junto a A
+    docs, emb, doc_tipo = [], [], {}
+    for tipo, v in (("a1", (1, 0.1)), ("a2", (1, -0.1)), ("b1", (0.1, 1)), ("b2", (-0.1, 1)), ("x", (1, 0))):
+        for i in range(3):
+            d = f"{tipo}-{i}"
+            docs.append(d), emb.append(v), doc_tipo.update({d: tipo})
+    fam = {"a1": "A", "a2": "A", "b1": "B", "b2": "B", "x": "B"}
+    t = coherencia(docs, np.array(emb), doc_tipo, fam).set_index("tipo")
+    assert t.loc["a1", "coincide"] and t.loc["b1", "coincide"]
+    assert not t.loc["x", "coincide"] and t.loc["x", "familia más cercana"] == "A"

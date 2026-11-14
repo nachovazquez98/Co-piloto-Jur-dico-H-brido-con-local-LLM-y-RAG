@@ -3,6 +3,7 @@
 Preparación (sin LLM):
     congelar                         Huella de código, corpus, índice, fichas, configuración, prompts y modelo
     familias                         Exporta evaluacion/familias_penal.csv (tipo -> familia) para revisión
+    familias --coherencia            Comprueba la agrupación con los embeddings del índice (v11.2)
     plantilla                        Borrador estratificado de consultas (evaluacion/consultas_penal_borrador.jsonl)
     validar                          Valida consultas y juicios, detecta fuga y resume el conjunto
     kappa-piloto                     Acuerdo del piloto de anotación (hacerlo antes de los 300 juicios)
@@ -105,6 +106,9 @@ def cmd_familias(args) -> None:
 
     corpus = load_corpus()
     penal = corpus[corpus["materia"] == "penal"]
+    if args.coherencia:
+        _guardar(_coherencia_familias(penal))
+        return
     conteo = penal["tipo"].value_counts().to_dict()
     try:
         path = exportar_csv(conteo, forzar=args.forzar)
@@ -119,6 +123,27 @@ def cmd_familias(args) -> None:
         _log(f"   {n:5d}  {f}")
     _log(f"\nCSV para el abogado: {path}\nEdita la columna 'familia' y pon 'si' en 'revisado'. "
          "El código usará este archivo en lugar de las reglas.")
+
+
+def _coherencia_familias(penal):
+    from ..datos.indice import load_index
+    from .familias import cargar_familias, coherencia
+    from .reporte import Corrida
+
+    _, chunks, emb = load_index()
+    familias = cargar_familias(penal["tipo"].unique().tolist())
+    t = coherencia(chunks["doc_id"].to_numpy(), emb, dict(zip(penal["id"], penal["tipo"])), familias)
+    corrida = Corrida("familias-coherencia", parametros={"min_sentencias_por_tipo": 3})
+    ok = int(t["coincide"].sum()) if len(t) else 0
+    corrida.tabla("Resumen", "Tipos con al menos 3 sentencias cuyo centroide de embeddings queda más cerca de su "
+                  "propia familia (calculada sin ese tipo) que de cualquier otra. Sustituye a la revisión del abogado "
+                  "como comprobación de consistencia; no dice qué agrupación es la jurídicamente correcta.",
+                  pd.DataFrame([{"tipos": len(t), "más cerca de su familia": ok,
+                                 "más cerca de otra": len(t) - ok}]))
+    if len(t) - ok:
+        corrida.tabla("Tipos más cercanos a otra familia", "Posibles errores de agrupación o tipos con varios delitos.",
+                      t[~t["coincide"]].drop(columns="coincide").sort_values("sentencias", ascending=False))
+    return corrida
 
 
 def cmd_plantilla(args) -> None:
@@ -514,6 +539,7 @@ def main(argv=None) -> None:
 
     s = sub.add_parser("familias", help="Exporta el CSV tipo -> familia para revisión")
     s.add_argument("--forzar", action="store_true", help="Sobrescribe el CSV (se pierde la revisión)")
+    s.add_argument("--coherencia", action="store_true", help="Comprueba la agrupación con embeddings (sin LLM)")
     s.set_defaults(func=cmd_familias)
 
     s = sub.add_parser("plantilla", help="Borrador estratificado de consultas a redactar")
