@@ -129,10 +129,14 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
 - Consultas difíciles (`20261113-115133_fb1f3fe_robustez`): las 8 terminaron, ninguna síntesis pronosticó el
   resultado (tampoco con instrucciones inyectadas en la consulta) y los datos personales de prueba no quedaron en
   ningún archivo; pero las consultas civil, familiar y fuera de tema **no** recibieron el aviso de "no hay
-  precedentes del mismo tipo" (ver [Limitaciones](#limitaciones)).
+  precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia (ver [Limitaciones](#limitaciones)).
 
-Lo que hace falta para completar la evaluación (trabajo de una persona) está en orden en
-[`evaluacion/README.md`](evaluacion/README.md).
+**Evaluación automática (v11.2).** Como no hay abogados disponibles para anotar, la referencia se construye sin
+intervención humana: el delito, con la categoría que asignó el STJ en su portal; el acto impugnado, el apelante y el
+sentido del fallo, por mayoría entre reglas y dos jueces LLM de familias distintas a la del modelo de la app
+(`qwen2.5:14b`, `gemma2:9b`, uno a la vez en la GPU). Cada juez se valida antes contra la categoría del STJ. El orden
+de los comandos está en [`evaluacion/README.md`](evaluacion/README.md); las corridas finales se hacen con el corpus
+completo, después de las descargas pendientes.
 
 ## Línea de comandos
 
@@ -168,16 +172,19 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 
 - **Cobertura:** muchos tipos penales tienen una o ninguna sentencia; cuando ningún precedente sale de las familias
   detectadas, la app lo dice.
-- **Consultas fuera de materia:** el corpus es penal y la app no detecta todavía una consulta civil, familiar o ajena
-  al derecho: devuelve los precedentes penales más cercanos sin avisar. La señal para avisar (`kem_max`) separa mal
-  las consultas sin respuesta en desarrollo (40 % de falsas alarmas, `20261113-130208_fb1f3fe_recuperacion`), así que
-  el umbral sigue sin fijar.
+- **Consultas fuera de materia:** el corpus es penal. Desde v11.2 la app avisa si la consulta no menciona ningún
+  delito ni término del proceso penal (lista de palabras, no un modelo: una consulta penal redactada sin ninguna de
+  ellas también recibiría el aviso). La señal de coincidencia (`kem_max`) separa mal las consultas sin respuesta en
+  desarrollo (40 % de falsas alarmas, `20261113-130208_fb1f3fe_recuperacion`), así que ese umbral sigue sin fijar.
 - **Páginas omitidas:** parte del corpus se procesó con una versión anterior que muestreaba los PDF largos; esas
   sentencias lo indican en el texto (lista en `evaluacion/paginas_omitidas.csv`, para volver a descargarlas). La
   ingesta actual lee los PDF completos.
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
+- **Evaluación sin expertos:** la referencia es lo que dicen el tribunal (su categoría) y el texto de la sentencia,
+  leído por reglas y por jueces LLM; mide si el sistema encuentra precedentes del mismo delito y el mismo problema
+  procesal, no si un abogado los consideraría útiles.
 - **Sin OCR:** los PDF escaneados no aportan texto. **Datos testados:** nunca se infieren.
 
 ## Desarrollo

@@ -2,6 +2,30 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y versionado [SemVer](https://semver.org/lang/es/).
 
+## [Sin publicar] - 11.2.0
+
+Evaluación sin anotadores humanos (no hay abogados disponibles): la referencia sale de la categoría que asignó el STJ,
+del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a la de la app, validados antes de usarse.
+
+### Añadido
+- `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez (`qwen2.5:14b`,
+  `gemma2:9b`; `qwen2.5:7b` no pasó la prueba piloto), reanudables y con la clave del prompt.
+- `evaluacion referencias`: valida cada juez contra la categoría del STJ (mínimo 0.80 fijado antes de correrlos),
+  referencia por mayoría de lectores para acto impugnado, apelante y sentido, juicios de relevancia con el formato
+  de la hoja del abogado y validación automática de las consultas (sustituye a `revisado: true`).
+- `evaluacion fichas-referencia`: fichas precalculadas contra la referencia, con IC 95 %.
+- `evaluacion esfuerzo`: sentencias que hay que abrir para encontrar 3 útiles con el portal, la búsqueda por
+  palabras y la app (sustituye al estudio de uso).
+- `evaluacion familias --coherencia`: comprueba la agrupación tipo → familia con los embeddings del índice.
+- `evaluacion borradores --ampliar N`: más consultas por familia sin tocar las existentes.
+- `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas y nuevas).
+
+### Cambiado
+- La app avisa cuando la consulta no menciona ningún delito ni término del proceso penal (antes, las consultas
+  civiles, familiares o ajenas al derecho recibían precedentes penales sin aviso).
+- La evaluación usa la referencia automática si existe (`COPILOTO_EVALUACION_AUTOMATICA`); las hojas de anotación
+  humana siguen sirviendo si se desactiva.
+
 ## [11.1.0] - 2026-11-13
 
 Preparación de la evaluación final: lo evaluado queda congelado, la partición de prueba se usa una sola vez y las

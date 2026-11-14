@@ -1,15 +1,61 @@
-# Evaluación: qué tiene que hacer cada persona
+# Evaluación
 
-Ningún número es reportable mientras haya consultas con `revisado: false`: la partición de **prueba** se rechaza
-hasta entonces. Todos los comandos: `python -m copiloto_juridico.evaluacion <comando>` desde la raíz del repositorio.
+Todos los comandos: `python -m copiloto_juridico.evaluacion <comando>` desde la raíz del repositorio.
 
-## 1. Abogado penalista: revisar las familias de delito — `familias_penal.csv`
+## Evaluación automática, sin anotadores (v11.2)
+
+No hay abogados disponibles para anotar, así que la referencia se construye sin intervención humana:
+
+| Qué haría el abogado | Referencia automática |
+|---|---|
+| Revisar las consultas | Comprobaciones de la guía (fuga, nombre del tipo, datos identificables, negativas del modelo) y aceptación de los dos jueces LLM (`referencias`) |
+| Juzgar la relevancia (0/1/2) | Mismo delito: familia de la **categoría del STJ** (externa). Mismo problema procesal: mayoría entre las reglas y los dos jueces. 2 = ambos, 1 = uno, 0 = ninguno |
+| Anotar fichas | Familia: categoría del STJ. Acto impugnado, apelante y sentido: mayoría entre reglas y jueces (sobre todas las sentencias) |
+| Kappa entre anotadores | Kappa entre reglas y cada juez, por campo y en la relevancia |
+| Revisar las familias | `familias --coherencia`: centroides de embeddings por tipo y familia |
+| Estudio de uso | `esfuerzo`: sentencias que hay que abrir para encontrar 3 útiles (portal, búsqueda por palabras, app) |
+
+Los jueces (`config.MODELOS_JUECES`: `qwen2.5:14b` y `gemma2:9b`) son modelos de familias distintas a la de la app y
+corren **uno a la vez** (8 GB de VRAM; `qwen2.5:14b` usa además el procesador). Un juez solo cuenta si acierta la familia
+de la categoría del STJ en al menos `JUEZ_EXACTITUD_MINIMA` = 0.80 de las sentencias, criterio fijado antes de
+correrlos. Límite que hay que declarar: es una evaluación contra lo que dicen el tribunal y el texto, no contra el
+juicio de un experto sobre la utilidad de un precedente.
+
+Orden, con el corpus definitivo (después de las descargas):
+
+```bash
+copiloto-datos construir-corpus --pdfs CARPETA ...  # y luego: copiloto-datos indexar (incluye metadatos)
+fichas-batch                     # fichas de las sentencias nuevas o cambiadas (llama3.1:8b)
+borradores --ampliar 10          # consultas nuevas hasta 10 por familia (llama3.1:8b)
+conceptos                        # conceptos clave de las consultas (llama3.1:8b)
+jueces --pares                   # pares (consulta, sentencia) a juzgar; sin LLM
+jueces --modelo qwen2.5:14b      # una tanda por juez (reanudable)
+jueces --modelo gemma2:9b
+referencias                      # referencias, juicios y consultas validadas; sin LLM
+congelar
+recuperacion --particion prueba
+qc --particion prueba
+fichas-referencia --particion prueba
+esfuerzo --particion prueba
+familias --coherencia
+```
+
+Las consultas validadas no necesitan `revisado: true`; las demás no entran a la evaluación. Si algún día hay un
+abogado, las secciones siguientes siguen valiendo y sus hojas sustituyen a la referencia automática
+(`COPILOTO_EVALUACION_AUTOMATICA=false`).
+
+## Evaluación con anotadores humanos (si hay un abogado disponible)
+
+Ningún número es reportable mientras haya consultas con `revisado: false` (y sin validar): la partición de
+**prueba** se rechaza hasta entonces.
+
+### 1. Abogado penalista: revisar las familias de delito — `familias_penal.csv`
 
 Cada tipo penal del portal está asignado a una familia. Revisa la columna `familia` (sobre todo las filas con
 `revisar = si`, que traen la duda en `nota`), corrígela si hace falta y pon `revisado = si`. El sistema usa este
 archivo tal como quede.
 
-## 2. Revisar las consultas — `consultas_penal.jsonl`
+### 2. Revisar las consultas — `consultas_penal.jsonl`
 
 Son borradores escritos por el LLM a partir de cada sentencia (comando `borradores`). Para cada línea:
 
@@ -22,21 +68,21 @@ Son borradores escritos por el LLM a partir de cada sentencia (comando `borrador
 Las líneas `S…` (`sin_respuesta: true`) son temas sin sentencias en el corpus; sirven para medir si el sistema lo
 reconoce. Al terminar: `validar`.
 
-## 2b. Consultas reales — `consultas_reales.jsonl`
+### 2b. Consultas reales — `consultas_reales.jsonl`
 
 Al menos 20 consultas escritas por abogados penalistas **sin ver sentencias del corpus**, tal como las escribirían
 en la app (el esquema está en las primeras líneas del archivo). Las consultas derivadas de sentencias facilitan la
 búsqueda (comparten vocabulario con su sentencia); `recuperacion` reporta por separado derivadas y reales para medir
 ese sesgo. Después de agregarlas, vuelve a correr `conceptos` y `hojas-anotacion`.
 
-## 3a. Piloto de anotación — `piloto_juicios.csv` (primero)
+### 3a. Piloto de anotación — `piloto_juicios.csv` (primero)
 
 10 consultas × 5 resultados que juzgan **dos personas por separado** (`relevancia_a`/`anotador_a` y
 `relevancia_b`/`anotador_b`) con la guía de abajo. `kappa-piloto` calcula el acuerdo y lista los pares en desacuerdo.
 Si kappa (0/1/2) es menor a 0.6, discutan los desacuerdos, precisen la guía en este archivo y repitan el piloto
 **antes** de los 300 juicios.
 
-## 3. Abogado: juzgar la relevancia — `anotacion_juicios.csv`
+### 3. Abogado: juzgar la relevancia — `anotacion_juicios.csv`
 
 Una fila por par consulta–sentencia, en orden aleatorio (no muestra el puntaje del sistema). Lee la consulta y el
 resumen de la sentencia (si hay duda, la sentencia completa) y escribe en `relevancia`:
@@ -53,7 +99,7 @@ Opcional, pero útil para separar las dos cosas que mezcla el grado 1: `mismo_de
 Escribe tu nombre en `anotador`. Una segunda persona juzga el 20 % de los pares en filas duplicadas con su propio
 nombre; `validar` calcula el acuerdo (kappa de Cohen). Si es menor a 0.6, se revisa este criterio.
 
-## 4. Abogado: anotar fichas — `anotacion_fichas.csv`
+### 4. Abogado: anotar fichas — `anotacion_fichas.csv`
 
 Para cada sentencia, leyéndola completa **antes de mirar la ficha del sistema**: `sentido_fallo` (CONFIRMA /
 MODIFICA / REVOCA / REPONE / OTRO), `etapa`, `acto_impugnado`, `delito`, `articulos` (números separados por `;`) y
