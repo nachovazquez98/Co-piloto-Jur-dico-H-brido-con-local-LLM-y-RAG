@@ -111,7 +111,8 @@ def con_consenso(tabla: pd.DataFrame, jueces: list[str]) -> pd.DataFrame:
 
 
 def acuerdo_lectores(tabla: pd.DataFrame, jueces: list[str]) -> pd.DataFrame:
-    """Kappa de Cohen y acuerdo simple entre cada par de lectores, por campo (sentencias donde ambos respondieron)."""
+    """Kappa de Cohen y acuerdo simple entre cada par de lectores, por campo, sobre las sentencias donde ambos
+    determinaron un valor (las reglas no leen el sentido en muchas sentencias: abstenerse no cuenta como desacuerdo)."""
     lectores = [REGLAS] + [lector(j) for j in jueces]
     filas = []
     for campo in CAMPOS:
@@ -120,6 +121,7 @@ def acuerdo_lectores(tabla: pd.DataFrame, jueces: list[str]) -> pd.DataFrame:
             if ca not in tabla or cb not in tabla:
                 continue
             t = tabla[[ca, cb]].dropna()
+            t = t[(t[ca] != NO_DETERMINADO) & (t[cb] != NO_DETERMINADO)]
             if t.empty:
                 continue
             filas.append({"campo": campo, "lector A": a, "lector B": b, "sentencias": len(t),
@@ -146,7 +148,8 @@ def _si_no(v: bool | None) -> str:
 def juicios_automaticos(pares: pd.DataFrame, consultas: dict, doc_familia: dict[str, str], actos: dict[str, str],
                         respuestas: dict[str, dict[str, dict | None]], jueces: list[str]) -> pd.DataFrame:
     """Hoja de juicios con el formato de la del abogado (consulta_id, doc_id, relevancia, mismo_delito,
-    mismo_problema_procesal, anotador): una fila por lector y una del consenso (solo si respondieron todos)."""
+    mismo_problema_procesal, anotador): una fila por lector (todos los jueces con respuesta, para medir el acuerdo) y
+    una del consenso con las reglas y los jueces usables `jueces` (solo si respondieron todos)."""
     filas = []
     for r in pares.itertuples():
         c = consultas[r.consulta_id]
@@ -155,16 +158,17 @@ def juicios_automaticos(pares: pd.DataFrame, consultas: dict, doc_familia: dict[
         proc = acto_c not in (None, "otro", NO_DETERMINADO) and actos.get(r.doc_id) == acto_c
         votos = [{"relevancia": 2 if delito and proc else 1 if delito or proc else 0, "mismo_delito": delito,
                   "mismo_problema_procesal": proc, "anotador": REGLAS}]
-        for j in jueces:
-            resp = respuestas.get(j, {}).get(f"{r.consulta_id}|{r.doc_id}")
+        for j in respuestas:
+            resp = respuestas[j].get(f"{r.consulta_id}|{r.doc_id}")
             if resp:
                 votos.append({**resp, "anotador": lector(j)})
         filas += [{"consulta_id": r.consulta_id, "doc_id": r.doc_id, "relevancia": v["relevancia"],
                    "mismo_delito": _si_no(v["mismo_delito"]),
                    "mismo_problema_procesal": _si_no(v["mismo_problema_procesal"]), "anotador": v["anotador"]}
                   for v in votos]
-        if len(votos) == 1 + len(jueces):
-            p = mayoria([v["mismo_problema_procesal"] for v in votos])
+        validos = [v for v in votos if v["anotador"] in [REGLAS] + [lector(j) for j in jueces]]
+        if len(validos) == 1 + len(jueces):
+            p = mayoria([v["mismo_problema_procesal"] for v in validos])
             p = None if p == NO_DETERMINADO else bool(p)
             filas.append({"consulta_id": r.consulta_id, "doc_id": r.doc_id,
                           "relevancia": 2 if delito and p else 1 if delito or p else 0, "mismo_delito": _si_no(delito),

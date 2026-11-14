@@ -408,7 +408,8 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         # v11.2: sin anotadores humanos, la relevancia es la mediana de las reglas y los jueces LLM (`referencias`)
         tabla_juicios = cargar_juicios(JUICIOS_AUTO_PATH, ids)
         tabla_juicios = tabla_juicios[tabla_juicios["anotador"] == CONSENSO]
-        fuente = "referencia automática (mediana de reglas y jueces LLM)"
+        fuente = ("referencia automática (mismo delito por la categoría del STJ; mismo problema procesal por mayoría "
+                  "de reglas y jueces LLM)")
     else:
         tabla_juicios = cargar_juicios(config.JUICIOS_PATH, ids)
     juicios = relevancia_por_par(tabla_juicios)
