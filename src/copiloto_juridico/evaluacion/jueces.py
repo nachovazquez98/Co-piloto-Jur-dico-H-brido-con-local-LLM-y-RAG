@@ -26,7 +26,7 @@ from typing import Callable
 import pandas as pd
 
 from .. import config, prompts
-from ..metadatos import ACTOS, APELANTES, NO_DETERMINADO
+from ..metadatos import ACTOS, APELANTES, NO_DETERMINADO, _acto, _apelante
 
 TAREAS = ("sentencia", "relevancia", "consulta")
 SENTIDOS = ("CONFIRMA", "MODIFICA", "REVOCA", "REPONE")
@@ -140,6 +140,34 @@ def _cerrado(v, opciones) -> str:
     return NO_DETERMINADO
 
 
+def _familia(v, familias: list[str]) -> str:
+    """Etiqueta de familia de la respuesta del juez: exacta; si no, la que dan las reglas de la agrupación al nombre
+    del delito ("homicidio culposo" -> delitos culposos); si no, la única etiqueta contenida en la respuesta
+    ("delitos sexuales (abuso sexual infantil)")."""
+    from ..fichas import familia_del_delito
+    from .familias import FAMILIA_OTROS, etiqueta_familia
+
+    exacta = _cerrado(v, familias)
+    if exacta != NO_DETERMINADO or not familias:
+        return exacta
+    t = _norm(v)
+    f = familia_del_delito(t)
+    if f != FAMILIA_OTROS and etiqueta_familia(f) in familias:
+        return etiqueta_familia(f)
+    contenidas = [x for x in familias if _norm(x) and _norm(x) in t]
+    return contenidas[0] if len(contenidas) == 1 else NO_DETERMINADO
+
+
+def _con_reglas(v, opciones, regla) -> str:
+    """Valor cerrado exacto o, si el juez escribió una frase ("auto de vinculación a proceso", "el Ministerio
+    Público"), el que le dan las mismas reglas con que se normaliza la ficha de la app."""
+    exacto = _cerrado(v, opciones)
+    if exacto != NO_DETERMINADO or _norm(v) in ("", "no determinado"):
+        return exacto
+    r = regla(str(v))
+    return r if r in opciones else NO_DETERMINADO
+
+
 def normalizar(tarea: str, respuesta: str, familias: list[str] | None = None) -> dict | None:
     """Dict con valores cerrados, o None si la respuesta no es JSON o no trae los campos de la tarea."""
     texto = respuesta or ""
@@ -155,9 +183,9 @@ def normalizar(tarea: str, respuesta: str, familias: list[str] | None = None) ->
             return None
         sentido = _norm(d["sentido"]).upper()
         hallados = [s for s in SENTIDOS if s[:5] in sentido]  # "SE REVOCA Y SE REPONE" cuenta como REPONE (reglas)
-        return {"familia": _cerrado(d["familia"], familias or []),
-                "acto_impugnado": _cerrado(d["acto_impugnado"], ACTOS),
-                "apelante": _cerrado(d["apelante"], APELANTES),
+        return {"familia": _familia(d["familia"], familias or []),
+                "acto_impugnado": _con_reglas(d["acto_impugnado"], ACTOS, _acto),
+                "apelante": _con_reglas(d["apelante"], APELANTES, _apelante),
                 "sentido": "REPONE" if "REPONE" in hallados else hallados[0] if hallados else NO_DETERMINADO}
     if tarea == "relevancia":
         try:

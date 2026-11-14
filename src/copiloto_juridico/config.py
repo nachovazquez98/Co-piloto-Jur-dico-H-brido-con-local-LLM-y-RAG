@@ -58,7 +58,10 @@ MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
 # la vez (8 GB de VRAM). Un juez se usa solo si acierta la familia del delito de la categoría del STJ al menos en
 # JUEZ_EXACTITUD_MINIMA de las sentencias: criterio fijado ANTES de correrlos, no ajustado a los resultados.
 EVALUACION_AUTOMATICA = _env("COPILOTO_EVALUACION_AUTOMATICA", True)
-MODELOS_JUECES = ["qwen2.5:7b", "gemma2:9b"]
+# Dos familias de modelos distintas a la de la app (Meta). En una prueba piloto sobre 60 sentencias, qwen2.5:7b no
+# alcanzó el mínimo y se descartó; qwen2.5:14b no cabe entero en 8 GB (Ollama pasa parte al procesador: más lento,
+# no falla). La validación completa de cada juez queda en la corrida `referencias`.
+MODELOS_JUECES = ["qwen2.5:14b", "gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
 JUECES_DIR = EVAL_DIR / "jueces"
 

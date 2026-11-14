@@ -667,9 +667,11 @@ escribe "no determinado".
 1. familia: el delito principal; elige una de estas familias: {familias}. Los delitos cometidos por culpa o
    imprudencia (homicidio culposo, lesiones o daños a título de culpa, p. ej. en un accidente de tránsito) son
    "delitos culposos". Si la sentencia trata varios delitos, elige el que se menciona primero.
-2. acto_impugnado: la resolución que se apeló: "vinculación" (auto de vinculación a proceso), "no vinculación",
-   "medida cautelar" (incluida la prisión preventiva), "sobreseimiento", "sentencia definitiva" (condena o
-   absolución, también en procedimiento abreviado) u "otro".
+2. acto_impugnado: la resolución que se apeló: "vinculación" (auto de vinculación a proceso), "no vinculación" (auto
+   que niega la vinculación), "medida cautelar" (prisión preventiva u otra medida cautelar), "sobreseimiento",
+   "sentencia definitiva" (condena o absolución, también en procedimiento abreviado) u "otro" para cualquier otra
+   resolución (p. ej. orden de aprehensión o su negativa, denegada apelación, reparación del daño, auto de formal
+   prisión del sistema tradicional, beneficios o sustitutivos de la pena).
 3. apelante: quién apeló: "defensa" (el imputado, el sentenciado o su defensor), "ministerio público", "asesor de la
    víctima" (la víctima, el ofendido o su asesor) o "varios" (más de una parte).
 4. sentido: lo que resolvió la Sala en los puntos resolutivos: "CONFIRMA", "MODIFICA", "REVOCA" o "REPONE" (ordena

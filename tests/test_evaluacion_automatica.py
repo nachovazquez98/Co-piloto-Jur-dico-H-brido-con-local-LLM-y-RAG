@@ -25,7 +25,7 @@ class Juez:
 def test_normaliza_respuestas_a_valores_cerrados():
     r = J.normalizar("sentencia", 'Aquí va: {"familia": "Robo", "acto_impugnado": "Vinculación", "apelante": '
                      '"la defensa", "sentido": "Se revoca y se ordena REPONER"}', ["robo", "homicidio"])
-    assert r == {"familia": "robo", "acto_impugnado": "vinculación", "apelante": NO_DETERMINADO, "sentido": "REPONE"}
+    assert r == {"familia": "robo", "acto_impugnado": "vinculación", "apelante": "defensa", "sentido": "REPONE"}
     assert J.normalizar("relevancia", '{"relevancia": "2", "mismo_delito": "sí", "mismo_problema_procesal": "no"}') == \
         {"relevancia": 2, "mismo_delito": True, "mismo_problema_procesal": False}
     assert J.normalizar("relevancia", '{"relevancia": 5}') is None
