@@ -28,6 +28,7 @@ Evaluación automática, sin anotadores humanos (v11.2):
     jueces --modelo M [--tareas ...] Una tanda de un juez LLM (un modelo a la vez; reanudable)
     referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
     fichas-referencia --particion P  Fichas precalculadas contra la referencia (sin LLM)
+    esfuerzo --particion P           Esfuerzo simulado: portal, búsqueda por palabras y app (sustituye al estudio de uso)
 """
 
 from __future__ import annotations
@@ -313,6 +314,13 @@ def cmd_recuperacion(args) -> None:
     _guardar(experimento_recuperacion(env, log=_log))
 
 
+def cmd_esfuerzo(args) -> None:
+    from .esfuerzo import experimento_esfuerzo
+
+    env = _entorno(args, "esfuerzo", args.particion)
+    _guardar(experimento_esfuerzo(env, log=_log))
+
+
 def cmd_ablacion(args) -> None:
     from .experimentos import experimento_ablacion
 
@@ -579,7 +587,8 @@ def main(argv=None) -> None:
     for nombre, func, ayuda in (("recuperacion", cmd_recuperacion, "Experimentos de recuperación y clasificación"),
                                 ("ablacion", cmd_ablacion, "Ablación del clasificador"),
                                 ("qc", cmd_qc, "Controles de calidad vs. juicio humano"),
-                                ("latencia", cmd_latencia, "Latencia de punta a punta")):
+                                ("latencia", cmd_latencia, "Latencia de punta a punta"),
+                                ("esfuerzo", cmd_esfuerzo, "Sentencias que hay que abrir para encontrar 3 útiles")):
         s = sub.add_parser(nombre, help=ayuda)
         s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
         s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")

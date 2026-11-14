@@ -152,3 +152,11 @@ def test_coherencia_de_familias_con_embeddings():
     t = coherencia(docs, np.array(emb), doc_tipo, fam).set_index("tipo")
     assert t.loc["a1", "coincide"] and t.loc["b1", "coincide"]
     assert not t.loc["x", "coincide"] and t.loc["x", "familia más cercana"] == "A"
+
+
+def test_esfuerzo_simulado_cuenta_sentencias_abiertas():
+    from copiloto_juridico.evaluacion.esfuerzo import TOPE, abiertas_hasta, tipo_sentencia
+
+    assert abiertas_hasta(["a", "x", "b", "y", "c"], {"a", "b", "c"}) == 5
+    assert abiertas_hasta(["x", "a"], {"a", "b", "c"}) == TOPE + 1
+    assert tipo_sentencia("sentencia definitiva") == "Definitiva" and tipo_sentencia("vinculación") == "Interlocutoria"
