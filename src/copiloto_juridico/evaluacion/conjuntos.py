@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -378,6 +379,41 @@ def muestrear_plantilla(corpus: pd.DataFrame, familias: dict[str, str], n_por_fa
             notas="Tema sugerido sin tipo en el corpus; confirmar que de verdad no hay sentencias del tema.",
             extra={"tema_sugerido": tema}))
     return plantilla
+
+
+def ampliar_plantilla(corpus: pd.DataFrame, familias: dict[str, str], existentes: list[Consulta],
+                      n_por_familia: int = 10, min_sentencias_familia: int = 10,
+                      semilla: int = config.EVAL_SEED, largo_extracto: int = 1200) -> list[Consulta]:
+    """v11.2: entradas NUEVAS para llegar a `n_por_familia` consultas por familia (la mitad en cada partición), con
+    sentencias que aún no son fuente de ninguna consulta y tipos aún no cubiertos primero. No toca las existentes;
+    los ids siguen la numeración. Sin revisión humana, más consultas dan intervalos de confianza más estrechos."""
+    rng = np.random.default_rng(semilla + 1)
+    penal = corpus[corpus["materia"] == "penal"].copy()
+    penal["familia"] = penal["tipo"].map(familias)
+    usados = {c.doc_id_fuente for c in existentes if c.doc_id_fuente}
+    hay = Counter((c.familia, c.particion) for c in existentes if c.familia and not c.sin_respuesta)
+    tipos_hechos = {c.tipo for c in existentes if c.tipo}
+    siguiente = 1 + max([int(c.id[1:]) for c in existentes if re.fullmatch(r"A\d+", c.id)] or [0])
+    tam = penal.groupby("familia")["id"].size()
+    nuevas = []
+    for familia in sorted(tam[tam >= min_sentencias_familia].index):
+        grupo = penal[(penal["familia"] == familia) & ~penal["id"].isin(usados)]
+        orden = rng.permutation(len(grupo))
+        cand = grupo.iloc[orden].assign(_hecho=lambda d: d["tipo"].isin(tipos_hechos)).sort_values("_hecho",
+                                                                                                 kind="stable")
+        cand = cand.drop_duplicates("tipo").pipe(lambda d: pd.concat([d, cand[~cand["id"].isin(d["id"])]]))
+        filas = iter(cand.itertuples())
+        for particion in PARTICIONES:
+            for _ in range(max(0, n_por_familia // 2 - hay[(familia, particion)])):
+                fila = next(filas, None)
+                if fila is None:
+                    break
+                nuevas.append(Consulta(
+                    id=f"A{siguiente:03d}", consulta="", doc_id_fuente=fila.id, tipo=fila.tipo, familia=familia,
+                    particion=particion, borrador=True, notas="Ampliación v11.2 (evaluación automática).",
+                    extra={"origen_muestra": "A-v11.2", "extracto_sentencia": fila.texto[:largo_extracto]}))
+                siguiente += 1
+    return nuevas
 
 
 # --------------------------------------------------------------------------------------------------------------

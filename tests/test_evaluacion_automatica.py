@@ -160,3 +160,16 @@ def test_esfuerzo_simulado_cuenta_sentencias_abiertas():
     assert abiertas_hasta(["a", "x", "b", "y", "c"], {"a", "b", "c"}) == 5
     assert abiertas_hasta(["x", "a"], {"a", "b", "c"}) == TOPE + 1
     assert tipo_sentencia("sentencia definitiva") == "Definitiva" and tipo_sentencia("vinculación") == "Interlocutoria"
+
+
+def test_ampliar_plantilla_no_toca_las_existentes():
+    from copiloto_juridico.evaluacion.conjuntos import ampliar_plantilla
+
+    corpus = pd.DataFrame({"id": [f"d{i}" for i in range(14)], "materia": "penal", "texto": "x" * 50,
+                           "tipo": ["penal/robo"] * 7 + ["penal/robo-calificado"] * 7})
+    fam = {"penal/robo": "robo", "penal/robo-calificado": "robo"}
+    existentes = [Consulta("A007", "c", "d0", "penal/robo", "robo", "prueba")]
+    nuevas = ampliar_plantilla(corpus, fam, existentes, n_por_familia=4)
+    assert [c.id for c in nuevas] == ["A008", "A009", "A010"]
+    assert sum(c.particion == "prueba" for c in nuevas) == 1 and "d0" not in {c.doc_id_fuente for c in nuevas}
+    assert nuevas[0].tipo == "penal/robo-calificado"  # primero el tipo aún no cubierto

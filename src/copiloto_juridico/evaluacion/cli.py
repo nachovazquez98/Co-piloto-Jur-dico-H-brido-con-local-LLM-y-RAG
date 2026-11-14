@@ -174,7 +174,17 @@ def cmd_borradores(args) -> None:
 
     destino = Path(args.consultas)
     textos = load_corpus().set_index("id")["texto"]
-    if args.solo_atencion:  # v11.1: solo las marcadas por el verificador, con el prompt estricto
+    if args.ampliar:  # v11.2: consultas nuevas hasta N por familia, sin tocar las existentes
+        from .conjuntos import ampliar_plantilla
+        from .familias import cargar_familias
+
+        corpus = load_corpus()
+        existentes = cargar_consultas(destino, permitir_vacias=True)
+        nuevas = ampliar_plantilla(corpus, cargar_familias(corpus["tipo"].unique().tolist()), existentes,
+                                   n_por_familia=args.ampliar)
+        _log(f"Redactando {len(nuevas)} consultas nuevas (prompt estricto)...")
+        consultas = existentes + redactar_borradores(nuevas, textos, _llm(), intentos=5, estricto=True, log=_log)
+    elif args.solo_atencion:  # v11.1: solo las marcadas por el verificador, con el prompt estricto
         consultas = cargar_consultas(destino, permitir_vacias=True)
         from ..pipeline import es_fallo
 
@@ -563,6 +573,7 @@ def main(argv=None) -> None:
     s.add_argument("--n", type=int, default=None, help="Entradas de la plantilla a redactar (todas por defecto)")
     s.add_argument("--plantilla", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
     s.add_argument("--forzar", action="store_true")
+    s.add_argument("--ampliar", type=int, metavar="N", help="Agrega consultas hasta N por familia (mitad por partición)")
     s.add_argument("--solo-atencion", action="store_true",
                    help="Regenera solo los marcados con ATENCIÓN (o que no son una consulta), con el prompt estricto")
     s.set_defaults(func=cmd_borradores)
