@@ -77,6 +77,10 @@ def versiones_prompts() -> dict[str, str]:
         "penal_dos_llamadas": (config.PROMPT_PENAL_VERSION, ext + rep),
         "qc2_llm": (config.QC2_MODO, prompts.PROMPT_VERIFICACION_POST_REPORTE),
         "sintesis": (config.PROMPT_SINTESIS_VERSION, prompts.prompt_sintesis()),
+        # los de los jueces de la evaluación automática (no los usa la app, pero cambian la referencia)
+        "juez_sentencia": ("v11.2", prompts.PROMPT_JUEZ_SENTENCIA),
+        "juez_relevancia": ("v11.2", prompts.PROMPT_JUEZ_RELEVANCIA),
+        "juez_consulta": ("v11.2", prompts.PROMPT_JUEZ_CONSULTA),
     }
     return {k: f"{v} · {_sha(t.encode())}" for k, (v, t) in usados.items()}
 

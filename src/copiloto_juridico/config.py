@@ -53,6 +53,14 @@ EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
 EVAL_BOOTSTRAP = 1000
 # Modelos de Ollama que compara `evaluacion modelos` (solo los ya instalados; los demás se omiten, no se descargan).
 MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
+# Evaluación automática (v11.2): no hay abogados disponibles, así que la referencia la dan la categoría del STJ, el
+# texto de la sentencia (reglas) y dos jueces LLM distintos del modelo de la app (`evaluacion jueces`). Corren uno a
+# la vez (8 GB de VRAM). Un juez se usa solo si acierta la familia del delito de la categoría del STJ al menos en
+# JUEZ_EXACTITUD_MINIMA de las sentencias: criterio fijado ANTES de correrlos, no ajustado a los resultados.
+EVALUACION_AUTOMATICA = _env("COPILOTO_EVALUACION_AUTOMATICA", True)
+MODELOS_JUECES = ["qwen2.5:7b", "gemma2:9b"]
+JUEZ_EXACTITUD_MINIMA = 0.80
+JUECES_DIR = EVAL_DIR / "jueces"
 
 COLLECTION_NAME = "sentencias_judiciales"
 MATERIAS = ["penal", "civil", "familiar", "mercantil", "laboral"]

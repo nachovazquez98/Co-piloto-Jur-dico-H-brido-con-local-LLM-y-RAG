@@ -652,3 +652,74 @@ Responde ÚNICAMENTE con el texto de la consulta.
 
 Consulta:
 """
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Jueces LLM de la evaluación automática (v11.2). Los usa un modelo DISTINTO del que genera las fichas; los criterios
+# son los de la guía de anotación (evaluacion/README.md). Responden solo JSON con valores cerrados.
+# --------------------------------------------------------------------------------------------------------------
+
+PROMPT_JUEZ_SENTENCIA = """
+Lees una sentencia de apelación penal del Supremo Tribunal de Justicia de Jalisco. El texto viene de un PDF: está en
+minúsculas, a veces sin acentos o con palabras partidas. Responde SOLO con lo que diga el texto; si no lo dice,
+escribe "no determinado".
+
+1. familia: el delito principal; elige una de estas familias: {familias}. Los delitos cometidos por culpa o
+   imprudencia (homicidio culposo, lesiones o daños a título de culpa, p. ej. en un accidente de tránsito) son
+   "delitos culposos". Si la sentencia trata varios delitos, elige el que se menciona primero.
+2. acto_impugnado: la resolución que se apeló: "vinculación" (auto de vinculación a proceso), "no vinculación",
+   "medida cautelar" (incluida la prisión preventiva), "sobreseimiento", "sentencia definitiva" (condena o
+   absolución, también en procedimiento abreviado) u "otro".
+3. apelante: quién apeló: "defensa" (el imputado, el sentenciado o su defensor), "ministerio público", "asesor de la
+   víctima" (la víctima, el ofendido o su asesor) o "varios" (más de una parte).
+4. sentido: lo que resolvió la Sala en los puntos resolutivos: "CONFIRMA", "MODIFICA", "REVOCA" o "REPONE" (ordena
+   reponer el procedimiento).
+
+Responde únicamente con JSON:
+{{"familia": "...", "acto_impugnado": "...", "apelante": "...", "sentido": "..."}}
+
+Inicio de la sentencia:
+{inicio}
+
+Puntos resolutivos (parte final de la sentencia):
+{final}
+"""
+
+PROMPT_JUEZ_RELEVANCIA = """
+Consulta de un defensor penal sobre su caso:
+{consulta}
+
+Sentencia de una Sala Penal, categoría "{categoria}" en el portal del tribunal (inicio y puntos resolutivos):
+{sentencia}
+
+Eres un abogado penalista y evalúas si esa sentencia le sirve al defensor como precedente. Contesta en este orden:
+1. delito_consulta: el delito que se atribuye en la consulta, en pocas palabras.
+2. delito_sentencia: el delito de la sentencia, en pocas palabras.
+3. mismo_delito: "si" si son el mismo delito o de la misma familia (p. ej. robo calificado y robo equiparado; abuso
+   sexual y violación), "no" si son delitos distintos.
+4. acto_consulta y acto_sentencia: qué resolución se apela en cada una (vinculación a proceso, no vinculación,
+   prisión preventiva u otra medida cautelar, sentencia definitiva, sobreseimiento u otra).
+5. mismo_problema_procesal: "si" si se apela el mismo tipo de resolución o se discute el mismo argumento; "no" si no.
+6. relevancia: 2 = mismo delito y contexto compatible, útil como precedente directo; 1 = misma familia de delito, o
+   mismo problema procesal con hechos distintos; 0 = otro delito, o solo coinciden palabras.
+
+Responde únicamente con JSON con esas claves:
+{{"delito_consulta": "", "delito_sentencia": "", "mismo_delito": "", "acto_consulta": "", "acto_sentencia": "",
+"mismo_problema_procesal": "", "relevancia": 0}}
+"""
+
+PROMPT_JUEZ_CONSULTA = """
+Revisas consultas de prueba para un buscador de precedentes penales. Cada una debe parecer escrita por un defensor
+sobre un caso concreto. Contesta:
+
+- es_consulta: "si" si es una consulta coherente en español que describe lo que se atribuye a una persona y qué
+  resolución se quiere apelar o qué se busca; "no" si es otra cosa (una negativa, una respuesta, una instrucción,
+  texto sin sentido o sin un caso concreto).
+- delito_identificable: "si" si un abogado penalista sabría de qué delito se trata al leerla; "no" si no.
+
+Responde únicamente con JSON:
+{{"es_consulta": "si|no", "delito_identificable": "si|no"}}
+
+Consulta:
+{consulta}
+"""

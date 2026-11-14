@@ -273,11 +273,13 @@ def cargar_fichas_anotadas(path: Path = config.FICHAS_ANOTADAS_PATH) -> list[dic
 
 
 def exigir_revisadas(consultas: list["Consulta"]) -> None:
-    """La partición de prueba solo se usa con consultas revisadas por una persona (no con borradores del LLM)."""
-    sin = [c.id for c in consultas if c.particion == "prueba" and not c.revisado]
+    """La partición de prueba solo se usa con consultas revisadas por una persona o, en la evaluación automática
+    (v11.2), validadas por `referencias` (comprobaciones de la guía + jueces LLM); nunca con borradores sin validar."""
+    sin = [c.id for c in consultas if c.particion == "prueba" and not (c.revisado or c.extra.get("validada"))]
     if sin:
-        raise ErrorValidacion(f"Rechazado: {len(sin)} consultas de prueba sin revisar (revisado: false), p. ej. "
-                              f"{', '.join(sin[:5])}. Revísalas y marca revisado: true antes de medir en prueba.")
+        raise ErrorValidacion(f"Rechazado: {len(sin)} consultas de prueba sin revisar ni validar, p. ej. "
+                              f"{', '.join(sin[:5])}. Corre `referencias` (evaluación automática) o revísalas y marca "
+                              "revisado: true antes de medir en prueba.")
 
 
 # --------------------------------------------------------------------------------------------------------------

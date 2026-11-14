@@ -317,6 +317,7 @@ class Entorno:
     preparadas: list[Preparada] = field(default_factory=list)
     facetas: dict[str, dict[str, dict[str, bool]]] = field(default_factory=dict)  # mismo delito / problema procesal
     tiempos_reranker: list[float] = field(default_factory=list)
+    fuente_juicios: str = "juicio humano"   # o la referencia automática (v11.2)
 
     @property
     def doc_tipo(self) -> dict[str, str]:
@@ -358,6 +359,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     from ..datos.corpus import load_corpus
     from .conjuntos import cargar_juicios, cargar_todas, facetas_por_par, relevancia_por_par, verificar_fuga
     from .familias import cargar_familias
+    from .referencias import CONSENSO, JUICIOS_AUTO_PATH, leer_validadas
 
     corrida = Corrida(comando, parametros={"particion": particion, **(parametros or {})})
     store = clasificador = None
@@ -379,6 +381,16 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(vacias)} consultas sin redactar se omiten: {', '.join(vacias[:10])}"
                          f"{'...' if len(vacias) > 10 else ''}")
     consultas = [c for c in todas if c.consulta.strip() and (particion in (None, "todas") or c.particion == particion)]
+    validadas = leer_validadas() if config.EVALUACION_AUTOMATICA else None
+    if validadas is not None:
+        # v11.2: sin revisión humana, solo cuentan las consultas que pasaron la validación automática (`referencias`)
+        descartadas = [c.id for c in consultas if not validadas.get(c.id, False)]
+        consultas = [c for c in consultas if validadas.get(c.id, False)]
+        for c in consultas:
+            c.borrador, c.extra["validada"] = False, True
+        corrida.advertir(f"Consultas validadas automáticamente (comprobaciones de la guía + jueces LLM): "
+                         f"{len(consultas)}; descartadas: {len(descartadas)}"
+                         + (f" ({', '.join(descartadas[:10])}{'...' if len(descartadas) > 10 else ''})." if descartadas else "."))
     if particion in ("prueba", "todas"):
         from .conjuntos import exigir_revisadas
 
@@ -391,7 +403,14 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(fugas)} consultas comparten más de 6 palabras seguidas con su sentencia fuente "
                          f"(fuga): {', '.join(sorted(fugas)[:10])}. Corre `validar` para verlas.")
     ids = {c.id for c in todas}
-    tabla_juicios = cargar_juicios(config.JUICIOS_PATH, ids)
+    fuente = "juicio humano"
+    if config.EVALUACION_AUTOMATICA and JUICIOS_AUTO_PATH.exists():
+        # v11.2: sin anotadores humanos, la relevancia es la mediana de las reglas y los jueces LLM (`referencias`)
+        tabla_juicios = cargar_juicios(JUICIOS_AUTO_PATH, ids)
+        tabla_juicios = tabla_juicios[tabla_juicios["anotador"] == CONSENSO]
+        fuente = "referencia automática (mediana de reglas y jueces LLM)"
+    else:
+        tabla_juicios = cargar_juicios(config.JUICIOS_PATH, ids)
     juicios = relevancia_por_par(tabla_juicios)
     conceptos, faltan = conceptos_de(consultas, leer_conceptos())
     if faltan:
@@ -401,8 +420,9 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     corrida.extra["nivel_clasificacion"] = config.NIVEL_CLASIFICACION
     corrida.extra["prompt_conceptos"] = config.PROMPT_CONCEPTOS_VERSION
     corrida.extra["materias_activas"] = list(config.MATERIAS_ACTIVAS)
+    corrida.extra["fuente_juicios"] = fuente
     return Entorno(store, clasificador, familias, consultas, conceptos, juicios, corrida,
-                   facetas=facetas_por_par(tabla_juicios))
+                   facetas=facetas_por_par(tabla_juicios), fuente_juicios=fuente)
 
 
 def preparar(env: Entorno) -> list[Preparada]:
@@ -614,11 +634,12 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         "sentencia fuente: miden si aparecen OTROS precedentes del mismo tipo; no sustituyen al juicio humano. "
         "IC95: Wilson para Hit, bootstrap (1,000) para MRR y nDCG.", pd.DataFrame(tabla_doc))
     if tabla_juicios:
-        corrida.tabla("Relevancia juzgada por humanos",
-                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios anotados; los no juzgados cuentan 0. Por "
+        corrida.tabla("Relevancia juzgada",
+                      f"Referencia: {env.fuente_juicios}. "
+                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios; los no juzgados cuentan 0. Por "
                       "separado: consultas derivadas de sentencias y consultas reales de abogados (la diferencia "
                       "estima el sesgo de las derivadas). P@5 por "
-                      "faceta: fracción del top 5 que el abogado marcó con el mismo delito o el mismo problema "
+                      "faceta: fracción del top 5 marcada con el mismo delito o el mismo problema "
                       "procesal (columnas opcionales de la hoja).",
                       pd.DataFrame(tabla_juicios))
     else:
@@ -920,8 +941,8 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
                          "veredicto": "—" if v is None else ("SI" if v else "NO")}
                         for (cid, d, rel), v in zip(pares, sistema)]
         corrida.tabla(
-            "QC_1 (relevancia) contra el juicio humano",
-            "Positivo = QC_1 deja pasar el documento. Recall = fracción de documentos relevantes que conserva (lo que "
+            "QC_1 (relevancia) contra la referencia",
+            f"Referencia: {env.fuente_juicios}. Positivo = QC_1 deja pasar el documento. Recall = fracción de documentos relevantes que conserva (lo que "
             "falta son descartes injustos; es el criterio principal para la defensa). Los veredictos no "
             "interpretables cuentan como SI (así se comporta la app) y su tasa se reporta aparte.",
             pd.DataFrame(filas))

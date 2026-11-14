@@ -22,6 +22,11 @@ Estudio de uso (sin LLM):
     estudio [--plantilla N]          Resumen manual vs. app (o arma casos.jsonl y registro.csv para N participantes)
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
+Evaluación automática, sin anotadores humanos (v11.2):
+    jueces --pares                   Pares (consulta, sentencia) a juzgar, por agrupamiento (sin LLM)
+    jueces --modelo M [--tareas ...] Una tanda de un juez LLM (un modelo a la vez; reanudable)
+    referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
+    fichas-referencia --particion P  Fichas precalculadas contra la referencia (sin LLM)
 """
 
 from __future__ import annotations
@@ -456,6 +461,32 @@ def cmd_estudio(args) -> None:
     _guardar(E.resumir(df, E.leer_casos()))
 
 
+def cmd_jueces(args) -> None:
+    from . import jueces as J
+
+    if args.pares:
+        J.guardar_pares(log=_log)
+        return
+    if not args.modelo:
+        sys.exit("❌ Indica --modelo (uno de config.MODELOS_JUECES) o --pares.")
+    for r in J.correr(args.modelo, tuple(args.tareas or J.TAREAS), args.max, log=_log):
+        _log(f"   {r}")
+
+
+def cmd_referencias(args) -> None:
+    from .referencias import construir
+
+    _guardar(construir(args.modelos, log=_log))
+
+
+def cmd_fichas_referencia(args) -> None:
+    from .referencias import evaluar_fichas
+
+    corrida = evaluar_fichas(args.particion, log=_log)
+    _control(corrida, args.particion if args.particion != "desarrollo" else None, "fichas-referencia", args.forzar)
+    _guardar(corrida)
+
+
 def cmd_errores(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -577,6 +608,22 @@ def main(argv=None) -> None:
     s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
     s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")
     s.set_defaults(func=cmd_errores)
+
+    s = sub.add_parser("jueces", help="Jueces LLM de la evaluación automática (una tanda por modelo)")
+    s.add_argument("--pares", action="store_true", help="Solo arma evaluacion/jueces/pares.csv (sin LLM)")
+    s.add_argument("--modelo", help="Modelo de Ollama ya instalado (p. ej. qwen2.5:7b)")
+    s.add_argument("--tareas", nargs="+", choices=["sentencia", "relevancia", "consulta"])
+    s.add_argument("--max", type=int, default=None, help="Elementos por tarea en esta tanda (todos por defecto)")
+    s.set_defaults(func=cmd_jueces)
+
+    s = sub.add_parser("referencias", help="Referencias automáticas a partir de reglas y jueces (sin LLM)")
+    s.add_argument("--modelos", nargs="+", help="Jueces (por defecto config.MODELOS_JUECES)")
+    s.set_defaults(func=cmd_referencias)
+
+    s = sub.add_parser("fichas-referencia", help="Fichas precalculadas contra la referencia automática (sin LLM)")
+    s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
+    s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
+    s.set_defaults(func=cmd_fichas_referencia)
 
     args = p.parse_args(argv)
     args.func(args)
