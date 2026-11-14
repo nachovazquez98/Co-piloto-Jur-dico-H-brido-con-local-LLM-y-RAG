@@ -409,6 +409,34 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
     return Busqueda(clasif, categorias, filtro, estrictos, amplios, candidatos, modo, acto)
 
 
+AVISO_OTRA_MATERIA = ("La consulta no menciona ningún delito ni etapa del proceso penal; el corpus es solo penal, así "
+                      "que estos precedentes probablemente no sirven para tu caso.")
+# Raíces de vocabulario penal (texto sin acentos, minúsculas): delitos, partes y actos del proceso.
+_RE_PENAL = re.compile("|".join([
+    r"\bdelit", r"\bimputad", r"\bacus", r"\bprocesad", r"\bsentenciad", r"\binculpad", r"\bvincul",
+    r"ministerio publico", r"\bfiscal", r"\bpenal", r"\bprision", r"\bcarcel", r"\bdenunci", r"\bquerell",
+    r"\bvictima", r"\bofendid", r"\bconden", r"\babsol", r"\baprehen", r"\bdetenid", r"\bdetencion",
+    r"\bjuicio oral", r"\bmedida cautelar", r"\bsobresei", r"\bhomicid", r"\bfeminicid", r"\bmat(o|ar|aron|ado|ada)\b",
+    r"\brob(o|a|ar|aron|ado|ada|os|ando|arle|arles|aba)\b", r"\bhurt", r"\basalt", r"\blesion", r"\bgolpe",
+    r"\bviolen", r"\babus", r"\bviola(cion|r|da|do|ron)\b", r"\bsexual", r"\bfraud", r"\bestaf", r"\bdespoj",
+    r"\bsecuestr", r"\bprivacion de la libertad", r"\bnarco", r"\bdroga", r"\bestupefac", r"\bmarihuana", r"\barma",
+    r"\bdispar", r"\bamenaz", r"\bextorsi", r"\babandon", r"\bsustrac", r"\btrata\b", r"\bfalsifi", r"\bfalsedad",
+    r"\bcohecho", r"\bpeculado", r"\bdano en las cosas", r"\bcorrupcion de menores", r"\bpornograf", r"\bacoso",
+    r"\bhostigamiento", r"\bdesaparic", r"\bencubrim", r"\bportacion", r"\bmenudeo", r"\bculpos", r"\bimprudencia",
+    r"\batropell", r"\bmaltrat", r"\bcuchill", r"\bpistola", r"\bagred", r"\bagresi", r"\bmuerte", r"\bdano fisico",
+    r"\breparacion del dano", r"\btocamient"]))
+
+
+def aviso_materia(consulta: str) -> str | None:
+    """Aviso si la consulta no parece penal (ningún delito ni término del proceso penal)."""
+    import unicodedata
+
+    if not config.AVISO_OTRA_MATERIA:
+        return None
+    t = unicodedata.normalize("NFKD", consulta.lower()).encode("ascii", "ignore").decode("ascii")
+    return None if _RE_PENAL.search(t) else AVISO_OTRA_MATERIA
+
+
 AVISO_SIN_MISMO_TIPO = "No hay precedentes del mismo tipo en el corpus; se muestran los más cercanos."
 AVISO_COINCIDENCIA_DEBIL = ("Ninguna categoría coincide bien con la consulta (señal {senal} = {valor:.3f} < "
                             "{umbral:.3f}); es probable que no haya precedentes del mismo tipo.")
@@ -658,7 +686,7 @@ class Copiloto:
             return
         yield Evento("paso_fin", "analisis", f"{len(precedentes)} informes válidos · {len(descartados)} descartados"
                      + (f" · {ambiguos} veredictos ambiguos" if ambiguos else ""))
-        aviso = aviso_cobertura([p.fuente for p in precedentes], senales)
+        aviso = aviso_materia(consulta) or aviso_cobertura([p.fuente for p in precedentes], senales)
         if aviso:
             yield log(f"   ⚠️ {aviso}", "analisis")
 

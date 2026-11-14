@@ -184,6 +184,11 @@ VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)
 # Resultados guardados para la demo (cache_resultados.py): la app muestra al instante una consulta ya analizada con
 # la misma configuración. Guarda la consulta en data/cache/resultados (local). La evaluación nunca la usa.
 CACHE_RESULTADOS = _env("COPILOTO_CACHE_RESULTADOS", True)
+# Aviso "parece de otra materia" (v11.2): el corpus es penal y, en `robustez` (20261113-115133_fb1f3fe), las consultas
+# civil, familiar y fuera de tema recibieron precedentes penales sin aviso. Se avisa si la consulta no menciona ningún
+# delito ni término del proceso penal (lista en pipeline._RE_PENAL). tests/test_robustez.py comprueba que avisa en las
+# 3 de otra materia y en ninguno de los 16 ejemplos penales; la corrida `robustez` de v11.2 lo deja registrado.
+AVISO_OTRA_MATERIA = _env("COPILOTO_AVISO_OTRA_MATERIA", True)
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
 # queda por debajo. Sin umbral (por defecto) esa segunda condición está desactivada: "por medir".
