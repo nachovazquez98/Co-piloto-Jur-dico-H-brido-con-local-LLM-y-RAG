@@ -320,7 +320,9 @@ def guardar_pares(log: Callable[[str], None] = print) -> Path:
     from .conjuntos import cargar_todas
     from .experimentos import conceptos_de, leer_conceptos
     from .familias import cargar_familias
+    from .modelos import descargar_de_memoria
 
+    descargar_de_memoria(config.LLMSettings())  # el modelo de embeddings no cabe junto a un LLM en 8 GB
     store = SentenciasStore(log=lambda _m: None)
     corpus = store.corpus
     clas = construir_clasificador(corpus["tipo"].unique().tolist())
