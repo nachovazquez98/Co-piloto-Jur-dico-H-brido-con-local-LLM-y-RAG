@@ -116,3 +116,24 @@ def _guardar(filas: dict[str, dict], path: Path) -> None:
     pd.DataFrame(list(filas.values()), columns=COLUMNAS).sort_values("doc_id").to_parquet(
         tmp, compression="zstd", index=False)
     tmp.replace(path)  # atómico: si se corta a media escritura, queda la versión anterior
+
+
+def actualizar_verificaciones(corpus: pd.DataFrame, path: Path = config.FICHAS_PRECALCULADAS_PATH) -> int:
+    """Recalcula las verificaciones deterministas (sentido por reglas, artículos no encontrados, marcas "verificar")
+    de las fichas guardadas cuyo texto no cambió, sin LLM: así un cambio en las reglas llega al diagnóstico sin
+    regenerar fichas. (La app ya las calcula al mostrar cada ficha.) Devuelve cuántas filas cambiaron."""
+    tabla = cargar(path)
+    textos = corpus.set_index("id")["texto"].to_dict()
+    filas, cambios = {}, 0
+    for r in tabla.to_dict("records"):
+        texto = textos.get(r["doc_id"])
+        if texto is not None and isinstance(r["ficha"], str) and r["huella_texto"] == huella_texto(texto):
+            v = verificaciones(FichaPenal.desde_guardada(r["ficha"]).campos_markdown(), texto)
+            nuevo = {"sentido_llm": v["sentido_llm"], "sentido_reglas": v["sentido_reglas"],
+                     "articulos_no_encontrados": json.dumps(v["articulos_no_encontrados"]),
+                     "verificar": json.dumps(v["verificar"], ensure_ascii=False)}
+            cambios += any((r[k] if isinstance(r[k], str) else None) != x for k, x in nuevo.items())
+            r.update(nuevo)
+        filas[r["doc_id"]] = r
+    _guardar(filas, path)
+    return cambios

@@ -399,12 +399,14 @@ def cmd_generacion(args) -> None:
 
 def cmd_fichas_batch(args) -> None:
     from ..datos.corpus import load_corpus
-    from ..fichas_precalculadas import cargar, generar_todas, version_ficha
+    from ..fichas_precalculadas import actualizar_verificaciones, cargar, generar_todas, version_ficha
     from .experimentos import diagnostico_fichas
 
     settings = config.LLMSettings()
+    corpus = load_corpus()
     if not args.solo_diagnostico:
-        generar_todas(load_corpus(), _llm(con_cache=False), limite=args.max, log=_log)
+        generar_todas(corpus, _llm(con_cache=False), limite=args.max, log=_log)
+    _log(f"Verificaciones recalculadas con las reglas actuales: {actualizar_verificaciones(corpus)} fichas cambiaron.")
     _guardar(diagnostico_fichas(cargar(), version_ficha(settings)))
 
 
