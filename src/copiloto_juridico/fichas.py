@@ -95,6 +95,36 @@ def extraer_articulos(texto: str) -> set[str]:
     return out
 
 
+# v11.2 (evaluacion/errores/articulos_no_encontrados.md): en la sentencia, los artículos se citan en listas largas
+# ("artículos 20 fracción i, 133 fracción iii, 461, 467 fracción vii, 475"), con otras palabras ("arábigos",
+# "diversos", "en relación al 219") y con palabras partidas por el PDF ("art ículo s"). Del lado de la sentencia se
+# toman los números que siguen a esas palabras (hasta un punto y coma o punto, como máximo `_VENTANA` caracteres) y
+# los que van justo antes de "del código", "de la ley", "constitucional"...
+_RE_CLAVE_TOLERANTE = re.compile(
+    r"\ba\s?r\s?t\s?[ií]\s?c\s?u\s?l\s?o\s?s?\b|\barts?\.|\bn\s?u\s?m\s?e\s?r\s?a\s?l(?:\s?e\s?s)?\b|\bordinal(?:es)?\b"
+    r"|\bar[aá]bigos?\b|\bpreceptos?\b|\bdispositivos?\b|\bdiversos?\b|\bsimilares\b"
+    r"|\ben\s+(?:relaci[oó]n|contexto)\s+(?:al|con\s+el|con\s+los)\b", re.IGNORECASE)
+_VENTANA = 160
+_RE_ANTES_DE_LEY = re.compile(r"(\d+)\s*(bis|ter|quater)?\s*,?\s*(?:de\s?l|de\s+la)\s+(?:c\s?[oó]\s?d\s?i\s?g\s?o|ley|"
+                              r"constituci[oó]n|enjuiciamiento)|(\d+)\s*(bis|ter|quater)?\s+constitucional",
+                              re.IGNORECASE)
+_RE_NUM_LISTA = re.compile(r"(?<![\d/.-])(\d{1,4})(?![\d/])\s*(?:[°º]\s*)?(bis|ter|quater)?(?!\s*(?:de\s+(?:enero|febrero|marzo|"
+                           r"abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)|años?|d[ií]as|meses))",
+                           re.IGNORECASE)
+
+
+def articulos_en_sentencia(texto: str) -> set[str]:
+    """Artículos que la sentencia cita, con la lectura tolerante descrita arriba (incluye `extraer_articulos`)."""
+    out = extraer_articulos(texto)
+    for m in _RE_CLAVE_TOLERANTE.finditer(texto or ""):
+        ventana = re.split(r"[;.](?!\s*\d)", texto[m.end():m.end() + _VENTANA], maxsplit=1)[0]
+        out |= {n.lstrip("0") + (s or "").lower() for n, s in _RE_NUM_LISTA.findall(ventana)}
+    for m in _RE_ANTES_DE_LEY.finditer(texto or ""):
+        n, s = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
+        out.add(n.lstrip("0") + (s or "").lower())
+    return out
+
+
 def f1_conjuntos(predichos: set, verdaderos: set) -> dict[str, float]:
     """Precisión, recall y F1 entre dos conjuntos (p. ej. artículos de la ficha vs. anotados)."""
     vp = len(predichos & verdaderos)
@@ -187,7 +217,7 @@ def verificar_articulos(texto_ficha: str, texto_sentencia: str) -> list[str]:
     PDFs de más de 50 páginas el corpus solo tiene 40 páginas, así que "no encontrado" significa "no está en el
     texto disponible"; por eso se marca para verificar en lugar de borrarlo.
     """
-    return sorted(extraer_articulos(texto_ficha) - extraer_articulos(texto_sentencia))
+    return sorted(extraer_articulos(texto_ficha) - articulos_en_sentencia(texto_sentencia))
 
 
 # --------------------------------------------------------------------------------------------------------------

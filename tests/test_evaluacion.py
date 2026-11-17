@@ -340,6 +340,18 @@ def test_articulos_con_ordinal_y_no_encontrados():
     assert verificar_articulos("Art. 233 y artículo 161", "... el artículo 233 del código ...") == ["161"]
 
 
+def test_articulos_en_sentencia_lectura_tolerante():
+    from copiloto_juridico.fichas import articulos_en_sentencia, verificar_articulos
+
+    texto = ("con apoyo en lo dispuesto por los artículos 20 fracción i, 133 fracción iii, 461, 467 fracción vii, 475, "
+             "478 y 479 del código nacional; en relación al 219, fracción i; los arábigos 461, 473; los numeral es "
+             "316, 317; previsto en el 250 del código penal; la audiencia del 25 de enero; 16 constitucional")
+    s = articulos_en_sentencia(texto)
+    assert {"20", "133", "461", "467", "475", "478", "479", "219", "473", "316", "317", "250", "16"} <= s
+    assert "25" not in s  # una fecha no es un artículo
+    assert verificar_articulos("Artículos 467 y 999", texto) == ["999"]
+
+
 def test_ficha_penal_desde_json():
     from copiloto_juridico.fichas import FichaPenal, familia_del_delito
 
