@@ -58,7 +58,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 57,falsedad y falsificacion,28,penal/falsedad-en-declaraciones-y-en-informes-dados-a-una-autoridad,FALSEDAD EN DECLARACIONES Y EN INFORMES DADOS A UNA AUTORIDAD,22.0,3,22,19,0
 58,falsedad y falsificacion,28,penal/falsificacion-de-documentos-en-general,FALSIFICACION DE DOCUMENTOS EN GENERAL,14.0,3,14,11,0
 59,falsedad y falsificacion,28,penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalid,"FALSIFICACION DE DOCUMENTOS EXPEDIDOS POR LOS PODERES DEL ESTADO, ORGANISMOS AUTONOMOS EN SU MODALID",4.0,0,4,4,0
-60,falsedad y falsificacion,28,penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,"FALSIFICACION  Y USO INDEBIDO DE SELLOS, MARCAS, LLAVES Y TROQUELES",9.0,6,9,3,0
+60,falsedad y falsificacion,28,penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,"FALSIFICACION  Y USO INDEBIDO DE SELLOS, MARCAS, LLAVES Y TROQUELES",9.0,6,9,3,3
 61,falsedad y falsificacion,28,penal/falsificacion-de-documentos,FALSIFICACION DE DOCUMENTOS,3.0,1,3,2,0
 62,falsedad y falsificacion,28,penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalidad-de-uso,"FALSIFICACION DE DOCUMENTOS EXPEDIDOS POR LOS PODERES DEL ESTADO, ORGANISMOS AUTONOMOS EN SU MODALIDAD DE USO",2.0,0,2,2,0
 63,falsedad y falsificacion,28,penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso,FALSIFICACION DE DOCUMENTOS EN GENERAL EN SU MODALIDAD DE USO,1.0,0,1,1,0
@@ -130,7 +130,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 129,delitos culposos,65,penal/lesiones-a-titulo-de-culpa-grave-y-otro,LESIONES A TITULO DE CULPA GRAVE Y OTRO,2.0,0,2,2,0
 130,delitos culposos,65,penal/lesiones-y-danos-en-las-cosas-a-titulo-de-culpa,LESIONES Y DAÑOS EN LAS COSAS A TITULO DE CULPA,2.0,0,2,2,0
 131,delitos culposos,65,penal/lesiones-y-homicidio-ambos-a-titulo-de-culpa,LESIONES Y HOMICIDIO AMBOS A TITULO DE CULPA,3.0,1,3,2,0
-132,delitos culposos,65,penal/responsabilidad-medica-y-lesiones-culposas,RESPONSABILIDAD MEDICA Y LESIONES CULPOSAS,2.0,0,2,2,0
+132,delitos culposos,65,penal/responsabilidad-medica-y-lesiones-culposas,RESPONSABILIDAD MEDICA Y LESIONES CULPOSAS,2.0,0,2,2,1
 133,delitos culposos,65,penal/dano-en-las-cosas-a-titulo-de-culpa-por-imprudencia,DAÑO EN LAS COSAS A TITULO DE CULPA POR IMPRUDENCIA,1.0,0,1,1,0
 134,delitos culposos,65,penal/dano-en-las-cosas-a-titulo-de-culpa-y-otro,DAÑO EN LAS COSAS A TITULO DE CULPA Y OTRO,1.0,0,1,1,0
 135,delitos culposos,65,penal/dano-en-las-cosas-y-homicidio-a-titulo-de-culpa,DAÑO EN LAS COSAS Y HOMICIDIO A TITULO DE CULPA,1.0,0,1,1,0
@@ -154,7 +154,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 153,delitos culposos,65,penal/lesiones-y-danos-a-titulo-de-culpa,LESIONES Y DAÑOS A TITULO DE CULPA,1.0,0,1,1,0
 154,delitos culposos,65,penal/lesiones-y-danos-culposos,LESIONES Y DAÑOS CULPOSOS,1.0,0,1,1,0
 155,delitos culposos,65,penal/responsabilidad-medica-y-homicidio-a-titulo-de-culpa,RESPONSABILIDAD MEDICA Y HOMICIDIO A TITULO DE CULPA,1.0,0,1,1,0
-156,delitos culposos,65,penal/responsabilidad-medica-y-lesiones-a-titulo-de-culpa,RESPONSABILIDAD MEDICA Y LESIONES A TITULO DE CULPA,1.0,0,1,1,0
+156,delitos culposos,65,penal/responsabilidad-medica-y-lesiones-a-titulo-de-culpa,RESPONSABILIDAD MEDICA Y LESIONES A TITULO DE CULPA,1.0,0,1,1,1
 157,despojo,76,penal/despojo,DESPOJO,55.0,12,30,18,0
 158,despojo,76,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,297.0,26,30,4,0
 159,despojo,76,penal/despojo-de-inmuebles-y-otros,DESPOJO DE INMUEBLES Y OTROS,5.0,1,5,4,0

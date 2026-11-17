@@ -253,7 +253,7 @@ def comparar_tareas(env, modelos: list[str], n_fichas: int = 150, n_pares: int =
       tienden a coincidir entre sí).
 
     El reporte final no tiene métrica automática y no se compara aquí."""
-    from ..fichas_precalculadas import cargar as cargar_fichas, generar_todas, version_ficha
+    from ..fichas_precalculadas import generar_todas
     from ..llm import get_client
     from ..pipeline import parse_veredicto
     from .. import prompts
@@ -329,14 +329,9 @@ def comparar_tareas(env, modelos: list[str], n_fichas: int = 150, n_pares: int =
             qc = resumen_binario(relevante, veredictos)
             acierto_qc = [float((True if v is None else v) == h) for v, h in zip(veredictos, relevante)]
 
-            # 3. Fichas (sin caché de respuestas: son largas); el modelo de la app parte de las precalculadas
+            # 3. Fichas (sin caché de respuestas: son largas). También las del modelo de la app se generan aquí, no
+            # se toman las precalculadas: así todos los modelos corren con la misma versión de Ollama.
             path = MODELOS_DIR / _slug(modelo) / "fichas.parquet"
-            if modelo == base.model and not path.exists():
-                pre = cargar_fichas()
-                pre = pre[pre["doc_id"].isin(ids) & (pre["version"] == version_ficha(settings))]
-                if len(pre):
-                    path.parent.mkdir(parents=True, exist_ok=True)
-                    pre.to_parquet(path, index=False)
             tabla = generar_todas(muestra, get_client(settings), path=path, log=log)
             tabla = tabla[tabla["doc_id"].isin(ids)]
             comp = {r["doc_id"]: r for r in R.comparar_fichas(tabla, ref).to_dict("records")}
