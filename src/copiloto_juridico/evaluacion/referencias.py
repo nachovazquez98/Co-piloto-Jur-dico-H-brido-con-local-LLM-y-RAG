@@ -304,17 +304,23 @@ def construir(modelos: list[str] | None = None, log=print, completa: bool = Fals
         raise SystemExit("❌ Faltan los metadatos procesales: corre `copiloto-datos metadatos`.")
     pares = pd.read_csv(J.PARES_PATH, dtype=str) if J.PARES_PATH.exists() else pd.DataFrame(
         columns=["consulta_id", "consulta", "doc_id"])
+    # El prompt del juez lleva la lista de familias de TODO el corpus penal: los elementos se arman con todo y luego
+    # se filtra la muestra (armarlos con la muestra cambiaría el prompt y ninguna respuesta guardada coincidiría).
+    items_sent = J.items_sentencias(penal, familias)
+    items_todas, penal_todo = items_sent, penal
     if not completa:  # misma muestra que los jueces: la referencia solo existe donde todos juzgaron
+        items_sent = [it for it in items_sent if J.de_la_muestra(it)]
         penal = penal[[J.en_muestra(d, config.MUESTRA_SENTENCIAS) for d in penal["id"]]]
         consultas = [c for c in consultas if J.en_muestra(c.id, config.MUESTRA_CONSULTAS)]
         pares = pares[[J.en_muestra(c, config.MUESTRA_CONSULTAS) for c in pares["consulta_id"]]]
-    items = {"sentencia": J.items_sentencias(penal, familias), "relevancia": J.items_relevancia(pares, textos, corpus.set_index("id")["tipo"].to_dict()),
+    items = {"sentencia": items_sent, "relevancia": J.items_relevancia(pares, textos, corpus.set_index("id")["tipo"].to_dict()),
              "consulta": J.items_consultas(consultas)}
     corrida = Corrida("referencias", parametros={
         "jueces": modelos, "exactitud_minima": config.JUEZ_EXACTITUD_MINIMA, "muestra": "completa" if completa else {
             "sentencias": config.MUESTRA_SENTENCIAS, "consultas": config.MUESTRA_CONSULTAS, "semilla": config.EVAL_SEED,
             "n_sentencias": len(penal), "n_consultas": len(consultas), "n_pares": len(pares)}})
     respuestas: dict[str, dict[str, dict]] = {}
+    completas: dict[str, dict] = {}  # jueces que ya juzgaron TODAS las sentencias: se validan con todas
     for modelo in modelos:
         registros = J.leer(modelo)
         if not registros:
@@ -327,10 +333,18 @@ def construir(modelos: list[str] | None = None, log=print, completa: bool = Fals
             if len(v) < len(its):
                 corrida.advertir(f"{modelo}: {len(its) - len(v)} de {len(its)} elementos de '{tarea}' sin juzgar con "
                                  "el prompt y el texto actuales.")
+        if not completa:
+            v_todas = J.vigentes(items_todas, registros)
+            if len(v_todas) == len(items_todas):
+                completas[modelo] = {i: r for (_, i), r in v_todas.items()}
         corrida.extra[f"digest_{modelo}"] = next((r.get("digest") for r in registros.values()), None)
 
     tabla = tabla_sentencias(penal, familias, meta, {j: r["sentencia"] for j, r in respuestas.items()})
-    val = validacion_jueces(tabla, list(respuestas))
+    # El mínimo se fijó sobre todas las sentencias: si el juez las juzgó todas, se valida con todas (más precisa que la
+    # muestra y sin elegir la cifra favorable); si no, con la muestra.
+    val = pd.concat([validacion_jueces(tabla_sentencias(penal_todo, familias, meta, {j: completas[j]})
+                                       if j in completas else tabla, [j]) for j in respuestas] or [pd.DataFrame()],
+                    ignore_index=True)
     jueces = usables(val)
     if not jueces:
         corrida.advertir("Ningún juez usable: la referencia queda solo con las reglas (no es una evaluación "
