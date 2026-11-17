@@ -19,6 +19,7 @@ sin otra tarea usando Ollama (cortaría sus peticiones en curso).
 from __future__ import annotations
 
 import dataclasses
+import re
 import shutil
 import subprocess
 import tempfile
@@ -197,4 +198,188 @@ def comparar(store, clasificador, modelos: list[str], n_consultas: int, n_fichas
                       "Exactitud por campo y F1 de artículos contra la anotación del abogado (fichas con JSON "
                       "válido). Usa la hoja de evaluación final: no elijas el modelo con esta tabla y después la "
                       "reportes como evaluación.", pd.DataFrame(filas_c))
+    return corrida
+
+
+# --------------------------------------------------------------------------------------------------------------
+# v11.2: qué modelo rinde mejor en cada tarea de la app, contra la referencia automática (`modelos-tareas`)
+# --------------------------------------------------------------------------------------------------------------
+
+MODELOS_DIR = config.EVAL_DIR / "modelos"
+REGLA_CAMBIO = ("Regla fijada antes de correr: en cada tarea, un modelo sustituye al de la app solo si su diferencia "
+                "pareada en la métrica principal tiene IC95 > 0 en la partición de desarrollo; si no, se queda el de "
+                "la app. La elección se confirma una sola vez en la partición de prueba.")
+
+
+def _slug(modelo: str) -> str:
+    return modelo.replace(":", "-").replace("/", "-")
+
+
+def familia_modelo(modelo: str) -> str:
+    """'qwen2.5:7b' -> 'qwen', 'gemma2:9b' -> 'gemma', 'llama3.1:8b' -> 'llama'."""
+    return re.match(r"[a-z]+", modelo.lower()).group()
+
+
+def cache_conceptos(modelo: str) -> Path:
+    """Los conceptos del modelo de la app van en la caché de siempre; los de los demás, en una propia."""
+    return config.CONCEPTOS_CACHE_PATH if modelo == config.LLMSettings().model else \
+        config.CONCEPTOS_CACHE_PATH.with_name(f"conceptos-{_slug(modelo)}.json")
+
+
+def puntaje_ficha(fila: dict | None) -> float:
+    """Fracción de campos correctos de una ficha contra la referencia (los campos sin referencia no cuentan). Sin
+    ficha válida = 0: un JSON inválido deja la ficha vacía en la app."""
+    if fila is None:
+        return 0.0
+    ok = [fila[f"{c}_ok"] for c in ("familia", "acto_impugnado", "apelante", "sentido") if fila[f"{c}_ok"] is not None]
+    return float(np.mean(ok)) if ok else 0.0
+
+
+def decision(fila: dict) -> str:
+    if fila["¿significativa?"] != "sí":
+        return "sin diferencia: se queda el de la app"
+    return "mejor que el de la app" if fila["Δ"] > 0 else "peor que el de la app"
+
+
+def comparar_tareas(env, modelos: list[str], n_fichas: int = 150, n_pares: int = 600,
+                    log: Callable[[str], None] = print) -> Corrida:
+    """Cada modelo hace las tareas medibles de la app con los mismos insumos (partición de desarrollo):
+
+    - conceptos: Hit@3 de familia de la clasificación con sus conceptos (leave-one-out; no depende de qué
+      documentos se juzgaron, así que no favorece al modelo con que se armaron los pares);
+    - QC_1: acierto por par contra la referencia de relevancia (relevante = 1 o 2), en los mismos pares;
+    - fichas: fracción de campos correctos contra la referencia de sentencias, en las mismas sentencias. Análisis
+      de sensibilidad: la referencia sin el juez de la misma familia del modelo (los modelos de una familia
+      tienden a coincidir entre sí).
+
+    El reporte final no tiene métrica automática y no se compara aquí."""
+    from ..fichas_precalculadas import cargar as cargar_fichas, generar_todas, version_ficha
+    from ..llm import get_client
+    from ..pipeline import parse_veredicto
+    from .. import prompts
+    from . import referencias as R
+    from .experimentos import (LLMConCache, Preparada, _clasificacion, _fila_diferencia, calcular_conceptos,
+                               conceptos_de, preparar, resumen_binario, resumen_categorias)
+
+    corrida = env.corrida
+    base = config.LLMSettings()
+    hay = instalados(base)
+    modelos = [base.model] + [x for x in modelos if x != base.model]
+    for x in [x for x in modelos if x not in hay]:
+        corrida.advertir(f"{x} no está instalado en Ollama; se omite (no se descarga solo).")
+    modelos = [x for x in modelos if x in hay]
+    if not R.REFERENCIAS_PATH.exists():
+        raise SystemExit("❌ Faltan las referencias: corre primero `jueces` y `referencias`.")
+
+    # Insumos fijos, iguales para todos los modelos
+    rng = np.random.default_rng(config.EVAL_SEED)
+    ref = pd.read_csv(R.REFERENCIAS_PATH, dtype=str)
+    ref = ref.astype(object).where(ref.notna(), None)
+    jueces = R.usables(R.validacion_jueces(ref, config.MODELOS_JUECES))
+    corpus = env.store.corpus
+    dev = sorted(set(ref.loc[ref["particion"] == "desarrollo", "doc_id"]) & set(corpus["id"]))
+    ids = sorted(rng.choice(dev, size=min(n_fichas, len(dev)), replace=False))
+    muestra = corpus[corpus["id"].isin(ids)].reset_index(drop=True)
+    consultas = {c.id: c for c in env.consultas}
+    pares = sorted((cid, d, rel) for cid, docs in env.juicios.items() if cid in consultas for d, rel in docs.items()
+                   if d in corpus.index)
+    if len(pares) > n_pares:
+        pares = [pares[i] for i in sorted(rng.choice(len(pares), size=n_pares, replace=False))]
+    relevante = [rel >= 1 for _, _, rel in pares]
+    conocidas = [p for p in preparar(env) if p.consulta.documento_conocido]
+    q_de = {p.consulta.id: p.q for p in preparar(env)}
+    corrida.parametros.update({"modelos": modelos, "particion": "desarrollo", "fichas": len(ids), "pares_qc1": len(pares),
+                               "consultas_conceptos": len(conocidas), "jueces_de_la_referencia": jueces,
+                               "qc1": [config.QC1_CONTEXTO, config.PROMPT_QC1_VERSION], "regla": REGLA_CAMBIO})
+    log(f"Comparación por tarea: {len(modelos)} modelos · {len(conocidas)} consultas · {len(pares)} pares · "
+        f"{len(ids)} sentencias (desarrollo).")
+
+    filas, por_modelo = [], {}
+    try:
+        for modelo in modelos:
+            settings = dataclasses.replace(base, model=modelo)
+            descargar_de_memoria(base)
+            log(f"== {modelo} ==")
+            cliente = LLMConCache(get_client(settings))
+
+            # 1. Conceptos -> clasificación
+            cache = calcular_conceptos(env.consultas, cliente, path=cache_conceptos(modelo), log=lambda _m: None)
+            conceptos, _ = conceptos_de(env.consultas, cache)
+            hits = []
+            for p in conocidas:
+                c = p.consulta
+                p2 = Preparada(c, p.q, conceptos[c.id], f"{c.consulta} {conceptos[c.id]}")
+                _, _, rk = _clasificacion(env, p2, excluir={c.doc_id_fuente})
+                hits.append(resumen_categorias(c.tipo, c.familia, rk, env.clasificador.tipos_de, env.familias)
+                            ["hit3_familia"])
+            log(f"   conceptos: Hit@3 familia {np.mean(hits):.3f}")
+
+            # 2. QC_1 con el contexto y el prompt de la app
+            veredictos = []
+            for i, (cid, d, _) in enumerate(pares, 1):
+                consulta = consultas[cid].consulta
+                if config.QC1_CONTEXTO == "fragmento_similar":
+                    frag = env.store.fragmento_mas_similar(d, q_de[cid], config.QC1_MAX_CHARS)
+                else:
+                    frag = corpus.loc[d, "texto"][:config.QC1_MAX_CHARS]
+                veredictos.append(parse_veredicto(cliente.generate(prompts.prompt_qc1().format(
+                    texto_consulta=consulta, fragmento_documento=frag))))
+                if i % 100 == 0:
+                    log(f"   QC_1: {i}/{len(pares)}")
+            qc = resumen_binario(relevante, veredictos)
+            acierto_qc = [float((True if v is None else v) == h) for v, h in zip(veredictos, relevante)]
+
+            # 3. Fichas (sin caché de respuestas: son largas); el modelo de la app parte de las precalculadas
+            path = MODELOS_DIR / _slug(modelo) / "fichas.parquet"
+            if modelo == base.model and not path.exists():
+                pre = cargar_fichas()
+                pre = pre[pre["doc_id"].isin(ids) & (pre["version"] == version_ficha(settings))]
+                if len(pre):
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    pre.to_parquet(path, index=False)
+            tabla = generar_todas(muestra, get_client(settings), path=path, log=log)
+            tabla = tabla[tabla["doc_id"].isin(ids)]
+            comp = {r["doc_id"]: r for r in R.comparar_fichas(tabla, ref).to_dict("records")}
+            otros = [j for j in jueces if familia_modelo(j) != familia_modelo(modelo)]
+            comp_sin = {r["doc_id"]: r for r in R.comparar_fichas(tabla, R.con_consenso(ref, otros)).to_dict("records")}
+            puntos = [puntaje_ficha(comp.get(d)) for d in ids]
+            puntos_sin = [puntaje_ficha(comp_sin.get(d)) for d in ids]
+            exact = R.tabla_exactitud_fichas(pd.DataFrame(comp.values())).set_index("campo")["exactitud"] if comp \
+                else pd.Series(dtype=float)
+
+            por_modelo[modelo] = {"conceptos": hits, "QC_1": acierto_qc, "fichas": puntos}
+            filas.append({"modelo": modelo, "familia": familia_modelo(modelo), "digest": hay[modelo][:12],
+                          "conceptos: Hit@3 familia": float(np.mean(hits)) if hits else None,
+                          "QC_1: acierto": float(np.mean(acierto_qc)) if acierto_qc else None,
+                          "QC_1: recall": qc.get("recall"), "QC_1: especificidad": qc.get("especificidad"),
+                          "QC_1: no interpretables": qc.get("tasa_no_interpretables"),
+                          "fichas: campos correctos": float(np.mean(puntos)),
+                          "fichas: sin juez de su familia": float(np.mean(puntos_sin)),
+                          **{f"fichas: {c}": exact.get(c) for c in ("familia", "acto_impugnado", "apelante", "sentido")},
+                          **{k: v for k, v in fila_fichas(tabla).items() if k in ("JSON válido", "artículos no encontrados",
+                                                                                  "s por ficha (p50)")}})
+    finally:
+        descargar_de_memoria(base)
+
+    corrida.tabla("Modelos por tarea (desarrollo)",
+                  "Mismos insumos para todos. Conceptos: Hit@3 de familia de la clasificación (leave-one-out). QC_1: "
+                  "acierto contra la referencia de relevancia (los veredictos no interpretables cuentan como SI, como "
+                  "en la app). Fichas: fracción de campos correctos por ficha (JSON inválido = 0); familia contra la "
+                  "categoría del STJ, el resto contra la mayoría de lectores. 'Sin juez de su familia': la misma "
+                  "medida con la referencia sin el juez de la familia del modelo.", pd.DataFrame(filas))
+    app = base.model
+    comp_filas = []
+    for modelo in modelos[1:]:
+        for tarea, metrica in (("conceptos", "Hit@3 familia"), ("QC_1", "acierto por par"),
+                               ("fichas", "campos correctos por ficha")):
+            a, b = por_modelo[modelo][tarea], por_modelo[app][tarea]
+            if not a:
+                continue
+            f = {"tarea": tarea, "A": modelo, "B": app, "métrica": metrica, "n": len(a), **_fila_diferencia(a, b)}
+            f["decisión"] = decision(f)
+            comp_filas.append(f)
+    if comp_filas:
+        corrida.tabla("Cada modelo contra el de la app", f"Δ = media(A − B) pareada, IC95 bootstrap. {REGLA_CAMBIO} "
+                      "El reporte final no tiene métrica automática: sigue con el modelo de la app.",
+                      pd.DataFrame(comp_filas))
     return corrida

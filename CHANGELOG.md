@@ -18,7 +18,15 @@ del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a l
   palabras y la app (sustituye al estudio de uso).
 - `evaluacion familias --coherencia`: comprueba la agrupación tipo → familia con los embeddings del índice.
 - `evaluacion borradores --ampliar N`: más consultas por familia sin tocar las existentes.
+- `evaluacion modelos-tareas`: qué modelo local rinde mejor en cada tarea medible de la app (conceptos, QC_1,
+  fichas) contra la referencia automática, en la partición de desarrollo, con la regla de cambio fijada antes de
+  correrla y la referencia sin el juez de la misma familia como análisis de sensibilidad.
 - `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas y nuevas).
+
+### Corregido
+- `evaluacion qc` medía QC_1 con el prompt v10; ahora usa el de la app (`prompt_qc1`, v11).
+- `evaluacion jueces --pares` saca de la VRAM los modelos de Ollama antes de cargar el de embeddings (fallaba con
+  `CUBLAS_STATUS_ALLOC_FAILED` en 8 GB).
 
 ### Cambiado
 - La app avisa cuando la consulta no menciona ningún delito ni término del proceso penal (antes, las consultas

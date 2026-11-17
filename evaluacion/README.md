@@ -32,6 +32,7 @@ jueces --pares                   # pares (consulta, sentencia) a juzgar; sin LLM
 jueces --modelo qwen2.5:14b      # una tanda por juez (reanudable)
 jueces --modelo gemma2:9b
 referencias                      # referencias, juicios y consultas validadas; sin LLM
+modelos-tareas                   # qué modelo rinde mejor en conceptos, QC_1 y fichas (desarrollo)
 congelar
 recuperacion --particion prueba
 qc --particion prueba

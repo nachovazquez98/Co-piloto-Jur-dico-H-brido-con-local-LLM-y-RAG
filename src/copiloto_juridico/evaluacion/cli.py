@@ -18,6 +18,7 @@ Con LLM:
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
+    modelos-tareas --fichas N --pares M   Qué modelo rinde mejor en conceptos, QC_1 y fichas (desarrollo)
     robustez                         Consultas difíciles con la app completa (diagnóstico)
 Estudio de uso (sin LLM):
     estudio [--plantilla N]          Resumen manual vs. app (o arma casos.jsonl y registro.csv para N participantes)
@@ -471,6 +472,13 @@ def cmd_modelos(args) -> None:
     _guardar(corrida)
 
 
+def cmd_modelos_tareas(args) -> None:
+    from .modelos import comparar_tareas
+
+    env = _entorno(args, "modelos-tareas", "desarrollo")
+    _guardar(comparar_tareas(env, args.modelos or config.MODELOS_COMPARACION, args.fichas, args.pares, log=_log))
+
+
 def cmd_robustez(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -643,6 +651,13 @@ def main(argv=None) -> None:
     s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite la comparación contra el conjunto C anotado")
     s.set_defaults(func=cmd_modelos)
+
+    s = sub.add_parser("modelos-tareas", help="Qué modelo rinde mejor en cada tarea, contra la referencia automática "
+                       "(partición de desarrollo)")
+    s.add_argument("--fichas", type=int, default=150, help="Sentencias de desarrollo (las mismas para cada modelo)")
+    s.add_argument("--pares", type=int, default=600, help="Pares para QC_1 (los mismos para cada modelo)")
+    s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
+    s.set_defaults(func=cmd_modelos_tareas)
 
     s = sub.add_parser("robustez", help="Consultas difíciles con el LLM real (diagnóstico)")
     s.set_defaults(func=cmd_robustez)

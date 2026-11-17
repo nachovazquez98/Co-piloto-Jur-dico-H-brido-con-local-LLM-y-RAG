@@ -173,3 +173,17 @@ def test_ampliar_plantilla_no_toca_las_existentes():
     assert [c.id for c in nuevas] == ["A008", "A009", "A010"]
     assert sum(c.particion == "prueba" for c in nuevas) == 1 and "d0" not in {c.doc_id_fuente for c in nuevas}
     assert nuevas[0].tipo == "penal/robo-calificado"  # primero el tipo aún no cubierto
+
+
+def test_comparacion_por_tarea_puntaje_y_decision():
+    from copiloto_juridico.evaluacion.modelos import cache_conceptos, decision, familia_modelo, puntaje_ficha
+
+    assert [familia_modelo(x) for x in ("qwen2.5:7b", "gemma2:9b", "llama3.1:8b", "mistral:7b")] == \
+        ["qwen", "gemma", "llama", "mistral"]
+    assert cache_conceptos(config.LLMSettings().model) == config.CONCEPTOS_CACHE_PATH
+    assert cache_conceptos("qwen2.5:7b").name == "conceptos-qwen2.5-7b.json"
+    fila = {"familia_ok": True, "acto_impugnado_ok": False, "apelante_ok": None, "sentido_ok": True}
+    assert puntaje_ficha(fila) == pytest.approx(2 / 3) and puntaje_ficha(None) == 0.0  # sin ficha válida = 0
+    assert decision({"¿significativa?": "no", "Δ": 0.1}).startswith("sin diferencia")
+    assert decision({"¿significativa?": "sí", "Δ": 0.1}) == "mejor que el de la app"
+    assert decision({"¿significativa?": "sí", "Δ": -0.1}) == "peor que el de la app"
