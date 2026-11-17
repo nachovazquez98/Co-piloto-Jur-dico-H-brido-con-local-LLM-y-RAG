@@ -53,6 +53,27 @@ def test_respuesta_invalida_se_reintenta_una_vez_y_queda_none(tmp_path):
     assert J.vigentes([J.Item("consulta", "A1", "p")], J.leer("juez-falso", tmp_path)) == {("consulta", "A1"): None}
 
 
+def test_relevancia_sin_calificacion_pide_solo_la_clave_que_falta(tmp_path):
+    sin = '{"mismo_delito": "si", "mismo_problema_procesal": "no"}'
+    item = J.Item("relevancia", "A1|d", "p")
+    juez = Juez(lambda p: '{"relevancia": 1}' if "no traía la calificación" in p else sin)
+    J.juzgar([item], juez, directorio=tmp_path, log=lambda m: None)
+    assert juez.llamadas == 3
+    assert J.vigentes([item], J.leer("juez-falso", tmp_path))[("relevancia", "A1|d")] == \
+        {"relevancia": 1, "mismo_delito": True, "mismo_problema_procesal": False}
+
+
+def test_relevancia_guardada_sin_calificacion_se_completa_sin_repetir_los_intentos(tmp_path):
+    item = J.Item("relevancia", "A1|d", "p")
+    J.juzgar([item], Juez('{"mismo_delito": "no"}'), directorio=tmp_path, log=lambda m: None)  # 3 llamadas, inválida
+    juez = Juez('{"relevancia": 0}')
+    J.juzgar([item], juez, directorio=tmp_path, log=lambda m: None)
+    assert juez.llamadas == 1
+    assert J.vigentes([item], J.leer("juez-falso", tmp_path))[("relevancia", "A1|d")]["relevancia"] == 0
+    J.juzgar([item], juez, directorio=tmp_path, log=lambda m: None)
+    assert juez.llamadas == 1  # ya válida: nada pendiente
+
+
 def test_mayoria_absoluta_entre_todos_los_lectores():
     assert R.mayoria(["CONFIRMA", "CONFIRMA", "REVOCA"]) == "CONFIRMA"
     assert R.mayoria(["CONFIRMA", "REVOCA", "MODIFICA"]) == NO_DETERMINADO

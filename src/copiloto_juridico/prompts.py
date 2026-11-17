@@ -745,3 +745,13 @@ Responde únicamente con JSON:
 Consulta:
 {consulta}
 """
+
+# Tercer intento del juez de relevancia: mistral:7b devolvía el JSON completo menos la clave "relevancia"
+# (1,293 de 3,381 pares). Se le pide solo esa clave, con su propia respuesta anterior a la vista.
+PROMPT_JUEZ_RELEVANCIA_FALTANTE = """{prompt}
+Tu respuesta anterior no traía la calificación final:
+{previa}
+
+Responde únicamente con JSON con la clave que falta (2, 1 o 0, según la escala de arriba):
+{{"relevancia": 0}}
+"""

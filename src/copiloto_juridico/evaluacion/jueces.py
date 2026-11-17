@@ -234,6 +234,40 @@ def vigentes(items: list[Item], registros: dict[tuple[str, str], dict]) -> dict[
     return out
 
 
+def _sin_relevancia(crudo: str) -> dict | None:
+    """El JSON del juez de relevancia si es válido salvo por la calificación; None en otro caso."""
+    texto = crudo or ""
+    ini, fin = texto.find("{"), texto.rfind("}")
+    try:
+        d = json.loads(texto[ini:fin + 1]) if ini >= 0 and fin > ini else None
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(d, dict) or normalizar("relevancia", texto) is not None:
+        return None
+    return d
+
+
+def _completar_relevancia(it: "Item", crudo: str, llm) -> dict | None:
+    """Tercer intento: pide solo la clave "relevancia" y la une a la respuesta anterior del mismo juez."""
+    from ..llm import LLMError
+
+    try:
+        faltante = llm.generate(prompts.PROMPT_JUEZ_RELEVANCIA_FALTANTE.format(prompt=it.prompt, previa=crudo[:500]),
+                                json_mode=True)
+    except LLMError:  # queda inválido y la siguiente tanda lo vuelve a intentar
+        return None
+    return normalizar("relevancia", json.dumps({**(_sin_relevancia(crudo) or {}), **_json_o_vacio(faltante)}))
+
+
+def _json_o_vacio(texto: str) -> dict:
+    ini, fin = (texto or "").find("{"), (texto or "").rfind("}")
+    try:
+        d = json.loads(texto[ini:fin + 1]) if ini >= 0 and fin > ini else {}
+    except json.JSONDecodeError:
+        return {}
+    return d if isinstance(d, dict) else {}
+
+
 def juzgar(items: list[Item], llm, familias: list[str] | None = None, directorio: Path = config.JUECES_DIR,
            limite: int | None = None, log: Callable[[str], None] = print) -> dict:
     """Juzga los elementos que faltan (o cuyo prompt cambió) y agrega cada respuesta al archivo del juez en cuanto
@@ -242,7 +276,14 @@ def juzgar(items: list[Item], llm, familias: list[str] | None = None, directorio
 
     modelo = llm.settings.model
     directorio.mkdir(parents=True, exist_ok=True)
-    hechos = vigentes(items, leer(modelo, directorio))
+    registros = leer(modelo, directorio)
+    hechos = vigentes(items, registros)
+    # Pares ya juzgados sin la calificación: solo se pide la clave que falta (no se repiten los dos intentos).
+    previas = {(it.tarea, it.id): registros[(it.tarea, it.id)]["crudo"] for it in items
+               if it.tarea == "relevancia" and (it.tarea, it.id) in hechos and hechos[(it.tarea, it.id)] is None
+               and _sin_relevancia(registros[(it.tarea, it.id)]["crudo"]) is not None}
+    for k in previas:
+        del hechos[k]
     pendientes = [it for it in items if (it.tarea, it.id) not in hechos][:limite]
     digest = digest_modelo(llm.settings)
     log(f"Juez {modelo}: {len(hechos)} ya juzgados, {len(pendientes)} por juzgar.")
@@ -250,8 +291,8 @@ def juzgar(items: list[Item], llm, familias: list[str] | None = None, directorio
     with open(archivo(modelo, directorio), "a", encoding="utf-8") as f:
         for i, it in enumerate(pendientes, 1):
             t0 = time.time()
-            respuesta, crudo = None, ""
-            for _ in range(2):
+            respuesta, crudo = None, previas.get((it.tarea, it.id), "")
+            for _ in range(0 if crudo else 2):
                 for intento in range(1, REINTENTOS_SERVIDOR + 1):
                     try:
                         crudo = llm.generate(it.prompt, json_mode=True)
@@ -264,6 +305,8 @@ def juzgar(items: list[Item], llm, familias: list[str] | None = None, directorio
                 respuesta = normalizar(it.tarea, crudo, familias)
                 if respuesta is not None:
                     break
+            if respuesta is None and it.tarea == "relevancia" and _sin_relevancia(crudo) is not None:
+                respuesta = _completar_relevancia(it, crudo, llm)
             invalidas += respuesta is None
             f.write(json.dumps({"tarea": it.tarea, "id": it.id, "clave": it.clave, "modelo": modelo, "digest": digest,
                                 "respuesta": respuesta, "crudo": "" if respuesta else crudo[:500],
