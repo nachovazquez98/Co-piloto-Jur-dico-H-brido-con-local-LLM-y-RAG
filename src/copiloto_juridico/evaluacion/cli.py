@@ -522,14 +522,14 @@ def cmd_jueces(args) -> None:
         return
     if not args.modelo:
         sys.exit("❌ Indica --modelo (uno de config.MODELOS_JUECES) o --pares.")
-    for r in J.correr(args.modelo, tuple(args.tareas or J.TAREAS), args.max, log=_log):
+    for r in J.correr(args.modelo, tuple(args.tareas or J.TAREAS), args.max, log=_log, completa=args.completa):
         _log(f"   {r}")
 
 
 def cmd_referencias(args) -> None:
     from .referencias import construir
 
-    _guardar(construir(args.modelos, log=_log))
+    _guardar(construir(args.modelos, log=_log, completa=args.completa))
 
 
 def cmd_fichas_referencia(args) -> None:
@@ -677,10 +677,12 @@ def main(argv=None) -> None:
     s.add_argument("--modelo", help="Modelo de Ollama ya instalado (p. ej. qwen2.5:7b)")
     s.add_argument("--tareas", nargs="+", choices=["sentencia", "relevancia", "consulta"])
     s.add_argument("--max", type=int, default=None, help="Elementos por tarea en esta tanda (todos por defecto)")
+    s.add_argument("--completa", action="store_true", help="Todo el corpus en lugar de la muestra (config.MUESTRA_*)")
     s.set_defaults(func=cmd_jueces)
 
     s = sub.add_parser("referencias", help="Referencias automáticas a partir de reglas y jueces (sin LLM)")
     s.add_argument("--modelos", nargs="+", help="Jueces (por defecto config.MODELOS_JUECES)")
+    s.add_argument("--completa", action="store_true", help="Todo el corpus en lugar de la muestra de los jueces")
     s.set_defaults(func=cmd_referencias)
 
     s = sub.add_parser("fichas-referencia", help="Fichas precalculadas contra la referencia automática (sin LLM)")

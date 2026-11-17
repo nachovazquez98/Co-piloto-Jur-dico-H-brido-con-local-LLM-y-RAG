@@ -64,6 +64,12 @@ EVALUACION_AUTOMATICA = _env("COPILOTO_EVALUACION_AUTOMATICA", True)
 # 0.80), por recursos y antes de construir la referencia. La validación completa de cada juez queda en `referencias`.
 MODELOS_JUECES = ["mistral:7b", "gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
+# Muestra al azar de los jueces (v11.2): juzgar todo con dos modelos tomaba ~7 h por juez. Cada elemento entra a la
+# muestra por el hash de su id con la semilla (no por orden), así que al crecer el corpus los que ya estaban no
+# cambian. Sentencias 0.30 (~420 de 1,412): IC95 de ±4 puntos para la exactitud de cada juez. Consultas 0.50: entran
+# con todos sus pares, para que las métricas por consulta (nDCG) tengan todos sus juicios. `--completa` usa todo.
+MUESTRA_SENTENCIAS = _env("COPILOTO_MUESTRA_SENTENCIAS", 0.30)
+MUESTRA_CONSULTAS = _env("COPILOTO_MUESTRA_CONSULTAS", 0.50)
 JUECES_DIR = EVAL_DIR / "jueces"
 
 COLLECTION_NAME = "sentencias_judiciales"

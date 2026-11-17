@@ -207,6 +207,18 @@ def normalizar(tarea: str, respuesta: str, familias: list[str] | None = None) ->
 # --------------------------------------------------------------------------------------------------------------
 
 
+def en_muestra(clave: str, fraccion: float, semilla: int = config.EVAL_SEED) -> bool:
+    """Muestreo estable por hash: el mismo id siempre queda dentro o fuera, sin importar qué más haya."""
+    return fraccion >= 1 or int(hashlib.sha256(f"{semilla}|{clave}".encode()).hexdigest()[:12], 16) < fraccion * 16 ** 12
+
+
+def de_la_muestra(it: "Item") -> bool:
+    """Sentencias por su id; pares y consultas por la consulta (una consulta entra con todos sus pares)."""
+    if it.tarea == "sentencia":
+        return en_muestra(it.id, config.MUESTRA_SENTENCIAS)
+    return en_muestra(it.id.split("|")[0], config.MUESTRA_CONSULTAS)
+
+
 def archivo(modelo: str, directorio: Path = config.JUECES_DIR) -> Path:
     return directorio / f"{re.sub(r'[^A-Za-z0-9.]+', '-', modelo)}.jsonl"
 
@@ -319,7 +331,7 @@ def juzgar(items: list[Item], llm, familias: list[str] | None = None, directorio
 
 
 def correr(modelo: str, tareas: tuple[str, ...] = TAREAS, limite: int | None = None,
-           log: Callable[[str], None] = print) -> list[dict]:
+           log: Callable[[str], None] = print, completa: bool = False) -> list[dict]:
     """Una tanda de un juez: saca de la GPU cualquier otro modelo, juzga las tareas pedidas y lo saca al terminar
     (nunca hay dos LLM cargados a la vez). No descarga modelos: si falta, lo dice."""
     import dataclasses
@@ -347,6 +359,8 @@ def correr(modelo: str, tareas: tuple[str, ...] = TAREAS, limite: int | None = N
         items += items_relevancia(pd.read_csv(PARES_PATH, dtype=str), por_id["texto"].to_dict(), por_id["tipo"].to_dict())
     if "consulta" in tareas:
         items += items_consultas(cargar_todas(corpus=corpus, familias=familias, permitir_vacias=True))
+    if not completa:
+        items = [it for it in items if de_la_muestra(it)]
     descargar_de_memoria(settings)
     try:
         llm = get_client(settings)

@@ -283,7 +283,7 @@ def tabla_exactitud_fichas(comp: pd.DataFrame) -> pd.DataFrame:
 # --------------------------------------------------------------------------------------------------------------
 
 
-def construir(modelos: list[str] | None = None, log=print):
+def construir(modelos: list[str] | None = None, log=print, completa: bool = False):
     """Junta reglas y jueces en las tres referencias (sentencias, juicios, consultas validadas) y deja constancia en
     una corrida "referencias": validación de cada juez, acuerdo entre lectores y cobertura. Sin LLM."""
     from .. import metadatos as md
@@ -304,9 +304,16 @@ def construir(modelos: list[str] | None = None, log=print):
         raise SystemExit("❌ Faltan los metadatos procesales: corre `copiloto-datos metadatos`.")
     pares = pd.read_csv(J.PARES_PATH, dtype=str) if J.PARES_PATH.exists() else pd.DataFrame(
         columns=["consulta_id", "consulta", "doc_id"])
+    if not completa:  # misma muestra que los jueces: la referencia solo existe donde todos juzgaron
+        penal = penal[[J.en_muestra(d, config.MUESTRA_SENTENCIAS) for d in penal["id"]]]
+        consultas = [c for c in consultas if J.en_muestra(c.id, config.MUESTRA_CONSULTAS)]
+        pares = pares[[J.en_muestra(c, config.MUESTRA_CONSULTAS) for c in pares["consulta_id"]]]
     items = {"sentencia": J.items_sentencias(penal, familias), "relevancia": J.items_relevancia(pares, textos, corpus.set_index("id")["tipo"].to_dict()),
              "consulta": J.items_consultas(consultas)}
-    corrida = Corrida("referencias", parametros={"jueces": modelos, "exactitud_minima": config.JUEZ_EXACTITUD_MINIMA})
+    corrida = Corrida("referencias", parametros={
+        "jueces": modelos, "exactitud_minima": config.JUEZ_EXACTITUD_MINIMA, "muestra": "completa" if completa else {
+            "sentencias": config.MUESTRA_SENTENCIAS, "consultas": config.MUESTRA_CONSULTAS, "semilla": config.EVAL_SEED,
+            "n_sentencias": len(penal), "n_consultas": len(consultas), "n_pares": len(pares)}})
     respuestas: dict[str, dict[str, dict]] = {}
     for modelo in modelos:
         registros = J.leer(modelo)

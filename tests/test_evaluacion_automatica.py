@@ -74,6 +74,17 @@ def test_relevancia_guardada_sin_calificacion_se_completa_sin_repetir_los_intent
     assert juez.llamadas == 1  # ya válida: nada pendiente
 
 
+def test_muestra_estable_y_por_consulta():
+    ids = [f"doc-{i}" for i in range(2000)]
+    dentro = [d for d in ids if J.en_muestra(d, 0.30)]
+    assert 500 < len(dentro) < 700  # ~30 %
+    assert dentro == [d for d in ids + ["otro-1", "otro-2"] if J.en_muestra(d, 0.30) and d.startswith("doc-")]
+    assert all(J.en_muestra(d, 1.0) for d in ids[:10])
+    # un par entra a la muestra si entra su consulta
+    for c in ("A001", "A002", "A003"):
+        assert J.de_la_muestra(J.Item("relevancia", f"{c}|x.pdf", "p")) == J.de_la_muestra(J.Item("consulta", c, "p"))
+
+
 def test_mayoria_absoluta_entre_todos_los_lectores():
     assert R.mayoria(["CONFIRMA", "CONFIRMA", "REVOCA"]) == "CONFIRMA"
     assert R.mayoria(["CONFIRMA", "REVOCA", "MODIFICA"]) == NO_DETERMINADO
