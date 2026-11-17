@@ -288,7 +288,11 @@ def comparar_tareas(env, modelos: list[str], n_fichas: int = 150, n_pares: int =
     relevante = [rel >= 1 for _, _, rel in pares]
     conocidas = [p for p in preparar(env) if p.consulta.documento_conocido]
     q_de = {p.consulta.id: p.q for p in preparar(env)}
-    corrida.parametros.update({"modelos": modelos, "particion": "desarrollo", "fichas": len(ids), "pares_qc1": len(pares),
+    try:
+        version_ollama = requests.get(base.base_url.rstrip("/") + "/api/version", timeout=5).json().get("version")
+    except (requests.RequestException, ValueError):
+        version_ollama = None
+    corrida.parametros.update({"ollama": version_ollama, "modelos": modelos, "particion": "desarrollo", "fichas": len(ids), "pares_qc1": len(pares),
                                "consultas_conceptos": len(conocidas), "jueces_de_la_referencia": jueces,
                                "qc1": [config.QC1_CONTEXTO, config.PROMPT_QC1_VERSION], "regla": REGLA_CAMBIO})
     log(f"Comparación por tarea: {len(modelos)} modelos · {len(conocidas)} consultas · {len(pares)} pares · "
