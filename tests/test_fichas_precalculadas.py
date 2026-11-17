@@ -49,6 +49,22 @@ def test_fichas_batch_registra_json_invalido(tmp_path):
     assert not tabla["json_valido"].iloc[0] and tabla["intentos"].iloc[0] == 2
 
 
+def test_tercer_intento_pide_solo_los_campos_faltantes(tmp_path):
+    """v11.2: si la ficha solo carece de 'delitos', se pide aparte y se une; las inválidas se reintentan."""
+    sin_delitos = json.dumps({**FICHA, "delitos": "[DATO NO DISPONIBLE]"})
+    llm = LLMFicha([sin_delitos, sin_delitos, json.dumps({"delitos": "Robo calificado"})])
+    tabla = fp.generar_todas(_corpus(("a", TEXTO)), llm, tmp_path / "f.parquet", log=lambda m: None)
+    fila = tabla.iloc[0]
+    assert fila["json_valido"] and fila["intentos"] == 3 and llm.llamadas == 3
+    assert FichaPenal.desde_guardada(fila["ficha"]).delitos == "Robo calificado"
+    # una ficha inválida guardada se vuelve a intentar en la siguiente corrida
+    path = tmp_path / "g.parquet"
+    fp.generar_todas(_corpus(("a", TEXTO)), LLMFicha(["no es json"]), path, log=lambda m: None)
+    llm2 = LLMFicha([json.dumps(FICHA)])
+    assert fp.generar_todas(_corpus(("a", TEXTO)), llm2, path, log=lambda m: None)["json_valido"].all()
+    assert llm2.llamadas == 1
+
+
 def test_pipeline_usa_la_ficha_precalculada(monkeypatch):
     from test_pipeline_v11 import ClasificadorFalso, LLMFalso, StoreFalso, _cand, _correr
 

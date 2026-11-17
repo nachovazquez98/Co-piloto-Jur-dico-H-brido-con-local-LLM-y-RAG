@@ -579,6 +579,26 @@ Sentencia:
 {contexto}
 """
 
+# v11.2: tercer intento de la ficha JSON. 62 de las 66 fichas inválidas de llama3.1:8b solo carecían de 'delitos'
+# (o 'resumen'), aun después del reintento (fichas-diagnostico 20261116-213316_1fc6dd4). Se piden únicamente esos
+# campos y se unen a la respuesta anterior; no cambia la versión de la ficha (el prompt principal es el mismo).
+PROMPT_FICHA_FALTANTES = """
+De la sentencia penal de apelación de abajo, responde ÚNICAMENTE con este JSON, en español:
+{{
+{campos}
+}}
+
+El delito siempre aparece en la sentencia (aunque los nombres de las personas estén testados): escribe el que se
+imputó o se tuvo por acreditado, con su modalidad. No escribas "[DATO NO DISPONIBLE]" en estos campos.
+
+Sentencia:
+{contexto}
+"""
+CAMPOS_FICHA_FALTANTES = {
+    "delitos": '  "delitos": "delito(s) imputados o acreditados, con su modalidad"',
+    "resumen": '  "resumen": "2 o 3 frases: delito, acto impugnado, quién apeló y qué resolvió la Sala"',
+}
+
 PROMPTS_PENAL_VERSIONES = {
     "v10": (PROMPT_EXTRACCION_PENAL, PROMPT_REPORTE_PENAL),
     "v11": (PROMPT_EXTRACCION_PENAL_V11, PROMPT_REPORTE_PENAL_V11),

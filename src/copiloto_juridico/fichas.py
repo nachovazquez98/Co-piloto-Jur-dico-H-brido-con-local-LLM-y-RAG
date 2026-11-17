@@ -210,6 +210,20 @@ def _texto(v) -> str:
     return str(v).strip() or DATO_NO_DISPONIBLE
 
 
+def _objeto_json(respuesta: str) -> dict:
+    texto = (respuesta or "").strip()
+    ini, fin = texto.find("{"), texto.rfind("}")
+    if ini < 0 or fin <= ini:
+        raise ValueError("la respuesta no contiene un objeto JSON")
+    try:
+        d = _json.loads(texto[ini:fin + 1])
+    except _json.JSONDecodeError as e:
+        raise ValueError(f"JSON inválido ({e.msg}, posición {e.pos})") from e
+    if not isinstance(d, dict):
+        raise ValueError("el JSON no es un objeto")
+    return d
+
+
 def _lista(v) -> list[str]:
     if v is None or v == DATO_NO_DISPONIBLE:
         return []
@@ -238,21 +252,16 @@ class FichaPenal:
     pruebas_decisivas: list[str] = field(default_factory=list)
 
     @classmethod
-    def desde_json(cls, respuesta: str) -> "FichaPenal":
+    def desde_json(cls, respuesta: str, complemento: dict | None = None) -> "FichaPenal":
         """Valida la respuesta del LLM. Lanza ValueError con un mensaje útil para pedir la corrección.
 
         Acepta texto alrededor del JSON (toma del primer "{" al último "}"). Obligatorio: un sentido del fallo
-        interpretable y los campos 'delitos' y 'resumen'; el resto, si falta, queda como dato no disponible."""
-        texto = (respuesta or "").strip()
-        ini, fin = texto.find("{"), texto.rfind("}")
-        if ini < 0 or fin <= ini:
-            raise ValueError("la respuesta no contiene un objeto JSON")
-        try:
-            d = _json.loads(texto[ini:fin + 1])
-        except _json.JSONDecodeError as e:
-            raise ValueError(f"JSON inválido ({e.msg}, posición {e.pos})") from e
-        if not isinstance(d, dict):
-            raise ValueError("el JSON no es un objeto")
+        interpretable y los campos 'delitos' y 'resumen'; el resto, si falta, queda como dato no disponible.
+        `complemento`: campos pedidos aparte que llenan los que la respuesta dejó vacíos."""
+        d = _objeto_json(respuesta)
+        for k, v in (complemento or {}).items():
+            if _texto(d.get(k)) == DATO_NO_DISPONIBLE:
+                d[k] = v
         campos = {k: _texto(d.get(k)) for k in _CAMPOS_TEXTO}
         faltan = [k for k in ("delitos", "resumen") if campos[k] == DATO_NO_DISPONIBLE]
         if faltan:
@@ -391,7 +400,18 @@ def generar_ficha_json(generate, contexto: str) -> tuple["FichaPenal | None", di
     try:
         return FichaPenal.desde_json(respuesta), {"intentos": 2, "error": error}
     except ValueError as e2:
-        return None, {"intentos": 2, "error": str(e2)}
+        error = str(e2)
+    # Tercer intento: si solo faltan campos obligatorios, se piden aparte y se unen a la respuesta anterior
+    faltan = [k for k in prompts.CAMPOS_FICHA_FALTANTES if f"'{k}'" in error] if "faltan los campos" in error else []
+    if not faltan:
+        return None, {"intentos": 2, "error": error}
+    pedido = prompts.PROMPT_FICHA_FALTANTES.format(
+        campos=",\n".join(prompts.CAMPOS_FICHA_FALTANTES[k] for k in faltan), contexto=contexto)
+    try:
+        return FichaPenal.desde_json(respuesta, _objeto_json(generate(pedido, json_mode=True))), \
+            {"intentos": 3, "error": error}
+    except ValueError as e3:
+        return None, {"intentos": 3, "error": str(e3)}
 
 
 def verificaciones(texto_ficha: str, texto_sentencia: str) -> dict:

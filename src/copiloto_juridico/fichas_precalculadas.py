@@ -72,7 +72,9 @@ def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCU
 
     version, digest = version_ficha(llm.settings), digest_modelo(llm.settings)
     tabla = cargar(path)
-    vigentes = {(d, h) for d, h, v in zip(tabla["doc_id"], tabla["huella_texto"], tabla["version"]) if v == version}
+    # Las fichas que quedaron inválidas se vuelven a intentar (v11.2: hay un tercer intento que antes no existía)
+    vigentes = {(d, h) for d, h, v, ok in zip(tabla["doc_id"], tabla["huella_texto"], tabla["version"],
+                                             tabla["json_valido"]) if v == version and bool(ok)}
     penal = corpus[corpus["materia"] == "penal"]
     pendientes = [(d, t) for d, t in zip(penal["id"], penal["texto"]) if (d, huella_texto(t)) not in vigentes]
     log(f"Fichas: {len(penal)} sentencias penales, {len(penal) - len(pendientes)} vigentes, "
