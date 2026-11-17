@@ -15,8 +15,9 @@ No hay abogados disponibles para anotar, así que la referencia se construye sin
 | Revisar las familias | `familias --coherencia`: centroides de embeddings por tipo y familia |
 | Estudio de uso | `esfuerzo`: sentencias que hay que abrir para encontrar 3 útiles (portal, búsqueda por palabras, app) |
 
-Los jueces (`config.MODELOS_JUECES`: `qwen2.5:14b` y `gemma2:9b`) son modelos de familias distintas a la de la app y
-corren **uno a la vez** (8 GB de VRAM; `qwen2.5:14b` usa además el procesador). Un juez solo cuenta si acierta la familia
+Los jueces (`config.MODELOS_JUECES`: `mistral:7b` y `gemma2:9b`) son modelos de familias distintas a la de la app y
+corren **uno a la vez** (8 GB de VRAM). `qwen2.5:14b` se descartó por recursos: no cabe en la GPU y la laptop no lo
+sostiene en tandas largas. Un juez solo cuenta si acierta la familia
 de la categoría del STJ en al menos `JUEZ_EXACTITUD_MINIMA` = 0.80 de las sentencias, criterio fijado antes de
 correrlos. Límite que hay que declarar: es una evaluación contra lo que dicen el tribunal y el texto, no contra el
 juicio de un experto sobre la utilidad de un precedente.
@@ -29,7 +30,7 @@ fichas-batch                     # fichas de las sentencias nuevas o cambiadas (
 borradores --ampliar 10          # consultas nuevas hasta 10 por familia (llama3.1:8b)
 conceptos                        # conceptos clave de las consultas (llama3.1:8b)
 jueces --pares                   # pares (consulta, sentencia) a juzgar; sin LLM
-jueces --modelo qwen2.5:14b      # una tanda por juez (reanudable)
+jueces --modelo mistral:7b       # una tanda por juez (reanudable)
 jueces --modelo gemma2:9b
 referencias                      # referencias, juicios y consultas validadas; sin LLM
 modelos-tareas                   # qué modelo rinde mejor en conceptos, QC_1 y fichas (desarrollo)

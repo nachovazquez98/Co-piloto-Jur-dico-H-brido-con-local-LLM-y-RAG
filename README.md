@@ -134,7 +134,7 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
 **Evaluación automática (v11.2).** Como no hay abogados disponibles para anotar, la referencia se construye sin
 intervención humana: el delito, con la categoría que asignó el STJ en su portal; el acto impugnado, el apelante y el
 sentido del fallo, por mayoría entre reglas y dos jueces LLM de familias distintas a la del modelo de la app
-(`qwen2.5:14b`, `gemma2:9b`, uno a la vez en la GPU). Cada juez se valida antes contra la categoría del STJ. El orden
+(`mistral:7b`, `gemma2:9b`, uno a la vez en la GPU). Cada juez se valida antes contra la categoría del STJ. El orden
 de los comandos está en [`evaluacion/README.md`](evaluacion/README.md); las corridas finales se hacen con el corpus
 completo, después de las descargas pendientes.
 

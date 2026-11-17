@@ -8,8 +8,8 @@ Evaluación sin anotadores humanos (no hay abogados disponibles): la referencia 
 del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a la de la app, validados antes de usarse.
 
 ### Añadido
-- `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez (`qwen2.5:14b`,
-  `gemma2:9b`; `qwen2.5:7b` no pasó la prueba piloto), reanudables y con la clave del prompt.
+- `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez (`mistral:7b`,
+  `gemma2:9b`; `qwen2.5:7b` no pasó la prueba piloto y `qwen2.5:14b` no cabe en 8 GB), reanudables y con la clave del prompt.
 - `evaluacion referencias`: valida cada juez contra la categoría del STJ (mínimo 0.80 fijado antes de correrlos),
   referencia por mayoría de lectores para acto impugnado, apelante y sentido, juicios de relevancia con el formato
   de la hoja del abogado y validación automática de las consultas (sustituye a `revisado: true`).
