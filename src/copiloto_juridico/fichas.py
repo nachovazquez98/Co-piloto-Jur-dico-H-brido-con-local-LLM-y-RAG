@@ -134,13 +134,19 @@ def datos_penales(extraccion: str) -> dict[str, str | None]:
 
 # Se buscan sobre el texto "compacto" (sin espacios ni acentos) porque la extracción del PDF parte palabras
 # ("segund o", "co ntrol"). El orden importa solo para nombrar el valor; se elige el primer verbo que aparece.
+# v11.2 (muestra de desacuerdos y de sentencias sin sentido, evaluacion/errores/sentido_fallo.md): también "lo
+# procedente es confirmar". El verbo sin "se" ("este órgano colegiado revoca la resolución") solo cuenta si no hay
+# ninguno de los anteriores: en la sección también se narra ("el colegiado confirma el amparo").
 _VERBOS_SENTIDO = [
-    ("REPONE", r"seordenalareposicion|seordenareponer|serepone[n]?el|sedecretalareposicion"),
-    ("REVOCA", r"serevoca[n]?|esderevocarse|revocase|procederevocar|sedeclaralarevocacion"),
-    ("MODIFICA", r"semodifica[n]?|esdemodificarse|modificase|proceedemodificar|procedemodificar"),
-    ("CONFIRMA", r"seconfirma[n]?|esdeconfirmarse|confirmase|procedeconfirmar"),
+    ("REPONE", r"seordenalareposicion|seordenareponer|serepone[n]?el|sedecretalareposicion|procedenteesreponer"),
+    ("REVOCA", r"serevoca[n]?|esderevocarse|revocase|procederevocar|sedeclaralarevocacion|procedenteesrevocar"),
+    ("MODIFICA", r"semodifica[n]?|esdemodificarse|modificase|proceedemodificar|procedemodificar"
+                 r"|procedenteesmodificar"),
+    ("CONFIRMA", r"seconfirma[n]?|esdeconfirmarse|confirmase|procedeconfirmar|procedenteesconfirmar"),
 ]
 _RE_VERBO = re.compile("|".join(f"(?P<{s}>{p})" for s, p in _VERBOS_SENTIDO))
+_RE_VERBO_SIN_SE = re.compile("|".join(f"(?P<{s}>{v}[n]?(?:la|el|lo)(?!amparo|ejecutoria))" for s, v in
+                                       (("REVOCA", "revoca"), ("MODIFICA", "modifica"), ("CONFIRMA", "confirma"))))
 _RE_MARCA = re.compile(r"seresuelve|resuelve|proposiciones|puntosresolutivos|resolutivos")
 # Anexo de datos testados al final del documento ("no.214 eliminado... lgppicr."): no es parte del fallo.
 _RE_ANEXO = re.compile(r"no\d+eliminado[a-z0-9]{0,200}?lgppicr")
@@ -165,10 +171,12 @@ def sentido_por_reglas(texto_sentencia: str, fraccion_final: float = 0.5, seccio
     c = _RE_ANEXO.sub("", _compacto(texto_sentencia))
     # Mitad final en documentos largos; el texto completo si es corto (siempre al menos 3 secciones).
     tramo = c[max(0, min(int(len(c) * (1 - fraccion_final)), len(c) - 3 * seccion)):]
-    for m in reversed(list(_RE_MARCA.finditer(tramo))):
-        verbos = [v.lastgroup for v in _RE_VERBO.finditer(tramo, m.end(), m.end() + seccion)]
-        if verbos:
-            return "REPONE" if "REPONE" in verbos else verbos[0]
+    marcas = list(_RE_MARCA.finditer(tramo))
+    for patron in (_RE_VERBO, _RE_VERBO_SIN_SE):
+        for m in reversed(marcas):
+            verbos = [v.lastgroup for v in patron.finditer(tramo, m.end(), m.end() + seccion)]
+            if verbos:
+                return "REPONE" if "REPONE" in verbos else verbos[0]
     return None
 
 

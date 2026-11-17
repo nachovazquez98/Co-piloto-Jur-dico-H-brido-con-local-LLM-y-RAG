@@ -322,6 +322,15 @@ def test_sentido_por_reglas_casos_dificiles():
     # Anexo de datos testados al final no impide encontrar los resolutivos
     anexo = " no.214 eliminadoelnombrecompleto en 1 renglones por ser un dato identificativo lgppicr." * 40
     assert sentido_por_reglas("x " * 300 + "r e s u e l v e primero. se confirma el auto" + anexo) == "CONFIRMA"
+    # v11.2: "lo procedente es ..." y el verbo sin "se"; este último solo si no hay otro (la sección también narra)
+    assert sentido_por_reglas("puntos resolutivos primero. por los razonamientos de este fallo, lo procedente es "
+                              "revocar el auto de no vinculación a proceso") == "REVOCA"
+    assert sentido_por_reglas("proposiciones primera. por los motivos y fundamentos revoca lo resuelto en la "
+                              "audiencia") == "REVOCA"
+    assert sentido_por_reglas("resuelve primero. el tribunal colegiado confirma el amparo indirecto; segundo. se "
+                              "revoca la resolución apelada") == "REVOCA"
+    # "Se deja insubsistente" no basta: puede ser la sentencia de la propia sala o una competencia
+    assert sentido_por_reglas("resuelve primera. se deja insubsistente la sentencia dictada por este ad quem") is None
 
 
 def test_articulos_con_ordinal_y_no_encontrados():
