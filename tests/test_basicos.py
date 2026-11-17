@@ -28,6 +28,15 @@ def test_select_balanced_aplica_tope_y_reparte_en_el_tiempo():
     assert fechas[0] == "2025-01-01" and fechas[-1] == "2025-01-28"
 
 
+def test_select_balanced_conserva_las_del_corpus_actual():
+    df = pd.DataFrame({"id": [f"d{i:02d}" for i in range(40)], "tipo": "penal/robo",
+                       "fecha": [f"2025-01-{i % 28 + 1:02d}" for i in range(40)]})
+    actuales = {f"d{i:02d}" for i in range(0, 40, 2)}  # 20 ya en el corpus
+    out = select_balanced(df, max_por_tipo=30, conservar=actuales)
+    assert len(out) == 30 and actuales <= set(out["id"])  # las nuevas solo llenan el cupo
+    assert len(select_balanced(df, max_por_tipo=10, conservar=actuales)) == 10
+
+
 def test_pages_to_read_muestrea_pdfs_largos(monkeypatch):
     from copiloto_juridico import config
 

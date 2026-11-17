@@ -29,7 +29,7 @@ def cmd_construir_corpus(args) -> None:
     from .datos.corpus import import_from_chroma_sqlite, load_corpus, save_corpus, unir_fuentes
     from .datos.procesamiento import process_pdf_folder
 
-    fuentes = []
+    fuentes, actual = [], pd.DataFrame(columns=["id"])
     if not args.reiniciar:
         actual = load_corpus()
         if len(actual):
@@ -50,7 +50,7 @@ def cmd_construir_corpus(args) -> None:
     # muestreada); entre iguales, la primera fuente (corpus actual > chroma > PDFs).
     todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
-    balanceado = select_balanced(todo, args.max_por_tipo)
+    balanceado = select_balanced(todo, args.max_por_tipo, conservar=set(actual["id"]))
     save_corpus(balanceado)
 
     rep = balance_report(balanceado, load_catalogo())

@@ -54,15 +54,32 @@ def load_catalogo(path: Path = config.CATALOGO_PATH) -> pd.DataFrame:
     return df
 
 
-def select_balanced(corpus: pd.DataFrame, max_por_tipo: int = config.MAX_SENTENCIAS_POR_TIPO) -> pd.DataFrame:
-    """Aplica el tope por tipo eligiendo sentencias repartidas uniformemente en el tiempo."""
+def select_balanced(corpus: pd.DataFrame, max_por_tipo: int = config.MAX_SENTENCIAS_POR_TIPO,
+                    conservar: set[str] | None = None) -> pd.DataFrame:
+    """Aplica el tope por tipo eligiendo sentencias repartidas uniformemente en el tiempo.
+
+    `conservar` (v11.2): ids que ya estaban en el corpus; se quedan primero y las nuevas solo llenan el cupo que
+    falte. Sin esto, agregar sentencias a un tipo lleno cambiaba la selección y sacaba sentencias que ya tenían
+    consultas, fichas y juicios."""
+    conservar = conservar or set()
     partes = []
     for _, grupo in corpus.sort_values(["tipo", "fecha", "id"]).groupby("tipo", sort=True):
         if len(grupo) > max_por_tipo:
-            idx = np.linspace(0, len(grupo) - 1, num=max_por_tipo).round().astype(int)
-            grupo = grupo.iloc[sorted(set(idx))]
+            fijas = grupo[grupo["id"].isin(conservar)]
+            if len(fijas) >= max_por_tipo:
+                grupo = _repartidas(fijas, max_por_tipo)
+            else:
+                resto = grupo[~grupo["id"].isin(conservar)]
+                grupo = pd.concat([fijas, _repartidas(resto, max_por_tipo - len(fijas))]).sort_values(["fecha", "id"])
         partes.append(grupo)
     return pd.concat(partes, ignore_index=True)
+
+
+def _repartidas(grupo: pd.DataFrame, n: int) -> pd.DataFrame:
+    if len(grupo) <= n:
+        return grupo
+    idx = np.linspace(0, len(grupo) - 1, num=n).round().astype(int)
+    return grupo.iloc[sorted(set(idx))]
 
 
 def balance_report(corpus: pd.DataFrame, catalogo: pd.DataFrame | None = None) -> pd.DataFrame:
