@@ -74,20 +74,20 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 73,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,67-2025,2025-06-13,toca,2025-06-13-132151_penal_abandono-de-familiares.pdf,31,,2
 74,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,,2025-06-18,fecha + delito,2025-06-18-093701_penal_abandono-de-familiares.pdf,87,,2
 75,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,158-2025,2025-06-23,toca,2025-06-23-134328_penal_abandono-de-familiares.pdf,33,si,1
-76,abandono de familiares,penal/abandono-de-personas,ABANDONO DE PERSONAS,137-2025,2025-07-11,toca,2025-07-11-133305_penal_abandono-de-personas.pdf,36,,1
-77,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,165-2025,2025-07-15,toca,2025-07-15-134339_penal_abandono-de-familiares.pdf,25,,1
+76,abandono de familiares,penal/abandono-de-personas,ABANDONO DE PERSONAS,137-2025,2025-07-11,toca,2025-07-11-133305_penal_abandono-de-personas.pdf,36,si,1
+77,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,165-2025,2025-07-15,toca,2025-07-15-134339_penal_abandono-de-familiares.pdf,25,si,1
 78,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,131-2025,2025-08-12,toca,2025-08-12-104417_penal_abandono-de-familiares.pdf,93,,2
-79,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,87-2025,2025-08-28,toca,2025-08-28-115114_penal_abandono-de-familiares.pdf,27,,1
-80,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,210-2025,2025-09-04,toca,2025-09-04-140446_penal_abandono-de-familiares.pdf,35,,1
+79,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,87-2025,2025-08-28,toca,2025-08-28-115114_penal_abandono-de-familiares.pdf,27,si,1
+80,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,210-2025,2025-09-04,toca,2025-09-04-140446_penal_abandono-de-familiares.pdf,35,si,1
 81,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,247-2025,2025-09-04,toca,2025-09-04-140713_penal_abandono-de-familiares.pdf,60,,2
 82,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,67-2025,2025-09-10,toca,2025-09-10-113952_penal_abandono-de-familiares.pdf,13,,2
 83,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,25-2024,2025-09-10,toca,2025-09-10-114715_penal_abandono-de-familiares.pdf,53,,2
 84,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,298-2021,2025-09-12,toca,2025-09-12-123209_penal_abandono-de-familiares.pdf,22,,2
-85,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,3-2025,2025-09-12,toca,2025-09-12-130700_penal_abandono-de-familiares.pdf,30,,1
-86,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,268-2025,2025-09-17,toca,2025-09-17-145408_penal_abandono-de-familiares.pdf,11,,1
+85,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,3-2025,2025-09-12,toca,2025-09-12-130700_penal_abandono-de-familiares.pdf,30,si,1
+86,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,268-2025,2025-09-17,toca,2025-09-17-145408_penal_abandono-de-familiares.pdf,11,si,1
 87,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,149-2025,2025-10-06,toca,2025-10-06-114630_penal_abandono-de-familiares.pdf,23,,2
 88,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,197-2025,2025-10-29,toca,2025-10-29-130912_penal_abandono-de-familiares.pdf,25,,2
-89,abandono de familiares,penal/abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares,ABANDONO DE FAMILIARES Y DESOBEDIENCIA O RESISTENCIA DE PARTICULARES,284-2025,2025-10-30,toca,2025-10-30-153953_penal_abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares.pdf,52,,1
+89,abandono de familiares,penal/abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares,ABANDONO DE FAMILIARES Y DESOBEDIENCIA O RESISTENCIA DE PARTICULARES,284-2025,2025-10-30,toca,2025-10-30-153953_penal_abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares.pdf,52,si,1
 90,abandono de familiares,penal/abandono-de-familiares,ABANDONO DE FAMILIARES,259-2025,2025-10-31,toca,2025-10-31-170907_penal_abandono-de-familiares.pdf,75,,2
 91,amenazas y extorsion,penal/amenazas,AMENAZAS,,2025-05-26,fecha + delito,2025-05-26-140551_penal_amenazas.pdf,33,,1
 92,amenazas y extorsion,penal/extorsion,EXTORSION,50-2025,2025-06-10,toca,2025-06-10-101653_penal_extorsion.pdf,63,,2
@@ -98,11 +98,11 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 97,amenazas y extorsion,penal/amenazas,AMENAZAS,143-2025,2025-09-01,toca,2025-09-01-133935_penal_amenazas.pdf,29,,2
 98,amenazas y extorsion,penal/extorsion,EXTORSION,222-2025,2025-09-08,toca,2025-09-08-191209_penal_extorsion.pdf,18,,2
 99,amenazas y extorsion,penal/extorsion,EXTORSION,220-2025,2025-09-09,toca,2025-09-09-133337_penal_extorsion.pdf,16,,2
-100,amenazas y extorsion,penal/amenazas-y-lesiones,AMENAZAS Y LESIONES,216-2025,2025-09-12,toca,2025-09-12-114458_penal_amenazas-y-lesiones.pdf,28,,1
+100,amenazas y extorsion,penal/amenazas-y-lesiones,AMENAZAS Y LESIONES,216-2025,2025-09-12,toca,2025-09-12-114458_penal_amenazas-y-lesiones.pdf,28,si,1
 101,amenazas y extorsion,penal/amenazas,AMENAZAS,295-2025,2025-09-18,toca,2025-09-18-112624_penal_amenazas.pdf,14,,2
-102,amenazas y extorsion,penal/extorsion,EXTORSION,207-2021,2025-10-15,toca,2025-10-15-093018_penal_extorsion.pdf,86,,1
+102,amenazas y extorsion,penal/extorsion,EXTORSION,207-2021,2025-10-15,toca,2025-10-15-093018_penal_extorsion.pdf,86,si,1
 103,amenazas y extorsion,penal/extorsion,EXTORSION,302-2025,2025-10-29,toca,2025-10-29-113156_penal_extorsion.pdf,43,,2
-104,amenazas y extorsion,penal/amenazas,AMENAZAS,201-2025,2025-10-29,toca,2025-10-29-125242_penal_amenazas.pdf,34,,1
+104,amenazas y extorsion,penal/amenazas,AMENAZAS,201-2025,2025-10-29,toca,2025-10-29-125242_penal_amenazas.pdf,34,si,1
 105,amenazas y extorsion,penal/amenazas,AMENAZAS,318-2025,2025-11-06,toca,2025-11-06-141732_penal_amenazas.pdf,29,,2
 106,amenazas y extorsion,penal/amenazas,AMENAZAS,343-2024,2025-11-11,toca,2025-11-11-113812_penal_amenazas.pdf,37,,2
 107,amenazas y extorsion,penal/extorsion,EXTORSION,185-2025,2025-11-14,toca,2025-11-14-124643_penal_extorsion.pdf,30,,2
@@ -117,14 +117,14 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 116,feminicidio,penal/feminicidio,FEMINICIDIO,23-2025,2025-04-04,toca,2025-04-04-094412_penal_feminicidio.pdf,31,,2
 117,feminicidio,penal/feminicidio,FEMINICIDIO,197-2024,2025-04-07,toca,2025-04-07-114454_penal_feminicidio.pdf,37,,2
 118,feminicidio,penal/feminicidio,FEMINICIDIO,350-2024,2025-04-09,toca,2025-04-09-112149_penal_feminicidio.pdf,353,,2
-119,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,281-2024,2025-04-10,toca,2025-04-10-181012_penal_tentativa-de-feminicidio.pdf,33,,2
+119,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,281-2024,2025-04-10,toca,2025-04-10-181012_penal_tentativa-de-feminicidio.pdf,33,si,2
 120,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,72-2025,2025-06-10,toca,2025-06-10-110937_penal_feminicidio-en-grado-de-tentativa.pdf,18,,2
-121,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,,2025-06-13,fecha + delito,2025-06-13-125603_penal_tentativa-de-feminicidio.pdf,287,,1
+121,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,,2025-06-13,fecha + delito,2025-06-13-125603_penal_tentativa-de-feminicidio.pdf,287,si,1
 122,feminicidio,penal/feminicidio,FEMINICIDIO,81-2025,2025-06-16,toca,2025-06-16-112339_penal_feminicidio.pdf,70,,2
 123,feminicidio,penal/feminicidio,FEMINICIDIO,154-2025,2025-06-30,toca,2025-06-30-134456_penal_feminicidio.pdf,68,,2
 124,feminicidio,penal/feminicidio,FEMINICIDIO,31-2025,2025-07-11,toca,2025-07-11-141643_penal_feminicidio.pdf,72,,2
-125,feminicidio,penal/feminicidio-y-otro,FEMINICIDIO Y OTRO,143-2024,2025-08-04,toca,2025-08-04-125733_penal_feminicidio-y-otro.pdf,76,,1
-126,feminicidio,penal/feminicidio,FEMINICIDIO,201-2025,2025-08-11,toca,2025-08-11-130149_penal_feminicidio.pdf,31,,1
+125,feminicidio,penal/feminicidio-y-otro,FEMINICIDIO Y OTRO,143-2024,2025-08-04,toca,2025-08-04-125733_penal_feminicidio-y-otro.pdf,76,si,1
+126,feminicidio,penal/feminicidio,FEMINICIDIO,201-2025,2025-08-11,toca,2025-08-11-130149_penal_feminicidio.pdf,31,si,1
 127,feminicidio,penal/feminicidio,FEMINICIDIO,213-2021,2025-08-11,toca,2025-08-11-130817_penal_feminicidio.pdf,73,,2
 128,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,,2025-09-05,fecha + delito,2025-09-05-144525_penal_feminicidio-en-grado-de-tentativa.pdf,39,,2
 129,feminicidio,penal/feminicidio,FEMINICIDIO,187-2025,2025-09-11,toca,2025-09-11-104320_penal_feminicidio.pdf,42,,2
@@ -132,17 +132,17 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 131,feminicidio,penal/feminicidio,FEMINICIDIO,123-2025,2025-09-12,toca,2025-09-12-104807_penal_feminicidio.pdf,51,,2
 132,feminicidio,penal/feminicidio,FEMINICIDIO,17-2025,2025-09-19,toca,2025-09-19-131356_penal_feminicidio.pdf,149,,2
 133,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,274-2025,2025-10-10,toca,2025-10-10-144418_penal_feminicidio-en-grado-de-tentativa.pdf,33,,2
-134,feminicidio,penal/feminicidio,FEMINICIDIO,126-2025,2025-10-15,toca,2025-10-15-115654_penal_feminicidio.pdf,229,,1
+134,feminicidio,penal/feminicidio,FEMINICIDIO,126-2025,2025-10-15,toca,2025-10-15-115654_penal_feminicidio.pdf,229,si,1
 135,feminicidio,penal/feminicidio,FEMINICIDIO,222-2025,2025-10-16,toca,2025-10-16-144825_penal_feminicidio.pdf,125,,2
-136,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,187-2025,2025-10-20,toca,2025-10-20-111157_penal_tentativa-de-feminicidio.pdf,109,,2
+136,feminicidio,penal/tentativa-de-feminicidio,TENTATIVA DE FEMINICIDIO,187-2025,2025-10-20,toca,2025-10-20-111157_penal_tentativa-de-feminicidio.pdf,109,si,2
 137,feminicidio,penal/feminicidio,FEMINICIDIO,116-2025,2025-10-24,toca,2025-10-24-151208_penal_feminicidio.pdf,129,,2
 138,feminicidio,penal/feminicidio,FEMINICIDIO,350-2024,2025-11-25,toca,2025-11-25-125325_penal_feminicidio.pdf,194,,2
 139,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,300-2025,2025-12-03,toca,2025-12-03-112342_penal_feminicidio-en-grado-de-tentativa.pdf,97,,2
 140,feminicidio,penal/feminicidio,FEMINICIDIO,307-2025,2025-12-08,toca,2025-12-08-112706_penal_feminicidio.pdf,72,,2
-141,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,564-2022,2026-01-09,toca,2026-01-09-094524_penal_feminicidio-en-grado-de-tentativa.pdf,93,,1
-142,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,237-2024,2025-04-07,toca,2025-04-07-124901_penal_desaparicion-cometida-por-particulares.pdf,65,,1
+141,feminicidio,penal/feminicidio-en-grado-de-tentativa,FEMINICIDIO EN GRADO DE TENTATIVA,564-2022,2026-01-09,toca,2026-01-09-094524_penal_feminicidio-en-grado-de-tentativa.pdf,93,si,1
+142,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,237-2024,2025-04-07,toca,2025-04-07-124901_penal_desaparicion-cometida-por-particulares.pdf,65,si,1
 143,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,438-2019,2025-04-08,toca,2025-04-08-111542_penal_desaparicion-forzada-de-personas.pdf,410,,2
-144,desaparicion de personas,penal/desaparicion-cometida-por-particulares-y-del-sistema-nacional-de-busqueda-de-personas,DESAPARICION COMETIDA POR PARTICULARES Y DEL SISTEMA NACIONAL DE BUSQUEDA DE PERSONAS,269-2024,2025-04-08,toca,2025-04-08-144123_penal_desaparicion-cometida-por-particulares-y-del-sistema-nacional-de-busqueda-de-personas.pdf,106,,1
+144,desaparicion de personas,penal/desaparicion-cometida-por-particulares-y-del-sistema-nacional-de-busqueda-de-personas,DESAPARICION COMETIDA POR PARTICULARES Y DEL SISTEMA NACIONAL DE BUSQUEDA DE PERSONAS,269-2024,2025-04-08,toca,2025-04-08-144123_penal_desaparicion-cometida-por-particulares-y-del-sistema-nacional-de-busqueda-de-personas.pdf,106,si,1
 145,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,443-2024,2025-04-09,toca,2025-04-09-120118_penal_desaparicion-forzada-de-personas.pdf,203,,2
 146,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,285-2024,2025-04-25,toca,2025-04-25-150237_penal_desaparicion-cometida-por-particulares.pdf,29,,2
 147,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,98-2025,2025-05-12,toca,2025-05-12-114741_penal_desaparicion-forzada-de-personas.pdf,50,,2
@@ -151,7 +151,7 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 150,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,112-2025,2025-06-16,toca,2025-06-16-150825_penal_desaparicion-cometida-por-particulares.pdf,185,,2
 151,desaparicion de personas,penal/desaparicion-forzada-de-personas-agravada,DESAPARICION FORZADA DE PERSONAS AGRAVADA,417-2024,2025-06-30,toca,2025-06-30-094842_penal_desaparicion-forzada-de-personas-agravada.pdf,184,,2
 152,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,92-2025,2025-06-30,toca,2025-06-30-134322_penal_desaparicion-cometida-por-particulares.pdf,248,,2
-153,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,75-2025,2025-07-10,toca,2025-07-10-122754_penal_desaparicion-forzada-de-personas.pdf,88,,1
+153,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,75-2025,2025-07-10,toca,2025-07-10-122754_penal_desaparicion-forzada-de-personas.pdf,88,si,1
 154,desaparicion de personas,penal/desaparicion-forzada-de-personas-agravada,DESAPARICION FORZADA DE PERSONAS AGRAVADA,49-2023,2025-07-14,toca,2025-07-14-101857_penal_desaparicion-forzada-de-personas-agravada.pdf,59,,2
 155,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,165-2025,2025-08-11,toca,2025-08-11-125200_penal_desaparicion-forzada-de-personas.pdf,16,,2
 156,desaparicion de personas,penal/desaparicion-forzada-de-personas,DESAPARICIÓN FORZADA DE PERSONAS,165-2025,2025-08-11,toca,2025-08-11-125406_penal_desaparicion-forzada-de-personas.pdf,16,,2
@@ -168,43 +168,43 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 167,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,189-2025,2025-10-10,toca,2025-10-10-121907_penal_desaparicion-cometida-por-particulares.pdf,113,,2
 168,desaparicion de personas,penal/desaparicion-forzada,DESAPARICIÓN FORZADA,174-2025,2025-10-10,toca,2025-10-10-132017_penal_desaparicion-forzada.pdf,57,,2
 169,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,,2025-10-10,fecha + delito,2025-10-10-133310_penal_desaparicion-cometida-por-particulares.pdf,53,,2
-170,desaparicion de personas,penal/desaparicion-forzada-de-personas-agravada,DESAPARICION FORZADA DE PERSONAS AGRAVADA,103-2025,2025-10-29,toca,2025-10-29-110423_penal_desaparicion-forzada-de-personas-agravada.pdf,75,,1
+170,desaparicion de personas,penal/desaparicion-forzada-de-personas-agravada,DESAPARICION FORZADA DE PERSONAS AGRAVADA,103-2025,2025-10-29,toca,2025-10-29-110423_penal_desaparicion-forzada-de-personas-agravada.pdf,75,si,1
 171,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,326-2025,2025-11-13,toca,2025-11-13-143926_penal_desaparicion-cometida-por-particulares.pdf,87,,2
-172,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,202-2024,2025-12-08,toca,2025-12-08-105006_penal_desaparicion-cometida-por-particulares.pdf,26,,1
+172,desaparicion de personas,penal/desaparicion-cometida-por-particulares,DESAPARICION COMETIDA POR PARTICULARES,202-2024,2025-12-08,toca,2025-12-08-105006_penal_desaparicion-cometida-por-particulares.pdf,26,si,1
 173,desaparicion de personas,penal/desaparicion-forzada-de-persona,DESAPARICION FORZADA DE PERSONA,402-2025,2025-12-12,toca,2025-12-12-142225_penal_desaparicion-forzada-de-persona.pdf,418,,2
 174,desaparicion de personas,penal/desaparicion-forzada-de-persona,DESAPARICION FORZADA DE PERSONA,319-2025,2026-01-07,toca,2026-01-07-124530_penal_desaparicion-forzada-de-persona.pdf,58,,2
 175,servidores publicos y administracion de justicia,penal/cohecho-y-abuso-sexual-infantil-agravado,COHECHO Y ABUSO SEXUAL INFANTIL AGRAVADO,110-2024,2025-03-17,toca,2025-03-17-130821_penal_cohecho-y-abuso-sexual-infantil-agravado.pdf,117,,2
-176,servidores publicos y administracion de justicia,penal/peculado,PECULADO,240-2024,2025-03-27,toca,2025-03-27-145356_penal_peculado.pdf,12,,1
+176,servidores publicos y administracion de justicia,penal/peculado,PECULADO,240-2024,2025-03-27,toca,2025-03-27-145356_penal_peculado.pdf,12,si,1
 177,servidores publicos y administracion de justicia,penal/cohecho,COHECHO,,2025-03-31,fecha + delito,2025-03-31-113144_penal_cohecho.pdf,16,,2
-178,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,206-2024,2025-04-08,toca,2025-04-08-140514_penal_abuso-de-autoridad.pdf,190,,1
-179,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,216-2022,2025-04-08,toca,2025-04-08-141058_penal_abuso-de-autoridad.pdf,44,,1
+178,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,206-2024,2025-04-08,toca,2025-04-08-140514_penal_abuso-de-autoridad.pdf,190,si,1
+179,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,216-2022,2025-04-08,toca,2025-04-08-141058_penal_abuso-de-autoridad.pdf,44,si,1
 180,servidores publicos y administracion de justicia,penal/abogados-patronos-y-litigantes,ABOGADOS PATRONOS Y LITIGANTES,339-2024,2025-04-25,toca,2025-04-25-100609_penal_abogados-patronos-y-litigantes.pdf,17,,2
-181,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,60-2025,2025-04-25,toca,2025-04-25-114535_penal_abuso-de-autoridad.pdf,143,,1
+181,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,60-2025,2025-04-25,toca,2025-04-25-114535_penal_abuso-de-autoridad.pdf,143,si,1
 182,servidores publicos y administracion de justicia,penal/utilizacion-ilicita-de-informacion-confidencial,UTILIZACION ILICITA DE INFORMACION CONFIDENCIAL,125-2025,2025-05-21,toca,2025-05-21-093855_penal_utilizacion-ilicita-de-informacion-confidencial.pdf,10,,2
 183,servidores publicos y administracion de justicia,penal/cohecho,COHECHO,61-2025,2025-05-22,toca,2025-05-22-125358_penal_cohecho.pdf,28,,2
 184,servidores publicos y administracion de justicia,penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades,DESVIO Y APROVECHAMIENTO INDEBIDO DE ATRIBUCIONES Y FACULTADES,361-2022,2025-05-27,toca,2025-05-27-103715_penal_desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades.pdf,28,,2
-185,servidores publicos y administracion de justicia,penal/abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,ABUSO DE AUTORIDAD Y DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,33-2019,2025-05-28,toca,2025-05-28-114034_penal_abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,224,,1
+185,servidores publicos y administracion de justicia,penal/abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,ABUSO DE AUTORIDAD Y DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,33-2019,2025-05-28,toca,2025-05-28-114034_penal_abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,224,si,1
 186,servidores publicos y administracion de justicia,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,191-2023,2025-05-29,toca,2025-05-29-120741_penal_delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,97,,2
-187,servidores publicos y administracion de justicia,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,,2025-05-30,fecha + delito,2025-05-30-110016_penal_delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,23,,1
+187,servidores publicos y administracion de justicia,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,,2025-05-30,fecha + delito,2025-05-30-110016_penal_delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,23,si,1
 188,servidores publicos y administracion de justicia,penal/uso-ilicito-de-atribuciones-y-facultades,USO ILICITO DE ATRIBUCIONES Y FACULTADES,19202425602,2025-07-08,toca,2025-07-08-150755_penal_uso-ilicito-de-atribuciones-y-facultades.pdf,50,,2
 189,servidores publicos y administracion de justicia,penal/cohecho,COHECHO,438-2024,2025-07-11,toca,2025-07-11-090750_penal_cohecho.pdf,69,,2
 190,servidores publicos y administracion de justicia,penal/delitos-en-materia-de-seguridad-social-de-los-servidores-publicos,DELITOS EN MATERIA DE SEGURIDAD SOCIAL DE LOS SERVIDORES PUBLICOS,128-2025,2025-08-04,toca,2025-08-04-135341_penal_delitos-en-materia-de-seguridad-social-de-los-servidores-publicos.pdf,41,,2
 191,servidores publicos y administracion de justicia,penal/cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,169-2025,2025-08-11,toca,2025-08-11-130609_penal_cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf,36,,2
-192,servidores publicos y administracion de justicia,penal/abuso-de-autoridad-y-lesiones,ABUSO DE AUTORIDAD Y LESIONES,,2025-09-18,fecha + delito,2025-09-18-093852_penal_abuso-de-autoridad-y-lesiones.pdf,16,,1
+192,servidores publicos y administracion de justicia,penal/abuso-de-autoridad-y-lesiones,ABUSO DE AUTORIDAD Y LESIONES,,2025-09-18,fecha + delito,2025-09-18-093852_penal_abuso-de-autoridad-y-lesiones.pdf,16,si,1
 193,servidores publicos y administracion de justicia,penal/cohecho,COHECHO,,2025-10-03,fecha + delito,2025-10-03-102923_penal_cohecho.pdf,25,,2
-194,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,225-2025,2025-10-03,toca,2025-10-03-213340_penal_abuso-de-autoridad.pdf,12,,1
+194,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,225-2025,2025-10-03,toca,2025-10-03-213340_penal_abuso-de-autoridad.pdf,12,si,1
 195,servidores publicos y administracion de justicia,penal/encubrimiento,ENCUBRIMIENTO,393-2024,2025-10-06,toca,2025-10-06-122130_penal_encubrimiento.pdf,31,,2
-196,servidores publicos y administracion de justicia,penal/materia-de-informacion-publica,MATERIA DE INFORMACION PUBLICA,261-2025,2025-10-09,toca,2025-10-09-103525_penal_materia-de-informacion-publica.pdf,15,,1
+196,servidores publicos y administracion de justicia,penal/materia-de-informacion-publica,MATERIA DE INFORMACION PUBLICA,261-2025,2025-10-09,toca,2025-10-09-103525_penal_materia-de-informacion-publica.pdf,15,si,1
 197,servidores publicos y administracion de justicia,penal/cohecho,COHECHO,265-2025,2025-10-09,toca,2025-10-09-104450_penal_cohecho.pdf,18,,2
 198,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,204-2025,2025-10-10,toca,2025-10-10-135214_penal_abuso-de-autoridad.pdf,69,,2
 199,servidores publicos y administracion de justicia,penal/delitos-en-materia-de-seguridad-social-de-los-servidores-publicos,DELITOS EN MATERIA DE SEGURIDAD SOCIAL DE LOS SERVIDORES PUBLICOS,212-2025,2025-10-30,toca,2025-10-30-133752_penal_delitos-en-materia-de-seguridad-social-de-los-servidores-publicos.pdf,45,,2
 200,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,212-2025,2025-12-11,toca,2025-12-11-144112_penal_abuso-de-autoridad.pdf,79,,2
-201,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,264-2025,2025-12-12,toca,2025-12-12-110952_penal_abuso-de-autoridad.pdf,49,,1
+201,servidores publicos y administracion de justicia,penal/abuso-de-autoridad,ABUSO DE AUTORIDAD,264-2025,2025-12-12,toca,2025-12-12-110952_penal_abuso-de-autoridad.pdf,49,si,1
 202,servidores publicos y administracion de justicia,penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades,DESVIO Y APROVECHAMIENTO INDEBIDO DE ATRIBUCIONES Y FACULTADES,286-2025,2025-12-12,toca,2025-12-12-141914_penal_desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades.pdf,93,,2
 203,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,430-2024,2025-03-21,toca,2025-03-21-144847_penal_homicidio-culposo.pdf,41,,2
 204,delitos culposos,penal/lesiones-y-homicidio-ambos-a-titulo-de-culpa,LESIONES Y HOMICIDIO AMBOS A TITULO DE CULPA,62-2025,2025-04-04,toca,2025-04-04-111739_penal_lesiones-y-homicidio-ambos-a-titulo-de-culpa.pdf,19,,2
 205,delitos culposos,penal/danos-en-las-cosas-a-titulo-de-culpa,DAÑOS EN LAS COSAS A TITULO DE CULPA,300-2024,2025-04-07,toca,2025-04-07-114737_penal_danos-en-las-cosas-a-titulo-de-culpa.pdf,23,,2
-206,delitos culposos,penal/lesiones-a-titulo-de-culpa,LESIONES A TITULO DE CULPA,302-2024,2025-04-07,toca,2025-04-07-123429_penal_lesiones-a-titulo-de-culpa.pdf,42,,1
+206,delitos culposos,penal/lesiones-a-titulo-de-culpa,LESIONES A TITULO DE CULPA,302-2024,2025-04-07,toca,2025-04-07-123429_penal_lesiones-a-titulo-de-culpa.pdf,42,si,1
 207,delitos culposos,penal/dano-en-las-cosas-y-lesiones-culposas,DAÑO EN LAS COSAS Y LESIONES CULPOSAS,25-2025,2025-04-08,toca,2025-04-08-131939_penal_dano-en-las-cosas-y-lesiones-culposas.pdf,400,,2
 208,delitos culposos,penal/dano-en-las-cosas-a-titulo-de-culpa,DAÑO EN LAS COSAS A TITULO DE CULPA,71-2019,2025-04-09,toca,2025-04-09-113216_penal_dano-en-las-cosas-a-titulo-de-culpa.pdf,19,,2
 209,delitos culposos,penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa,LESIONES Y DAÑO EN LAS COSAS AMBOS A TITULO DE CULPA,331-2023,2025-04-10,toca,2025-04-10-131355_penal_lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa.pdf,25,,2
@@ -214,18 +214,18 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 213,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,88-2023,2025-06-10,toca,2025-06-10-100359_penal_homicidio-a-titulo-de-culpa.pdf,384,,1
 214,delitos culposos,penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA,136-2025,2025-06-13,toca,2025-06-13-100453_penal_homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa.pdf,33,,2
 215,delitos culposos,penal/lesiones-culposas,LESIONES CULPOSAS,168-2025,2025-06-20,toca,2025-06-20-120226_penal_lesiones-culposas.pdf,97,,2
-216,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,10-2025,2025-06-24,toca,2025-06-24-135129_penal_homicidio-a-titulo-de-culpa.pdf,19,,1
-217,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,21-2025,2025-07-08,toca,2025-07-08-143912_penal_homicidio-culposo.pdf,27,,1
+216,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,10-2025,2025-06-24,toca,2025-06-24-135129_penal_homicidio-a-titulo-de-culpa.pdf,19,si,1
+217,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,21-2025,2025-07-08,toca,2025-07-08-143912_penal_homicidio-culposo.pdf,27,si,1
 218,delitos culposos,penal/responsabilidad-medica-y-homicidio-culposo,RESPONSABILIDAD MEDICA Y HOMICIDIO CULPOSO,,2025-07-11,fecha + delito,2025-07-11-102154_penal_responsabilidad-medica-y-homicidio-culposo.pdf,46,,2
 219,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,173-2025,2025-07-15,toca,2025-07-15-130045_penal_homicidio-a-titulo-de-culpa.pdf,63,,2
 220,delitos culposos,penal/lesiones-a-titulo-de-culpa,LESIONES A TITULO DE CULPA,218-2025,2025-07-15,toca,2025-07-15-141107_penal_lesiones-a-titulo-de-culpa.pdf,31,,2
 221,delitos culposos,penal/homicidio-a-titulo-de-culpa-y-otro,HOMICIDIO A TITULO DE CULPA Y OTRO,100-2025,2025-08-04,toca,2025-08-04-125412_penal_homicidio-a-titulo-de-culpa-y-otro.pdf,103,,2
 222,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,264-2025,2025-08-29,toca,2025-08-29-102127_penal_homicidio-culposo.pdf,136,,2
 223,delitos culposos,penal/homicidio-a-titulo-de-culpa-y-otro,HOMICIDIO A TITULO DE CULPA Y OTRO,332-2024,2025-09-04,toca,2025-09-04-124458_penal_homicidio-a-titulo-de-culpa-y-otro.pdf,105,,2
-224,delitos culposos,penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS  TODOS A TITULO DE CULPA",,2025-09-17,fecha + delito,2025-09-17-135327_penal_homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa.pdf,40,,1
-225,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,64-2024,2025-09-18,toca,2025-09-18-112207_penal_homicidio-culposo.pdf,169,,2
+224,delitos culposos,penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS  TODOS A TITULO DE CULPA",,2025-09-17,fecha + delito,2025-09-17-135327_penal_homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa.pdf,40,si,1
+225,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,64-2024,2025-09-18,toca,2025-09-18-112207_penal_homicidio-culposo.pdf,169,si,2
 226,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,,2025-10-06,fecha + delito,2025-10-06-113831_penal_homicidio-a-titulo-de-culpa.pdf,12,,2
-227,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,64-2024,2025-10-10,toca,2025-10-10-143548_penal_homicidio-culposo.pdf,155,,1
+227,delitos culposos,penal/homicidio-culposo,HOMICIDIO CULPOSO,64-2024,2025-10-10,toca,2025-10-10-143548_penal_homicidio-culposo.pdf,155,si,1
 228,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,75-2025,2025-10-13,toca,2025-10-13-124944_penal_homicidio-a-titulo-de-culpa.pdf,337,,2
 229,delitos culposos,penal/homicidio-a-titulo-de-culpa-grave-y-otro,HOMICIDIO A TITULO DE CULPA GRAVE Y OTRO,19-2023,2025-10-27,toca,2025-10-27-090742_penal_homicidio-a-titulo-de-culpa-grave-y-otro.pdf,59,,2
 230,delitos culposos,penal/lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,LESIONES Y DAÑO EN LAS COSAS A TITULO DE CULPA,250-2025,2025-11-07,toca,2025-11-07-121914_penal_lesiones-y-dano-en-las-cosas-a-titulo-de-culpa.pdf,83,,2
@@ -233,14 +233,14 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 232,delitos culposos,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,369-2025,2025-12-29,toca,2025-12-29-152454_penal_homicidio-a-titulo-de-culpa.pdf,175,,2
 233,delitos culposos,penal/homicidio-a-titulo-de-culpa-grave,HOMICIDIO A TITULO DE CULPA GRAVE,396-2025,2026-01-09,toca,2026-01-09-095301_penal_homicidio-a-titulo-de-culpa-grave.pdf,61,,2
 234,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,20-2025,2025-03-25,toca,2025-03-25-142244_penal_despojo-de-inmuebles-y-aguas.pdf,40,,2
-235,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,234-2024,2025-03-27,toca,2025-03-27-140144_penal_despojo-de-inmuebles-y-aguas.pdf,25,,1
+235,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,234-2024,2025-03-27,toca,2025-03-27-140144_penal_despojo-de-inmuebles-y-aguas.pdf,25,si,1
 236,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,52-2025,2025-03-31,toca,2025-03-31-124515_penal_despojo-de-inmuebles-y-aguas.pdf,77,,2
 237,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,242-2024,2025-03-31,toca,2025-03-31-141147_penal_despojo-de-inmuebles.pdf,50,,1
 238,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,195-2024,2025-04-08,toca,2025-04-08-135720_penal_despojo-de-inmuebles-y-aguas.pdf,79,,2
-239,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,446-2024,2025-04-08,toca,2025-04-08-155853_penal_despojo-de-inmuebles.pdf,139,,1
+239,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,446-2024,2025-04-08,toca,2025-04-08-155853_penal_despojo-de-inmuebles.pdf,139,si,1
 240,despojo,penal/despojo-y-dano-en-las-cosas,DESPOJO Y DAÑO EN LAS COSAS,243-2021,2025-04-09,toca,2025-04-09-094938_penal_despojo-y-dano-en-las-cosas.pdf,22,,2
 241,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,321-2022,2025-04-17,toca,2025-04-17-123824_penal_despojo-de-inmuebles.pdf,112,,2
-242,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,106-2024,2025-04-23,toca,2025-04-23-144141_penal_despojo-de-inmuebles.pdf,21,,1
+242,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,106-2024,2025-04-23,toca,2025-04-23-144141_penal_despojo-de-inmuebles.pdf,21,si,1
 243,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,399-2024,2025-04-28,toca,2025-04-28-101657_penal_despojo-de-inmuebles-y-aguas.pdf,22,,2
 244,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,422-2024,2025-05-14,toca,2025-05-14-110921_penal_despojo-de-inmuebles-y-aguas.pdf,26,,2
 245,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,47-2025,2025-05-16,toca,2025-05-16-113746_penal_despojo-de-inmuebles.pdf,30,,2
@@ -251,7 +251,7 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 250,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,64-2025,2025-07-07,toca,2025-07-07-110103_penal_despojo-de-inmuebles.pdf,21,,2
 251,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,84-2025,2025-07-07,toca,2025-07-07-133644_penal_despojo-de-inmuebles.pdf,51,,2
 252,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,477-2018,2025-07-08,toca,2025-07-08-143431_penal_despojo-de-inmuebles.pdf,212,,2
-253,despojo,penal/despojo,DESPOJO,122-2025,2025-07-10,toca,2025-07-10-121233_penal_despojo.pdf,48,,1
+253,despojo,penal/despojo,DESPOJO,122-2025,2025-07-10,toca,2025-07-10-121233_penal_despojo.pdf,48,si,1
 254,despojo,penal/despojo,DESPOJO,408-2024,2025-07-10,toca,2025-07-10-133539_penal_despojo.pdf,22,,2
 255,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,186-2025,2025-08-07,toca,2025-08-07-113132_penal_despojo-de-inmuebles-y-aguas.pdf,102,,2
 256,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,174-2025,2025-08-08,toca,2025-08-08-170225_penal_despojo-de-inmuebles.pdf,54,,2
@@ -270,51 +270,51 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 269,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,206-2019,2025-10-02,toca,2025-10-02-114142_penal_despojo-de-inmuebles-y-aguas.pdf,99,,2
 270,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,206-2019,2025-10-02,toca,2025-10-02-115219_penal_despojo-de-inmuebles-y-aguas.pdf,95,,2
 271,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,207-2025,2025-10-10,toca,2025-10-10-144326_penal_despojo-de-inmuebles.pdf,26,,2
-272,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,176-2025,2025-10-21,toca,2025-10-21-093352_penal_despojo-de-inmuebles.pdf,331,,1
-273,despojo,penal/tentativa-de-despojo,TENTATIVA DE DESPOJO,267-2023,2025-10-31,toca,2025-10-31-144648_penal_tentativa-de-despojo.pdf,38,,1
-274,despojo,penal/despojo,DESPOJO,197-2025,2025-11-20,toca,2025-11-20-144723_penal_despojo.pdf,57,,1
+272,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,176-2025,2025-10-21,toca,2025-10-21-093352_penal_despojo-de-inmuebles.pdf,331,si,1
+273,despojo,penal/tentativa-de-despojo,TENTATIVA DE DESPOJO,267-2023,2025-10-31,toca,2025-10-31-144648_penal_tentativa-de-despojo.pdf,38,si,1
+274,despojo,penal/despojo,DESPOJO,197-2025,2025-11-20,toca,2025-11-20-144723_penal_despojo.pdf,57,si,1
 275,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,349-2025,2025-11-24,toca,2025-11-24-142229_penal_despojo-de-inmuebles-y-aguas.pdf,109,,2
 276,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,390-2025,2025-12-29,toca,2025-12-29-152639_penal_despojo-de-inmuebles.pdf,18,,2
-277,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,372-2025,2026-01-06,toca,2026-01-06-142718_penal_despojo-de-inmuebles-y-aguas.pdf,137,,1
-278,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,197-2025,2026-01-07,toca,2026-01-07-094232_penal_despojo-de-inmuebles.pdf,57,,1
+277,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,372-2025,2026-01-06,toca,2026-01-06-142718_penal_despojo-de-inmuebles-y-aguas.pdf,137,si,1
+278,despojo,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,197-2025,2026-01-07,toca,2026-01-07-094232_penal_despojo-de-inmuebles.pdf,57,si,1
 279,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,208-2025,2026-01-09,toca,2026-01-09-093110_penal_despojo-de-inmuebles-y-aguas.pdf,284,,2
 280,despojo,penal/despojo-de-inmuebles-y-aguas,DESPOJO DE INMUEBLES Y AGUAS,360-2025,2026-01-09,toca,2026-01-09-145055_penal_despojo-de-inmuebles-y-aguas.pdf,27,,2
-281,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,92-2024,2025-04-01,toca,2025-04-01-181604_penal_lesiones-calificadas.pdf,37,,1
+281,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,92-2024,2025-04-01,toca,2025-04-01-181604_penal_lesiones-calificadas.pdf,37,si,1
 282,lesiones,penal/lesiones-calificadas-y-otro,LESIONES CALIFICADAS Y OTRO,364-2024,2025-04-08,toca,2025-04-08-152818_penal_lesiones-calificadas-y-otro.pdf,18,,2
 283,lesiones,penal/lesiones-dolosas,LESIONES DOLOSAS,272-2024,2025-05-22,toca,2025-05-22-125552_penal_lesiones-dolosas.pdf,21,,2
-284,lesiones,penal/lesiones,LESIONES,134-2024,2025-06-04,toca,2025-06-04-121956_penal_lesiones.pdf,55,,1
+284,lesiones,penal/lesiones,LESIONES,134-2024,2025-06-04,toca,2025-06-04-121956_penal_lesiones.pdf,55,si,1
 285,lesiones,penal/lesiones,LESIONES,14-2025,2025-06-13,toca,2025-06-13-135147_penal_lesiones.pdf,140,,2
-286,lesiones,penal/lesiones-dolosas-agravadas,LESIONES DOLOSAS AGRAVADAS,,2025-06-16,fecha + delito,2025-06-16-121033_penal_lesiones-dolosas-agravadas.pdf,138,,1
+286,lesiones,penal/lesiones-dolosas-agravadas,LESIONES DOLOSAS AGRAVADAS,,2025-06-16,fecha + delito,2025-06-16-121033_penal_lesiones-dolosas-agravadas.pdf,138,si,1
 287,lesiones,penal/lesiones-calificadas-en-rina,LESIONES CALIFICADAS EN RINA,137-2025,2025-06-26,toca,2025-06-26-133915_penal_lesiones-calificadas-en-rina.pdf,23,,2
-288,lesiones,penal/lesiones,LESIONES,49-2025,2025-06-30,toca,2025-06-30-113130_penal_lesiones.pdf,34,,1
-289,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,1442-2011,2025-07-04,toca,2025-07-04-140339_penal_lesiones-calificadas.pdf,62,,1
+288,lesiones,penal/lesiones,LESIONES,49-2025,2025-06-30,toca,2025-06-30-113130_penal_lesiones.pdf,34,si,1
+289,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,1442-2011,2025-07-04,toca,2025-07-04-140339_penal_lesiones-calificadas.pdf,62,si,1
 290,lesiones,penal/lesiones-dolosas,LESIONES DOLOSAS,285-2023,2025-07-07,toca,2025-07-07-085804_penal_lesiones-dolosas.pdf,187,,2
 291,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,189-2025,2025-07-15,toca,2025-07-15-105109_penal_lesiones-calificadas.pdf,17,,2
-292,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,205-2025,2025-08-07,toca,2025-08-07-112521_penal_lesiones-intencionales.pdf,64,,2
-293,lesiones,penal/lesiones,LESIONES,156-2025,2025-08-29,toca,2025-08-29-151932_penal_lesiones.pdf,41,,1
-294,lesiones,penal/lesiones-y-otro,LESIONES Y OTRO,273-2024,2025-09-12,toca,2025-09-12-103337_penal_lesiones-y-otro.pdf,45,,1
-295,lesiones,penal/lesiones,LESIONES,217-2025,2025-09-17,toca,2025-09-17-113039_penal_lesiones.pdf,59,,1
+292,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,205-2025,2025-08-07,toca,2025-08-07-112521_penal_lesiones-intencionales.pdf,64,si,2
+293,lesiones,penal/lesiones,LESIONES,156-2025,2025-08-29,toca,2025-08-29-151932_penal_lesiones.pdf,41,si,1
+294,lesiones,penal/lesiones-y-otro,LESIONES Y OTRO,273-2024,2025-09-12,toca,2025-09-12-103337_penal_lesiones-y-otro.pdf,45,si,1
+295,lesiones,penal/lesiones,LESIONES,217-2025,2025-09-17,toca,2025-09-17-113039_penal_lesiones.pdf,59,si,1
 296,lesiones,penal/lesiones-dolosas,LESIONES DOLOSAS,233-2025,2025-09-23,toca,2025-09-23-131423_penal_lesiones-dolosas.pdf,28,,2
 297,lesiones,penal/lesiones-dolosas,LESIONES DOLOSAS,89-2025,2025-09-30,toca,2025-09-30-193613_penal_lesiones-dolosas.pdf,35,,2
 298,lesiones,penal/lesiones-en-rina,LESIONES EN RIÑA,159-2025,2025-10-01,toca,2025-10-01-124234_penal_lesiones-en-rina.pdf,9,,2
 299,lesiones,penal/lesiones-dolosas,LESIONES DOLOSAS,258-2025,2025-10-03,toca,2025-10-03-103543_penal_lesiones-dolosas.pdf,86,,2
-300,lesiones,penal/lesiones-dolosas-calificadas,LESIONES DOLOSAS CALIFICADAS,260-2025,2025-10-07,toca,2025-10-07-133225_penal_lesiones-dolosas-calificadas.pdf,61,,1
+300,lesiones,penal/lesiones-dolosas-calificadas,LESIONES DOLOSAS CALIFICADAS,260-2025,2025-10-07,toca,2025-10-07-133225_penal_lesiones-dolosas-calificadas.pdf,61,si,1
 301,lesiones,penal/lesiones-dolosas-y-lesiones-calificadas,LESIONES DOLOSAS Y LESIONES CALIFICADAS,228-2025,2025-10-09,toca,2025-10-09-103646_penal_lesiones-dolosas-y-lesiones-calificadas.pdf,51,,2
-302,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,230-2025,2025-10-09,toca,2025-10-09-104839_penal_lesiones-calificadas.pdf,145,,1
-303,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,93-2025,2025-10-09,toca,2025-10-09-144457_penal_lesiones-intencionales.pdf,174,,2
+302,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,230-2025,2025-10-09,toca,2025-10-09-104839_penal_lesiones-calificadas.pdf,145,si,1
+303,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,93-2025,2025-10-09,toca,2025-10-09-144457_penal_lesiones-intencionales.pdf,174,si,2
 304,lesiones,penal/lesiones,LESIONES,4620252,2025-10-10,toca,2025-10-10-131439_penal_lesiones.pdf,37,,1
-305,lesiones,penal/lesiones-y-responsabilidad-medica,LESIONES Y RESPONSABILIDAD MEDICA,283-2025,2025-10-10,toca,2025-10-10-144246_penal_lesiones-y-responsabilidad-medica.pdf,152,,1
-306,lesiones,penal/lesiones-simples,LESIONES SIMPLES,299-2025,2025-10-13,toca,2025-10-13-114713_penal_lesiones-simples.pdf,13,,1
-307,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,,2025-10-13,fecha + delito,2025-10-13-125946_penal_lesiones-intencionales.pdf,33,,1
+305,lesiones,penal/lesiones-y-responsabilidad-medica,LESIONES Y RESPONSABILIDAD MEDICA,283-2025,2025-10-10,toca,2025-10-10-144246_penal_lesiones-y-responsabilidad-medica.pdf,152,si,1
+306,lesiones,penal/lesiones-simples,LESIONES SIMPLES,299-2025,2025-10-13,toca,2025-10-13-114713_penal_lesiones-simples.pdf,13,si,1
+307,lesiones,penal/lesiones-intencionales,LESIONES INTENCIONALES,,2025-10-13,fecha + delito,2025-10-13-125946_penal_lesiones-intencionales.pdf,33,si,1
 308,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,276-2025,2025-10-16,toca,2025-10-16-101018_penal_lesiones-calificadas.pdf,38,,2
-309,lesiones,penal/lesiones-y-otro,LESIONES Y OTRO,331-2023,2025-10-20,toca,2025-10-20-143635_penal_lesiones-y-otro.pdf,25,,1
-310,lesiones,penal/lesiones-y-otros,LESIONES Y OTROS,311-2025,2025-10-31,toca,2025-10-31-111901_penal_lesiones-y-otros.pdf,60,,1
-311,lesiones,penal/lesiones,LESIONES,341-2025,2025-10-31,toca,2025-10-31-112110_penal_lesiones.pdf,26,,1
-312,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,53-2025,2025-11-10,toca,2025-11-10-103321_penal_lesiones-calificadas.pdf,30,,1
-313,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,338-2025,2025-11-10,toca,2025-11-10-115427_penal_lesiones-calificadas.pdf,18,,1
+309,lesiones,penal/lesiones-y-otro,LESIONES Y OTRO,331-2023,2025-10-20,toca,2025-10-20-143635_penal_lesiones-y-otro.pdf,25,si,1
+310,lesiones,penal/lesiones-y-otros,LESIONES Y OTROS,311-2025,2025-10-31,toca,2025-10-31-111901_penal_lesiones-y-otros.pdf,60,si,1
+311,lesiones,penal/lesiones,LESIONES,341-2025,2025-10-31,toca,2025-10-31-112110_penal_lesiones.pdf,26,si,1
+312,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,53-2025,2025-11-10,toca,2025-11-10-103321_penal_lesiones-calificadas.pdf,30,si,1
+313,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,338-2025,2025-11-10,toca,2025-11-10-115427_penal_lesiones-calificadas.pdf,18,si,1
 314,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,,2025-11-12,fecha + delito,2025-11-12-141013_penal_lesiones-calificadas.pdf,26,,2
 315,lesiones,penal/lesiones-dolosas-y-amenazas,LESIONES DOLOSAS Y AMENAZAS,286-2025,2025-11-18,toca,2025-11-18-140510_penal_lesiones-dolosas-y-amenazas.pdf,19,,2
-316,lesiones,penal/lesiones-dolosas-y-violencia-familiar,LESIONES DOLOSAS Y VIOLENCIA FAMILIAR,313-2025,2025-11-26,toca,2025-11-26-121851_penal_lesiones-dolosas-y-violencia-familiar.pdf,128,,1
+316,lesiones,penal/lesiones-dolosas-y-violencia-familiar,LESIONES DOLOSAS Y VIOLENCIA FAMILIAR,313-2025,2025-11-26,toca,2025-11-26-121851_penal_lesiones-dolosas-y-violencia-familiar.pdf,128,si,1
 317,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,337-2025,2025-12-01,toca,2025-12-01-142520_penal_lesiones-calificadas.pdf,24,,2
 318,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,185-2024,2025-12-03,toca,2025-12-03-112244_penal_lesiones-calificadas.pdf,15,,1
 319,lesiones,penal/lesiones-calificadas,LESIONES CALIFICADAS,261-2025,2025-12-11,toca,2025-12-11-121746_penal_lesiones-calificadas.pdf,38,,2
@@ -335,62 +335,62 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 334,privacion de la libertad y secuestro,penal/secuestro-agravado-y-otros,SECUESTRO AGRAVADO Y OTROS,04-2021,2025-04-25,toca,2025-04-25-133228_penal_secuestro-agravado-y-otros.pdf,37,,2
 335,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,442-2024,2025-04-25,toca,2025-04-25-152914_penal_secuestro-agravado.pdf,89,,2
 336,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,198-2024,2025-04-28,toca,2025-04-28-172033_penal_secuestro.pdf,46,,2
-337,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,398-2024,2025-05-12,toca,2025-05-12-133417_penal_secuestro.pdf,48,,1
+337,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,398-2024,2025-05-12,toca,2025-05-12-133417_penal_secuestro.pdf,48,si,1
 338,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,137-2024,2025-05-16,toca,2025-05-16-113943_penal_secuestro.pdf,134,,2
-339,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,266-2023,2025-05-22,toca,2025-05-22-130523_penal_secuestro-agravado.pdf,595,,1
+339,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,266-2023,2025-05-22,toca,2025-05-22-130523_penal_secuestro-agravado.pdf,595,si,1
 340,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,90-2024,2025-05-22,toca,2025-05-22-141837_penal_secuestro-agravado.pdf,709,,2
 341,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad-y-robo-calificado,PRIVACION ILEGAL DE LA LIBERTAD Y ROBO CALIFICADO,123-2025,2025-05-26,toca,2025-05-26-091031_penal_privacion-ilegal-de-la-libertad-y-robo-calificado.pdf,129,,2
 342,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,,2025-05-30,fecha + delito,2025-05-30-111615_penal_secuestro-agravado.pdf,445,,2
 343,privacion de la libertad y secuestro,penal/delitos-en-materia-de-secuestro-agravado,DELITOS EN MATERIA DE SECUESTRO AGRAVADO,53-2025,2025-05-30,toca,2025-05-30-113634_penal_delitos-en-materia-de-secuestro-agravado.pdf,18,,2
-344,privacion de la libertad y secuestro,penal/secuestro-express,SECUESTRO EXPRESS,448-2024,2025-06-05,toca,2025-06-05-135030_penal_secuestro-express.pdf,79,,1
+344,privacion de la libertad y secuestro,penal/secuestro-express,SECUESTRO EXPRESS,448-2024,2025-06-05,toca,2025-06-05-135030_penal_secuestro-express.pdf,79,si,1
 345,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,,2025-06-10,fecha + delito,2025-06-10-095224_penal_secuestro-agravado.pdf,119,,2
 346,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,142-2022,2025-06-10,toca,2025-06-10-184949_penal_secuestro.pdf,376,,2
 347,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,122-2025,2025-06-13,toca,2025-06-13-131524_penal_secuestro-agravado.pdf,1016,,2
 348,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,91-2023,2025-06-13,toca,2025-06-13-131729_penal_secuestro.pdf,363,,2
 349,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,,2025-06-20,fecha + delito,2025-06-20-120332_penal_secuestro.pdf,137,,2
 350,privacion de la libertad y secuestro,penal/secuestro-y-delincuencia-organizada,SECUESTRO Y DELINCUENCIA ORGANIZADA,335-2015,2025-06-26,toca,2025-06-26-124323_penal_secuestro-y-delincuencia-organizada.pdf,17,,2
-351,privacion de la libertad y secuestro,penal/secuestro-y-otros,SECUESTRO Y OTROS,127-2025,2025-06-30,toca,2025-06-30-100134_penal_secuestro-y-otros.pdf,19,,1
+351,privacion de la libertad y secuestro,penal/secuestro-y-otros,SECUESTRO Y OTROS,127-2025,2025-06-30,toca,2025-06-30-100134_penal_secuestro-y-otros.pdf,19,si,1
 352,privacion de la libertad y secuestro,penal/secuestro-y-delincuencia-organizada,SECUESTRO Y DELINCUENCIA ORGANIZADA,335-2015,2025-06-30,toca,2025-06-30-112421_penal_secuestro-y-delincuencia-organizada.pdf,17,,2
 353,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,320-2022,2025-06-30,toca,2025-06-30-170739_penal_secuestro-agravado.pdf,173,,2
 354,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,152-2025,2025-07-02,toca,2025-07-02-114948_penal_secuestro.pdf,13,,2
 355,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad-y-otros-derechos,PRIVACION ILEGAL DE LA LIBERTAD Y OTROS DERECHOS,195-2025,2025-07-08,toca,2025-07-08-151013_penal_privacion-ilegal-de-la-libertad-y-otros-derechos.pdf,16,,2
-356,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad,PRIVACION ILEGAL DE LA LIBERTAD,75-2025,2025-07-10,toca,2025-07-10-132428_penal_privacion-ilegal-de-la-libertad.pdf,50,,1
+356,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad,PRIVACION ILEGAL DE LA LIBERTAD,75-2025,2025-07-10,toca,2025-07-10-132428_penal_privacion-ilegal-de-la-libertad.pdf,50,si,1
 357,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,153-2020,2025-07-15,toca,2025-07-15-145038_penal_secuestro-agravado.pdf,389,,2
 358,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,134-2024,2025-08-08,toca,2025-08-08-123543_penal_secuestro-agravado.pdf,587,,2
-359,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,173-2022,2025-08-12,toca,2025-08-12-091748_penal_secuestro-agravado.pdf,92,,1
+359,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,173-2022,2025-08-12,toca,2025-08-12-091748_penal_secuestro-agravado.pdf,92,si,1
 360,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,92-2025,2025-08-14,toca,2025-08-14-144129_penal_secuestro.pdf,199,,2
 361,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,115-2025,2025-08-28,toca,2025-08-28-131733_penal_secuestro-agravado.pdf,102,,2
 362,privacion de la libertad y secuestro,penal/secuestro-express-y-robo-calificado,SECUESTRO EXPRESS Y ROBO CALIFICADO,120-2024,2025-09-01,toca,2025-09-01-132905_penal_secuestro-express-y-robo-calificado.pdf,230,,2
 363,privacion de la libertad y secuestro,penal/secuestro-en-su-modalidad-de-exigir-rescate,SECUESTRO EN SU MODALIDAD DE EXIGIR RESCATE,,2025-09-04,fecha + delito,2025-09-04-140124_penal_secuestro-en-su-modalidad-de-exigir-rescate.pdf,56,,2
 364,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,1111-2002,2025-09-10,toca,2025-09-10-121719_penal_secuestro.pdf,271,,2
-365,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,55-2025,2025-09-12,toca,2025-09-12-120353_penal_secuestro.pdf,385,,1
+365,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,55-2025,2025-09-12,toca,2025-09-12-120353_penal_secuestro.pdf,385,si,1
 366,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad-y-homicidio,PRIVACION ILEGAL DE LA LIBERTAD Y HOMICIDIO,153-2025,2025-09-12,toca,2025-09-12-131121_penal_privacion-ilegal-de-la-libertad-y-homicidio.pdf,37,,2
 367,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,115-2025,2025-09-18,toca,2025-09-18-121703_penal_secuestro-agravado.pdf,342,,2
 368,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,34-2025,2025-09-29,toca,2025-09-29-113934_penal_secuestro.pdf,162,,2
 369,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,412-2024,2025-10-01,toca,2025-10-01-134348_penal_secuestro.pdf,130,,2
 370,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,82-2025,2025-10-03,toca,2025-10-03-103920_penal_secuestro.pdf,54,,2
-371,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,266-2025,2025-10-07,toca,2025-10-07-133710_penal_secuestro-agravado.pdf,235,,1
+371,privacion de la libertad y secuestro,penal/secuestro-agravado,SECUESTRO AGRAVADO,266-2025,2025-10-07,toca,2025-10-07-133710_penal_secuestro-agravado.pdf,235,si,1
 372,privacion de la libertad y secuestro,penal/secuestro-y-asociacion-delictuosa,SECUESTRO Y ASOCIACIÓN DELICTUOSA,1111-2002,2025-10-27,toca,2025-10-27-134730_penal_secuestro-y-asociacion-delictuosa.pdf,271,,2
-373,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,183-2025,2025-10-29,toca,2025-10-29-143436_penal_secuestro.pdf,192,,1
+373,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,183-2025,2025-10-29,toca,2025-10-29-143436_penal_secuestro.pdf,192,si,1
 374,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,52-2024,2025-11-04,toca,2025-11-04-111518_penal_secuestro.pdf,175,,2
 375,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,,2025-11-05,fecha + delito,2025-11-05-211900_penal_secuestro.pdf,71,,2
-376,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad-y-robo-calificado,PRIVACION ILEGAL DE LA LIBERTAD Y ROBO CALIFICADO,333-2025,2025-11-06,toca,2025-11-06-142040_penal_privacion-ilegal-de-la-libertad-y-robo-calificado.pdf,164,,1
-377,privacion de la libertad y secuestro,penal/secuestro-agravado-y-otro,SECUESTRO AGRAVADO Y OTRO,266-2025,2025-12-12,toca,2025-12-12-141255_penal_secuestro-agravado-y-otro.pdf,165,,1
+376,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad-y-robo-calificado,PRIVACION ILEGAL DE LA LIBERTAD Y ROBO CALIFICADO,333-2025,2025-11-06,toca,2025-11-06-142040_penal_privacion-ilegal-de-la-libertad-y-robo-calificado.pdf,164,si,1
+377,privacion de la libertad y secuestro,penal/secuestro-agravado-y-otro,SECUESTRO AGRAVADO Y OTRO,266-2025,2025-12-12,toca,2025-12-12-141255_penal_secuestro-agravado-y-otro.pdf,165,si,1
 378,privacion de la libertad y secuestro,penal/secuestro,SECUESTRO,314-2025,2025-12-27,toca,2025-12-27-150721_penal_secuestro.pdf,477,,2
 379,privacion de la libertad y secuestro,penal/privacion-ilegal-de-la-libertad,PRIVACION ILEGAL DE LA LIBERTAD,190-2025,2026-01-05,toca,2026-01-05-145427_penal_privacion-ilegal-de-la-libertad.pdf,53,,2
 380,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,24-2025,2025-03-18,toca,2025-03-18-135343_penal_fraude-generico.pdf,26,,2
 381,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,264-2024,2025-03-20,toca,2025-03-20-115215_penal_abuso-de-confianza.pdf,19,,2
-382,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,262-2024,2025-03-27,toca,2025-03-27-102554_penal_administracion-fraudulenta.pdf,29,,1
+382,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,262-2024,2025-03-27,toca,2025-03-27-102554_penal_administracion-fraudulenta.pdf,29,si,1
 383,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,124-2021,2025-03-28,toca,2025-03-28-122051_penal_fraude-procesal.pdf,23,,2
 384,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,189-2024,2025-03-31,toca,2025-03-31-105219_penal_administracion-fraudulenta.pdf,14,,2
 385,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,437-2024,2025-03-31,toca,2025-03-31-112305_penal_fraude-especifico.pdf,68,,2
 386,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,10-2025,2025-03-31,toca,2025-03-31-122317_penal_fraude-generico.pdf,420,,2
 387,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,28-2025,2025-04-01,toca,2025-04-01-144725_penal_fraude-procesal.pdf,217,,2
-388,fraude y abuso de confianza,penal/fraude,FRAUDE,260-2024,2025-04-02,toca,2025-04-02-144839_penal_fraude.pdf,17,,1
+388,fraude y abuso de confianza,penal/fraude,FRAUDE,260-2024,2025-04-02,toca,2025-04-02-144839_penal_fraude.pdf,17,si,1
 389,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,,2025-04-03,fecha + delito,2025-04-03-120507_penal_fraude-generico.pdf,43,,2
-390,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,166-2021,2025-04-04,toca,2025-04-04-101310_penal_fraude-especifico.pdf,11,,1
-391,fraude y abuso de confianza,penal/fraude,FRAUDE,37-2025,2025-04-04,toca,2025-04-04-203135_penal_fraude.pdf,24,,1
-392,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,1238-2016,2025-04-10,toca,2025-04-10-135126_penal_abuso-de-confianza.pdf,24,,1
+390,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,166-2021,2025-04-04,toca,2025-04-04-101310_penal_fraude-especifico.pdf,11,si,1
+391,fraude y abuso de confianza,penal/fraude,FRAUDE,37-2025,2025-04-04,toca,2025-04-04-203135_penal_fraude.pdf,24,si,1
+392,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,1238-2016,2025-04-10,toca,2025-04-10-135126_penal_abuso-de-confianza.pdf,24,si,1
 393,fraude y abuso de confianza,penal/fraude-y-suplantacion-de-identidad,FRAUDE Y SUPLANTACION DE IDENTIDAD,66-2025,2025-04-17,toca,2025-04-17-165404_penal_fraude-y-suplantacion-de-identidad.pdf,123,,2
 394,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,17-2025,2025-04-21,toca,2025-04-21-130659_penal_fraude-generico.pdf,11,,1
 395,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,77-2023,2025-04-24,toca,2025-04-24-095837_penal_fraude-especifico.pdf,97,,2
@@ -398,34 +398,34 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 397,fraude y abuso de confianza,penal/fraude,FRAUDE,32-2025,2025-04-25,toca,2025-04-25-211910_penal_fraude.pdf,177,,2
 398,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,19-2025,2025-05-16,toca,2025-05-16-113848_penal_fraude-generico.pdf,11,,2
 399,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,409-2024,2025-05-22,toca,2025-05-22-142441_penal_fraude-generico.pdf,59,,2
-400,fraude y abuso de confianza,penal/fraude-y-otros,FRAUDE Y OTROS,53-2018,2025-05-28,toca,2025-05-28-112952_penal_fraude-y-otros.pdf,82,,1
-401,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,27-2025,2025-05-30,toca,2025-05-30-113710_penal_fraude-generico.pdf,30,,1
+400,fraude y abuso de confianza,penal/fraude-y-otros,FRAUDE Y OTROS,53-2018,2025-05-28,toca,2025-05-28-112952_penal_fraude-y-otros.pdf,82,si,1
+401,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,27-2025,2025-05-30,toca,2025-05-30-113710_penal_fraude-generico.pdf,30,si,1
 402,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,132-2025,2025-05-30,toca,2025-05-30-114208_penal_fraude-especifico.pdf,73,,2
 403,fraude y abuso de confianza,penal/fraude-y-despojo-de-inmuebles-y-aguas,FRAUDE Y DESPOJO DE INMUEBLES Y AGUAS,,2025-05-30,fecha + delito,2025-05-30-133617_penal_fraude-y-despojo-de-inmuebles-y-aguas.pdf,233,,2
 404,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,05-2023,2025-06-10,toca,2025-06-10-111939_penal_fraude-especifico.pdf,7,,2
-405,fraude y abuso de confianza,penal/fraude,FRAUDE,91-2025,2025-06-16,toca,2025-06-16-112316_penal_fraude.pdf,122,,1
+405,fraude y abuso de confianza,penal/fraude,FRAUDE,91-2025,2025-06-16,toca,2025-06-16-112316_penal_fraude.pdf,122,si,1
 406,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,131-2025,2025-06-16,toca,2025-06-16-122552_penal_abuso-de-confianza.pdf,53,,2
 407,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,83202523,2025-06-19,toca,2025-06-19-114710_penal_administracion-fraudulenta.pdf,38,,2
 408,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,35-2025,2025-06-27,toca,2025-06-27-144936_penal_fraude-procesal.pdf,125,,2
-409,fraude y abuso de confianza,penal/fraude,FRAUDE,147-2025,2025-06-30,toca,2025-06-30-110427_penal_fraude.pdf,47,,1
+409,fraude y abuso de confianza,penal/fraude,FRAUDE,147-2025,2025-06-30,toca,2025-06-30-110427_penal_fraude.pdf,47,si,1
 410,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,567-2022,2025-06-30,toca,2025-06-30-185105_penal_fraude-generico.pdf,73,,2
 411,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,76-2025,2025-07-02,toca,2025-07-02-114546_penal_fraude-especifico.pdf,59,,2
 412,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,94-2025,2025-07-08,toca,2025-07-08-143856_penal_fraude-generico.pdf,62,,2
-413,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,13-2025,2025-07-10,toca,2025-07-10-133338_penal_fraude-especifico.pdf,56,,1
-414,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,157-2025,2025-07-14,toca,2025-07-14-153312_penal_fraude-especifico.pdf,27,,1
+413,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,13-2025,2025-07-10,toca,2025-07-10-133338_penal_fraude-especifico.pdf,56,si,1
+414,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,157-2025,2025-07-14,toca,2025-07-14-153312_penal_fraude-especifico.pdf,27,si,1
 415,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,116-2023,2025-08-07,toca,2025-08-07-112325_penal_fraude-especifico.pdf,28,,2
 416,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,85-2025,2025-08-12,toca,2025-08-12-112910_penal_fraude-especifico.pdf,33,,2
 417,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,,2025-08-19,fecha + delito,2025-08-19-145208_penal_fraude-generico.pdf,37,,1
 418,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,153-2025,2025-08-26,toca,2025-08-26-113125_penal_fraude-procesal.pdf,69,,2
-419,fraude y abuso de confianza,penal/fraude-y-otros,FRAUDE Y OTROS,182-2025,2025-08-26,toca,2025-08-26-142948_penal_fraude-y-otros.pdf,48,,1
+419,fraude y abuso de confianza,penal/fraude-y-otros,FRAUDE Y OTROS,182-2025,2025-08-26,toca,2025-08-26-142948_penal_fraude-y-otros.pdf,48,si,1
 420,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,71-2025,2025-08-28,toca,2025-08-28-115636_penal_fraude-generico.pdf,47,,2
 421,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,165-2025,2025-08-28,toca,2025-08-28-123323_penal_fraude-especifico.pdf,48,,2
-422,fraude y abuso de confianza,penal/fraude,FRAUDE,233-2025,2025-08-29,toca,2025-08-29-131051_penal_fraude.pdf,30,,1
+422,fraude y abuso de confianza,penal/fraude,FRAUDE,233-2025,2025-08-29,toca,2025-08-29-131051_penal_fraude.pdf,30,si,1
 423,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,161-2025,2025-09-03,toca,2025-09-03-123654_penal_fraude-generico.pdf,61,,2
 424,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,,2025-09-04,fecha + delito,2025-09-04-140235_penal_fraude-especifico.pdf,250,,2
 425,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,254-2025,2025-09-05,toca,2025-09-05-141542_penal_administracion-fraudulenta.pdf,96,,2
 426,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,435-2020,2025-09-08,toca,2025-09-08-192548_penal_fraude-generico.pdf,49,,2
-427,fraude y abuso de confianza,penal/fraude,FRAUDE,89-2025,2025-09-10,toca,2025-09-10-142121_penal_fraude.pdf,74,,1
+427,fraude y abuso de confianza,penal/fraude,FRAUDE,89-2025,2025-09-10,toca,2025-09-10-142121_penal_fraude.pdf,74,si,1
 428,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,252-2025,2025-09-12,toca,2025-09-12-115616_penal_fraude-generico.pdf,26,,2
 429,fraude y abuso de confianza,penal/fraude,FRAUDE,,2025-09-17,fecha + delito,2025-09-17-113504_penal_fraude.pdf,13,,1
 430,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,33-2024,2025-09-18,toca,2025-09-18-112104_penal_administracion-fraudulenta.pdf,82,,2
@@ -434,24 +434,24 @@ n,familia,tipo,delito_portal,toca_portal,fecha,buscar_por,guardar_como,paginas_o
 433,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,244-2024,2025-09-26,toca,2025-09-26-162030_penal_fraude-procesal.pdf,30,,2
 434,fraude y abuso de confianza,penal/fraude,FRAUDE,239-2025,2025-09-26,toca,2025-09-26-182947_penal_fraude.pdf,23,,2
 435,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,142-2025,2025-09-30,toca,2025-09-30-112338_penal_fraude-generico.pdf,57,,2
-436,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,257-2025,2025-10-01,toca,2025-10-01-123614_penal_administracion-fraudulenta.pdf,64,,1
+436,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,257-2025,2025-10-01,toca,2025-10-01-123614_penal_administracion-fraudulenta.pdf,64,si,1
 437,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,107-2025,2025-10-06,toca,2025-10-06-100830_penal_fraude-procesal.pdf,23,,2
 438,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,300-2025,2025-10-07,toca,2025-10-07-133838_penal_fraude-especifico.pdf,39,,2
-439,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,229-2025,2025-10-09,toca,2025-10-09-124931_penal_fraude-generico.pdf,29,,1
+439,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,229-2025,2025-10-09,toca,2025-10-09-124931_penal_fraude-generico.pdf,29,si,1
 440,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,299-2025,2025-10-10,toca,2025-10-10-133813_penal_abuso-de-confianza.pdf,133,,2
 441,fraude y abuso de confianza,penal/fraude,FRAUDE,18-2025,2025-10-10,toca,2025-10-10-140033_penal_fraude.pdf,21,,2
 442,fraude y abuso de confianza,penal/administracion-fraudulenta,ADMINISTRACION FRAUDULENTA,298-2025,2025-10-14,toca,2025-10-14-104437_penal_administracion-fraudulenta.pdf,118,,2
 443,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,29120252,2025-10-21,toca,2025-10-21-114731_penal_fraude-especifico.pdf,68,,1
-444,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,192-2025,2025-10-27,toca,2025-10-27-134505_penal_abuso-de-confianza.pdf,17,,1
-445,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,200-2025,2025-10-31,toca,2025-10-31-111708_penal_fraude-procesal.pdf,35,,1
-446,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,259-2025,2025-10-31,toca,2025-10-31-111804_penal_fraude-generico.pdf,39,,1
+444,fraude y abuso de confianza,penal/abuso-de-confianza,ABUSO DE CONFIANZA,192-2025,2025-10-27,toca,2025-10-27-134505_penal_abuso-de-confianza.pdf,17,si,1
+445,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,200-2025,2025-10-31,toca,2025-10-31-111708_penal_fraude-procesal.pdf,35,si,1
+446,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,259-2025,2025-10-31,toca,2025-10-31-111804_penal_fraude-generico.pdf,39,si,1
 447,fraude y abuso de confianza,penal/fraude-generico,FRAUDE GENERICO,124-2024,2025-10-31,toca,2025-10-31-171819_penal_fraude-generico.pdf,129,,2
 448,fraude y abuso de confianza,penal/fraude,FRAUDE,280-2025,2025-11-06,toca,2025-11-06-142349_penal_fraude.pdf,32,,2
 449,fraude y abuso de confianza,penal/fraude,FRAUDE,309-2025,2025-11-13,toca,2025-11-13-143831_penal_fraude.pdf,98,,2
-450,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,132-2025,2025-11-26,toca,2025-11-26-125922_penal_fraude-procesal.pdf,34,,1
-451,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,151-2022,2025-11-28,toca,2025-11-28-124302_penal_fraude-especifico.pdf,19,,1
+450,fraude y abuso de confianza,penal/fraude-procesal,FRAUDE PROCESAL,132-2025,2025-11-26,toca,2025-11-26-125922_penal_fraude-procesal.pdf,34,si,1
+451,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,151-2022,2025-11-28,toca,2025-11-28-124302_penal_fraude-especifico.pdf,19,si,1
 452,fraude y abuso de confianza,penal/fraude,FRAUDE,205-2025,2026-01-07,toca,2026-01-07-094443_penal_fraude.pdf,27,,2
-453,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,398-2025,2026-01-12,toca,2026-01-12-112446_penal_fraude-especifico.pdf,32,,1
+453,fraude y abuso de confianza,penal/fraude-especifico,FRAUDE ESPECIFICO,398-2025,2026-01-12,toca,2026-01-12-112446_penal_fraude-especifico.pdf,32,si,1
 454,delitos sexuales,penal/abuso-sexual-infantil-agravado-y-violencia-intrafamiliar,ABUSO SEXUAL INFANTIL AGRAVADO Y VIOLENCIA INTRAFAMILIAR,227-2021,2025-03-14,toca,2025-03-14-203008_penal_abuso-sexual-infantil-agravado-y-violencia-intrafamiliar.pdf,75,,2
 455,delitos sexuales,penal/violacion,VIOLACION,,2025-03-20,fecha + delito,2025-03-20-115105_penal_violacion.pdf,32,,1
 456,delitos sexuales,penal/violacion,VIOLACION,131-2023,2025-03-21,toca,2025-03-21-122339_penal_violacion.pdf,32,,2

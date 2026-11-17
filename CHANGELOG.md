@@ -24,6 +24,13 @@ del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a l
 - `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas y nuevas).
 
 ### Corregido
+- Sentido del fallo por reglas: también "lo procedente es confirmar/revocar…" y el verbo sin "se" (cobertura 557 →
+  608 de 1,412, sin cambiar ningún valor ya leído; `evaluacion/errores/sentido_fallo.md`).
+- Artículos "no encontrados": la sentencia se lee de forma tolerante (listas con fracciones, "arábigos", "diversos",
+  "en relación al", palabras partidas por el PDF): 429 → 23 de 5,096 (`evaluacion/errores/articulos_no_encontrados.md`).
+- Ficha JSON: tercer intento que pide solo los campos obligatorios que faltan; las fichas inválidas se reintentan en
+  `fichas-batch`, que además recalcula las verificaciones sin LLM.
+- `construir-corpus` conserva las sentencias que ya estaban al aplicar el tope de 30 por tipo.
 - `evaluacion qc` medía QC_1 con el prompt v10; ahora usa el de la app (`prompt_qc1`, v11).
 - `evaluacion jueces --pares` saca de la VRAM los modelos de Ollama antes de cargar el de embeddings (fallaba con
   `CUBLAS_STATUS_ALLOC_FAILED` en 8 GB).

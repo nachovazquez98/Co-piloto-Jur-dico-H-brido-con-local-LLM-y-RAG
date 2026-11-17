@@ -88,7 +88,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 87,servidores publicos y administracion de justicia,50,penal/cohecho,COHECHO,18.0,7,18,11,0
 88,servidores publicos y administracion de justicia,50,penal/abuso-de-autoridad-y-otro,ABUSO DE AUTORIDAD Y OTRO,5.0,2,5,3,0
 89,servidores publicos y administracion de justicia,50,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico-a-titulo-de-dolo,DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO A TITULO DE DOLO,3.0,0,3,3,0
-90,servidores publicos y administracion de justicia,50,penal/abuso-de-autoridad-y-lesiones-calificadas,ABUSO DE AUTORIDAD Y LESIONES CALIFICADAS,2.0,0,2,2,0
+90,servidores publicos y administracion de justicia,50,penal/abuso-de-autoridad-y-lesiones-calificadas,ABUSO DE AUTORIDAD Y LESIONES CALIFICADAS,2.0,0,2,2,2
 91,servidores publicos y administracion de justicia,50,penal/encubrimiento,ENCUBRIMIENTO,3.0,1,3,2,0
 92,servidores publicos y administracion de justicia,50,penal/abuso-de-autoridad-y-robo-calificado,ABUSO DE AUTORIDAD Y ROBO CALIFICADO,1.0,0,1,1,0
 93,servidores publicos y administracion de justicia,50,penal/cohecho-y-abuso-sexual-infantil-agravado,COHECHO Y ABUSO SEXUAL INFANTIL AGRAVADO,2.0,1,2,1,0
@@ -98,8 +98,8 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 97,delitos culposos,65,penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa,LESIONES Y DAÑO EN LAS COSAS AMBOS A TITULO DE CULPA,11684.0,4,30,26,0
 98,delitos culposos,65,penal/homicidio-culposo,HOMICIDIO CULPOSO,63.0,6,30,24,0
 99,delitos culposos,65,penal/dano-en-las-cosas-a-titulo-de-culpa,DAÑO EN LAS COSAS A TITULO DE CULPA,79.0,7,30,23,0
-100,delitos culposos,65,penal/lesiones-a-titulo-de-culpa,LESIONES A TITULO DE CULPA,60.0,10,30,20,0
-101,delitos culposos,65,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,43.0,14,30,16,0
+100,delitos culposos,65,penal/lesiones-a-titulo-de-culpa,LESIONES A TITULO DE CULPA,60.0,10,30,20,1
+101,delitos culposos,65,penal/homicidio-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA,43.0,14,30,16,6
 102,delitos culposos,65,penal/dano-en-las-cosas-culposo,DAÑO EN LAS COSAS CULPOSO,14.0,0,14,14,0
 103,delitos culposos,65,penal/lesiones-culposas,LESIONES CULPOSAS,15.0,2,15,13,0
 104,delitos culposos,65,penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,LESIONES A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA,12.0,0,12,12,0
@@ -113,9 +113,9 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 112,delitos culposos,65,penal/dano-a-las-cosas-a-titulo-de-culpa,DAÑO A LAS COSAS A TITULO DE CULPA,4.0,0,4,4,0
 113,delitos culposos,65,penal/dano-en-las-cosas-cometido-a-titulo-de-culpa,DAÑO EN LAS COSAS COMETIDO A TITULO DE CULPA,4.0,0,4,4,0
 114,delitos culposos,65,penal/homicidio-a-titulo-de-culpa-grave-y-otro,HOMICIDIO A TITULO DE CULPA GRAVE Y OTRO,5.0,1,5,4,0
-115,delitos culposos,65,penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA,5.0,1,5,4,0
+115,delitos culposos,65,penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,HOMICIDIO A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA,5.0,1,5,4,2
 116,delitos culposos,65,penal/lesiones-cometidas-a-titulo-de-culpa,LESIONES COMETIDAS A TITULO DE CULPA,4.0,0,4,4,0
-117,delitos culposos,65,penal/homicidio-a-titulo-de-culpa-y-otros,HOMICIDIO A TITULO DE CULPA Y OTROS,3.0,0,3,3,0
+117,delitos culposos,65,penal/homicidio-a-titulo-de-culpa-y-otros,HOMICIDIO A TITULO DE CULPA Y OTROS,3.0,0,3,3,1
 118,delitos culposos,65,penal/lesiones-a-titulo-de-culpa-grave,LESIONES A TITULO DE CULPA GRAVE,4.0,1,4,3,0
 119,delitos culposos,65,penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas,LESIONES A TITULO DE CULPA Y DAÑO EN LAS COSAS,3.0,0,3,3,0
 120,delitos culposos,65,penal/lesiones-y-dano-en-las-cosas-culposos,LESIONES Y DAÑO EN LAS COSAS CULPOSOS,3.0,0,3,3,0
@@ -142,7 +142,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 141,delitos culposos,65,penal/homicidio-en-grado-de-culpa,HOMICIDIO EN GRADO DE CULPA,1.0,0,1,1,0
 142,delitos culposos,65,penal/homicidio-imprudencial-y-dano-en-las-cosas-culposo,HOMICIDIO IMPRUDENCIAL Y DAÑO EN LAS COSAS CULPOSO,1.0,0,1,1,0
 143,delitos culposos,65,penal/homicidio-lesiones-y-dano-en-las-cosas-culposos,"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS CULPOSOS",1.0,0,1,1,0
-144,delitos culposos,65,penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS  TODOS A TITULO DE CULPA",2.0,1,2,1,0
+144,delitos culposos,65,penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS  TODOS A TITULO DE CULPA",2.0,1,2,1,1
 145,delitos culposos,65,penal/homicidio-lesiones-y-danos-todos-a-titulo-de-culpa,"HOMICIDIO, LESIONES Y DAÑOS TODOS A TITULO DE CULPA",1.0,0,1,1,0
 146,delitos culposos,65,penal/homicidio-por-culpa-grave,HOMICIDIO POR CULPA GRAVE,1.0,0,1,1,0
 147,delitos culposos,65,penal/homicidio-por-culpa-grave-y-otros,HOMICIDIO POR CULPA GRAVE Y OTROS,1.0,0,1,1,0
@@ -155,8 +155,8 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 154,delitos culposos,65,penal/lesiones-y-danos-culposos,LESIONES Y DAÑOS CULPOSOS,1.0,0,1,1,0
 155,delitos culposos,65,penal/responsabilidad-medica-y-homicidio-a-titulo-de-culpa,RESPONSABILIDAD MEDICA Y HOMICIDIO A TITULO DE CULPA,1.0,0,1,1,0
 156,delitos culposos,65,penal/responsabilidad-medica-y-lesiones-a-titulo-de-culpa,RESPONSABILIDAD MEDICA Y LESIONES A TITULO DE CULPA,1.0,0,1,1,1
-157,despojo,76,penal/despojo,DESPOJO,55.0,12,30,18,0
-158,despojo,76,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,297.0,26,30,4,0
+157,despojo,76,penal/despojo,DESPOJO,55.0,12,30,18,1
+158,despojo,76,penal/despojo-de-inmuebles,DESPOJO DE INMUEBLES,297.0,26,30,4,2
 159,despojo,76,penal/despojo-de-inmuebles-y-otros,DESPOJO DE INMUEBLES Y OTROS,5.0,1,5,4,0
 160,despojo,76,penal/despojo-de-inmueble-y-otro,DESPOJO DE INMUEBLE Y OTRO,2.0,0,2,2,0
 161,despojo,76,penal/despojo-de-inmuebles-y-dano-en-las-cosas,DESPOJO DE INMUEBLES Y DAÑO EN LAS COSAS,3.0,1,3,2,0
@@ -167,11 +167,11 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 166,despojo,76,penal/despojo-de-inmuebles-y-aguas-y-dano-en-las-cosas,DESPOJO DE INMUEBLES Y AGUAS Y DAÑO EN LAS COSAS,1.0,0,1,1,0
 167,despojo,76,penal/despojo-y-robo-calificado,DESPOJO Y ROBO CALIFICADO,1.0,0,1,1,0
 168,despojo,76,penal/tentativa-de-despojo-de-inmuebles-y-aguas,TENTATIVA DE DESPOJO DE INMUEBLES Y AGUAS,1.0,0,1,1,0
-169,lesiones,76,penal/lesiones,LESIONES,51.0,13,30,17,0
+169,lesiones,76,penal/lesiones,LESIONES,51.0,13,30,17,2
 170,lesiones,76,penal/lesiones-dolosas,LESIONES DOLOSAS,26.0,12,26,14,0
-171,lesiones,76,penal/lesiones-calificadas,LESIONES CALIFICADAS,141.0,23,30,7,0
+171,lesiones,76,penal/lesiones-calificadas,LESIONES CALIFICADAS,141.0,23,30,7,7
 172,lesiones,76,penal/lesiones-simples-intencionales,LESIONES SIMPLES INTENCIONALES,5.0,0,5,5,0
-173,lesiones,76,penal/lesiones-y-dano-en-las-cosas,LESIONES Y DAÑO EN LAS COSAS,6.0,1,6,5,0
+173,lesiones,76,penal/lesiones-y-dano-en-las-cosas,LESIONES Y DAÑO EN LAS COSAS,6.0,1,6,5,1
 174,lesiones,76,penal/lesiones-y-danos-en-las-cosas,LESIONES Y DAÑOS EN LAS COSAS,4.0,0,4,4,0
 175,lesiones,76,penal/lesiones-y-violencia-intrafamiliar,LESIONES Y VIOLENCIA INTRAFAMILIAR,4.0,0,4,4,0
 176,lesiones,76,penal/lesiones-dolosas-y-violencia-intrafamiliar,LESIONES DOLOSAS Y VIOLENCIA INTRAFAMILIAR,3.0,0,3,3,0
@@ -181,25 +181,25 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 180,lesiones,76,penal/lesiones-y-allanamiento-de-morada,LESIONES Y ALLANAMIENTO DE MORADA,2.0,0,2,2,0
 181,lesiones,76,penal/lesiones-y-amenazas,LESIONES Y AMENAZAS,3.0,1,3,2,0
 182,lesiones,76,penal/lesiones-y-delitos-cometidos-contra-representantes-de-la-autoridad,LESIONES Y DELITOS COMETIDOS CONTRA REPRESENTANTES DE LA AUTORIDAD,2.0,0,2,2,0
-183,lesiones,76,penal/lesiones-y-otros,LESIONES Y OTROS,3.0,1,3,2,0
-184,lesiones,76,penal/lesiones-calificadas-y-abuso-de-autoridad,LESIONES CALIFICADAS Y ABUSO DE AUTORIDAD,1.0,0,1,1,0
+183,lesiones,76,penal/lesiones-y-otros,LESIONES Y OTROS,3.0,1,3,2,1
+184,lesiones,76,penal/lesiones-calificadas-y-abuso-de-autoridad,LESIONES CALIFICADAS Y ABUSO DE AUTORIDAD,1.0,0,1,1,1
 185,lesiones,76,penal/lesiones-calificadas-y-maltrato-al-infante,LESIONES CALIFICADAS Y MALTRATO AL INFANTE,1.0,0,1,1,0
 186,lesiones,76,penal/lesiones-dolosas-y-amenazas,LESIONES DOLOSAS Y AMENAZAS,2.0,1,2,1,0
 187,lesiones,76,penal/lesiones-en-rina,LESIONES EN RIÑA,5.0,4,5,1,0
 188,lesiones,76,penal/lesiones-en-rina-inesperada,LESIONES EN RIÑA INESPERADA,1.0,0,1,1,0
-189,lesiones,76,penal/lesiones-intencionales,LESIONES INTENCIONALES,4.0,3,4,1,0
+189,lesiones,76,penal/lesiones-intencionales,LESIONES INTENCIONALES,4.0,3,4,1,1
 190,lesiones,76,penal/lesiones-y-maltrato-al-infante,LESIONES Y MALTRATO AL INFANTE,1.0,0,1,1,0
 191,privacion de la libertad y secuestro,80,penal/privacion-ilegal-de-la-libertad,PRIVACION ILEGAL DE LA LIBERTAD,111.0,9,30,21,0
 192,privacion de la libertad y secuestro,80,penal/secuestro-y-delincuencia-organizada,SECUESTRO Y DELINCUENCIA ORGANIZADA,12.0,2,12,10,0
 193,privacion de la libertad y secuestro,80,penal/secuestro-y-otros,SECUESTRO Y OTROS,9.0,1,9,8,0
 194,privacion de la libertad y secuestro,80,penal/delitos-en-materia-de-secuestro-agravado,DELITOS EN MATERIA DE SECUESTRO AGRAVADO,7.0,1,7,6,0
-195,privacion de la libertad y secuestro,80,penal/secuestro-agravado,SECUESTRO AGRAVADO,64.0,24,30,6,0
+195,privacion de la libertad y secuestro,80,penal/secuestro-agravado,SECUESTRO AGRAVADO,64.0,24,30,6,4
 196,privacion de la libertad y secuestro,80,penal/secuestro-con-el-proposito-de-obtener-un-rescate,SECUESTRO CON EL PROPOSITO DE OBTENER UN RESCATE,5.0,0,5,5,0
 197,privacion de la libertad y secuestro,80,penal/secuestro-y-asociacion-delictuosa,SECUESTRO Y ASOCIACIÓN DELICTUOSA,7.0,3,7,4,0
 198,privacion de la libertad y secuestro,80,penal/secuestro-en-su-modalidad-de-exigir-rescate,SECUESTRO EN SU MODALIDAD DE EXIGIR RESCATE,5.0,2,5,3,0
 199,privacion de la libertad y secuestro,80,penal/secuestro-express-agravado,SECUESTRO EXPRESS AGRAVADO,3.0,0,3,3,0
 200,privacion de la libertad y secuestro,80,penal/secuestro-y-extorsion,SECUESTRO Y EXTORSION,3.0,0,3,3,0
-201,privacion de la libertad y secuestro,80,penal/secuestro,SECUESTRO,80.0,28,30,2,0
+201,privacion de la libertad y secuestro,80,penal/secuestro,SECUESTRO,80.0,28,30,2,2
 202,privacion de la libertad y secuestro,80,penal/secuestro-en-grado-de-tentativa,SECUESTRO EN GRADO DE TENTATIVA,2.0,0,2,2,0
 203,privacion de la libertad y secuestro,80,penal/delitos-en-materia-de-secuestro-en-su-modalidad-de-secuestro-express-con-la-finalidad-de-extorsion,DELITOS EN MATERIA DE SECUESTRO EN SU MODALIDAD DE SECUESTRO EXPRESS CON LA FINALIDAD DE EXTORSIÓN,1.0,0,1,1,0
 204,privacion de la libertad y secuestro,80,penal/privacion-ilegal-de-la-libertad-y-violacion,PRIVACION ILEGAL DE LA LIBERTAD Y VIOLACION,1.0,0,1,1,0
@@ -213,7 +213,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 212,fraude y abuso de confianza,132,penal/violacion-de-deposito,VIOLACIÓN DE DEPOSITO,8.0,1,8,7,0
 213,fraude y abuso de confianza,132,penal/abuso-de-confianza-equiparado,ABUSO DE CONFIANZA EQUIPARADO,3.0,0,3,3,0
 214,fraude y abuso de confianza,132,penal/fraude-especifico-y-otro,FRAUDE ESPECIFICO Y OTRO,3.0,0,3,3,0
-215,fraude y abuso de confianza,132,penal/fraude-procesal,FRAUDE PROCESAL,15.0,12,15,3,0
+215,fraude y abuso de confianza,132,penal/fraude-procesal,FRAUDE PROCESAL,15.0,12,15,3,3
 216,fraude y abuso de confianza,132,penal/fraude-generico-y-fraude-especifico,FRAUDE GENERICO Y FRAUDE ESPECIFICO,2.0,0,2,2,0
 217,fraude y abuso de confianza,132,penal/abuso-de-confianza-tentado,ABUSO DE CONFIANZA TENTADO,1.0,0,1,1,0
 218,fraude y abuso de confianza,132,penal/fraude-en-grado-de-tentativa,FRAUDE EN GRADO DE TENTATIVA,1.0,0,1,1,0
@@ -235,14 +235,14 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 234,delitos sexuales,148,penal/corrupcion-de-menores-y-otro,CORRUPCION DE MENORES Y OTRO,3.0,0,3,3,0
 235,delitos sexuales,148,penal/corrupcion-de-menores-y-otros,CORRUPCION DE MENORES Y OTROS,3.0,0,3,3,0
 236,delitos sexuales,148,penal/tentativa-de-abuso-sexual-infantil-agravado,TENTATIVA DE ABUSO SEXUAL INFANTIL AGRAVADO,3.0,0,3,3,0
-237,delitos sexuales,148,penal/violacion-y-otro,VIOLACION Y OTRO,4.0,1,4,3,0
+237,delitos sexuales,148,penal/violacion-y-otro,VIOLACION Y OTRO,4.0,1,4,3,1
 238,delitos sexuales,148,penal/violacion-y-robo-calificado,VIOLACION Y ROBO CALIFICADO,5.0,2,5,3,0
 239,delitos sexuales,148,penal/abuso-sexual-agravado,ABUSO SEXUAL AGRAVADO,3.0,1,3,2,0
 240,delitos sexuales,148,penal/abuso-sexual-infantil-agravado-y-corrupcion-de-menores,ABUSO  SEXUAL INFANTIL  AGRAVADO Y CORRUPCION DE MENORES,5.0,3,5,2,0
 241,delitos sexuales,148,penal/atentados-al-pudor-y-lesiones,ATENTADOS AL PUDOR Y LESIONES,2.0,0,2,2,0
 242,delitos sexuales,148,penal/corrupcion-de-menores-y-abuso-sexual-infantil,CORRUPCION DE MENORES Y ABUSO SEXUAL INFANTIL,3.0,1,3,2,0
 243,delitos sexuales,148,penal/violacion-y-corrupcion-de-menores,VIOLACION Y CORRUPCION DE MENORES,2.0,0,2,2,0
-244,delitos sexuales,148,penal/violacion-y-otros,VIOLACION Y OTROS,6.0,4,6,2,0
+244,delitos sexuales,148,penal/violacion-y-otros,VIOLACION Y OTROS,6.0,4,6,2,2
 245,delitos sexuales,148,penal/abuso-sexual-infantil-agravado-corrupcion-de-menores-y-violencia-intrafamiliar,"ABUSO SEXUAL INFANTIL AGRAVADO, CORRUPCION DE MENORES Y VIOLENCIA INTRAFAMILIAR",1.0,0,1,1,0
 246,delitos sexuales,148,penal/abuso-sexual-infantil-agravado-en-grado-de-tentativa,ABUSO SEXUAL INFANTIL AGRAVADO EN GRADO DE TENTATIVA,1.0,0,1,1,0
 247,delitos sexuales,148,penal/abuso-sexual-infantil-agravado-y-maltrato-infantil,ABUSO SEXUAL INFANTIL AGRAVADO Y MALTRATO INFANTIL,1.0,0,1,1,0
@@ -380,7 +380,7 @@ n,familia,sentencias_familia,tipo,delito_portal,disponibles,en_corpus,meta,falta
 379,homicidio,163,penal/homicidio-calificado-y-robo-de-infante,HOMICIDIO CALIFICADO Y ROBO  DE INFANTE,1.0,0,1,1,0
 380,homicidio,163,penal/homicidio-calificado-y-robo-simple,HOMICIDIO CALIFICADO Y ROBO SIMPLE,1.0,0,1,1,0
 381,homicidio,163,penal/homicidio-calificado-y-secuestro,HOMICIDIO CALIFICADO Y SECUESTRO,1.0,0,1,1,0
-382,homicidio,163,penal/homicidio-calificado-y-violacion,HOMICIDIO CALIFICADO Y VIOLACIÓN,1.0,0,1,1,0
+382,homicidio,163,penal/homicidio-calificado-y-violacion,HOMICIDIO CALIFICADO Y VIOLACIÓN,1.0,0,1,1,1
 383,homicidio,163,penal/homicidio-calificado-y-violacion-equiparada,HOMICIDIO CALIFICADO Y VIOLACION EQUIPARADA,1.0,0,1,1,0
 384,homicidio,163,penal/homicidio-dano-en-las-cosas-y-lesiones,"HOMICIDIO, DAÑO EN LAS COSAS Y LESIONES",1.0,0,1,1,0
 385,homicidio,163,penal/homicidio-doloso,HOMICIDIO DOLOSO,1.0,0,1,1,0
