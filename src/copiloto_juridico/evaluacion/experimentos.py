@@ -914,7 +914,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
     consultas = {c.id: c for c in env.consultas}
     pares = [(cid, d, rel) for cid, docs in env.juicios.items() if cid in consultas for d, rel in docs.items()
              if d in env.store.corpus.index]
-    corrida.parametros["variantes"] = list(variantes)
+    corrida.parametros.update(variantes=list(variantes), prompt_qc1=config.PROMPT_QC1_VERSION)
     if not pares:
         corrida.advertir("No hay pares juzgados (juicios.csv) para las consultas de esta partición: QC_1 por medir.")
     else:
@@ -931,7 +931,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
                     fragmento = env.store.fragmento_mas_similar(doc_id, q)
                 else:
                     fragmento = env.store.corpus.loc[doc_id, "texto"][:2500]
-                resp = llm.generate(prompts.PROMPT_VERIFICACION_RELEVANCIA.format(
+                resp = llm.generate(prompts.prompt_qc1().format(  # el mismo prompt que la app
                     texto_consulta=consulta, fragmento_documento=fragmento))
                 sistema.append(parse_veredicto(resp))
                 if i % 25 == 0:
