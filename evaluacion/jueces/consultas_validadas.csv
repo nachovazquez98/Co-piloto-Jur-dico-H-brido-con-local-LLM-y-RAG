@@ -1,0 +1,108 @@
+id,particion,sin_respuesta,validada,motivo
+A001,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A002,prueba,False,False,gemma2:9b: no se identifica el delito
+A003,desarrollo,False,True,
+A005,prueba,False,True,
+A007,prueba,False,True,
+A008,prueba,False,True,
+A010,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A011,prueba,False,True,
+A013,desarrollo,False,True,
+A015,desarrollo,False,True,
+A018,prueba,False,True,
+A020,desarrollo,False,True,
+A021,desarrollo,False,True,
+A023,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A025,prueba,False,True,
+A027,prueba,False,True,
+A028,prueba,False,False,"copiaba estas frases de la sentencia: «auto de no vinculacion a proceso y», «un auto de no vinculacion a proceso»"
+A032,desarrollo,False,True,
+A033,prueba,False,True,
+A034,prueba,False,True,
+A035,desarrollo,False,False,incluía datos que identifican la sentencia: siete años
+A036,prueba,False,True,
+A039,desarrollo,False,True,
+A040,desarrollo,False,True,
+A044,prueba,False,True,
+A047,desarrollo,False,True,
+A048,desarrollo,False,True,
+A050,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A051,desarrollo,False,True,
+A054,prueba,False,True,
+A059,prueba,False,True,
+A061,desarrollo,False,True,
+A064,prueba,False,True,
+A066,desarrollo,False,True,
+A069,desarrollo,False,True,
+A070,prueba,False,True,
+A071,prueba,False,True,
+A074,desarrollo,False,True,
+A075,prueba,False,True,
+A077,desarrollo,False,False,"copiaba estas frases de la sentencia: «19 fraccion i incisos a b c», «9 fraccion i inciso a en relacion», «a b c y e de la»"
+A078,prueba,False,True,
+A079,desarrollo,False,True,
+A082,desarrollo,False,True,
+A084,desarrollo,False,True,
+A086,desarrollo,False,True,
+A087,desarrollo,False,True,
+A093,prueba,False,True,
+A094,prueba,False,True,
+A095,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A096,desarrollo,False,True,
+A099,prueba,False,True,
+A100,prueba,False,True,
+A103,prueba,False,False,copiaba estas frases de la sentencia: «auto de no vinculacion a proceso en»
+A104,desarrollo,False,True,
+A105,prueba,False,True,
+A106,prueba,False,False,"copiaba estas frases de la sentencia: «37 del codigo nacional de procedimientos penales», «articulo 37 del codigo nacional de procedimientos», «del articulo 37 del codigo nacional de»"
+A108,prueba,False,True,
+A109,desarrollo,False,True,
+A111,prueba,False,True,
+A113,prueba,False,True,
+A116,prueba,False,True,
+A119,prueba,False,True,
+A120,prueba,False,True,
+S001,prueba,True,True,
+S002,desarrollo,True,True,
+S004,desarrollo,True,False,gemma2:9b: no es una consulta de defensa coherente
+S005,prueba,True,True,
+S010,desarrollo,True,True,
+A121,desarrollo,False,True,
+A124,prueba,False,True,
+A128,desarrollo,False,True,
+A129,prueba,False,True,
+A130,prueba,False,True,
+A131,desarrollo,False,True,
+A132,desarrollo,False,False,"copiaba estas frases de la sentencia: «existe litis sobre la cual se sustente», «litis sobre la cual se sustente el», «no existe litis sobre la cual se»"
+A134,prueba,False,False,incluía datos que identifican la sentencia: 25 años
+A135,prueba,False,True,
+A139,prueba,False,False,gemma2:9b: no se identifica el delito
+A142,desarrollo,False,True,
+A144,prueba,False,True,
+A146,desarrollo,False,True,
+A147,desarrollo,False,True,
+A148,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A149,prueba,False,False,"copiaba estas frases de la sentencia: «el sobreseimiento total de la causa penal», «su responsabilidad criminal en la comision del»"
+A153,prueba,False,True,
+A155,prueba,False,True,
+A157,desarrollo,False,True,
+A159,prueba,False,True,
+A161,desarrollo,False,True,
+A163,prueba,False,True,
+A165,prueba,False,False,gemma2:9b: no se identifica el delito
+A170,desarrollo,False,False,"copiaba estas frases de la sentencia: «232 bis fracciones i iv y ix», «atribuye su probable participacion en la comision», «bis fracciones i iv y ix del»"
+A172,prueba,False,True,
+A177,prueba,False,True,
+A185,prueba,False,True,
+A187,desarrollo,False,True,
+A188,prueba,False,True,
+A190,desarrollo,False,False,"copiaba estas frases de la sentencia: «ampliacion del termino constitucional de ciento cuarenta», «constitucional de ciento cuarenta y cuatro horas», «del termino constitucional de ciento cuarenta y»"
+A191,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A192,prueba,False,True,
+A193,prueba,False,True,
+A194,prueba,False,False,gemma2:9b: no se identifica el delito
+A196,prueba,False,False,copiaba estas frases de la sentencia: «vinculacion a proceso y la imposicion de»
+A197,desarrollo,False,True,
+A198,desarrollo,False,False,gemma2:9b: no se identifica el delito
+A199,prueba,False,True,
+A201,prueba,False,False,copiaba estas frases de la sentencia: «que nego la suspension condicional del proceso»
