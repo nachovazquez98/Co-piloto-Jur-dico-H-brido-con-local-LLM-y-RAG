@@ -18,7 +18,8 @@ from copiloto_juridico.ayudas import AYUDA, AVISO_LEGAL
 from copiloto_juridico.ejemplos import EJEMPLOS
 from copiloto_juridico.fichas import extraer_articulos
 from copiloto_juridico.llm import get_client
-from copiloto_juridico.pipeline import PASOS, Copiloto, Opciones, Resultado
+from copiloto_juridico.evaluacion.familias import etiqueta_familia
+from copiloto_juridico.pipeline import PASOS, Copiloto, Opciones, Resultado, familias_disponibles, sugerir_familias
 
 st.set_page_config(page_title="Co-piloto Jurídico", page_icon="⚖️", layout="wide")
 
@@ -47,6 +48,31 @@ if "consulta" not in st.session_state:
 st.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
 consulta = st.text_area("Describe el caso", key="consulta", height=140,
                         placeholder="Hechos, delito, qué resolución se apela y por qué...")
+
+
+@st.cache_data(show_spinner=False)
+def _familias(huella: int) -> dict[str, int]:
+    f = familias_disponibles(store.corpus)
+    return dict(sorted(f.items(), key=lambda kv: (kv[0] == "otros", kv[0])))  # "otros" al final
+
+
+@st.cache_data(show_spinner=False, max_entries=200)
+def _sugerencia(texto: str, huella: int) -> list[str]:
+    return sugerir_familias(store, clasificador, texto)
+
+
+familias = _familias(len(store.corpus))
+sugerencia = [f for f in _sugerencia(consulta.strip(), len(store.corpus)) if f in familias] if consulta.strip() else []
+if sugerencia:
+    a, b = st.columns([4, 1], vertical_alignment="center")
+    a.caption("Sugerencia inicial de la app según la descripción: "
+              + ", ".join(f"**{etiqueta_familia(f)}** ({familias[f]})" for f in sugerencia)
+              + ". Puedes usarla, cambiarla o dejar el delito sin elegir.")
+    b.button("Usar la sugerencia", on_click=lambda: st.session_state.update(familias=sugerencia))
+elegidas = st.multiselect("Delito (opcional): uno o varios", list(familias), key="familias",
+                          format_func=lambda f: f"{etiqueta_familia(f)} ({familias[f]})",
+                          placeholder="Sin elegir: la app lo deduce de la descripción", help=AYUDA["delito"])
+opciones["familias"] = tuple(elegidas)
 buscar = st.button("Buscar precedentes", type="primary", disabled=not consulta.strip())
 
 
@@ -143,6 +169,8 @@ if res:
     st.subheader("Síntesis")
     if res.aviso_cobertura:
         st.warning(res.aviso_cobertura)
+    if res.nota_delito:
+        st.info(res.nota_delito)
     st.markdown(res.sintesis)
     st.subheader("Precedentes")
     for p in res.precedentes:
@@ -154,7 +182,9 @@ if res:
     with st.expander("Detalles técnicos"):
         st.markdown(f"**Conceptos clave:** {res.entidades} · **Tiempo:** {res.segundos:.0f} s · "
                     f"**Llamadas al LLM:** {res.llamadas_llm} · **Modelo:** {res.modelo}")
-        st.markdown("**Clasificación de la consulta** (las 3 primeras categorías filtran la búsqueda)")
+        st.markdown("**Clasificación de la consulta** " + (
+            f"(la búsqueda se filtró por los delitos que elegiste: {', '.join(map(etiqueta_familia, res.familias_elegidas))})"
+            if res.familias_elegidas else "(las 3 primeras categorías filtran la búsqueda)"))
         tabla = res.tabla_clasificacion[["categoría", "score_híbrido", "coseno", "jaccard", "voto_recuperación"]]
         st.dataframe(tabla, hide_index=True, width="stretch", column_config={
             "score_híbrido": st.column_config.NumberColumn("score", format="%.3f", help=AYUDA["score_hibrido"]),

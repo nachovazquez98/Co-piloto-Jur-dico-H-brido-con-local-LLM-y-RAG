@@ -14,8 +14,11 @@ AYUDA = {
     "coseno": "Parecido entre la consulta y el nombre de la categoría (embeddings).",
     "jaccard": "Palabras en común entre los conceptos clave y el nombre de la categoría, sobre el total de palabras.",
     "voto": "Cuánto aparecen sentencias de esa categoría entre las recuperadas (1 = la más representada).",
-    "fuente": ("Filtro estricto = de una de las 3 categorías detectadas; búsqueda amplia = añadida sin filtro porque "
-               "el filtro dio pocos candidatos."),
+    "fuente": ("Filtro estricto = de los delitos que elegiste o, si no elegiste, de una de las 3 categorías detectadas; "
+               "búsqueda amplia = añadida sin filtro porque el filtro dio pocos candidatos."),
+    "delito": ("Opcional. Vacío: la app deduce el delito de la descripción y busca en las 3 categorías más probables. "
+               "Si eliges uno o varios, solo se buscan sentencias de esos delitos (si hay pocas, se completa con las "
+               "más parecidas de otros delitos y se marcan). Entre paréntesis, cuántas sentencias hay de cada uno."),
     "descartados": "Candidatos eliminados por los controles; muchos descartes indican una consulta ambigua o un tema poco cubierto.",
     "ambiguos": "El control respondió algo que no se pudo leer como SI/NO y el sistema continuó.",
     "sentido_fallo": ("Leído de los puntos resolutivos de la sentencia cuando es posible; 'verificar' = la ficha del "

@@ -9,6 +9,8 @@ relevancia 2: misma familia de delito (categoría del STJ) y mismo acto impugnad
 - portal por delito y tipo de sentencia: además, el filtro "Definitiva / Interlocutoria" del portal.
 - búsqueda por palabras: BM25 con el texto de la consulta.
 - la app: la lista de candidatos de `buscar_candidatos`, en su orden.
+- la app con el delito elegido (v11.2): el usuario elige en la app la familia de delito de su caso (la de la categoría
+  del STJ, igual de optimista que el portal) y la búsqueda se filtra por ella en lugar de por el clasificador.
 
 Si no se llega a `K` dentro de las primeras `TOPE` sentencias, cuenta como `TOPE` + 1 (no encontró). Advertencia: la
 app ordena por familia y acto impugnado, que es parte de esta definición de "útil"; el resultado mide cuánto ahorra
@@ -26,7 +28,8 @@ from .. import config
 from ..metadatos import NO_DETERMINADO
 
 K, TOPE = 3, 30
-ESTRATEGIAS = ("portal: delito", "portal: delito + tipo de sentencia", "búsqueda por palabras", "app")
+ESTRATEGIAS = ("portal: delito", "portal: delito + tipo de sentencia", "búsqueda por palabras", "app",
+               "app con el delito elegido")
 
 
 def tipo_sentencia(acto: str) -> str:
@@ -90,9 +93,10 @@ def experimento_esfuerzo(env, log: Callable[[str], None] = print):
             "búsqueda por palabras": [x.doc_id for x in env.store.buscar(c.consulta, modo="lexica", num_docs=TOPE + 1,
                                                                         consulta_lexica=p.lexica,
                                                                         excluir={c.doc_id_fuente})],
-            "app": [x.doc_id for x, _ in buscar_candidatos(env.store, env.clasificador, c.consulta, p.conceptos, p.q,
-                                                          config.RAG_NUM_RESULTS_DESIRED).candidatos
-                    if x.doc_id != c.doc_id_fuente],
+            **{e: [x.doc_id for x, _ in buscar_candidatos(env.store, env.clasificador, c.consulta, p.conceptos, p.q,
+                                                         config.RAG_NUM_RESULTS_DESIRED, familias=f).candidatos
+                   if x.doc_id != c.doc_id_fuente]
+               for e, f in (("app", ()), ("app con el delito elegido", (c.familia,)))},
         }
         filas.append({"id": c.id, "útiles en el corpus": len(utiles),
                       **{e: abiertas_hasta(listas[e], utiles) for e in ESTRATEGIAS}})
@@ -109,11 +113,14 @@ def experimento_esfuerzo(env, log: Callable[[str], None] = print):
     corrida.tabla(f"Sentencias que hay que abrir para encontrar {K} útiles",
                   f"Útil = misma familia (categoría del STJ) y mismo acto impugnado ({fuente}) que la sentencia de la "
                   f"consulta, sin contarla. Si no se llega en {TOPE}, cuenta {TOPE + 1}. El portal supone que se elige "
-                  "la categoría exacta (optimista).", pd.DataFrame(resumen))
+                  "la categoría exacta y 'app con el delito elegido', que se elige su familia (optimistas).",
+                  pd.DataFrame(resumen))
     # con signo invertido: Δ = sentencias que ahorra la app y "gana A" = la app abre menos
-    comp = [{"A": "app", "B": e, "métrica": "sentencias que ahorra la app", "n": len(t),
-             **_fila_diferencia((-t["app"]).tolist(), (-t[e]).tolist())} for e in ESTRATEGIAS if e != "app"]
-    corrida.tabla("Comparaciones pareadas", "Δ = media(otra − app) por consulta: sentencias que la app ahorra (positivo "
-                  "= la app abre menos). IC95 bootstrap pareado.", pd.DataFrame(comp))
+    pares = [("app", e) for e in ESTRATEGIAS[:3]] + [("app con el delito elegido", "app")]
+    comp = [{"A": a, "B": b, "métrica": "sentencias que ahorra A", "n": len(t),
+             **_fila_diferencia((-t[a]).tolist(), (-t[b]).tolist())} for a, b in pares]
+    corrida.tabla("Comparaciones pareadas", "Δ = media(B − A) por consulta: sentencias que A ahorra (positivo = A abre "
+                  "menos). La última fila mide cuánto ayuda elegir el delito en la app. IC95 bootstrap pareado.",
+                  pd.DataFrame(comp))
     corrida.tabla("Por consulta", "Sentencias abiertas con cada estrategia.", t, diagnostico=True)
     return corrida

@@ -22,6 +22,8 @@ def test_clave_depende_de_lo_que_cambia_el_resultado():
     assert base != C.clave("robo calificado de celular", config.LLMSettings(model="qwen2.5:7b"))
     assert base != C.clave("robo calificado de celular", s, {"num_precedentes": 5})
     assert base == C.clave("robo calificado de celular", s, {"num_precedentes": config.RAG_NUM_RESULTS_DESIRED})
+    assert base != C.clave("robo calificado de celular", s, {"familias": ("robo",)})  # v11.2: delito elegido
+    assert base == C.clave("robo calificado de celular", s, {"familias": ()})
 
 
 def test_guardar_y_buscar(tmp_path, monkeypatch):

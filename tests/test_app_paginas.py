@@ -72,6 +72,8 @@ def test_pantalla_principal_con_resultado():
     at.run()
     assert not at.exception
     assert [b.label for b in at.button] == ["Buscar precedentes"]
+    assert [m.label for m in at.multiselect] == ["Delito (opcional): uno o varios"]  # v11.2
+    assert any(o.startswith("robo (") for o in at.multiselect[0].options)  # familia con su número de sentencias
     assert not at.tabs  # sin pestañas: un solo desplegable de detalles técnicos
     assert [e.label for e in at.main.expander] == ["Ficha completa", "Detalles técnicos"]
     assert [e.label for e in at.sidebar.expander] == ["Configuración"]
@@ -80,6 +82,10 @@ def test_pantalla_principal_con_resultado():
     assert "Reconocimiento ilegal" in textos and "no encontrado en la sentencia" in textos
     assert any(AVISO_SIN_MISMO_TIPO in w.value for w in at.warning)
     assert not any("Resultado guardado" in c.value for c in at.caption)
+    res.familias_elegidas, res.nota_delito = ("homicidio",), "Elegiste homicidio; la app habría buscado en robo."
+    at.run()
+    assert [i.value for i in at.info] == [res.nota_delito]
+    assert any("delitos que elegiste: homicidio" in m.value for m in at.markdown)
     at.session_state["guardado_el"] = "2026-11-13T10:00"  # v11.1: resultado de la caché, una sola línea discreta
     at.run()
     assert [c.value for c in at.caption if "Resultado guardado" in c.value] == ["Resultado guardado el 2026-11-13 10:00"]

@@ -47,7 +47,7 @@ evaluación guardada.
 |---|---|---|
 | 1. Conceptos clave | consulta → delito + problema procesal | LLM (Ollama, `llama3.1:8b`) |
 | 2. Clasificación | consulta → 3 familias de delito más probables | coseno de embeddings + Jaccard de lemas + voto de las sentencias recuperadas |
-| 3. Búsqueda | familias → hasta 30 sentencias candidatas | embeddings `multilingual-e5-base` (ChromaDB) + BM25, fusión RRF; filtro por familia con respaldo sin filtro |
+| 3. Búsqueda | familias (o los delitos que elige el usuario, uno o varios) → hasta 30 sentencias candidatas | embeddings `multilingual-e5-base` (ChromaDB) + BM25, fusión RRF; filtro por familia con respaldo sin filtro |
 | 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
 | 5. Síntesis | fichas → respuesta a la consulta | lista a favor / en contra de la defensa por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
 

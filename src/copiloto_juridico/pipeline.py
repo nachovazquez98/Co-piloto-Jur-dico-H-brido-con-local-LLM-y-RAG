@@ -39,8 +39,9 @@ DESCRIPCION_PASOS = {
                  "falla, se usa la consulta completa.",
     "clasificacion": "Entran la consulta y sus conceptos; salen las 10 categorías más probables. Combina coseno de "
                      "embeddings, coincidencia de lemas (Jaccard, KEM) y el voto de las sentencias recuperadas.",
-    "busqueda": "Entran las 3 mejores categorías; salen hasta 30 sentencias candidatas. Fusiona búsqueda semántica "
-                "(embeddings) y léxica (BM25) con RRF; si el filtro da pocas, completa sin filtro.",
+    "busqueda": "Entran las 3 mejores categorías, o los delitos que eligió el usuario; salen hasta 30 sentencias "
+                "candidatas. Fusiona búsqueda semántica (embeddings) y léxica (BM25) con RRF; si el filtro da pocas, "
+                "completa sin filtro.",
     "analisis": "Por candidato: QC_1 (¿es relevante?), extracción de hechos, ficha e QC_2 (¿la ficha es coherente?), "
                 "hasta tener N fichas válidas. El LLM lee la sentencia recortada a su ventana de contexto.",
     "sintesis": "Entran las fichas válidas. Con reglas: qué precedentes fueron favorables o desfavorables para la "
@@ -63,6 +64,8 @@ class Opciones:
     max_candidatos: int = 15
     qc_relevancia: bool = True
     qc_post_reporte: bool = True
+    # v11.2: familias de delito que elige el usuario (una o varias); vacío = las elige el clasificador
+    familias: tuple[str, ...] = ()
 
 
 @dataclass
@@ -152,16 +155,23 @@ class Resultado:
     aviso_cobertura: str | None = None    # "no hay precedentes del mismo tipo..." cuando aplica
     llamadas_llm: int = 0
     citas: dict | None = None             # verificación de citas de la síntesis (afirmaciones, válidas, marcadas)
+    familias_elegidas: tuple[str, ...] = ()  # v11.2: delitos que eligió el usuario (vacío = los eligió el clasificador)
+    nota_delito: str | None = None        # el clasificador habría buscado en otra familia que la elegida
 
     def markdown(self) -> str:
+        from .evaluacion.familias import etiqueta_familia
+
         partes = [
             "# Informe del Co-piloto Jurídico\n",
             f"**Consulta:** {self.consulta}\n",
             f"**Categoría detectada:** {etiqueta_tipo(self.categoria)}  ",
+            *([f"**Delitos elegidos:** {', '.join(map(etiqueta_familia, self.familias_elegidas))}  "]
+              if self.familias_elegidas else []),
             f"**Búsqueda:** {self.modo_busqueda}  ",
             f"**Modelo:** {self.modelo} · **Tiempo:** {self.segundos:.0f} s · "
             f"**Veredictos ambiguos:** {self.veredictos_ambiguos}\n",
             *([f"> ⚠️ {self.aviso_cobertura}\n"] if self.aviso_cobertura else []),
+            *([f"> {self.nota_delito}\n"] if self.nota_delito else []),
             "---\n## Síntesis de precedentes relevantes\n",
             self.sintesis or "_No se generó síntesis._",
             "\n---\n## Apéndice: análisis detallado de precedentes\n",
@@ -377,17 +387,68 @@ class Busqueda:
     candidatos: list[tuple[Candidato, str]]
     modo: str
     acto_consulta: str | None = None
+    sugeridas: list[str] = field(default_factory=list)  # las del clasificador, aunque el usuario haya elegido otras
+
+
+def familias_de_categoria(clasificador, categoria: str) -> set[str]:
+    from .evaluacion.familias import cargar_familias
+
+    tipos = clasificador.tipos_de(categoria)
+    return set(cargar_familias(tipos).values())
+
+
+def familias_disponibles(corpus: pd.DataFrame) -> dict[str, int]:
+    """Familias de delito del corpus penal con su número de sentencias (para el selector de la app)."""
+    from .evaluacion.familias import cargar_familias
+
+    penal = corpus.loc[corpus["materia"] == "penal", "tipo"]
+    return penal.map(cargar_familias(penal.unique().tolist())).value_counts().sort_index().to_dict()
+
+
+def sugerir_familias(store, clasificador, consulta: str) -> list[str]:
+    """Sugerencia inicial para el selector de delitos (v11.2): las familias de las 3 primeras categorías del
+    clasificador, sin llamar al LLM (la consulta hace de conceptos clave; tarda menos de un segundo). La búsqueda
+    real usa los conceptos del LLM, así que puede diferir un poco."""
+    q = embed_query(consulta)
+    amplios = store.buscar(consulta, query_embedding=q, consulta_lexica=consulta)
+    tabla = clasificador.clasificar(consulta, consulta, q, recuperados=amplios).tabla
+    salida: list[str] = []
+    for c in tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO):
+        salida += [f for f in sorted(familias_de_categoria(clasificador, c)) if f not in salida]
+    return salida
+
+
+def nota_delito(clasificador, familias, sugeridas: list[str]) -> str | None:
+    """Si el usuario eligió delitos y la primera categoría del clasificador es de otra familia, se le dice (puede
+    haber elegido mal, o la descripción no deja ver el delito): no cambia la búsqueda."""
+    from .evaluacion.familias import etiqueta_familia
+
+    if not familias or not sugeridas:
+        return None
+    top = familias_de_categoria(clasificador, sugeridas[0])
+    if top & set(familias):
+        return None
+    return (f"Elegiste {', '.join(map(etiqueta_familia, familias))}; por la descripción del caso, la app habría buscado "
+            f"primero en {', '.join(sorted(map(etiqueta_familia, top)))}. Si no era tu intención, agrega ese delito "
+            "o quita el que elegiste.")
 
 
 def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb, num_precedentes: int,
-                      orden: str | None = None) -> Busqueda:
-    """Pasos 2 y 3 de la app (clasificación y búsqueda adaptativa), compartidos con la evaluación."""
+                      orden: str | None = None, familias: tuple[str, ...] | list[str] = ()) -> Busqueda:
+    """Pasos 2 y 3 de la app (clasificación y búsqueda adaptativa), compartidos con la evaluación.
+
+    `familias` (v11.2): las familias de delito que eligió el usuario. Sustituyen a las 3 primeras categorías del
+    clasificador en el filtro estricto, en el orden por facetas y en QC_2; la búsqueda amplia sigue completando si el
+    filtro trae pocos candidatos (marcados como "Búsqueda amplia"), para no dejar sin resultados una familia chica."""
     from .metadatos import acto_de_consulta
 
     lexica = f"{consulta} {entidades}"
     amplios = store.buscar(consulta, query_embedding=q_emb, consulta_lexica=lexica)
     clasif = clasificador.clasificar(consulta, entidades, q_emb, recuperados=amplios)
-    categorias = clasif.tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO).tolist()
+    sugeridas = clasif.tabla["tipo"].head(config.NUM_CATEGORIAS_FILTRO).tolist()
+    elegidas = set(familias)
+    categorias = ([c for c in clasificador.tipos if familias_de_categoria(clasificador, c) & elegidas]
+                  if elegidas else []) or sugeridas
     filtro = [t for c in categorias for t in clasificador.tipos_de(c)]
     estrictos = store.buscar(consulta, tipos=filtro, query_embedding=q_emb, consulta_lexica=lexica)
     candidatos, modo = combinar_candidatos(estrictos, amplios, num_precedentes)
@@ -402,11 +463,12 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
         from .evaluacion.familias import cargar_familias
         from .metadatos import cargar as cargar_metadatos
 
-        familias = cargar_familias(sorted({c.tipo for c, _ in candidatos} | set(filtro)))
-        top1 = {familias.get(t, t) for t in clasificador.tipos_de(categorias[0])}
+        fam_doc = cargar_familias(sorted({c.tipo for c, _ in candidatos} | set(filtro)))
+        # con familias elegidas por el usuario, todas valen igual; si no, la primera del clasificador
+        top = elegidas or {fam_doc.get(t, t) for t in clasificador.tipos_de(categorias[0])}
         actos = {d: m["acto_impugnado"] for d, m in cargar_metadatos().items()}
-        candidatos = ordenar_por_facetas(candidatos, familias, top1, acto, actos)
-    return Busqueda(clasif, categorias, filtro, estrictos, amplios, candidatos, modo, acto)
+        candidatos = ordenar_por_facetas(candidatos, fam_doc, top, acto, actos)
+    return Busqueda(clasif, categorias, filtro, estrictos, amplios, candidatos, modo, acto, sugeridas)
 
 
 AVISO_OTRA_MATERIA = ("La consulta no menciona ningún delito ni etapa del proceso penal; el corpus es solo penal, así "
@@ -585,7 +647,8 @@ class Copiloto:
         yield Evento("paso_inicio", "clasificacion")
         yield log("--- PASO 2: RE-RANKING HÍBRIDO Y SELECCIÓN DE CATEGORÍA ---", "clasificacion")
         q_emb = embed_query(consulta)
-        b = buscar_candidatos(self.store, self.clasificador, consulta, entidades, q_emb, op.num_precedentes)
+        b = buscar_candidatos(self.store, self.clasificador, consulta, entidades, q_emb, op.num_precedentes,
+                              familias=op.familias)
         clasif, categorias, filtro, estrictos = b.clasificacion, b.categorias, b.filtro, b.estrictos
         candidatos, modo = b.candidatos, b.modo
         yield log(f"   -> KEM Tokens dinámicos: {clasif.tokens_kem}", "clasificacion")
@@ -594,6 +657,12 @@ class Copiloto:
                       f"| Jaccard:{r['jaccard']:.2f} | KEM:{r['kem']:.2f} | Voto:{r['voto_recuperación']:.2f} "
                       f"| Penalidad:{r['penalidad']:.2f}", "clasificacion")
         yield log(f"   ✅ Categoría final seleccionada: '{clasif.tipo}'", "clasificacion")
+        nota = nota_delito(self.clasificador, op.familias, b.sugeridas)
+        if op.familias:
+            yield log(f"   -> Delitos elegidos por el usuario: {', '.join(op.familias)} (sustituyen a las categorías "
+                      "del clasificador en el filtro).", "clasificacion")
+        if nota:
+            yield log(f"   ⚠️ {nota}", "clasificacion")
         senales = senales_coincidencia(clasif.tabla)
         yield Evento("paso_fin", "clasificacion", etiqueta_tipo(clasif.tipo), {"tabla": clasif.tabla,
                                                                               "senales": senales})
@@ -724,6 +793,6 @@ class Copiloto:
 
         resultado = Resultado(consulta, clasif.tipo, entidades, clasif.tabla, modo, precedentes, sintesis.strip(),
                               descartados, time.time() - t0, self.llm.settings.model, ambiguos, aviso,
-                              self.llamadas + (1 if len(precedentes) >= 2 else 0), citas)
+                              self.llamadas + (1 if len(precedentes) >= 2 else 0), citas, tuple(op.familias), nota)
         yield log(f"\nTiempo total: {resultado.segundos:.1f} s")
         yield Evento("resultado", datos={"resultado": resultado})

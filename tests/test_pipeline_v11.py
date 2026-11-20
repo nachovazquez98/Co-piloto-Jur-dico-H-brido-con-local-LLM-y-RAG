@@ -32,6 +32,7 @@ class StoreFalso:
 class ClasificadorFalso:
     def __init__(self, categorias=("penal/robo-calificado",), miembros=None):
         self.categorias, self.miembros = list(categorias), miembros or {}
+        self.tipos = sorted(set(self.categorias) | set(self.miembros))
 
     def tipos_de(self, c):
         return self.miembros.get(c, [c])
@@ -313,3 +314,31 @@ def test_verificar_ficha_marca_sentido_y_articulos():
     assert prec.sentido_reglas == "MODIFICA" and prec.datos_penales["sentido_fallo"] == "MODIFICA"
     assert prec.datos_penales["sentido_llm"] == "CONFIRMA"
     assert prec.articulos_no_encontrados == ["161"] and len(prec.verificar) == 2
+
+
+def test_delitos_elegidos_por_el_usuario_sustituyen_al_clasificador():
+    """v11.2: con delitos elegidos, el filtro estricto usa sus tipos (no los del clasificador) y, si el clasificador
+    habría buscado en otra familia, se avisa sin cambiar la búsqueda."""
+    miembros = {"penal/familia/robo": ["penal/robo", "penal/robo-calificado"],
+                "penal/familia/homicidio": ["penal/homicidio"], "penal/familia/lesiones": ["penal/lesiones"]}
+    store = StoreFalso([_cand(f"h{i}", "penal/homicidio") for i in range(6)], [])
+    clasif = ClasificadorFalso(["penal/familia/robo"], miembros)
+    llm_ = LLMFalso()
+    llm_.ficha["delitos"] = "Homicidio calificado"  # QC_2 descarta una ficha de robo si se eligió homicidio
+    _, res = _correr(store, clasif, llm_, num_precedentes=1, familias=("homicidio", "lesiones"))
+    assert ["penal/homicidio", "penal/lesiones"] in store.llamadas
+    assert ["penal/robo", "penal/robo-calificado"] not in store.llamadas
+    assert res.familias_elegidas == ("homicidio", "lesiones")
+    assert "robo" in res.nota_delito and "Delitos elegidos" in res.markdown()
+
+    store = StoreFalso([_cand(f"r{i}") for i in range(6)], [])
+    _, res = _correr(store, clasif, LLMFalso(), num_precedentes=1, familias=("robo",))
+    assert res.nota_delito is None  # coincide con el clasificador: sin nota
+    _, res = _correr(store, clasif, LLMFalso(), num_precedentes=1)
+    assert res.familias_elegidas == () and ["penal/robo", "penal/robo-calificado"] in store.llamadas
+
+
+def test_sugerencia_inicial_de_delitos_sin_llm():
+    miembros = {"penal/familia/robo": ["penal/robo"], "penal/familia/homicidio": ["penal/homicidio"]}
+    clasif = ClasificadorFalso(["penal/familia/robo", "penal/familia/homicidio"], miembros)
+    assert pipeline.sugerir_familias(StoreFalso([], []), clasif, "me acusan de robo") == ["robo", "homicidio"]
