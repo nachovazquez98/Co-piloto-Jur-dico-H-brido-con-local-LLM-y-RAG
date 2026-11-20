@@ -164,3 +164,19 @@ def test_duplicados_de_texto_conserva_la_fuente_de_consultas():
                            "texto": [t, t.replace("robo", "r obo"), "otra sentencia distinta " * 50]})
     assert duplicados_de_texto(corpus).to_dict("records") == [{"id": "2.pdf", "igual_a": "1.pdf"}]
     assert duplicados_de_texto(corpus, {"2.pdf"})["id"].tolist() == ["1.pdf"]
+
+
+def test_extraccion_conserva_inicio_numerado_y_resolutivos():
+    """v11.2: "1.VISTOS" numerado marca el inicio y un "Notifíquese" citado de primera instancia no corta la sentencia
+    antes de los resolutivos (casos reales de las descargas a mano)."""
+    from copiloto_juridico.datos.procesamiento import extract_and_clean_legal_text
+
+    crudo = ("Toca: 318/2025\nPágina:1\n1.VISTOS para resolver el toca penal 318/2025.\n"
+             + "el juez de origen resolvió: «QUINTA.- Notifíquese personalmente a las partes». " * 3
+             + "consideraciones de la sala sobre los agravios. " * 200
+             + "\nANTECEDENTES de la investigación.\n" + "más análisis de los agravios. " * 40
+             + "por lo expuesto, esta Sala resuelve con las siguientes proposiciones: primera.- se confirma el auto. "
+             + "Notifíquese. Así lo resolvió la Sala. firmas y anexo de datos testados " * 3)
+    texto = extract_and_clean_legal_text(crudo)
+    assert texto.startswith("1.vistos para resolver")
+    assert "se confirma el auto" in texto and "anexo de datos testados" not in texto

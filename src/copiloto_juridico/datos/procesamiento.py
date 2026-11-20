@@ -34,8 +34,9 @@ RE_NOISE_F1 = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# Palabra que abre una sección al inicio de una línea; la sentencia puede numerar los párrafos ("1.VISTOS").
 RE_STRUCTURAL_KEYWORDS_F1 = re.compile(
-    r"^\s*("
+    r"^\s*(?:\d{1,3}\s*[.\-)]+\s*)?("
     r"V\s*I\s*S\s*T\s*O\s*(?:S)?\b"
     r"|R\s*E\s*S\s*U\s*L\s*T\s*A\s*N\s*D\s*O\s*(?:S)?\b"
     r"|A\s*N\s*T\s*E\s*C\s*E\s*D\s*E\s*N\s*T\s*E\s*(?:S)?\b"
@@ -91,16 +92,24 @@ def extract_text_from_pdf(pdf_path: Path) -> str:
     return ""
 
 
+# Resolutivos dentro de una línea ("esta Sala resuelve con las siguientes: Proposiciones"); la extracción puede
+# separar las letras ("R E S U E L V E").
+RE_RESOLUTIVOS = re.compile(r"r\s?e\s?s\s?u\s?e\s?l\s?v\s?e|p\s?r\s?o\s?p\s?o\s?s\s?i\s?c\s?i\s?o\s?n\s?e\s?s|"
+                            r"p\s?r\s?o\s?p\s?o\s?s\s?i\s?t\s?i\s?v\s?a\s?s|resolutivos", re.IGNORECASE)
+
+
 def extract_and_clean_legal_text(raw_text: str) -> str:
-    """Quita ruido (encabezados, numeración) y aísla el cuerpo de la resolución."""
+    """Quita ruido (encabezados, numeración) y aísla el cuerpo de la resolución: desde la primera palabra de sección
+    (si está en el primer 10 % del texto; si no, desde el inicio) hasta la fórmula final ("Notifíquese", "Así lo
+    resolvió"...) posterior a los resolutivos. v11.2: antes el final se buscaba después de la última palabra de
+    sección al inicio de línea, y un "Notifíquese" citado de la resolución de primera instancia dejaba hasta el 1 %
+    del documento."""
     pre = RE_NOISE_F1.sub(" ", raw_text)
     matches = list(RE_STRUCTURAL_KEYWORDS_F1.finditer(pre))
-    if matches:
-        end = RE_FINAL_BOILERPLATE_F1.search(pre, pos=matches[-1].end())
-        core = pre[matches[0].start(): end.start() if end else len(pre)]
-    else:
-        end = RE_FINAL_BOILERPLATE_F1.search(pre)
-        core = pre[: end.start()] if end else pre
+    inicio = matches[0].start() if matches and matches[0].start() < 0.10 * len(pre) else 0
+    desde = max([matches[-1].end() if matches else 0] + [m.end() for m in RE_RESOLUTIVOS.finditer(pre)][-1:])
+    end = RE_FINAL_BOILERPLATE_F1.search(pre, pos=desde)
+    core = pre[inicio: end.start() if end else len(pre)]
     cleaned = re.sub(r"\s+", " ", core).strip()
     cleaned = re.sub(r"[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ.,;?¿!¡\s-]", "", cleaned)
     return cleaned.lower().strip()

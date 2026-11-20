@@ -31,16 +31,18 @@ def cmd_construir_corpus(args) -> None:
                                save_corpus, unir_fuentes)
     from .datos.procesamiento import process_pdf_folder
 
-    fuentes, actual, rechazadas = [], pd.DataFrame(columns=["id"]), []
+    # Orden de las fuentes: PDFs > corpus actual > ChromaDB. El PDF procesado ahora reemplaza al texto guardado de la
+    # misma sentencia (v11.2: así entra la extracción corregida); los PDF con el texto de otra sentencia ya se quitaron.
+    fuentes, viejas, actual, rechazadas = [], [], pd.DataFrame(columns=["id"]), []
     if not args.reiniciar:
         actual = load_corpus()
         if len(actual):
             _log(f"Corpus actual: {len(actual)} sentencias.")
-            fuentes.append(actual)
+            viejas.append(actual)
     for db in args.chroma or []:
         df = import_from_chroma_sqlite(Path(db))
         _log(f"Importadas {len(df)} sentencias desde ChromaDB '{db}'.")
-        fuentes.append(df)
+        viejas.append(df)
     for carpeta in args.pdfs or []:
         df = pd.DataFrame(process_pdf_folder(Path(carpeta), log=_log))
         _log(f"Procesadas {len(df)} sentencias desde PDFs en '{carpeta}'.")
@@ -52,6 +54,7 @@ def cmd_construir_corpus(args) -> None:
                 rechazadas.append(ajenas.assign(carpeta=str(carpeta)))
                 df = df[~df["id"].isin(ajenas["id"])]
         fuentes.append(df)
+    fuentes += viejas
     if not fuentes:
         sys.exit("No hay fuentes: usa --chroma y/o --pdfs.")
     if args.pdfs:  # el reporte de esta construcción, de todas las carpetas (vacío si no hubo rechazos)
@@ -59,7 +62,7 @@ def cmd_construir_corpus(args) -> None:
             config.CORPUS_DIR / "descargas_rechazadas.csv", index=False)
 
     # Una sentencia repetida: gana la versión sin páginas omitidas (el PDF vuelto a descargar reemplaza a la
-    # muestreada); entre iguales, la primera fuente (corpus actual > chroma > PDFs).
+    # muestreada); entre iguales, la primera fuente (PDFs > corpus actual > chroma).
     todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
     # La misma sentencia publicada dos veces con distinto nombre: contaría doble en la búsqueda y podía quedar una
