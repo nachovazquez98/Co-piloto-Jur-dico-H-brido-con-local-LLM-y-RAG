@@ -31,7 +31,7 @@ def cmd_construir_corpus(args) -> None:
                                save_corpus, unir_fuentes)
     from .datos.procesamiento import process_pdf_folder
 
-    fuentes, actual = [], pd.DataFrame(columns=["id"])
+    fuentes, actual, rechazadas = [], pd.DataFrame(columns=["id"]), []
     if not args.reiniciar:
         actual = load_corpus()
         if len(actual):
@@ -49,11 +49,14 @@ def cmd_construir_corpus(args) -> None:
             if len(ajenas):
                 _log(f"⚠️ {len(ajenas)} PDF con el nombre de una sentencia del corpus pero el texto de otra; se conserva "
                      f"el texto anterior: {', '.join(ajenas['id'])}")
-                ajenas.to_csv(config.CORPUS_DIR / "descargas_rechazadas.csv", index=False)
+                rechazadas.append(ajenas.assign(carpeta=str(carpeta)))
                 df = df[~df["id"].isin(ajenas["id"])]
         fuentes.append(df)
     if not fuentes:
         sys.exit("No hay fuentes: usa --chroma y/o --pdfs.")
+    if args.pdfs:  # el reporte de esta construcción, de todas las carpetas (vacío si no hubo rechazos)
+        (pd.concat(rechazadas) if rechazadas else pd.DataFrame(columns=["id", "carpeta"])).to_csv(
+            config.CORPUS_DIR / "descargas_rechazadas.csv", index=False)
 
     # Una sentencia repetida: gana la versión sin páginas omitidas (el PDF vuelto a descargar reemplaza a la
     # muestreada); entre iguales, la primera fuente (corpus actual > chroma > PDFs).
@@ -66,9 +69,9 @@ def cmd_construir_corpus(args) -> None:
         fuentes_consultas = {json.loads(x).get("doc_id_fuente") for x in config.CONSULTAS_PATH.read_text(
             encoding="utf-8").splitlines() if x.strip() and not x.lstrip().startswith("#")}
     dup = duplicados_de_texto(todo, fuentes_consultas)
+    dup.to_csv(config.CORPUS_DIR / "duplicados.csv", index=False)  # el de esta construcción, aunque esté vacío
     if len(dup):
         _log(f"⚠️ {len(dup)} sentencias repetidas (mismo texto con otro nombre); se quita la copia.")
-        dup.to_csv(config.CORPUS_DIR / "duplicados.csv", index=False)
         todo = todo[~todo["id"].isin(dup["id"])]
     huerfanas = sorted(set(dup["id"]) & fuentes_consultas)
     if huerfanas:
