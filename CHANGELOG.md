@@ -5,22 +5,24 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 ## [Sin publicar] - 11.2.0
 
 Evaluación sin anotadores humanos (no hay abogados disponibles): la referencia sale de la categoría que asignó el STJ,
-del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a la de la app, validados antes de usarse.
+del texto de la sentencia (reglas) y de un juez LLM de otra familia que la del modelo de la app, validado antes de
+usarse. Corpus penal ampliado con descargas a mano desde el portal.
 
 ### Añadido
-- `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez (`mistral:7b`,
-  `gemma2:9b`; `qwen2.5:7b` no pasó la prueba piloto y `qwen2.5:14b` no cabe en 8 GB), reanudables y con la clave del prompt.
-- `evaluacion referencias`: valida cada juez contra la categoría del STJ (mínimo 0.80 fijado antes de correrlos),
-  referencia por mayoría de lectores para acto impugnado, apelante y sentido, juicios de relevancia con el formato
-  de la hoja del abogado y validación automática de las consultas (sustituye a `revisado: true`).
+- `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez, reanudables y con
+  la clave del prompt, sobre una muestra estable por hash (30 % de las sentencias, 50 % de las consultas con todos sus
+  pares; `--completa` para todo). Si el juez de relevancia omite la calificación, un tercer intento pide solo esa clave.
+- `evaluacion referencias`: valida cada juez contra la categoría del STJ (mínimo 0.80 fijado antes de correrlos; con
+  todas las sentencias si el juez las juzgó todas), referencia por mayoría de lectores para acto impugnado, apelante
+  y sentido, juicios de relevancia y validación automática de las consultas.
 - `evaluacion fichas-referencia`: fichas precalculadas contra la referencia, con IC 95 %.
 - `evaluacion esfuerzo`: sentencias que hay que abrir para encontrar 3 útiles con el portal, la búsqueda por
-  palabras y la app (sustituye al estudio de uso).
+  palabras y la app.
 - `evaluacion familias --coherencia`: comprueba la agrupación tipo → familia con los embeddings del índice.
 - `evaluacion borradores --ampliar N`: más consultas por familia sin tocar las existentes.
-- `evaluacion modelos-tareas`: qué modelo local rinde mejor en cada tarea medible de la app (conceptos, QC_1,
-  fichas) contra la referencia automática, en la partición de desarrollo, con la regla de cambio fijada antes de
-  correrla y la referencia sin el juez de la misma familia como análisis de sensibilidad.
+- `construir-corpus` rechaza un PDF con el nombre de una sentencia del corpus pero el texto de otra (se conserva el
+  anterior; `data/corpus/descargas_rechazadas.csv`) y quita las sentencias publicadas dos veces con distinto nombre
+  (`data/corpus/duplicados.csv`): contaban doble en la búsqueda y podían quedar en desarrollo y en prueba a la vez.
 - `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas y nuevas).
 
 ### Corregido
@@ -34,12 +36,28 @@ del texto de la sentencia (reglas) y de dos jueces LLM de familias distintas a l
 - `evaluacion qc` medía QC_1 con el prompt v10; ahora usa el de la app (`prompt_qc1`, v11).
 - `evaluacion jueces --pares` saca de la VRAM los modelos de Ollama antes de cargar el de embeddings (fallaba con
   `CUBLAS_STATUS_ALLOC_FAILED` en 8 GB).
+- `referencias` armaba el prompt del juez con la lista de familias de la muestra y ninguna respuesta guardada
+  coincidía; ahora la arma con todo el corpus.
 
 ### Cambiado
+- Corpus: 357 sentencias penales vueltas a descargar completas, 51 nuevas y 22 repetidas fuera (11 penales; una
+  consulta, A132, apunta ahora a la copia que se queda). Penal: 1,412 → 1,451 sentencias; con páginas omitidas,
+  ~800 → 439. Sentido leído por reglas: 875 de 1,451 (`20261119-195104_3995979_metadatos-cobertura`).
+- Jueces: `qwen2.5:7b` no pasó la prueba piloto, `qwen2.5:14b` no cabe en 8 GB, `mistral:7b` no alcanzó 0.80 (0.795
+  en 1,412) y queda solo `gemma2:9b` (0.845 en la muestra de 401): `20261117-065346_a60ca4f_referencias`.
 - La app avisa cuando la consulta no menciona ningún delito ni término del proceso penal (antes, las consultas
   civiles, familiares o ajenas al derecho recibían precedentes penales sin aviso).
-- La evaluación usa la referencia automática si existe (`COPILOTO_EVALUACION_AUTOMATICA`); las hojas de anotación
-  humana siguen sirviendo si se desactiva.
+- La página "Cómo funciona" muestra `fichas-referencia` y `esfuerzo` en lugar de `generacion`.
+- Prueba de regresión v10: el caso civil "Daños y perjuicios (accidente vehicular)" queda registrado como fallo
+  conocido. Con el corpus penal completo, "homicidio culposo" desplaza a "pago de daños y perjuicios" del top 3; es un
+  cambio de datos, fuera del alcance penal.
+
+### Quitado
+- Camino de anotación humana, que nunca se usó: hojas de juicios y fichas, piloto de anotación (`hojas-anotacion`,
+  `kappa-piloto`), `generacion`, estudio de uso (`estudio`), consultas reales vacías, plantilla inicial (`plantilla`)
+  y la opción `COPILOTO_EVALUACION_AUTOMATICA`. Las hojas estaban vacías.
+- `evaluacion modelos-tareas`: no se corrió y no respalda ninguna decisión.
+- Listas de descarga viejas (`redescarga_penal.csv`, `pendientes_penal.csv`), reemplazadas por `evaluacion/descargas/`.
 
 ## [11.1.0] - 2026-11-13
 
