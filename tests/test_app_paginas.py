@@ -20,7 +20,7 @@ def test_como_funciona_sin_resultados_dice_por_medir(tmp_path, monkeypatch):
     at = st_testing.AppTest.from_file(str(APP / "pages" / "1_Como_funciona.py"), default_timeout=60).run()
     assert not at.exception
     textos = " ".join(m.value for m in at.markdown)
-    assert textos.count("Por medir") == 4 and "Agravios" in textos
+    assert textos.count("Por medir") == 5 and "Agravios" in textos
 
 
 def test_como_funciona_oculta_diagnosticos(tmp_path, monkeypatch):

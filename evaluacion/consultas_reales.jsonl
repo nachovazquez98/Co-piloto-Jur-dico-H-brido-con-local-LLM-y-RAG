@@ -1,3 +1,0 @@
-# Consultas REALES: escritas por abogados penalistas SIN ver sentencias del corpus (al menos 20). Una por línea, JSON:
-# {"id": "R001", "consulta": "texto tal como lo escribiría el defensor", "doc_id_fuente": null, "tipo": null, "familia": "familia de delito esperada o null", "particion": "desarrollo|prueba", "sin_respuesta": false, "borrador": false, "revisado": true, "notas": "quién la escribió"}
-# Su relevancia viene de anotacion_juicios.csv (corre `hojas-anotacion` después de agregarlas). Las líneas con # se ignoran.

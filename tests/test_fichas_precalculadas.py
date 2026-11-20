@@ -77,22 +77,6 @@ def test_pipeline_usa_la_ficha_precalculada(monkeypatch):
     assert not any("Sentencia:" in p for p in llm_.prompts)  # ninguna llamada de ficha
 
 
-def test_generacion_evalua_la_ficha_de_la_app(monkeypatch, tmp_path):
-    """`generacion` y QC_2 deben juzgar la misma ficha que muestra la app (precalculada o JSON), no la de v10."""
-    from copiloto_juridico.evaluacion.experimentos import generar_ficha
-
-    path = tmp_path / "f.parquet"
-    llm = LLMFicha([json.dumps(FICHA)])
-    fp.generar_todas(_corpus(("a", TEXTO)), llm, path, log=lambda m: None)
-    monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", True)
-    monkeypatch.setattr(fp, "ficha_guardada", lambda d, t, s: fp.FichaPenal.desde_guardada(
-        fp.cargar(path).set_index("doc_id").loc[d, "ficha"]))
-    g = generar_ficha(TEXTO, llm, doc_id="a")
-    assert g["origen"] == "precalculada" and llm.llamadas == 1 and "Resultado para la defensa" in g["informe"]
-    monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", False)
-    assert generar_ficha(TEXTO, llm, doc_id="a")["origen"] == "generada" and llm.llamadas == 2
-
-
 def test_fichas_batch_sobrevive_a_una_caida_del_servidor(tmp_path, monkeypatch):
     from copiloto_juridico.llm import LLMError
 

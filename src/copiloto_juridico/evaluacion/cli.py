@@ -4,38 +4,31 @@ Preparación (sin LLM):
     congelar                         Huella de código, corpus, índice, fichas, configuración, prompts y modelo
     familias                         Exporta evaluacion/familias_penal.csv (tipo -> familia) para revisión
     familias --coherencia            Comprueba la agrupación con los embeddings del índice (v11.2)
-    plantilla                        Borrador estratificado de consultas (evaluacion/consultas_penal_borrador.jsonl)
-    validar                          Valida consultas y juicios, detecta fuga y resume el conjunto
-    kappa-piloto                     Acuerdo del piloto de anotación (hacerlo antes de los 300 juicios)
+    validar                          Valida las consultas, detecta fuga y resume el conjunto
 Experimentos sin LLM (usan los conceptos en caché):
     recuperacion --particion P       Líneas base, filtro, k de RRF, k-NN; métricas con IC 95 %
     ablacion --particion P           Quita un componente del clasificador a la vez
     pesos                            Malla de pesos en desarrollo; resultado en prueba una sola vez
 Con LLM:
     conceptos                        Precalcula los conceptos clave de cada consulta
-    qc --particion P                 QC_1 vs. juicios humanos (inicio vs. fragmento similar) y QC_2
-    generacion                       Fichas del conjunto C vs. anotación; CSV para marcar alucinaciones
+    qc --particion P                 QC_1 contra la referencia (inicio vs. fragmento similar)
     latencia --particion P --max N   Tiempos p50/p95 por etapa, llamadas al LLM y descartes
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
-    modelos-tareas --fichas N --pares M   Qué modelo rinde mejor en conceptos, QC_1 y fichas (desarrollo)
     robustez                         Consultas difíciles con la app completa (diagnóstico)
-Estudio de uso (sin LLM):
-    estudio [--plantilla N]          Resumen manual vs. app (o arma casos.jsonl y registro.csv para N participantes)
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
-Evaluación automática, sin anotadores humanos (v11.2):
+Referencia automática, sin anotadores humanos (v11.2):
     jueces --pares                   Pares (consulta, sentencia) a juzgar, por agrupamiento (sin LLM)
     jueces --modelo M [--tareas ...] Una tanda de un juez LLM (un modelo a la vez; reanudable)
     referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
     fichas-referencia --particion P  Fichas precalculadas contra la referencia (sin LLM)
-    esfuerzo --particion P           Esfuerzo simulado: portal, búsqueda por palabras y app (sustituye al estudio de uso)
+    esfuerzo --particion P           Esfuerzo simulado: portal, búsqueda por palabras y app
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 from collections import Counter
@@ -148,26 +141,6 @@ def _coherencia_familias(penal):
     return corrida
 
 
-def cmd_plantilla(args) -> None:
-    from ..datos.corpus import load_corpus
-    from .conjuntos import guardar_consultas, muestrear_plantilla
-    from .familias import cargar_familias
-
-    corpus = load_corpus()
-    familias = cargar_familias(corpus["tipo"].unique().tolist())
-    plantilla = muestrear_plantilla(corpus, familias, n_por_familia=args.n_por_familia, n_raros=args.n_raros,
-                                    n_sin_respuesta=args.n_sin_respuesta, semilla=args.semilla)
-    path = Path(args.salida)
-    if path.resolve() == config.CONSULTAS_PATH.resolve():
-        sys.exit("❌ La plantilla no puede sobrescribir el conjunto final; usa otra ruta de salida.")
-    guardar_consultas(plantilla, path)
-    dist = Counter((c.familia or "sin respuesta", c.particion) for c in plantilla)
-    _log(f"\nPlantilla con {len(plantilla)} elementos (borrador: true) en {path}")
-    _log(pd.Series(dist).unstack(fill_value=0).to_string())
-    _log("\nSiguiente paso: redacta/corrige cada 'consulta', pon borrador: false, guarda como "
-         f"{config.CONSULTAS_PATH.name} y corre `validar`.")
-
-
 def cmd_borradores(args) -> None:
     from ..datos.corpus import load_corpus
     from .anotacion import redactar_borradores
@@ -193,71 +166,17 @@ def cmd_borradores(args) -> None:
         _log(f"Regenerando {len(marcadas)} borradores marcados con ATENCIÓN o vacíos (prompt estricto)...")
         redactar_borradores(marcadas, textos, _llm(), intentos=5, estricto=True, log=_log)
     else:
-        if destino.exists() and not args.forzar:
-            sys.exit(f"❌ {destino} ya existe (puede tener consultas revisadas). Usa --forzar para sobrescribirlo.")
-        plantilla = cargar_consultas(Path(args.plantilla), permitir_vacias=True)
-        consultas = redactar_borradores(plantilla, textos, _llm(), n=args.n, log=_log)
+        sys.exit("❌ Indica --ampliar N o --solo-atencion.")
     guardar_consultas(consultas, destino)
     fugas = sum(1 for c in consultas if c.extra.get("fuga"))
     _log(f"\n{len(consultas)} borradores en {destino} (borrador: true, revisado: false); {fugas} aún marcados con "
          "ATENCIÓN. Revísalos y marca revisado: true; la partición de prueba se rechaza mientras haya sin revisar.")
 
 
-def cmd_hojas(args) -> None:
-    from ..clasificador import construir_clasificador
-    from ..vectorstore import SentenciasStore
-    from .anotacion import hoja_fichas, hoja_juicios, hoja_piloto
-    from .conjuntos import cargar_juicios, cargar_todas
-    from .experimentos import conceptos_de, leer_conceptos
-    from .familias import cargar_familias
-
-    destinos = [config.JUICIOS_PATH, config.FICHAS_ANOTADAS_PATH, config.PILOTO_JUICIOS_PATH]
-    for path in destinos:
-        if path.exists() and not args.forzar:
-            sys.exit(f"❌ {path} ya existe (puede tener anotaciones). Usa --forzar para sobrescribirlo.")
-    if any(len(cargar_juicios(p)) for p in destinos[:1]) and args.forzar:
-        sys.exit(f"❌ {config.JUICIOS_PATH.name} ya tiene juicios: no se sobrescribe ni con --forzar.")
-    store = SentenciasStore(log=lambda _m: None)
-    tipos = store.corpus["tipo"].unique().tolist()
-    clasificador = construir_clasificador(tipos)
-    consultas = cargar_todas(Path(args.consultas), permitir_vacias=True)
-    conceptos, _ = conceptos_de(consultas, leer_conceptos())
-    jz = hoja_juicios(store, clasificador, consultas, conceptos, n_consultas=args.n_consultas)
-    jz.to_csv(config.JUICIOS_PATH, index=False)
-    piloto = hoja_piloto(store, clasificador, consultas, conceptos, set(jz["consulta_id"]))
-    piloto.to_csv(config.PILOTO_JUICIOS_PATH, index=False)
-    fc = hoja_fichas(store.corpus, cargar_familias(tipos), n=args.n_fichas)
-    fc.to_csv(config.FICHAS_ANOTADAS_PATH, index=False)
-    _log(f"Piloto: {config.PILOTO_JUICIOS_PATH} ({piloto['consulta_id'].nunique()} consultas, {len(piloto)} pares, "
-         "dos anotadores)\n"
-         f"Hoja de juicios: {config.JUICIOS_PATH} ({jz['consulta_id'].nunique()} consultas, {len(jz)} pares)\n"
-         f"Hoja de fichas: {config.FICHAS_ANOTADAS_PATH} ({len(fc)} sentencias, "
-         f"{int(fc['ficha_app'].astype(bool).sum())} con la ficha precalculada que muestra la app). "
-         "Instrucciones en evaluacion/README.md.")
-
-
-def cmd_kappa_piloto(args) -> None:
-    from .anotacion import kappa_piloto
-    from .reporte import Corrida
-
-    if not config.PILOTO_JUICIOS_PATH.exists():
-        sys.exit(f"❌ No existe {config.PILOTO_JUICIOS_PATH}: corre `hojas-anotacion`.")
-    resumen, desacuerdos = kappa_piloto(pd.read_csv(config.PILOTO_JUICIOS_PATH, dtype=str).fillna(""))
-    if not resumen["pares"]:
-        sys.exit("❌ El piloto no tiene pares juzgados por los dos anotadores todavía.")
-    corrida = Corrida("kappa-piloto", parametros={"hoja": config.PILOTO_JUICIOS_PATH.name})
-    corrida.tabla("Acuerdo del piloto", "Kappa de Cohen entre los dos anotadores. Si el de 0/1/2 es menor a 0.6, se "
-                  "ajusta la guía (evaluacion/README.md) antes de los 300 juicios.", pd.DataFrame([resumen]))
-    corrida.tabla("Pares en desacuerdo", "Para discutir entre los anotadores y precisar la guía.", desacuerdos)
-    if resumen["kappa_0_1_2"] < 0.6:
-        corrida.advertir("Kappa < 0.6: ajusta la guía de anotación antes de los 300 juicios.")
-    _guardar(corrida)
-
-
 def cmd_validar(args) -> None:
     from ..datos.corpus import load_corpus
-    from .conjuntos import (ErrorValidacion, acuerdo_entre_anotadores, cargar_consultas, cargar_juicios,
-                            detalles_identificables, nombre_tipo_en_consulta, verificar_fuga)
+    from .conjuntos import (ErrorValidacion, cargar_consultas, detalles_identificables, nombre_tipo_en_consulta,
+                            verificar_fuga)
     from .familias import cargar_familias
 
     corpus = load_corpus()
@@ -281,19 +200,6 @@ def cmd_validar(args) -> None:
             _log(f"⚠️ {c.id} menciona literalmente el nombre del tipo ({c.tipo}); facilita la clasificación.")
         if detalles := detalles_identificables(c.consulta):
             _log(f"⚠️ {c.id} trae datos que identifican la sentencia ({', '.join(detalles[:3])}); quítalos.")
-    try:
-        juicios = cargar_juicios(config.JUICIOS_PATH, {c.id for c in consultas})
-    except ErrorValidacion as e:
-        sys.exit(f"❌ {e}")
-    if len(juicios):
-        _log(f"✅ {len(juicios)} juicios de relevancia de {juicios['anotador'].nunique()} anotador(es).")
-        acuerdo = acuerdo_entre_anotadores(juicios)
-        if acuerdo:
-            _log(f"   Acuerdo {acuerdo['anotadores']}: kappa = {acuerdo['kappa_0_1_2']:.3f} (0/1/2), "
-                 f"{acuerdo['kappa_binario']:.3f} (binario) en {acuerdo['pares']} pares"
-                 + ("  ⚠️ < 0.6: revisa la guía de anotación" if acuerdo["kappa_0_1_2"] < 0.6 else ""))
-    else:
-        _log("ℹ️ Sin juicios de relevancia todavía (juicios.csv).")
     if fugas:
         sys.exit(1)
 
@@ -372,31 +278,6 @@ def cmd_qc(args) -> None:
     _guardar(experimento_qc(env, _llm(), variantes, log=_log))
 
 
-def cmd_generacion(args) -> None:
-    from ..datos.corpus import load_corpus
-    from .conjuntos import cargar_fichas_anotadas
-    from .experimentos import experimento_generacion
-    from .reporte import Corrida
-
-    fichas = cargar_fichas_anotadas()
-    if not fichas:
-        sys.exit(f"❌ No hay fichas anotadas en {config.FICHAS_ANOTADAS_PATH} (ver evaluacion/README.md).")
-    corrida = Corrida("generacion")
-    # La hoja de fichas no se divide en particiones: toda corrida contra ella es evaluación final.
-    _control(corrida, "prueba", "generacion", args.forzar)
-    corrida, muestra, generadas = experimento_generacion(fichas, load_corpus(), _llm(), corrida,
-                                                         version_prompt=args.prompt_penal,
-                                                         n_afirmaciones=args.n_afirmaciones, log=_log)
-    pj, _ = corrida.guardar()
-    base = pj.with_suffix("")
-    muestra.to_csv(f"{base}_afirmaciones.csv", index=False)
-    with open(f"{base}_fichas.jsonl", "w", encoding="utf-8") as f:
-        for g in generadas:
-            f.write(json.dumps(g, ensure_ascii=False) + "\n")
-    print(corrida.markdown())
-    _log(f"\nResultados: {pj}\nAfirmaciones para marcar alucinaciones: {base}_afirmaciones.csv")
-
-
 def cmd_fichas_batch(args) -> None:
     from ..datos.corpus import load_corpus
     from ..fichas_precalculadas import actualizar_verificaciones, cargar, generar_todas, version_ficha
@@ -457,28 +338,11 @@ def cmd_latencia(args) -> None:
 def cmd_modelos(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
-    from .conjuntos import cargar_fichas_anotadas
     from .modelos import comparar
-    from .reporte import Corrida
 
-    anotadas = cargar_fichas_anotadas()
-    previo = Corrida("modelos")
-    # con el conjunto C anotado, la comparación toca la hoja de evaluación final: una vez por congelado
-    _control(previo, "prueba" if anotadas else None, "modelos", args.forzar)
     store = SentenciasStore(log=lambda _m: None)
     clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
-    corrida = comparar(store, clas, args.modelos or config.MODELOS_COMPARACION, args.max, args.fichas, anotadas,
-                       log=_log)
-    corrida.advertencias[:0] = previo.advertencias
-    corrida.extra.update(previo.extra)
-    _guardar(corrida)
-
-
-def cmd_modelos_tareas(args) -> None:
-    from .modelos import comparar_tareas
-
-    env = _entorno(args, "modelos-tareas", "desarrollo")
-    _guardar(comparar_tareas(env, args.modelos or config.MODELOS_COMPARACION, args.fichas, args.pares, log=_log))
+    _guardar(comparar(store, clas, args.modelos or config.MODELOS_COMPARACION, args.max, args.fichas, log=_log))
 
 
 def cmd_robustez(args) -> None:
@@ -490,28 +354,6 @@ def cmd_robustez(args) -> None:
     clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
     # sin la caché de respuestas del LLM: guardaría en disco los prompts con los datos personales inventados
     _guardar(correr(store, clas, _llm(con_cache=False), log=_log))
-
-
-def cmd_estudio(args) -> None:
-    from . import estudio as E
-
-    if args.plantilla:
-        if E.REGISTRO_PATH.exists() and len(E.leer_registro()):
-            sys.exit(f"❌ {E.REGISTRO_PATH} ya tiene registros llenos; no se sobrescribe.")
-        E.ESTUDIO_DIR.mkdir(parents=True, exist_ok=True)
-        casos = E.leer_casos() or E.casos_desde_ejemplos()
-        if not E.CASOS_PATH.exists():
-            E.CASOS_PATH.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in casos), encoding="utf-8")
-        E.asignacion(args.plantilla, [c["id"] for c in casos]).to_csv(E.REGISTRO_PATH, index=False)
-        _log(f"{len(casos)} casos en {E.CASOS_PATH} y asignación de {args.plantilla} participantes en {E.REGISTRO_PATH}.")
-        return
-    try:
-        df = E.leer_registro()
-    except (FileNotFoundError, ValueError) as e:
-        sys.exit(f"❌ {e}")
-    if df.empty:
-        sys.exit(f"❌ {E.REGISTRO_PATH} no tiene registros con minutos todavía (ver {E.ESTUDIO_DIR / 'README.md'}).")
-    _guardar(E.resumir(df, E.leer_casos()))
 
 
 def cmd_jueces(args) -> None:
@@ -570,34 +412,13 @@ def main(argv=None) -> None:
     s.add_argument("--coherencia", action="store_true", help="Comprueba la agrupación con embeddings (sin LLM)")
     s.set_defaults(func=cmd_familias)
 
-    s = sub.add_parser("plantilla", help="Borrador estratificado de consultas a redactar")
-    s.add_argument("--n-por-familia", type=int, default=5,
-                   help="Sentencias por familia con >= 10 sentencias (5 x 20 familias + 20 raros = 120)")
-    s.add_argument("--n-raros", type=int, default=20)
-    s.add_argument("--n-sin-respuesta", type=int, default=10)
-    s.add_argument("--semilla", type=int, default=config.EVAL_SEED)
-    s.add_argument("--salida", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
-    s.set_defaults(func=cmd_plantilla)
-
     s = sub.add_parser("borradores", help="Borradores de consultas con el LLM (verificador de fuga incluido)")
-    s.add_argument("--n", type=int, default=None, help="Entradas de la plantilla a redactar (todas por defecto)")
-    s.add_argument("--plantilla", default=str(config.EVAL_DIR / "consultas_penal_borrador.jsonl"))
-    s.add_argument("--forzar", action="store_true")
     s.add_argument("--ampliar", type=int, metavar="N", help="Agrega consultas hasta N por familia (mitad por partición)")
     s.add_argument("--solo-atencion", action="store_true",
                    help="Regenera solo los marcados con ATENCIÓN (o que no son una consulta), con el prompt estricto")
     s.set_defaults(func=cmd_borradores)
 
-    s = sub.add_parser("hojas-anotacion", help="Hojas CSV para el abogado (juicios y fichas)")
-    s.add_argument("--n-consultas", type=int, default=30)
-    s.add_argument("--n-fichas", type=int, default=40)
-    s.add_argument("--forzar", action="store_true")
-    s.set_defaults(func=cmd_hojas)
-
-    s = sub.add_parser("kappa-piloto", help="Acuerdo entre los dos anotadores del piloto y pares en desacuerdo")
-    s.set_defaults(func=cmd_kappa_piloto)
-
-    s = sub.add_parser("validar", help="Valida consultas/juicios y detecta fuga")
+    s = sub.add_parser("validar", help="Valida las consultas y detecta fuga")
     s.add_argument("--permitir-vacias", action="store_true", help="Acepta consultas aún sin redactar")
     s.set_defaults(func=cmd_validar)
 
@@ -607,7 +428,7 @@ def main(argv=None) -> None:
 
     for nombre, func, ayuda in (("recuperacion", cmd_recuperacion, "Experimentos de recuperación y clasificación"),
                                 ("ablacion", cmd_ablacion, "Ablación del clasificador"),
-                                ("qc", cmd_qc, "Controles de calidad vs. juicio humano"),
+                                ("qc", cmd_qc, "QC_1 contra la referencia automática"),
                                 ("latencia", cmd_latencia, "Latencia de punta a punta"),
                                 ("esfuerzo", cmd_esfuerzo, "Sentencias que hay que abrir para encontrar 3 útiles")):
         s = sub.add_parser(nombre, help=ayuda)
@@ -641,32 +462,14 @@ def main(argv=None) -> None:
     s.add_argument("--recalcular-conceptos", action="store_true", help="Precalcula los conceptos con el LLM")
     s.set_defaults(func=cmd_regresion)
 
-    s = sub.add_parser("generacion", help="Fichas del conjunto C vs. anotación")
-    s.add_argument("--prompt-penal", choices=["v10", "v11"], default=None)
-    s.add_argument("--n-afirmaciones", type=int, default=100)
-    s.add_argument("--forzar", metavar="MOTIVO", help="Repite la corrida (es evaluación final; queda en el reporte)")
-    s.set_defaults(func=cmd_generacion)
-
     s = sub.add_parser("modelos", help="Compara los modelos de Ollama ya instalados (no descarga ninguno)")
     s.add_argument("--max", type=int, default=10, help="Ejemplos penales para la latencia")
     s.add_argument("--fichas", type=int, default=20, help="Sentencias penales (las mismas para cada modelo)")
     s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
-    s.add_argument("--forzar", metavar="MOTIVO", help="Repite la comparación contra el conjunto C anotado")
     s.set_defaults(func=cmd_modelos)
-
-    s = sub.add_parser("modelos-tareas", help="Qué modelo rinde mejor en cada tarea, contra la referencia automática "
-                       "(partición de desarrollo)")
-    s.add_argument("--fichas", type=int, default=150, help="Sentencias de desarrollo (las mismas para cada modelo)")
-    s.add_argument("--pares", type=int, default=600, help="Pares para QC_1 (los mismos para cada modelo)")
-    s.add_argument("--modelos", nargs="+", help="Lista de modelos (por defecto config.MODELOS_COMPARACION)")
-    s.set_defaults(func=cmd_modelos_tareas)
 
     s = sub.add_parser("robustez", help="Consultas difíciles con el LLM real (diagnóstico)")
     s.set_defaults(func=cmd_robustez)
-
-    s = sub.add_parser("estudio", help="Estudio de uso: resumen manual vs. app")
-    s.add_argument("--plantilla", type=int, metavar="N", help="Crea casos.jsonl y registro.csv para N participantes")
-    s.set_defaults(func=cmd_estudio)
 
     s = sub.add_parser("errores", help="Análisis de errores de corridas guardadas (sin LLM)")
     s.add_argument("--corrida", nargs="+", required=True, help="Nombre de la corrida en evaluacion/resultados/")

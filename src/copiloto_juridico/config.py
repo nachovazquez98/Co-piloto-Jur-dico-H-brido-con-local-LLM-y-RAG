@@ -41,12 +41,8 @@ CHROMA_DIR = Path(_env("COPILOTO_CHROMA_DIR", str(DATA_DIR / "chroma")))       #
 
 # --- Evaluación (v11) ---
 EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))
-FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito (lo revisa un abogado)
-CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Consultas derivadas de sentencias (borradores revisados)
-CONSULTAS_REALES_PATH = EVAL_DIR / "consultas_reales.jsonl"  # Escritas por abogados sin ver sentencias
-PILOTO_JUICIOS_PATH = EVAL_DIR / "piloto_juicios.csv"       # Piloto de anotación: 10 consultas x 5, dos anotadores
-JUICIOS_PATH = EVAL_DIR / "anotacion_juicios.csv"           # Hoja de juicios de relevancia 0/1/2 (la llena el abogado)
-FICHAS_ANOTADAS_PATH = EVAL_DIR / "anotacion_fichas.csv"    # Hoja del conjunto C (la llena el abogado)
+FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito
+CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Consultas redactadas a partir de sentencias
 CONCEPTOS_CACHE_PATH = EVAL_DIR / "cache" / "conceptos.json"
 RESULTADOS_DIR = EVAL_DIR / "resultados"
 EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
@@ -57,7 +53,6 @@ MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
 # texto de la sentencia (reglas) y dos jueces LLM distintos del modelo de la app (`evaluacion jueces`). Corren uno a
 # la vez (8 GB de VRAM). Un juez se usa solo si acierta la familia del delito de la categoría del STJ al menos en
 # JUEZ_EXACTITUD_MINIMA de las sentencias: criterio fijado ANTES de correrlos, no ajustado a los resultados.
-EVALUACION_AUTOMATICA = _env("COPILOTO_EVALUACION_AUTOMATICA", True)
 # Dos familias de modelos distintas a la de la app (Meta), que caben enteros en 8 GB. En una prueba piloto sobre 60
 # sentencias, qwen2.5:7b no alcanzó el mínimo y se descartó. qwen2.5:14b sí lo alcanzaba, pero no cabe en la GPU
 # (~11 GB entre GPU y RAM) y la laptop no lo sostiene en tandas largas: se sustituyó por mistral:7b (piloto: 48/60 =

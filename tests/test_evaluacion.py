@@ -66,21 +66,6 @@ def _corpus():
     return pd.DataFrame(filas)
 
 
-def test_plantilla_estratificada_y_reproducible():
-    corpus = _corpus()
-    familias = fam.cargar_familias(corpus["tipo"].unique().tolist(), path=fam.config.ROOT_DIR / "no-existe.csv")
-    a = cj.muestrear_plantilla(corpus, familias, n_por_familia=4, n_raros=2, n_sin_respuesta=2, semilla=1)
-    b = cj.muestrear_plantilla(corpus, familias, n_por_familia=4, n_raros=2, n_sin_respuesta=2, semilla=1)
-    assert [c.doc_id_fuente for c in a] == [c.doc_id_fuente for c in b]
-    conocidas = [c for c in a if c.doc_id_fuente]
-    assert all(c.borrador and c.consulta == "" for c in a)
-    assert len({c.doc_id_fuente for c in conocidas}) == len(conocidas)        # sin repetidos
-    robo = [c for c in conocidas if c.familia == "robo" and c.extra["origen_muestra"] == "A"]
-    assert len(robo) == 4 and {c.tipo for c in robo} == {"penal/robo-calificado", "penal/robo-simple"}
-    assert {c.particion for c in robo} == {"desarrollo", "prueba"}
-    assert sum(c.sin_respuesta for c in a) == 2
-
-
 def test_validacion_lista_todos_los_problemas(tmp_path):
     corpus = _corpus()
     path = tmp_path / "c.jsonl"
@@ -109,13 +94,11 @@ def _escribir(tmp_path, filas):
     return p
 
 
-def test_juicios_y_acuerdo(tmp_path):
+def test_juicios_se_validan(tmp_path):
     p = tmp_path / "j.csv"
     p.write_text("consulta_id,doc_id,relevancia,anotador\nB1,d1,2,ana\nB1,d2,0,ana\nB1,d1,2,luis\nB1,d2,1,luis\n")
     j = cj.cargar_juicios(p, {"B1"})
     assert cj.relevancia_por_par(j, "ana") == {"B1": {"d1": 2, "d2": 0}}
-    ac = cj.acuerdo_entre_anotadores(j)
-    assert ac["pares"] == 2 and ac["kappa_binario"] == 0.0
     p.write_text("consulta_id,doc_id,relevancia,anotador\nB1,d1,3,ana\n")
     with pytest.raises(cj.ErrorValidacion):
         cj.cargar_juicios(p)
@@ -162,15 +145,6 @@ def test_sentido_y_coincidencias():
     assert coincide_texto("Robo calificado, art. 236", "robo calificado")
     assert not coincide_texto("Fraude", "robo calificado")
     assert f1_conjuntos({"1", "2"}, {"2", "3"})["f1"] == 0.5
-
-
-def test_comparar_ficha_detecta_articulo_inexistente():
-    r = ex.comparar_ficha(FICHA, {"doc_id": "d", "sentido_fallo": "confirma", "etapa": "vinculación a proceso",
-                                  "delito": "robo calificado", "articulos": ["233", "236"]},
-                          texto_sentencia="... articulo 233 y articulo 236 del codigo penal ...")
-    assert r["sentido_ok"] and r["etapa_ok"] and r["delito_ok"]
-    assert r["articulos_recall"] == 1.0 and r["articulos_precision"] == pytest.approx(2 / 5)
-    assert "316" in r["articulos_inexistentes"]
 
 
 # --- Experimentos (funciones puras) ---------------------------------------------------------------------------
@@ -395,28 +369,6 @@ def test_borradores_reintentan_si_copian_y_quedan_sin_revisar():
     for c in out:
         c.revisado = True
     cj.exigir_revisadas(out)
-
-
-def test_hojas_de_anotacion_csv(tmp_path):
-    from copiloto_juridico.evaluacion.anotacion import hoja_fichas, resumen_sentencia
-
-    r = resumen_sentencia("vistos para resolver el toca ... " * 20 + " r e s u e l v e primera. se confirma el auto",
-                          "penal/robo-calificado", "2025-01-01")
-    assert r.count("\n") == 2 and "PENAL · robo calificado" in r and "se confirma" in r
-    corpus = _corpus()
-    familias = {t: fam.asignar_familia(t).familia for t in corpus["tipo"].unique()}
-    fc = hoja_fichas(corpus, familias, n=6)
-    assert len(fc) == 6 and set(fc["familia"]) == {"robo", "fraude-y-abuso-de-confianza", "lesiones"}
-    # El abogado llena dos filas; el cargador lee solo esas
-    fc.loc[0, ["sentido_fallo", "articulos", "ficha_aceptable"]] = ["CONFIRMA", "233; 236", "sí"]
-    fc.loc[1, "sentido_fallo"] = "REVOCA"
-    fc.to_csv(tmp_path / "f.csv", index=False)
-    fichas = cj.cargar_fichas_anotadas(tmp_path / "f.csv")
-    assert len(fichas) == 2 and fichas[0]["articulos"] == ["233", "236"] and fichas[0]["ficha_aceptable"] is True
-    p = tmp_path / "j.csv"
-    p.write_text("consulta_id,consulta,doc_id,resumen,relevancia,anotador\nB1,c,d1,r,2,\nB1,c,d2,r,,\n")
-    j = cj.cargar_juicios(p)
-    assert len(j) == 1 and j.iloc[0]["anotador"] == "anotador1"
 
 
 def test_resultado_para_defensa():

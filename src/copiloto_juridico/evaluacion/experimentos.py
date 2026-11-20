@@ -31,7 +31,6 @@ import pandas as pd
 
 from .. import config, prompts
 from ..clasificador import COMPONENTES, PENALIZACIONES, PesosClasificador, puntuar
-from ..fichas import coincide_texto, datos_penales, extraer_articulos, f1_conjuntos, normalizar_sentido
 from . import metricas as m
 from .conjuntos import Consulta
 from .reporte import Corrida
@@ -381,7 +380,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(vacias)} consultas sin redactar se omiten: {', '.join(vacias[:10])}"
                          f"{'...' if len(vacias) > 10 else ''}")
     consultas = [c for c in todas if c.consulta.strip() and (particion in (None, "todas") or c.particion == particion)]
-    validadas = leer_validadas() if config.EVALUACION_AUTOMATICA else None
+    validadas = leer_validadas()
     if validadas is not None:
         # v11.2: sin revisión humana, solo cuentan las consultas que pasaron la validación automática (`referencias`)
         descartadas = [c.id for c in consultas if not validadas.get(c.id, False)]
@@ -403,15 +402,11 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
         corrida.advertir(f"{len(fugas)} consultas comparten más de 6 palabras seguidas con su sentencia fuente "
                          f"(fuga): {', '.join(sorted(fugas)[:10])}. Corre `validar` para verlas.")
     ids = {c.id for c in todas}
-    fuente = "juicio humano"
-    if config.EVALUACION_AUTOMATICA and JUICIOS_AUTO_PATH.exists():
-        # v11.2: sin anotadores humanos, la relevancia es la mediana de las reglas y los jueces LLM (`referencias`)
-        tabla_juicios = cargar_juicios(JUICIOS_AUTO_PATH, ids)
-        tabla_juicios = tabla_juicios[tabla_juicios["anotador"] == CONSENSO]
-        fuente = ("referencia automática (mismo delito por la categoría del STJ; mismo problema procesal por mayoría "
-                  "de reglas y jueces LLM)")
-    else:
-        tabla_juicios = cargar_juicios(config.JUICIOS_PATH, ids)
+    # Sin anotadores humanos, la relevancia es la referencia automática (`referencias`)
+    tabla_juicios = cargar_juicios(JUICIOS_AUTO_PATH, ids)
+    tabla_juicios = tabla_juicios[tabla_juicios["anotador"] == CONSENSO]
+    fuente = ("referencia automática (mismo delito por la categoría del STJ; mismo problema procesal por mayoría "
+              "de las reglas y el juez LLM)")
     juicios = relevancia_por_par(tabla_juicios)
     conceptos, faltan = conceptos_de(consultas, leer_conceptos())
     if faltan:
@@ -615,12 +610,9 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
         fila.update(_fila_promedio("nDCG@5 (metadatos)", [f["ndcg5_meta"] for f in doc]))
         fila["P@5 mismo tipo"] = float(np.mean([f["p5_meta"] for f in doc])) if doc else float("nan")
         tabla_doc.append(fila)
-        origen = {p.consulta.id: p.consulta.origen for p in preparadas}
-        for subconjunto in ("derivadas", "reales"):
-            jz = [f for f in filas if "ndcg5" in f and origen[f["id"]] == subconjunto[:-1]]
-            if not jz:
-                continue
-            fj = {"variante": nombre, "consultas": subconjunto, "n": len(jz)}
+        jz = [f for f in filas if "ndcg5" in f]
+        if jz:
+            fj = {"variante": nombre, "n": len(jz)}
             fj.update(_fila_promedio("nDCG@5", [f["ndcg5"] for f in jz]))
             fj.update(_fila_promedio("P@5", [f["p5"] for f in jz]))
             fj["cobertura juicios top-5"] = float(np.mean([f["cobertura"] for f in jz]))
@@ -637,14 +629,13 @@ def experimento_recuperacion(env: Entorno, log: Callable[[str], None] = print) -
     if tabla_juicios:
         corrida.tabla("Relevancia juzgada",
                       f"Referencia: {env.fuente_juicios}. "
-                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios; los no juzgados cuentan 0. Por "
-                      "separado: consultas derivadas de sentencias y consultas reales de abogados (la diferencia "
-                      "estima el sesgo de las derivadas). P@5 por "
-                      "faceta: fracción del top 5 marcada con el mismo delito o el mismo problema "
-                      "procesal (columnas opcionales de la hoja).",
+                      "nDCG@5 y P@5 (relevante = 1 o 2) con los juicios; los no juzgados cuentan 0. Las "
+                      "consultas se redactaron a partir de sentencias: comparten vocabulario con ellas, lo que "
+                      "favorece la búsqueda. P@5 por faceta: fracción del top 5 con el mismo delito o el mismo "
+                      "problema procesal.",
                       pd.DataFrame(tabla_juicios))
     else:
-        corrida.advertir("Sin juicios de relevancia anotados: nDCG@5 y P@5 humanos quedan por medir.")
+        corrida.advertir("Sin juicios de relevancia (`referencias`): nDCG@5 y P@5 quedan por medir.")
 
     # --- Comparaciones pareadas clave ---
     comparaciones = []
@@ -905,10 +896,10 @@ def _filas_qc(nombre: str, r: dict, recall_aciertos: int, n_relevantes: int) -> 
 
 def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fragmento_similar"),
                    log: Callable[[str], None] = print) -> Corrida:
-    """QC_1 sobre los pares de juicios.csv (relevante = relevancia ≥ 1) y QC_2 sobre las fichas anotadas."""
+    """QC_1 sobre los pares con referencia (relevante = relevancia ≥ 1). QC_2 es determinista y no se mide aquí:
+    lo que decide (la familia del delito de la ficha) lo mide `fichas-referencia`."""
     from ..embeddings import embed_query
     from ..pipeline import parse_veredicto
-    from .conjuntos import cargar_fichas_anotadas
 
     corrida = env.corrida
     consultas = {c.id: c for c in env.consultas}
@@ -916,7 +907,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
              if d in env.store.corpus.index]
     corrida.parametros.update(variantes=list(variantes), prompt_qc1=config.PROMPT_QC1_VERSION)
     if not pares:
-        corrida.advertir("No hay pares juzgados (juicios.csv) para las consultas de esta partición: QC_1 por medir.")
+        corrida.advertir("No hay pares con referencia (`referencias`) para las consultas de esta partición: QC_1 por medir.")
     else:
         embs: dict[str, np.ndarray] = {}
         filas, detalle = [], []
@@ -949,41 +940,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
             pd.DataFrame(filas))
         corrida.tabla("Veredictos de QC_1 por par", "Lo usa el comando `errores` (descartes de pares relevantes).",
                       pd.DataFrame(detalle), diagnostico=True)
-
-    fichas = [f for f in cargar_fichas_anotadas() if f.get("consulta_id") in consultas and "ficha_aceptable" in f]
-    if not fichas:
-        corrida.advertir("No hay fichas anotadas con consulta_id y ficha_aceptable: QC_2 por medir.")
-        return corrida
-    log(f"QC_2 ({config.QC2_MODO}) sobre {len(fichas)} fichas anotadas...")
-    humano, sistema = [], []
-    for f in fichas:
-        humano.append(bool(f["ficha_aceptable"]))
-        sistema.append(_qc2_como_la_app(env, consultas[f["consulta_id"]], f["doc_id"], llm))
-    r = resumen_binario(humano, sistema)
-    corrida.tabla("QC_2 contra el juicio humano",
-                  f"QC_2 {config.QC2_MODO} (el de la app) sobre la ficha que muestra la app. Positivo = QC_2 acepta "
-                  "la ficha; verdad = el anotador la marcó como aceptable.",
-                  pd.DataFrame([_filas_qc("QC_2", r, r["VP"], r["VP"] + r["FN"])]))
     return corrida
-
-
-def _qc2_como_la_app(env: Entorno, consulta: Consulta, doc_id: str, llm) -> bool | None:
-    """Veredicto de QC_2 para (consulta, sentencia) con el mismo control y la misma ficha que la app."""
-    from ..embeddings import embed_query
-    from ..pipeline import Precedente, buscar_candidatos, parse_veredicto, qc2_determinista
-    from ..vectorstore import Candidato
-
-    row = env.store.corpus.loc[doc_id]
-    g = generar_ficha(row["texto"], llm, doc_id=doc_id)
-    if config.QC2_MODO == "llm":
-        return parse_veredicto(llm.generate(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
-            texto_consulta=consulta.consulta, informe_generado=g["informe"])))
-    b = buscar_candidatos(env.store, env.clasificador, consulta.consulta, env.conceptos.get(consulta.id, consulta.consulta),
-                          embed_query(consulta.consulta), config.RAG_NUM_RESULTS_DESIRED)
-    tipos = [t for c in b.categorias for t in env.clasificador.tipos_de(c)]
-    cand = Candidato(doc_id, row["materia"], row["delito_o_accion"], row["tipo"], row["fecha"], 0.0, 0.0, row["texto"])
-    prec = Precedente(0, cand, "", g["informe"], g["extraccion"], False, ficha=g["ficha"])
-    return qc2_determinista(prec, {env.familias.get(t, t) for t in tipos})[0]
 
 
 def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callable[[str], None] = print) -> Corrida:
@@ -1039,112 +996,6 @@ def experimento_qc_diagnostico(store, clasificador, llm, k: int = 5, log: Callab
 # --------------------------------------------------------------------------------------------------------------
 # Generación de fichas (LLM)
 # --------------------------------------------------------------------------------------------------------------
-
-
-def generar_ficha(texto: str, llm, version_prompt: str | None = None, doc_id: str | None = None) -> dict:
-    """La ficha de una sentencia como la produce la app (paso 4, sin QC): con FICHA_MODO "json", la precalculada si
-    está vigente o una llamada JSON (con reintento); si falla, o si se pide una versión de prompt penal concreta
-    (comparación v10/v11), la extracción + informe en dos llamadas."""
-    from ..fichas import generar_ficha_json, verificaciones
-    from ..fichas_precalculadas import ficha_guardada
-    from ..pipeline import recortar_contexto
-
-    contexto = recortar_contexto(texto, llm.settings.max_context_chars)
-    base = {"chars_leidos": len(contexto), "chars_total": len(texto)}
-    if version_prompt is None and config.FICHA_MODO == "json":
-        ficha = ficha_guardada(doc_id, texto, llm.settings) if doc_id and config.FICHAS_PRECALCULADAS else None
-        origen = "precalculada"
-        if ficha is None:
-            ficha, _ = generar_ficha_json(llm.generate, contexto)
-            origen = "generada"
-        if ficha is not None:
-            v = verificaciones(ficha.campos_markdown(), texto)
-            return {**base, "extraccion": ficha.campos_markdown(), "origen": origen, "ficha": ficha,
-                    "informe": ficha.informe_markdown(v["articulos_no_encontrados"], v["sentido_reglas"])}
-    p_ext, p_rep = prompts.prompts_penal(version_prompt)
-    extraccion = llm.generate(p_ext.format(contexto=contexto))
-    informe = llm.generate(p_rep.format(hechos=extraccion))
-    return {**base, "extraccion": extraccion, "informe": informe, "origen": "dos llamadas", "ficha": None}
-
-
-def comparar_ficha(extraccion: str, anotada: dict, texto_sentencia: str) -> dict:
-    """Compara una ficha generada con su anotación: exactitud por campo, F1 de artículos y precisión de
-    artículos contra el texto de la sentencia (automática: un artículo que no aparece en la sentencia es una
-    alucinación segura; uno que sí aparece puede seguir siendo el equivocado)."""
-    datos = datos_penales(extraccion)
-    # Toda la ficha: los artículos también aparecen en "Delito(s)" ("art. 233 en relación con el 236").
-    arts_ficha = extraer_articulos(extraccion)
-    arts_texto = extraer_articulos(texto_sentencia)
-    out = {"doc_id": anotada["doc_id"],
-           "sentido_generado": datos["sentido_fallo"], "sentido_anotado": normalizar_sentido(anotada.get("sentido_fallo")),
-           "etapa_generada": datos["etapa"], "etapa_anotada": anotada.get("etapa"),
-           "delito_generado": datos["delito"], "delito_anotado": anotada.get("delito"),
-           "articulos_ficha": sorted(arts_ficha), "articulos_anotados": sorted(extraer_articulos(
-               " ".join(f"art. {a}" for a in anotada.get("articulos", []))))}
-    out["sentido_ok"] = out["sentido_generado"] == out["sentido_anotado"] if out["sentido_anotado"] else None
-    out["etapa_ok"] = coincide_texto(datos["etapa"], anotada.get("etapa")) if anotada.get("etapa") else None
-    out["delito_ok"] = coincide_texto(datos["delito"], anotada.get("delito")) if anotada.get("delito") else None
-    if anotada.get("articulos") is not None:
-        out.update({f"articulos_{k}": v for k, v in f1_conjuntos(arts_ficha, set(out["articulos_anotados"])).items()})
-    out["articulos_en_texto"] = (len(arts_ficha & arts_texto) / len(arts_ficha)) if arts_ficha else None
-    out["articulos_inexistentes"] = sorted(arts_ficha - arts_texto)
-    return out
-
-
-def afirmaciones(doc_id: str, informe: str) -> list[dict]:
-    """Divide una ficha en afirmaciones revisables (viñetas y oraciones) para la revisión de alucinaciones."""
-    out = []
-    for linea in informe.splitlines():
-        t = linea.strip().lstrip("-*• ").strip()
-        if len(t) < 25 or t.startswith("#"):
-            continue
-        for oracion in [o.strip() for o in t.split(". ") if len(o.strip()) >= 25]:
-            out.append({"doc_id": doc_id, "afirmacion": oracion, "alucinacion (0/1)": "", "comentario": ""})
-    return out
-
-
-def experimento_generacion(fichas_anotadas: list[dict], corpus: pd.DataFrame, llm, corrida: Corrida,
-                           version_prompt: str | None = None, n_afirmaciones: int = 100,
-                           log: Callable[[str], None] = print) -> tuple[Corrida, pd.DataFrame, list[dict]]:
-    """Genera las fichas del conjunto C, las compara campo por campo y prepara la muestra de afirmaciones."""
-    corrida.parametros.update(ficha=f"dos llamadas, prompt {version_prompt}" if version_prompt else
-                              f"{config.FICHA_MODO} (precalculada si está vigente)", n_afirmaciones=n_afirmaciones)
-    textos = corpus.set_index("id")["texto"]
-    filas, generadas, todas_af = [], [], []
-    for i, f in enumerate(fichas_anotadas, 1):
-        if f["doc_id"] not in textos.index:
-            corrida.advertir(f"{f['doc_id']} no está en el corpus; se omite.")
-            continue
-        log(f"   [{i}/{len(fichas_anotadas)}] {f['doc_id']}")
-        g = generar_ficha(textos[f["doc_id"]], llm, version_prompt, doc_id=f["doc_id"])
-        generadas.append({"doc_id": f["doc_id"], **{k: v for k, v in g.items() if k != "ficha"}})
-        filas.append(comparar_ficha(g["extraccion"], f, textos[f["doc_id"]]))
-        todas_af += afirmaciones(f["doc_id"], g["informe"])
-    df = pd.DataFrame(filas)
-    corrida.extra["origen_fichas"] = dict(Counter(g["origen"] for g in generadas))
-    resumen = []
-    for col, nombre in (("sentido_ok", "Sentido del fallo"), ("etapa_ok", "Etapa procesal"), ("delito_ok", "Delito")):
-        vals = [float(v) for v in df.get(col, pd.Series(dtype=object)).dropna()] if len(df) else []
-        resumen.append({"campo": nombre, **_fila_proporcion("exactitud", vals)})
-    for col, nombre in (("articulos_f1", "Artículos citados (F1 vs. anotación)"),
-                        ("articulos_en_texto", "Artículos de la ficha presentes en la sentencia")):
-        vals = [float(v) for v in df.get(col, pd.Series(dtype=object)).dropna()] if len(df) else []
-        resumen.append({"campo": nombre, **_fila_promedio("exactitud", vals)})
-    corrida.tabla("Calidad de la ficha por campo",
-                  "Exactitud = coincide con la anotación humana (sentido: valor cerrado; etapa y delito: igual o "
-                  "contenido tras normalizar). Artículos: F1 entre conjuntos de números. 'Presentes en la sentencia' "
-                  "es automática: un artículo ausente del texto es una alucinación segura.", pd.DataFrame(resumen))
-    if len(df):
-        detalle = df.copy()
-        for col in ("articulos_ficha", "articulos_anotados", "articulos_inexistentes"):
-            if col in detalle:
-                detalle[col] = detalle[col].map(lambda v: ", ".join(v) if isinstance(v, list) else v)
-        corrida.tabla("Detalle por sentencia", "Valores generados vs. anotados.", detalle)
-    rng = np.random.default_rng(config.EVAL_SEED)
-    muestra = [todas_af[i] for i in sorted(rng.choice(len(todas_af), size=min(n_afirmaciones, len(todas_af)),
-                                                      replace=False))] if todas_af else []
-    corrida.advertir("Tasa de alucinación por medir: marca la columna 'alucinacion (0/1)' del CSV de afirmaciones.")
-    return corrida, pd.DataFrame(muestra), generadas
 
 
 # --------------------------------------------------------------------------------------------------------------

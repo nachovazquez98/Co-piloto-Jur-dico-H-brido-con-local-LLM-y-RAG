@@ -216,14 +216,16 @@ def casos_de_ejemplos(rec: Reconstructor, k: int, qc1: dict[str, dict[str, str]]
 
 
 def _consultas_de(corrida: dict, rec: Reconstructor):
-    from .conjuntos import cargar_todas, relevancia_por_par, cargar_juicios
+    from .conjuntos import cargar_juicios, cargar_todas, relevancia_por_par
     from .experimentos import conceptos_de, leer_conceptos
+    from .referencias import CONSENSO, JUICIOS_AUTO_PATH
 
     particion = corrida.get("parametros", {}).get("particion")
     todas = cargar_todas(config.CONSULTAS_PATH, corpus=rec.store.corpus, familias=rec.familias, permitir_vacias=True)
     consultas = [c for c in todas if c.consulta.strip() and (particion in (None, "todas") or c.particion == particion)]
     conceptos, _ = conceptos_de(consultas, leer_conceptos())
-    juicios = relevancia_por_par(cargar_juicios(config.JUICIOS_PATH, {c.id for c in todas}))
+    tabla = cargar_juicios(JUICIOS_AUTO_PATH, {c.id for c in todas})
+    juicios = relevancia_por_par(tabla[tabla["anotador"] == CONSENSO])
     return consultas, conceptos, juicios
 
 
@@ -289,29 +291,27 @@ def analizar(ident: str, store, clasificador) -> tuple[str, dict, list[Caso], li
             casos.append(caso)
         if comando == "qc":
             casos = [c for c in casos if c.marca_corrida]
-    elif comando == "generacion":
+    elif comando == "fichas-referencia":
         casos = []
-        for f in filas(corrida, "Detalle por sentencia"):
+        for f in filas(corrida, "Fichas que no coinciden"):
             motivos = [m for m, mal in (
-                (f"sentido: ficha {f.get('sentido_generado')}, anotado {f.get('sentido_anotado')}", f.get("sentido_ok") is False),
-                (f"delito: ficha «{f.get('delito_generado')}», anotado «{f.get('delito_anotado')}»", f.get("delito_ok") is False),
-                (f"artículos que no están en la sentencia: {f.get('articulos_inexistentes')}", bool(f.get("articulos_inexistentes"))),
+                (f"sentido: ficha {f.get('sentido_ficha')}, referencia {f.get('sentido_ref')}",
+                 f.get("sentido_ficha") != f.get("sentido_ref")),
+                (f"familia: ficha «{f.get('familia_ficha')}», referencia «{f.get('familia_ref')}»",
+                 f.get("familia_ficha") != f.get("familia_ref")),
             ) if mal]
-            etapa = f.get("etapa_ok") is False
-            if not motivos and not etapa:
+            if not motivos:
                 continue
             d = rec.devuelto_por_id(f["doc_id"], None)
             d.verificar = motivos
-            casos.append(Caso(f["doc_id"], "(ficha del conjunto C; sin consulta)", None, devueltos=[d],
-                              marca_corrida="ficha" if motivos else "otro",
-                              nota="" if motivos else f"etapa: ficha «{f.get('etapa_generada')}», anotada "
-                                                      f"«{f.get('etapa_anotada')}»"))
+            casos.append(Caso(f["doc_id"], "(ficha contra la referencia automática; sin consulta)", None,
+                              devueltos=[d], marca_corrida="ficha"))
         for c in casos:
             c.tipo, c.tambien = c.marca_corrida, []
         return nombre, corrida, casos, corregidos, avisos
     else:
         raise ValueError(f"`errores` no sabe leer corridas de `{comando}` (sí: regresion, qc-diagnostico, "
-                         "recuperacion, qc, generacion).")
+                         "recuperacion, qc, fichas-referencia).")
     casos = [clasificar(c, k) for c in casos]
     return nombre, corrida, [c for c in casos if c.tipo], corregidos, avisos
 
@@ -362,8 +362,8 @@ def markdown_corrida(nombre: str, corrida: dict, casos: list[Caso], corregidos: 
     lineas = [f"# Errores de `{nombre}`", "",
               f"- Comando: `{corrida['comando']}` · commit `{corrida.get('commit')}` · corpus `{corrida.get('corpus_fingerprint')}`",
               f"- {'Diagnóstico (consultas de ejemplo, no evaluación).' if corrida['comando'] in ('regresion', 'qc-diagnostico') else 'Partición: ' + str(corrida.get('parametros', {}).get('particion'))}",
-              "- Relevante = " + ("juicio humano ≥ 1." if corrida["comando"] in ("recuperacion", "qc") and
-                                 Path(config.JUICIOS_PATH).exists() else "de la familia correcta (sin juicios humanos)."),
+              "- Relevante = " + ("relevancia ≥ 1 en la referencia automática." if corrida["comando"] in
+                                 ("recuperacion", "qc") else "de la familia correcta."),
               "- Fichas: precalculadas (`data/fichas/fichas-penal.parquet`); las marcas son las deterministas de la app.",
               ""]
     lineas += [f"> ⚠️ {a}" for a in avisos] + ([""] if avisos else [])

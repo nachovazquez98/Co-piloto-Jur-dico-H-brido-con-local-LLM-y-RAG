@@ -49,7 +49,8 @@ st.header("Evaluación")
 st.markdown("Resultados de la última corrida guardada de cada experimento (`evaluacion/resultados/`). Lo que no "
             "se ha medido aparece como **por medir**.")
 for comando, titulo in (("recuperacion", "Clasificación y recuperación"), ("qc", "Controles de calidad"),
-                        ("generacion", "Calidad de la ficha"), ("latencia", "Tiempo por consulta")):
+                        ("fichas-referencia", "Calidad de la ficha"), ("esfuerzo", "Esfuerzo para encontrar precedentes"),
+                        ("latencia", "Tiempo por consulta")):
     datos = ultimo_resultado(comando)
     st.subheader(titulo)
     if datos is None:

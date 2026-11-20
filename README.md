@@ -74,22 +74,22 @@ En el primer arranque se descarga el modelo de embeddings (~1 GB) y se construye
 
 ## Evaluación
 
-El protocolo (sección 6 del informe) separa cada componente y lo mide con datos que no se usaron para ajustarlo.
-Todo se ejecuta con `python -m copiloto_juridico.evaluacion <comando>`; cada corrida queda en
-`evaluacion/resultados/` con su fecha, commit, configuración, semilla y huella del corpus. La guía de anotación y el
-orden de trabajo están en [`evaluacion/README.md`](evaluacion/README.md).
+El protocolo separa cada componente y lo mide con datos que no se usaron para ajustarlo. Todo se ejecuta con
+`python -m copiloto_juridico.evaluacion <comando>`; cada corrida queda en `evaluacion/resultados/` con su fecha,
+commit, configuración, semilla y huella del corpus. No hay abogados disponibles: la referencia es automática (la
+categoría del STJ, reglas y un juez LLM validado) y se describe en [`evaluacion/README.md`](evaluacion/README.md).
 
 | Qué se mide | Métrica | Comando | Estado |
 |---|---|---|---|
-| ¿El filtro conserva la familia correcta? | Hit@3 de familia, *leave-one-out*, IC 95 % (Wilson) | `recuperacion` | por medir (faltan las consultas revisadas) |
+| ¿El filtro conserva la familia correcta? | Hit@3 de familia, IC 95 % (Wilson) | `recuperacion` | por medir |
 | ¿La búsqueda híbrida supera a BM25 y a embeddings solos? | Hit@5, MRR, nDCG@5, diferencia pareada con IC bootstrap | `recuperacion` | por medir |
-| ¿QC_1 pierde precedentes útiles? | precisión, recall, kappa contra el juicio de un abogado | `qc` | por medir (faltan juicios) |
-| ¿La ficha es correcta? | exactitud por campo, F1 de artículos, tasa de alucinación | `generacion` | por medir (faltan fichas anotadas) |
+| ¿QC_1 pierde precedentes útiles? | precisión, recall, kappa contra la referencia | `qc` | por medir |
+| ¿La ficha es correcta? | exactitud por campo contra la referencia, artículos que no están en la sentencia | `fichas-referencia` | por medir |
+| ¿Ahorra trabajo? | sentencias que hay que abrir para encontrar 3 útiles | `esfuerzo` | por medir |
 | ¿Cuánto tarda? | p50/p95 por etapa, llamadas al LLM | `latencia` | ver abajo |
 
-Orden de la evaluación final: revisar consultas → piloto de anotación (`kappa-piloto`) → juicios y fichas anotados →
-`congelar` → `recuperacion`, `qc` y `generacion` con `--particion prueba`, una sola vez. Mientras tanto, todo lo que
-sigue es **diagnóstico** (consultas de ejemplo o sin anotación humana), no evaluación.
+Orden de la evaluación final: corpus definitivo → fichas → juez y `referencias` → `congelar` → corridas con
+`--particion prueba`, una sola vez. Lo que sigue en esta sección es **diagnóstico**, no evaluación.
 
 **Referencia histórica (v10):** en 15 de 18 consultas de ejemplo el filtro incluyó la categoría correcta:
 Hit@3 = 0.83, IC 95 % [0.61, 0.94], n = 18. Son consultas de cinco materias (no un conjunto penal) y los pesos se
@@ -131,12 +131,11 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
   ningún archivo; pero las consultas civil, familiar y fuera de tema **no** recibieron el aviso de "no hay
   precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia (ver [Limitaciones](#limitaciones)).
 
-**Evaluación automática (v11.2).** Como no hay abogados disponibles para anotar, la referencia se construye sin
-intervención humana: el delito, con la categoría que asignó el STJ en su portal; el acto impugnado, el apelante y el
-sentido del fallo, por mayoría entre reglas y dos jueces LLM de familias distintas a la del modelo de la app
-(`mistral:7b`, `gemma2:9b`, uno a la vez en la GPU). Cada juez se valida antes contra la categoría del STJ. El orden
-de los comandos está en [`evaluacion/README.md`](evaluacion/README.md); las corridas finales se hacen con el corpus
-completo, después de las descargas pendientes.
+**Evaluación automática (v11.2).** El delito sale de la categoría que asignó el STJ en su portal; el acto
+impugnado, el apelante y el sentido del fallo, de la mayoría entre las reglas y el juez `gemma2:9b` (0.845 de
+exactitud en la familia contra el STJ; `mistral:7b` no alcanzó el mínimo de 0.80 fijado antes de correrlo:
+`20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
+las consultas con todos sus pares).
 
 ## Línea de comandos
 

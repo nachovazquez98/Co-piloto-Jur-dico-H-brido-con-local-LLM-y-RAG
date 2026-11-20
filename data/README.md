@@ -15,9 +15,12 @@ descargadas de su API pública (fase 0 del notebook) y procesadas en la fase 1 (
 texto se recuperó de la base `chroma_db_juridica_8.2` (5,805 sentencias) y de 44 PDFs locales (ya incluidos en esa base).
 
 Aquella extracción **muestreaba los PDF de más de 50 páginas** (leía 40); esas sentencias conservan la marca
-"... N págs omitidas ..." en el texto: son 1,374 (800 penales), listadas en `evaluacion/paginas_omitidas.csv`
-(`cli limpiar-corpus --omitidas`). No se recortan ni se descartan: hay que volver a descargar esos PDF y procesarlos
-completos con `construir-corpus --pdfs`. La ingesta actual lee los PDF completos. En v11 el texto guardado se limpió
+"... N págs omitidas ..." en el texto. En v11.2 se volvieron a descargar a mano 362 PDF penales desde el portal
+(`data/raw/redescarga/`) y se agregaron 51 sentencias penales nuevas (`data/raw/nuevas/`); quedan 1,004 con páginas
+omitidas (439 penales), listadas en `evaluacion/paginas_omitidas.csv`. `construir-corpus --pdfs` conserva el texto
+anterior si un PDF trae el texto de otra sentencia (5 casos, `data/corpus/descargas_rechazadas.csv`) y quita las
+sentencias publicadas dos veces con distinto nombre (22, `data/corpus/duplicados.csv`). La ingesta actual lee los PDF
+completos. En v11 el texto guardado se limpió
 además del anexo de datos testados, las etiquetas de testado, los encabezados y pies de página (también con palabras
 partidas por la extracción) y los números de expediente repetidos en cada hoja (`cli limpiar-corpus`: 16 % menos
 caracteres, idempotente). Las sentencias penales se indexan completas; las de otras

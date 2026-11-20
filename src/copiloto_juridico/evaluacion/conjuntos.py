@@ -1,18 +1,13 @@
-"""Conjuntos de evaluación: consultas, juicios de relevancia y fichas anotadas (sección 6.2 del informe).
-
-Archivos (en `evaluacion/`):
+"""Conjuntos de evaluación: consultas y juicios de relevancia.
 
 - `consultas_penal.jsonl`, una consulta por línea:
   `{"id", "consulta", "doc_id_fuente", "tipo", "familia", "particion", "sin_respuesta", "borrador"?, "notas"?}`
-  * Conjunto A (documento conocido): `doc_id_fuente` es la sentencia de la que se redactó la consulta.
-  * Conjunto B (consultas reales): `doc_id_fuente` es null; su relevancia viene de `juicios.csv`.
+  * Documento conocido: `doc_id_fuente` es la sentencia de la que se redactó la consulta (`borradores`).
   * Sin respuesta: `sin_respuesta: true`, tema sin tipo en el corpus; el sistema debería reconocerlo.
-- `juicios.csv`: `consulta_id, doc_id, relevancia (0/1/2), anotador`.
-- `fichas_anotadas.jsonl`: `{"doc_id", "sentido_fallo", "etapa", "delito", "articulos": [...], ...}`.
+- Juicios de relevancia (`consulta_id, doc_id, relevancia 0/1/2, anotador`): los escribe `referencias` en
+  `evaluacion/jueces/juicios_automaticos.csv`.
 
-Este módulo **no redacta consultas finales**: `muestrear_plantilla` genera un borrador (`borrador: true`) con
-la sentencia elegida y un extracto de sus hechos; una persona redacta la consulta. Los experimentos marcan
-como "BORRADOR — no reportable" cualquier corrida que use consultas en borrador.
+Solo cuentan las consultas validadas por `referencias` (comprobaciones de la guía y el juez LLM).
 """
 
 from __future__ import annotations
@@ -47,14 +42,9 @@ class Consulta:
     particion: str
     sin_respuesta: bool = False
     borrador: bool = False
-    revisado: bool = False     # una persona revisó la consulta (obligatorio para usar la partición de prueba)
+    revisado: bool = False     # campo heredado de v11.1; en la evaluación automática cuenta `validada`
     notas: str = ""
     extra: dict = field(default_factory=dict)
-
-    @property
-    def origen(self) -> str:
-        """"derivada" (redactada a partir de una sentencia) o "real" (escrita por un abogado sin ver sentencias)."""
-        return self.extra.get("origen", "derivada")
 
     @property
     def documento_conocido(self) -> bool:
@@ -138,19 +128,9 @@ def cargar_consultas(path: Path = config.CONSULTAS_PATH, corpus: pd.DataFrame | 
     return consultas
 
 
-def cargar_todas(path: Path = config.CONSULTAS_PATH, reales: Path = config.CONSULTAS_REALES_PATH,
-                 **kw) -> list[Consulta]:
-    """Consultas derivadas + consultas reales (si hay). Los ids deben ser únicos entre ambos archivos."""
-    consultas = cargar_consultas(path, **kw)
-    if reales.exists():
-        extra = cargar_consultas(reales, **kw)
-        for c in extra:
-            c.extra["origen"] = "real"
-        repetidos = {c.id for c in consultas} & {c.id for c in extra}
-        if repetidos:
-            raise ErrorValidacion(f"ids repetidos entre {path.name} y {reales.name}: {sorted(repetidos)[:5]}")
-        consultas += extra
-    return consultas
+def cargar_todas(path: Path = config.CONSULTAS_PATH, **kw) -> list[Consulta]:
+    """Todas las consultas del conjunto (alias de `cargar_consultas` con la ruta por defecto)."""
+    return cargar_consultas(path, **kw)
 
 
 def guardar_consultas(consultas: list[Consulta], path: Path) -> Path:
@@ -163,7 +143,7 @@ def guardar_consultas(consultas: list[Consulta], path: Path) -> Path:
     return path
 
 
-def cargar_juicios(path: Path = config.JUICIOS_PATH, ids_consultas: set[str] | None = None) -> pd.DataFrame:
+def cargar_juicios(path: Path, ids_consultas: set[str] | None = None) -> pd.DataFrame:
     """Lee la hoja de juicios (consulta_id, doc_id, relevancia ∈ {0,1,2}, anotador; puede traer más columnas de
     apoyo, como el resumen) y valida su contenido. Las filas sin relevancia (aún no juzgadas) se ignoran; si falta
     el anotador se asume "anotador1".
@@ -234,45 +214,6 @@ def relevancia_por_par(juicios: pd.DataFrame, anotador_principal: str | None = N
     return out
 
 
-def acuerdo_entre_anotadores(juicios: pd.DataFrame) -> dict | None:
-    """Kappa de Cohen sobre los pares juzgados por dos anotadores (el 20 % doble del conjunto B)."""
-    from .metricas import cohen_kappa
-
-    anotadores = juicios["anotador"].dropna().unique().tolist()
-    if len(anotadores) < 2:
-        return None
-    a, b = anotadores[:2]
-    pa = juicios[juicios["anotador"] == a].set_index(["consulta_id", "doc_id"])["relevancia"]
-    pb = juicios[juicios["anotador"] == b].set_index(["consulta_id", "doc_id"])["relevancia"]
-    comunes = pa.index.intersection(pb.index)
-    if len(comunes) == 0:
-        return None
-    return {"anotadores": [a, b], "pares": int(len(comunes)),
-            "kappa_0_1_2": cohen_kappa(pa[comunes].tolist(), pb[comunes].tolist()),
-            "kappa_binario": cohen_kappa((pa[comunes] >= 1).tolist(), (pb[comunes] >= 1).tolist())}
-
-
-def cargar_fichas_anotadas(path: Path = config.FICHAS_ANOTADAS_PATH) -> list[dict]:
-    """Conjunto C desde la hoja que llena el abogado: una fila por sentencia con sentido_fallo, etapa,
-    acto_impugnado, delito, articulos ("233; 236"), agravios y, opcional, consulta_id + ficha_aceptable (si/no).
-    Las filas sin sentido del fallo (aún no anotadas) se ignoran."""
-    if not path.exists():
-        return []
-    df = pd.read_csv(path, dtype=str).fillna("")
-    if "doc_id" not in df.columns:
-        raise ErrorValidacion(f"{path.name}: falta la columna doc_id")
-    fichas = []
-    for fila in df.to_dict("records"):
-        if not fila.get("sentido_fallo", "").strip():
-            continue
-        d = {k: v.strip() for k, v in fila.items() if isinstance(v, str) and v.strip()}
-        d["articulos"] = [a.strip() for a in re.split(r"[;,]", fila.get("articulos", "")) if a.strip()]
-        if fila.get("ficha_aceptable", "").strip():
-            d["ficha_aceptable"] = fila["ficha_aceptable"].strip().lower() in {"si", "sí", "1", "true"}
-        fichas.append(d)
-    return fichas
-
-
 def exigir_revisadas(consultas: list["Consulta"]) -> None:
     """La partición de prueba solo se usa con consultas revisadas por una persona o, en la evaluación automática
     (v11.2), validadas por `referencias` (comprobaciones de la guía + jueces LLM); nunca con borradores sin validar."""
@@ -284,102 +225,8 @@ def exigir_revisadas(consultas: list["Consulta"]) -> None:
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Plantilla de consultas (muestreo estratificado)
+# Consultas nuevas por familia (`borradores --ampliar`)
 # --------------------------------------------------------------------------------------------------------------
-
-TEMAS_SIN_RESPUESTA = [
-    "Justicia para adolescentes: medida de internamiento a un menor de 16 años",
-    "Delito fiscal federal (defraudación fiscal) — competencia federal, no del STJ",
-    "Amparo indirecto contra la orden de aprehensión (lo resuelve un juez federal)",
-    "Beneficios preliberacionales en la etapa de ejecución de la pena",
-    "Delitos electorales en una jornada de votación",
-    "Contrabando de mercancía en aduana",
-    "Delitos informáticos: acceso ilícito a sistemas de una empresa",
-    "Extradición internacional de un imputado",
-    "Responsabilidad penal de una persona moral (empresa)",
-    "Delito contra la propiedad industrial (piratería de marcas)",
-]
-
-
-def muestrear_plantilla(corpus: pd.DataFrame, familias: dict[str, str], n_por_familia: int = 3,
-                        min_sentencias_familia: int = 10, n_raros: int = 20, n_sin_respuesta: int = 10,
-                        semilla: int = config.EVAL_SEED, largo_extracto: int = 1200) -> list[Consulta]:
-    """Plantilla del conjunto A con muestreo estratificado por familia y semilla fija.
-
-    - De cada familia con al menos `min_sentencias_familia` sentencias se eligen `n_por_familia` sentencias,
-      de tipos distintos cuando es posible (para no medir siempre el tipo más frecuente).
-    - Se añaden `n_raros` sentencias de tipos con menos de 5 sentencias (los casos difíciles).
-    - Se añaden `n_sin_respuesta` temas sin tipo en el corpus.
-    - Partición 50/50 estratificada: dentro de cada familia se alternan desarrollo y prueba tras barajar.
-
-    Cada elemento sale con `borrador: true`, `consulta: ""` y en `extra` un extracto del inicio de la
-    sentencia para que la persona que redacta sepa de qué trata. La consulta final la escribe una persona.
-    """
-    rng = np.random.default_rng(semilla)
-    penal = corpus[corpus["materia"] == "penal"].copy()
-    penal["familia"] = penal["tipo"].map(familias)
-    por_tipo = penal.groupby("tipo")["id"].transform("size")
-    tam_familia = penal.groupby("familia")["id"].size()
-
-    elegidos: list[tuple[str, pd.Series]] = []
-    usados: set[str] = set()
-    for familia in sorted(tam_familia[tam_familia >= min_sentencias_familia].index):
-        grupo = penal[penal["familia"] == familia]
-        tipos = list(grupo["tipo"].unique())
-        rng.shuffle(tipos)
-        # Primero un documento de cada tipo distinto (tipos con más sentencias primero), luego al azar.
-        tipos.sort(key=lambda t: -int((grupo["tipo"] == t).sum()))
-        filas = []
-        for t in tipos:
-            cand = grupo[(grupo["tipo"] == t) & ~grupo["id"].isin(usados)]
-            if len(cand):
-                filas.append(cand.iloc[int(rng.integers(len(cand)))])
-            if len(filas) >= n_por_familia:
-                break
-        if len(filas) < n_por_familia:  # familia con pocos tipos: se completa al azar dentro de la familia
-            elegidos_ids = {f["id"] for f in filas}
-            resto = grupo[~grupo["id"].isin(usados | elegidos_ids)]
-            idx = rng.choice(len(resto), size=min(n_por_familia - len(filas), len(resto)), replace=False)
-            filas += [resto.iloc[int(i)] for i in sorted(idx)]
-        for fila in filas:
-            usados.add(fila["id"])
-            elegidos.append(("A", fila))
-
-    raros = penal[(por_tipo < 5) & ~penal["id"].isin(usados)]
-    if len(raros):
-        idx = rng.choice(len(raros), size=min(n_raros, len(raros)), replace=False)
-        for i in sorted(idx):
-            elegidos.append(("A-raro", raros.iloc[int(i)]))
-
-    # Partición estratificada por familia
-    particion: dict[str, str] = {}
-    familias_elegidas: dict[str, list[str]] = {}
-    for _, fila in elegidos:
-        familias_elegidas.setdefault(fila["familia"], []).append(fila["id"])
-    inicio = 0
-    for fam in sorted(familias_elegidas):
-        ids = familias_elegidas[fam]
-        rng.shuffle(ids)
-        for j, d in enumerate(ids):
-            particion[d] = PARTICIONES[(j + inicio) % 2]
-        inicio += len(ids)  # alterna con qué partición empieza cada familia para equilibrar las impares
-
-    plantilla = []
-    for n, (origen, fila) in enumerate(elegidos, 1):
-        plantilla.append(Consulta(
-            id=f"A{n:03d}", consulta="", doc_id_fuente=fila["id"], tipo=fila["tipo"], familia=fila["familia"],
-            particion=particion[fila["id"]], borrador=True,
-            notas="Redactar como lo escribiría un defensor: hechos y problema procesal, sin copiar frases de la "
-                  "sentencia ni el nombre del tipo.",
-            extra={"origen_muestra": origen, "extracto_sentencia": fila["texto"][:largo_extracto]}))
-    for n, tema in enumerate(TEMAS_SIN_RESPUESTA[:n_sin_respuesta], 1):
-        plantilla.append(Consulta(
-            id=f"S{n:03d}", consulta="", doc_id_fuente=None, tipo=None, familia=None,
-            particion=PARTICIONES[n % 2], sin_respuesta=True, borrador=True,
-            notas="Tema sugerido sin tipo en el corpus; confirmar que de verdad no hay sentencias del tema.",
-            extra={"tema_sugerido": tema}))
-    return plantilla
-
 
 def ampliar_plantilla(corpus: pd.DataFrame, familias: dict[str, str], existentes: list[Consulta],
                       n_por_familia: int = 10, min_sentencias_familia: int = 10,

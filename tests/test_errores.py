@@ -56,14 +56,14 @@ def test_seleccion_un_caso_por_tipo_y_tabla_para_diapositiva():
     assert "solo 1 de los 3 primeros precedentes es de esa familia" in md
 
 
-def test_lee_la_corrida_de_generacion(tmp_path, monkeypatch):
-    corrida = {"comando": "generacion", "commit": "abc", "corpus_fingerprint": "x", "parametros": {},
-               "tablas": {"Detalle por sentencia": {"filas": [
-                   {"doc_id": "a.pdf", "sentido_ok": False, "sentido_generado": "CONFIRMA", "sentido_anotado": "REVOCA",
-                    "delito_ok": True, "etapa_ok": True, "articulos_inexistentes": ""},
-                   {"doc_id": "b.pdf", "sentido_ok": True, "delito_ok": True, "etapa_ok": True,
-                    "articulos_inexistentes": ""}]}}}
-    (tmp_path / "20261113-000000_abc_generacion.json").write_text(json.dumps(corrida))
+def test_lee_la_corrida_de_fichas_referencia(tmp_path, monkeypatch):
+    corrida = {"comando": "fichas-referencia", "commit": "abc", "corpus_fingerprint": "x", "parametros": {},
+               "tablas": {"Fichas que no coinciden": {"filas": [
+                   {"doc_id": "a.pdf", "familia_ref": "robo", "familia_ficha": "robo", "sentido_ref": "REVOCA",
+                    "sentido_ficha": "CONFIRMA"},
+                   {"doc_id": "b.pdf", "familia_ref": "robo", "familia_ficha": "robo", "sentido_ref": "CONFIRMA",
+                    "sentido_ficha": "CONFIRMA"}]}}}
+    (tmp_path / "20261113-000000_abc_fichas-referencia.json").write_text(json.dumps(corrida))
     monkeypatch.setattr(E.config, "RESULTADOS_DIR", tmp_path)
     monkeypatch.setattr(E.cargar_corrida, "__defaults__", (tmp_path,))
 
@@ -73,10 +73,10 @@ def test_lee_la_corrida_de_generacion(tmp_path, monkeypatch):
                                "texto": ["toca penal 582025 vistos", "sin número"]}).set_index("id", drop=False)
 
     nombre, leida, casos, corregidos, _avisos = E.analizar("20261113-000000_abc", Store(), None)
-    assert nombre == "20261113-000000_abc_generacion" and not corregidos
+    assert nombre == "20261113-000000_abc_fichas-referencia" and not corregidos
     assert [(c.id, c.tipo) for c in casos] == [("a.pdf", "ficha")]
     assert casos[0].devueltos[0].toca == "58/2025"
-    assert "sentido: ficha CONFIRMA, anotado REVOCA" in E.markdown_corrida(nombre, leida, casos, [], [])
+    assert "sentido: ficha CONFIRMA, referencia REVOCA" in E.markdown_corrida(nombre, leida, casos, [], [])
 
 
 def test_corrida_inexistente_o_sin_veredictos(tmp_path):
