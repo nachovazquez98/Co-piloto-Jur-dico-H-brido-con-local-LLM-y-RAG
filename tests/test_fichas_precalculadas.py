@@ -90,3 +90,22 @@ def test_fichas_batch_sobrevive_a_una_caida_del_servidor(tmp_path, monkeypatch):
     monkeypatch.setattr(fp.time, "sleep", lambda s: None)
     tabla = fp.generar_todas(_corpus(("a", TEXTO)), LLMCaido([]), tmp_path / "f.parquet", log=lambda m: None)
     assert tabla["json_valido"].all()
+
+
+def test_fichas_batch_sigue_si_una_sentencia_cuelga_al_llm(tmp_path, monkeypatch):
+    from copiloto_juridico.llm import LLMError
+
+    class LLMColgado(LLMFicha):
+        def generate(self, prompt, json_mode=False):
+            if "CUELGA" in prompt:
+                raise LLMError("Read timed out. (read timeout=600)")
+            return json.dumps(FICHA)
+
+        def health(self):
+            return True, "activo"
+
+    monkeypatch.setattr(fp.time, "sleep", lambda s: None)
+    tabla = fp.generar_todas(_corpus(("a", TEXTO), ("b", TEXTO + " CUELGA")), LLMColgado([]), tmp_path / "f.parquet",
+                             log=lambda m: None).set_index("doc_id")
+    assert tabla.loc["a", "json_valido"] and not tabla.loc["b", "json_valido"]
+    assert "sin respuesta" in tabla.loc["b", "error"]

@@ -90,8 +90,14 @@ def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCU
                 break
             except LLMError as e:  # el servidor del LLM se cayó o se reinició: no se pierde el lote
                 if intento == REINTENTOS_SERVIDOR:
-                    _guardar(filas, path)
-                    raise
+                    if not llm.health()[0]:
+                        _guardar(filas, path)
+                        raise
+                    # El servidor responde, pero esta sentencia lo deja colgado: queda como ficha inválida
+                    # (se reintenta en la próxima corrida) y el lote sigue con las demás.
+                    log(f"   ⚠️ {doc_id}: sin respuesta en {REINTENTOS_SERVIDOR} intentos; queda sin ficha")
+                    ficha, info = None, {"intentos": REINTENTOS_SERVIDOR, "error": f"LLM sin respuesta: {e}"[:300]}
+                    break
                 log(f"   ⚠️ {doc_id}: {e} · reintento {intento} en {ESPERA_REINTENTO} s")
                 time.sleep(ESPERA_REINTENTO)
         v = verificaciones(ficha.campos_markdown(), texto) if ficha else {
