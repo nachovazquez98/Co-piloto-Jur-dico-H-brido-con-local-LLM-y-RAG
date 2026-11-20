@@ -61,8 +61,10 @@ EVALUACION_AUTOMATICA = _env("COPILOTO_EVALUACION_AUTOMATICA", True)
 # Dos familias de modelos distintas a la de la app (Meta), que caben enteros en 8 GB. En una prueba piloto sobre 60
 # sentencias, qwen2.5:7b no alcanzó el mínimo y se descartó. qwen2.5:14b sí lo alcanzaba, pero no cabe en la GPU
 # (~11 GB entre GPU y RAM) y la laptop no lo sostiene en tandas largas: se sustituyó por mistral:7b (piloto: 48/60 =
-# 0.80), por recursos y antes de construir la referencia. La validación completa de cada juez queda en `referencias`.
-MODELOS_JUECES = ["mistral:7b", "gemma2:9b"]
+# 0.80), por recursos y antes de construir la referencia. En la validación completa, mistral:7b no alcanzó el mínimo
+# (0.795 en las 1,412 sentencias, corrida 20261117-065346_a60ca4f_referencias) y quedó fuera; la referencia es la
+# mayoría entre las reglas y gemma2:9b.
+MODELOS_JUECES = ["gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
 # Muestra al azar de los jueces (v11.2): juzgar todo con dos modelos tomaba ~7 h por juez. Cada elemento entra a la
 # muestra por el hash de su id con la semilla (no por orden), así que al crecer el corpus los que ya estaban no
