@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import logging
+import re
 import sqlite3
 from pathlib import Path
 
@@ -31,6 +33,44 @@ def save_corpus(df: pd.DataFrame, directory: Path = config.CORPUS_DIR) -> list[P
 
 
 _RE_OMITIDAS = r"págs? omitidas?"
+
+
+def _compacto(texto: str) -> str:
+    """Solo letras y números en minúsculas: la extracción del PDF parte palabras ("fracció n") de forma distinta."""
+    return re.sub(r"[^0-9a-zñáéíóúü]", "", texto.lower())
+
+
+def contenido_en(viejo: str, nuevo: str, ventanas: int = 20, largo: int = 60) -> float:
+    """Fracción de ventanas repartidas del texto viejo que aparecen en el nuevo. Un PDF vuelto a descargar de la
+    misma sentencia contiene el texto muestreado que ya había (en las 360 redescargas: ≥ 0.80 o ≤ 0.15)."""
+    a, b = _compacto(viejo), _compacto(nuevo)
+    if len(a) < largo:
+        return 0.0
+    paso = max(1, (len(a) - largo) // ventanas)
+    muestras = [a[i:i + largo] for i in range(0, len(a) - largo, paso)][:ventanas]
+    return sum(m in b for m in muestras) / len(muestras)
+
+
+def descargas_ajenas(actual: pd.DataFrame, nuevos: pd.DataFrame, minimo: float = 0.5) -> pd.DataFrame:
+    """PDFs nuevos con el id de una sentencia que ya está en el corpus pero con el texto de otra (se guardó otro
+    documento con ese nombre). No deben reemplazarla."""
+    previo = actual.set_index("id")["texto"]
+    filas = [{"id": r.id, "contenido": round(contenido_en(previo[r.id], r.texto), 2)}
+             for r in nuevos.itertuples() if r.id in previo.index]
+    t = pd.DataFrame(filas, columns=["id", "contenido"])
+    return t[t["contenido"] < minimo]
+
+
+def duplicados_de_texto(corpus: pd.DataFrame, preferidos: set[str] | None = None) -> pd.DataFrame:
+    """Sentencias publicadas dos veces en el portal con distinto nombre (mismo texto). Devuelve (id que se quita,
+    id que se queda); se queda el de `preferidos` (p. ej. fuente de consultas) o, si no, el primero por fecha."""
+    preferidos = preferidos or set()
+    huella = corpus["texto"].map(lambda t: hashlib.sha1((_compacto(t[:6000]) + _compacto(t[-3000:])).encode()).hexdigest())
+    orden = corpus.assign(_h=huella, _p=~corpus["id"].isin(preferidos)).sort_values(["_p", "fecha", "id"])
+    filas = []
+    for _, g in orden.groupby("_h", sort=False):
+        filas += [{"id": d, "igual_a": g["id"].iloc[0]} for d in g["id"].iloc[1:]]
+    return pd.DataFrame(filas, columns=["id", "igual_a"])
 
 
 def unir_fuentes(fuentes: list[pd.DataFrame]) -> pd.DataFrame:

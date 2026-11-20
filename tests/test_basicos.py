@@ -142,3 +142,25 @@ def test_pdf_completo_reemplaza_la_version_muestreada():
     unido = unir_fuentes([actual, pdfs]).set_index("id")
     assert unido.loc["a.pdf", "origen"] == "pdf"     # la completa reemplaza a la muestreada
     assert unido.loc["b.pdf", "origen"] == "chroma"  # entre completas, la primera fuente
+
+
+def test_descarga_con_texto_de_otra_sentencia_se_rechaza():
+    from copiloto_juridico.datos.corpus import contenido_en, descargas_ajenas
+
+    viejo = "vistos para resolver el toca penal 76/2025 formado con motivo del recurso de apelación " * 8
+    completo = viejo.replace("vistos", "vis tos") + " puntos resolutivos: se confirma la resolución apelada."
+    otro = "resultando que el juez de control negó la excusa planteada en la carpeta administrativa 12/2024 " * 8
+    assert contenido_en(viejo, completo) >= 0.8 and contenido_en(viejo, otro) == 0
+    actual = pd.DataFrame({"id": ["a.pdf", "b.pdf"], "texto": [viejo, viejo]})
+    nuevos = pd.DataFrame({"id": ["a.pdf", "b.pdf", "c.pdf"], "texto": [completo, otro, otro]})
+    assert descargas_ajenas(actual, nuevos)["id"].tolist() == ["b.pdf"]
+
+
+def test_duplicados_de_texto_conserva_la_fuente_de_consultas():
+    from copiloto_juridico.datos.corpus import duplicados_de_texto
+
+    t = "sentencia de la sala penal sobre robo calificado " * 50
+    corpus = pd.DataFrame({"id": ["1.pdf", "2.pdf", "3.pdf"], "fecha": ["2025-01-01", "2025-02-01", "2025-03-01"],
+                           "texto": [t, t.replace("robo", "r obo"), "otra sentencia distinta " * 50]})
+    assert duplicados_de_texto(corpus).to_dict("records") == [{"id": "2.pdf", "igual_a": "1.pdf"}]
+    assert duplicados_de_texto(corpus, {"2.pdf"})["id"].tolist() == ["1.pdf"]

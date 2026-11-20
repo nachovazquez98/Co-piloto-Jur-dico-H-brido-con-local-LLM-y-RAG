@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from collections import Counter
@@ -26,7 +27,8 @@ def _log(msg: str) -> None:
 
 def cmd_construir_corpus(args) -> None:
     from .datos.balance import balance_report, load_catalogo, select_balanced
-    from .datos.corpus import import_from_chroma_sqlite, load_corpus, save_corpus, unir_fuentes
+    from .datos.corpus import (descargas_ajenas, duplicados_de_texto, import_from_chroma_sqlite, load_corpus,
+                               save_corpus, unir_fuentes)
     from .datos.procesamiento import process_pdf_folder
 
     fuentes, actual = [], pd.DataFrame(columns=["id"])
@@ -42,6 +44,13 @@ def cmd_construir_corpus(args) -> None:
     for carpeta in args.pdfs or []:
         df = pd.DataFrame(process_pdf_folder(Path(carpeta), log=_log))
         _log(f"Procesadas {len(df)} sentencias desde PDFs en '{carpeta}'.")
+        if len(actual) and len(df):
+            ajenas = descargas_ajenas(actual, df)
+            if len(ajenas):
+                _log(f"⚠️ {len(ajenas)} PDF con el nombre de una sentencia del corpus pero el texto de otra; se conserva "
+                     f"el texto anterior: {', '.join(ajenas['id'])}")
+                ajenas.to_csv(config.CORPUS_DIR / "descargas_rechazadas.csv", index=False)
+                df = df[~df["id"].isin(ajenas["id"])]
         fuentes.append(df)
     if not fuentes:
         sys.exit("No hay fuentes: usa --chroma y/o --pdfs.")
@@ -50,6 +59,20 @@ def cmd_construir_corpus(args) -> None:
     # muestreada); entre iguales, la primera fuente (corpus actual > chroma > PDFs).
     todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
+    # La misma sentencia publicada dos veces con distinto nombre: contaría doble en la búsqueda y podía quedar una
+    # copia en desarrollo y otra en prueba. Se queda la que es fuente de consultas o, si no, la primera por fecha.
+    fuentes_consultas = set()
+    if config.CONSULTAS_PATH.exists():
+        fuentes_consultas = {json.loads(x).get("doc_id_fuente") for x in config.CONSULTAS_PATH.read_text(
+            encoding="utf-8").splitlines() if x.strip() and not x.lstrip().startswith("#")}
+    dup = duplicados_de_texto(todo, fuentes_consultas)
+    if len(dup):
+        _log(f"⚠️ {len(dup)} sentencias repetidas (mismo texto con otro nombre); se quita la copia.")
+        dup.to_csv(config.CORPUS_DIR / "duplicados.csv", index=False)
+        todo = todo[~todo["id"].isin(dup["id"])]
+    huerfanas = sorted(set(dup["id"]) & fuentes_consultas)
+    if huerfanas:
+        _log(f"⚠️ Consultas con fuente repetida: apúntalas a la copia que se queda (duplicados.csv): {huerfanas}")
     balanceado = select_balanced(todo, args.max_por_tipo, conservar=set(actual["id"]))
     save_corpus(balanceado)
 
