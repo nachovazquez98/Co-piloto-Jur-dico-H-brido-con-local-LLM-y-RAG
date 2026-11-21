@@ -286,7 +286,12 @@ def cmd_fichas_batch(args) -> None:
     settings = config.LLMSettings()
     corpus = load_corpus()
     if not args.solo_diagnostico:
-        generar_todas(corpus, _llm(con_cache=False), limite=args.max, log=_log)
+        from .jueces import en_muestra
+
+        # --muestra: solo las sentencias de la muestra de la referencia (las únicas que evalúa fichas-referencia);
+        # las demás las genera la app en el momento si hacen falta.
+        lote = corpus[[en_muestra(d, config.MUESTRA_SENTENCIAS) for d in corpus["id"]]] if args.muestra else corpus
+        generar_todas(lote, _llm(con_cache=False), limite=args.max, log=_log)
     _log(f"Verificaciones recalculadas con las reglas actuales: {actualizar_verificaciones(corpus)} fichas cambiaron.")
     _guardar(diagnostico_fichas(cargar(), version_ficha(settings)))
 
@@ -452,6 +457,8 @@ def main(argv=None) -> None:
     s = sub.add_parser("fichas-batch", help="Ficha JSON de cada sentencia penal, una sola vez (reanudable)")
     s.add_argument("--max", type=int, default=None, help="Fichas a generar en esta corrida (todas por defecto)")
     s.add_argument("--solo-diagnostico", action="store_true", help="Solo el reporte, sin llamar al LLM")
+    s.add_argument("--muestra", action="store_true",
+                   help="Solo las sentencias de la muestra de la referencia (config.MUESTRA_SENTENCIAS)")
     s.set_defaults(func=cmd_fichas_batch)
 
     s = sub.add_parser("qc-diagnostico", help="Tasa de descarte de QC_1 por versión y contexto (sin anotaciones)")

@@ -80,21 +80,23 @@ def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCU
     log(f"Fichas: {len(penal)} sentencias penales, {len(penal) - len(pendientes)} vigentes, "
         f"{len(pendientes)} por generar (versión {version}).")
     filas = {r["doc_id"]: r for r in tabla.to_dict("records")}
-    t_ini = time.time()
+    t_ini, sin_respuesta = time.time(), 0
     for i, (doc_id, texto) in enumerate(pendientes[:limite], 1):
         t0 = time.time()
         contexto = recortar_contexto(texto, llm.settings.max_context_chars)
         for intento in range(1, REINTENTOS_SERVIDOR + 1):
             try:
                 ficha, info = generar_ficha_json(llm.generate, contexto)
+                sin_respuesta = 0
                 break
             except LLMError as e:  # el servidor del LLM se cayó o se reinició: no se pierde el lote
                 if intento == REINTENTOS_SERVIDOR:
-                    if not llm.health()[0]:
+                    sin_respuesta += 1
+                    if sin_respuesta >= 2:  # dos sentencias seguidas: es el servidor, no la sentencia
                         _guardar(filas, path)
                         raise
-                    # El servidor responde, pero esta sentencia lo deja colgado: queda como ficha inválida
-                    # (se reintenta en la próxima corrida) y el lote sigue con las demás.
+                    # Una sentencia que deja al servidor sin responder queda como ficha inválida (se reintenta en
+                    # la próxima corrida) y el lote sigue con las demás.
                     log(f"   ⚠️ {doc_id}: sin respuesta en {REINTENTOS_SERVIDOR} intentos; queda sin ficha")
                     ficha, info = None, {"intentos": REINTENTOS_SERVIDOR, "error": f"LLM sin respuesta: {e}"[:300]}
                     break
