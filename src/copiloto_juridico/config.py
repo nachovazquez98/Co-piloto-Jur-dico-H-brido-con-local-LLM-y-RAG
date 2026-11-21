@@ -214,6 +214,11 @@ class LLMSettings:
     """Parámetros del proveedor de LLM. Se editan desde la barra lateral de la app."""
 
     provider: str = _env("COPILOTO_LLM_PROVIDER", "ollama")  # "ollama" | "openai"
+    # En `modelos` (20261113-125326_fb1f3fe: 10 consultas, 20 fichas, sin referencia) qwen2.5:7b fue más rápido
+    # (83 s frente a 125 s por consulta; 18 s frente a 29 s por ficha) y mejor en los diagnósticos (JSON 20/20 frente
+    # a 19/20; "dato no disponible" 3.5 % frente a 8.9 %). Se mantiene llama3.1:8b en v11.2 porque cambiarlo invalida
+    # las 2,495 fichas precalculadas (~12.7 h) y obliga a repetir la evaluación; es el siguiente cambio recomendado,
+    # medido antes con `fichas-referencia` contra la referencia.
     model: str = _env("COPILOTO_LLM_MODEL", "llama3.1:8b")
     base_url: str = _env("COPILOTO_LLM_BASE_URL", "http://localhost:11434")
     api_key: str = field(default=_env("COPILOTO_LLM_API_KEY", ""), repr=False)
