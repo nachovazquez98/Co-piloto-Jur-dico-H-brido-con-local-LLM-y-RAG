@@ -85,7 +85,6 @@ class Precedente:
     informe: str
     extraccion: str
     fallback: bool
-    veredicto_relevancia: str = ""
     veredicto_reporte: str = ""
     ambiguo_qc1: bool = False      # QC_1 respondió algo que no se pudo interpretar como SI/NO
     ambiguo_qc2: bool = False
@@ -732,7 +731,7 @@ class Copiloto:
                 if prec is None:
                     descartados.append({"documento": cand.doc_id, "tipo": cand.tipo, "motivo": motivo})
                     continue
-                prec.numero, prec.veredicto_relevancia, prec.ambiguo_qc1 = len(precedentes) + 1, veredicto_rel, ambiguo_qc1
+                prec.numero, prec.ambiguo_qc1 = len(precedentes) + 1, ambiguo_qc1
                 ambiguos += prec.ambiguo_qc2
                 precedentes.append(prec)
                 yield log(f"   ✅ Informe válido ({len(precedentes)}/{op.num_precedentes}).", "analisis")
@@ -750,8 +749,7 @@ class Copiloto:
                         yield log(m, "analisis")
                     if prec is None:
                         continue
-                    prec.numero, prec.veredicto_relevancia, prec.no_verificado_qc1 = (len(precedentes) + 1,
-                                                                                      veredicto_rel, True)
+                    prec.numero, prec.no_verificado_qc1 = len(precedentes) + 1, True
                     descartados = [d for d in descartados if d["documento"] != cand.doc_id]
                     precedentes.append(prec)
                     yield Evento("precedente", "analisis", datos={"precedente": prec})

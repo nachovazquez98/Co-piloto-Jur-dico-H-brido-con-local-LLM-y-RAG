@@ -125,25 +125,6 @@ def articulos_en_sentencia(texto: str) -> set[str]:
     return out
 
 
-def f1_conjuntos(predichos: set, verdaderos: set) -> dict[str, float]:
-    """Precisión, recall y F1 entre dos conjuntos (p. ej. artículos de la ficha vs. anotados)."""
-    vp = len(predichos & verdaderos)
-    prec = vp / len(predichos) if predichos else (1.0 if not verdaderos else 0.0)
-    rec = vp / len(verdaderos) if verdaderos else (1.0 if not predichos else 0.0)
-    f1 = 2 * prec * rec / (prec + rec) if prec + rec else 0.0
-    return {"precision": prec, "recall": rec, "f1": f1}
-
-
-def coincide_texto(predicho: str | None, anotado: str | None) -> bool:
-    """Coincidencia de un campo de texto libre (etapa, delito): iguales tras normalizar, o uno contiene al
-    otro ("robo calificado" vs. "robo calificado art 236"). Criterio deliberadamente simple: el CSV de
-    revisión permite que una persona corrija los casos dudosos."""
-    p, a = normalizar(predicho or ""), normalizar(anotado or "")
-    if not p or not a:
-        return False
-    return p == a or a in p or p in a
-
-
 def datos_penales(extraccion: str) -> dict[str, str | None]:
     """Campos de la ficha penal que la interfaz muestra destacados (None si la ficha no los trae)."""
     c = parsear_campos(extraccion)

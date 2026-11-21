@@ -11,7 +11,7 @@ from copiloto_juridico.clasificador import PesosClasificador, puntuar
 from copiloto_juridico.evaluacion import conjuntos as cj
 from copiloto_juridico.evaluacion import experimentos as ex
 from copiloto_juridico.evaluacion import familias as fam
-from copiloto_juridico.fichas import (coincide_texto, datos_penales, extraer_articulos, f1_conjuntos,
+from copiloto_juridico.fichas import (datos_penales, extraer_articulos,
                                       normalizar_sentido, parsear_campos)
 
 # --- Familias -------------------------------------------------------------------------------------------------
@@ -142,9 +142,6 @@ def test_sentido_y_coincidencias():
     assert normalizar_sentido("Se ordena la reposición del procedimiento") == "REPONE"
     assert normalizar_sentido("[DATO NO DISPONIBLE]") is None
     assert normalizar_sentido("Absuelve") == "OTRO"
-    assert coincide_texto("Robo calificado, art. 236", "robo calificado")
-    assert not coincide_texto("Fraude", "robo calificado")
-    assert f1_conjuntos({"1", "2"}, {"2", "3"})["f1"] == 0.5
 
 
 # --- Experimentos (funciones puras) ---------------------------------------------------------------------------
