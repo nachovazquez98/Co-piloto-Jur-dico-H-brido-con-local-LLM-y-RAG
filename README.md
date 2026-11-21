@@ -15,18 +15,18 @@ apelación, con búsqueda híbrida (embeddings + BM25), un LLM local y una inter
 
 ---
 
-## Para quién es y qué hace
+## Objeto y alcance
 
-**Usuario:** abogado de la defensa penal (pública o particular) que prepara o contesta un recurso de apelación ante
-las Salas Penales del STJ Jalisco.
+**Usuario destinatario:** el abogado defensor, público o particular, que prepara o contesta un recurso de apelación
+ante las Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco (STJ).
 
-**Qué hace:** recibe la descripción del caso en lenguaje natural y devuelve las sentencias penales del propio tribunal
-más parecidas, con una ficha de cada una (delito, acto impugnado, agravios y cómo los calificó la Sala, sentido del
-fallo, fundamento legal) y una síntesis comparativa.
+**Objeto:** a partir de la descripción de un caso en lenguaje natural, recuperar las resoluciones penales del propio
+tribunal más afines y elaborar una ficha de cada una (delito, acto impugnado, agravios y su calificación por la Sala,
+sentido del fallo, fundamento legal), así como una síntesis comparativa.
 
-**Qué no hace:** no predice el resultado de un juicio, no redacta agravios y no sustituye la lectura de la sentencia
-original ni el criterio del abogado. Las resoluciones del STJ son precedentes orientadores, no jurisprudencia
-obligatoria.
+**Alcance:** el sistema no pronostica el resultado del asunto, no redacta agravios y no sustituye la lectura de la
+resolución original ni el criterio profesional. Las resoluciones del STJ constituyen precedentes orientadores, no
+jurisprudencia obligatoria.
 
 ## Uso en 4 pasos
 
