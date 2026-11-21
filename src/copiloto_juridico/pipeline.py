@@ -35,18 +35,27 @@ PASOS = [
 
 # Qué entra, qué sale y qué concepto usa cada paso (se muestra en el panel de pasos de la app).
 DESCRIPCION_PASOS = {
-    "entidades": "Entra la consulta; sale una lista de 1 a 3 conceptos jurídicos. El LLM actúa como extractor; si "
-                 "falla, se usa la consulta completa.",
-    "clasificacion": "Entran la consulta y sus conceptos; salen las 10 categorías más probables. Combina coseno de "
-                     "embeddings, coincidencia de lemas (Jaccard, KEM) y el voto de las sentencias recuperadas.",
-    "busqueda": "Entran las 3 mejores categorías, o los delitos que eligió el usuario; salen hasta 30 sentencias "
-                "candidatas. Fusiona búsqueda semántica (embeddings) y léxica (BM25) con RRF; si el filtro da pocas, "
-                "completa sin filtro.",
-    "analisis": "Por candidato: QC_1 (¿es relevante?), extracción de hechos, ficha e QC_2 (¿la ficha es coherente?), "
-                "hasta tener N fichas válidas. El LLM lee la sentencia recortada a su ventana de contexto.",
-    "sintesis": "Entran las fichas válidas. Con reglas: qué precedentes fueron favorables o desfavorables para la "
-                "defensa (quién apeló y sentido del fallo). Con el LLM, solo con esas fichas (RAG): qué argumentos "
-                "aceptó o rechazó la Sala. No pronostica el resultado del caso.",
+    "entidades": "El modelo de lenguaje identifica en la consulta de 1 a 3 conceptos jurídicos: primero el delito, "
+                 "con su modalidad (deducido de los hechos si no se nombra), y después el problema procesal (p. ej. "
+                 "vinculación a proceso, prisión preventiva). Si no logra extraerlos, se utiliza la consulta íntegra.",
+    "clasificacion": "La consulta se compara con las 24 familias de delito del corpus penal mediante cuatro señales: "
+                     "similitud semántica (coseno de embeddings), coincidencia de lemas (Jaccard), concisión de la "
+                     "categoría y el voto de las sentencias más parecidas. Resultado: las categorías más probables, "
+                     "en orden.",
+    "busqueda": "Se buscan sentencias de las 3 familias más probables o, en su caso, de los delitos que seleccionó "
+                "el usuario. Se combinan dos búsquedas: semántica (embeddings, encuentra el mismo supuesto aunque se "
+                "redacte distinto) y literal (BM25, privilegia términos exactos como el nombre del delito); ambas "
+                "listas se fusionan con RRF. Si el filtro arroja pocos resultados, se completa sin filtro. Hasta 30 "
+                "sentencias candidatas.",
+    "analisis": "Para cada candidata: QC_1 (el modelo verifica que trate el mismo delito o el mismo problema "
+                "procesal), ficha estructurada de la resolución (acto impugnado, apelante, agravios y su "
+                "calificación, sentido del fallo, fundamento legal) y verificaciones automáticas contra el texto "
+                "(sentido del fallo según los puntos resolutivos, artículos citados, QC_2 del delito), hasta reunir "
+                "el número de precedentes solicitado.",
+    "sintesis": "Con reglas, se determina qué precedentes resultaron favorables o desfavorables para la defensa "
+                "(quién apeló y sentido del fallo). El modelo redacta, exclusivamente con esas fichas, qué "
+                "argumentos acogió o desestimó la Sala; cada afirmación cita su precedente y se verifica. No se "
+                "pronostica el resultado del asunto.",
 }
 
 
@@ -428,9 +437,9 @@ def nota_delito(clasificador, familias, sugeridas: list[str]) -> str | None:
     top = familias_de_categoria(clasificador, sugeridas[0])
     if top & set(familias):
         return None
-    return (f"Elegiste {', '.join(map(etiqueta_familia, familias))}; por la descripción del caso, la app habría buscado "
-            f"primero en {', '.join(sorted(map(etiqueta_familia, top)))}. Si no era tu intención, agrega ese delito "
-            "o quita el que elegiste.")
+    return (f"Delito seleccionado: {', '.join(map(etiqueta_familia, familias))}. Conforme a la descripción de los "
+            f"hechos, el sistema habría buscado primero en {', '.join(sorted(map(etiqueta_familia, top)))}. Si la "
+            "selección no corresponde al caso, agregue ese delito o retire el seleccionado.")
 
 
 def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb, num_precedentes: int,
@@ -471,8 +480,9 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
     return Busqueda(clasif, categorias, filtro, estrictos, amplios, candidatos, modo, acto, sugeridas)
 
 
-AVISO_OTRA_MATERIA = ("La consulta no menciona ningún delito ni etapa del proceso penal; el corpus es solo penal, así "
-                      "que estos precedentes probablemente no sirven para tu caso.")
+AVISO_OTRA_MATERIA = ("La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende "
+                      "únicamente resoluciones de las Salas Penales, por lo que estos precedentes probablemente no son "
+                      "aplicables al asunto planteado.")
 # Raíces de vocabulario penal (texto sin acentos, minúsculas): delitos, partes y actos del proceso.
 _RE_PENAL = re.compile("|".join([
     r"\bdelit", r"\bimputad", r"\bacus", r"\bprocesad", r"\bsentenciad", r"\binculpad", r"\bvincul",
@@ -779,7 +789,7 @@ class Copiloto:
                 yield Evento("error", "sintesis", str(e))
                 return
             yield log("   ✅ Síntesis generada." if not es_fallo(sintesis) else
-                      "   ⚠️ La síntesis parece incompleta; revisa los informes individuales.", "sintesis")
+                      "   ⚠️ La síntesis parece incompleta; consulte los informes individuales.", "sintesis")
         citas = None
         if config.VERIFICAR_CITAS and len(precedentes) >= 2:
             sintesis, citas = verificar_citas(sintesis, precedentes)

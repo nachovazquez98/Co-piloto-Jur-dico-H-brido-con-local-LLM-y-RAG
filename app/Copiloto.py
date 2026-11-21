@@ -31,7 +31,10 @@ store = get_store()
 clasificador = get_clasificador()
 
 st.title("⚖️ Co-piloto Jurídico")
-st.markdown("Describe tu caso y encuentra cómo han resuelto las Salas Penales del STJ Jalisco apelaciones parecidas.")
+st.markdown("Recuperación y análisis de precedentes de las Salas Penales del Supremo Tribunal de Justicia del Estado "
+            "de Jalisco para la defensa en el recurso de apelación. Describa los hechos y la resolución que se "
+            "impugna; el sistema localiza las resoluciones más afines y elabora una ficha de cada una. La página "
+            "**Cómo funciona** explica el método.")
 
 # --- Consulta ---
 ESCRIBIR = "Escribir mi propia consulta"
@@ -46,8 +49,8 @@ def _cargar_ejemplo() -> None:
 if "consulta" not in st.session_state:
     st.session_state["consulta"] = ""
 st.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
-consulta = st.text_area("Describe el caso", key="consulta", height=140,
-                        placeholder="Hechos, delito, qué resolución se apela y por qué...")
+consulta = st.text_area("Descripción del caso", key="consulta", height=140,
+                        placeholder="Hechos, delito imputado, resolución que se apela y motivos de inconformidad...")
 
 
 @st.cache_data(show_spinner=False)
@@ -67,11 +70,11 @@ if sugerencia:
     a, b = st.columns([4, 1], vertical_alignment="center")
     a.caption("Sugerencia inicial de la app según la descripción: "
               + ", ".join(f"**{etiqueta_familia(f)}** ({familias[f]})" for f in sugerencia)
-              + ". Puedes usarla, cambiarla o dejar el delito sin elegir.")
+              + ". Es una orientación: puede aceptarse, modificarse o dejar el delito sin seleccionar.")
     b.button("Usar la sugerencia", on_click=lambda: st.session_state.update(familias=sugerencia))
 elegidas = st.multiselect("Delito (opcional): uno o varios", list(familias), key="familias",
                           format_func=lambda f: f"{etiqueta_familia(f)} ({familias[f]})",
-                          placeholder="Sin elegir: la app lo deduce de la descripción", help=AYUDA["delito"])
+                          placeholder="Sin selección: el sistema lo deduce de la descripción", help=AYUDA["delito"])
 opciones["familias"] = tuple(elegidas)
 buscar = st.button("Buscar precedentes", type="primary", disabled=not consulta.strip())
 
@@ -138,7 +141,7 @@ def tarjeta(p) -> None:
         st.markdown(f"#### Precedente {p.numero} · `{t['documento']}`")
         if t["no_verificado_qc1"]:
             st.warning("No verificado por QC_1: el control lo descartó, pero se muestra porque descartó todos los "
-                       "candidatos. Revísalo con más cuidado.")
+                       "candidatos. Revíselo con especial cuidado.")
         a, b, c = st.columns(3)
         a.markdown(f"**Toca / expediente**  \n{t['identificador']}  \n**Fecha de publicación**  \n{t['fecha']}")
         b.markdown(f"**Delito**  \n{t['delito']}  \n**Acto impugnado**  \n{t['acto_impugnado']}")
@@ -183,7 +186,7 @@ if res:
         st.markdown(f"**Conceptos clave:** {res.entidades} · **Tiempo:** {res.segundos:.0f} s · "
                     f"**Llamadas al LLM:** {res.llamadas_llm} · **Modelo:** {res.modelo}")
         st.markdown("**Clasificación de la consulta** " + (
-            f"(la búsqueda se filtró por los delitos que elegiste: {', '.join(map(etiqueta_familia, res.familias_elegidas))})"
+            f"(la búsqueda se filtró por los delitos seleccionados: {', '.join(map(etiqueta_familia, res.familias_elegidas))})"
             if res.familias_elegidas else "(las 3 primeras categorías filtran la búsqueda)"))
         tabla = res.tabla_clasificacion[["categoría", "score_híbrido", "coseno", "jaccard", "voto_recuperación"]]
         st.dataframe(tabla, hide_index=True, width="stretch", column_config={
