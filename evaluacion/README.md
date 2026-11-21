@@ -27,14 +27,11 @@ criterio fijado antes de correrlos:
 | `qwen2.5:14b` | Descartado por recursos: no cabe en 8 GB y la laptop no lo sostiene en tandas largas | comentario en `config.py` |
 | `mistral:7b` | **No usable:** 0.795 en las 1,412 sentencias | `resultados/20261117-065346_a60ca4f_referencias` |
 | `gemma2:9b` | **Usable:** 0.845, IC 95 % [0.807, 0.877], en la muestra de 401 del corpus anterior | `resultados/20261117-065346_a60ca4f_referencias` |
-| `gemma2:9b`, corpus final | **Usable:** 0.807, IC 95 % [0.772, 0.838], en las 554 sentencias de la muestra con tipo del corpus original; 0.739 [0.706, 0.770] con las 725 | `resultados/20261121-012037_c909a5c_referencias` |
+| `gemma2:9b`, corpus final | **No usable:** 0.739, IC 95 % [0.706, 0.770], en las 725 sentencias de la muestra | `resultados/20261121-003449_5311dc1_referencias`, `errores/juez_familia.md` |
 
-**Población de la validación (decisión posterior, declarada).** El mínimo se fijó cuando todos los tipos del corpus
-estaban en `familias_penal.csv` (familias asignadas por reglas; ninguna revisada por una persona). Con el corpus final
-llegaron 257 tipos nuevos, en su mayoría raros y compuestos, cuya familia por reglas es ambigua (daño en las cosas a título de culpa: «delitos culposos» o «daño en las cosas»; delitos sexuales en
-el ámbito familiar). En esas sentencias el juez acertó 0.520 (n = 171) y la exactitud total cayó a 0.739
-(`20261121-003449_5311dc1_referencias`, juez no usable). Tras ver ese resultado, y con la aprobación del autor, la
-validación se aplica a la población original (tipos del corpus original); la exactitud con todas se sigue reportando.
+**Consecuencia.** Sin juez usable, el acto impugnado, el apelante y el sentido de la referencia salen de las reglas, que
+la app también usa para ordenar candidatos: esas métricas no son independientes y se reportan como tales. Las métricas
+principales usan solo la familia de la categoría del STJ, externa al sistema.
 
 **Muestra.** Juzgar todo con un juez tomaba ~7 h. Los jueces y la referencia usan una muestra fija por hash del id
 con la semilla de evaluación (`config.MUESTRA_SENTENCIAS` = 0.30, `MUESTRA_CONSULTAS` = 0.50): al crecer el corpus,

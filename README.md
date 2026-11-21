@@ -134,10 +134,10 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
   precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia (ver [Limitaciones](#limitaciones)).
 
 **Evaluación automática (v11.2).** El delito sale de la categoría que asignó el STJ en su portal; el acto
-impugnado, el apelante y el sentido del fallo, de la mayoría entre las reglas y el juez `gemma2:9b` (0.807 de
-exactitud en la familia contra el STJ en las sentencias de los tipos del corpus original, n = 554; 0.739 con todas, por
-la familia ambigua de los tipos nuevos, raros y compuestos: `20261121-012037_c909a5c_referencias`; `mistral:7b` no
-alcanzó el mínimo de 0.80 fijado antes de correrlo: `20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
+impugnado, el apelante y el sentido del fallo, de las reglas sobre el texto: el juez `gemma2:9b` acertó la familia del
+STJ en 0.739 de 725 sentencias del corpus final, por debajo del mínimo de 0.80 fijado antes de correrlo, y no se usa
+(`20261121-003449_5311dc1_referencias`, análisis en `evaluacion/errores/juez_familia.md`); `mistral:7b` tampoco
+alcanzó el mínimo (`20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
 las consultas con todos sus pares).
 
 ## Línea de comandos
