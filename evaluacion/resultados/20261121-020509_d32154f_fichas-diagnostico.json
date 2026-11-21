@@ -1,0 +1,293 @@
+{
+  "comando": "fichas-diagnostico",
+  "fecha": "2026-11-21T02:05:09",
+  "commit": "d32154f",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "version_ficha": "v11-9e84ac8f47"
+  },
+  "corpus_fingerprint": "e3c3ff004e3af705",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Sin congelado: corrida de desarrollo no atada a una versión."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS": [
+      "penal",
+      "civil",
+      "familiar",
+      "mercantil",
+      "laboral"
+    ],
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "n_fichas": 2326,
+  "congelado": null,
+  "tablas": {
+    "Resumen": {
+      "descripcion": "Diagnóstico sin anotación: un desacuerdo o un artículo ausente no es necesariamente un error del LLM (las reglas también fallan y hay sentencias con páginas omitidas).",
+      "columnas": [
+        "indicador",
+        "valor"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "indicador": "Fichas de esta versión",
+          "valor": "2326"
+        },
+        {
+          "indicador": "JSON inválido tras el reintento",
+          "valor": "3/2326 (0.1%)"
+        },
+        {
+          "indicador": "Necesitaron reintento (y quedaron válidas)",
+          "valor": "163/2323 (7.0%)"
+        },
+        {
+          "indicador": "Sentido leído por reglas (cobertura)",
+          "valor": "1784/2323 (76.8%)"
+        },
+        {
+          "indicador": "Sentido LLM = reglas (donde hay ambos)",
+          "valor": "1274/1784 (71.4%)"
+        },
+        {
+          "indicador": "Fichas con algún artículo no encontrado en la sentencia",
+          "valor": "36/2323 (1.5%)"
+        },
+        {
+          "indicador": "Artículos citados no encontrados en la sentencia",
+          "valor": "44/9622 (0.5%)"
+        },
+        {
+          "indicador": "Segundos por ficha (p50 / p95)",
+          "valor": "22 / 37"
+        }
+      ]
+    },
+    "Sentido del fallo: LLM (filas) vs. resolutivos por reglas (columnas)": {
+      "descripcion": "La diagonal son coincidencias.",
+      "columnas": [
+        "LLM \\ reglas",
+        "CONFIRMA",
+        "MODIFICA",
+        "REPONE",
+        "REVOCA"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "LLM \\ reglas": "CONFIRMA",
+          "CONFIRMA": 859,
+          "MODIFICA": 95,
+          "REPONE": 92,
+          "REVOCA": 218
+        },
+        {
+          "LLM \\ reglas": "MODIFICA",
+          "CONFIRMA": 5,
+          "MODIFICA": 204,
+          "REPONE": 3,
+          "REVOCA": 1
+        },
+        {
+          "LLM \\ reglas": "REPONE",
+          "CONFIRMA": 0,
+          "MODIFICA": 0,
+          "REPONE": 53,
+          "REVOCA": 0
+        },
+        {
+          "LLM \\ reglas": "REVOCA",
+          "CONFIRMA": 1,
+          "MODIFICA": 3,
+          "REPONE": 92,
+          "REVOCA": 158
+        }
+      ]
+    },
+    "Dato no disponible por campo": {
+      "descripcion": "Listas: vacías. Un campo muy vacío es el primero a revisar al anotar (o el texto lo testó).",
+      "columnas": [
+        "campo",
+        "dato no disponible"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "campo": "tribunal",
+          "dato no disponible": "0/2323 (0.0%)"
+        },
+        {
+          "campo": "fecha_resolucion",
+          "dato no disponible": "426/2323 (18.3%)"
+        },
+        {
+          "campo": "identificador",
+          "dato no disponible": "6/2323 (0.3%)"
+        },
+        {
+          "campo": "etapa_procesal",
+          "dato no disponible": "10/2323 (0.4%)"
+        },
+        {
+          "campo": "acto_impugnado",
+          "dato no disponible": "23/2323 (1.0%)"
+        },
+        {
+          "campo": "apelante",
+          "dato no disponible": "97/2323 (4.2%)"
+        },
+        {
+          "campo": "delitos",
+          "dato no disponible": "0/2323 (0.0%)"
+        },
+        {
+          "campo": "hechos_clave",
+          "dato no disponible": "2/2323 (0.1%)"
+        },
+        {
+          "campo": "decision",
+          "dato no disponible": "12/2323 (0.5%)"
+        },
+        {
+          "campo": "resumen",
+          "dato no disponible": "0/2323 (0.0%)"
+        },
+        {
+          "campo": "agravios",
+          "dato no disponible": "745/2323 (32.1%)"
+        },
+        {
+          "campo": "fundamento_legal",
+          "dato no disponible": "66/2323 (2.8%)"
+        },
+        {
+          "campo": "pruebas_decisivas",
+          "dato no disponible": "564/2323 (24.3%)"
+        },
+        {
+          "campo": "sentido_fallo = OTRO",
+          "dato no disponible": "0/2323 (0.0%)"
+        }
+      ]
+    }
+  }
+}
