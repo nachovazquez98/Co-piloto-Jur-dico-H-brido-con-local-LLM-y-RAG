@@ -75,7 +75,6 @@ MUESTRA_CONSULTAS = _env("COPILOTO_MUESTRA_CONSULTAS", 0.50)
 JUECES_DIR = EVAL_DIR / "jueces"
 
 COLLECTION_NAME = "sentencias_judiciales"
-MATERIAS = ["penal", "civil", "familiar", "mercantil", "laboral"]
 
 # --- Embeddings ---
 # Modelo multilingüe (el corpus está en español). all-mpnet-base-v2 era un modelo entrenado en inglés.
@@ -141,7 +140,7 @@ def _env_lista(name: str, default: list[str]) -> list[str]:
 
 
 # --- v11: el alcance es la defensa penal en apelación. Las opciones de v10 quedan por variable de entorno solo
-# para comparar en la evaluación (p. ej. COPILOTO_MATERIAS=penal,civil,familiar,mercantil,laboral). ---
+# para comparar en la evaluación. Desde v11.2 el corpus contiene solo la materia penal. ---
 # Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS ("violacion", "falsedad"...): castigaba delitos
 # reales (penal/violacion tiene 30 sentencias) sin evidencia a favor. Desactivada; en la regresión solo ayudaba a un
 # ejemplo por accidente, y ese caso se resuelve con ENRIQUECER_FAMILIAS

@@ -573,19 +573,14 @@ class Copiloto:
                 verificar_ficha(prec)
                 prec.informe = ficha.informe_markdown(prec.articulos_no_encontrados, prec.sentido_reglas)
                 return self._qc2(consulta, prec, categorias, op, logs)
-        p_ext, p_rep = prompts.prompts_para(cand.materia)
-        logs.append(f"   -> Extrayendo hechos con prompt {cand.materia.upper()} "
-                    f"({len(contexto):,} de {len(cand.texto):,} caracteres)...")
+        # Ficha en dos llamadas (v10, solo para comparar) o respaldo si la ficha JSON no fue válida.
+        p_ext, p_rep = prompts.prompts_penal()
+        logs.append(f"   -> Extrayendo hechos ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
         hechos = self._llm(p_ext.format(contexto=contexto))
         fallback = False
         if es_fallo(hechos):
-            logs.append("   ⚠️ Falló la extracción específica. Reintentando con extracción genérica...")
-            p_ext, p_rep = prompts.PROMPTS_DEFAULT
-            hechos = self._llm(p_ext.format(contexto=contexto))
-            fallback = True
-            if es_fallo(hechos):
-                logs.append("   ❌ Falló también la extracción genérica. Descartado.")
-                return None, "Extracción", logs
+            logs.append("   ❌ Falló la extracción. Descartado.")
+            return None, "Extracción", logs
         logs.append("   -> Generando informe...")
         informe = self._llm(p_rep.format(hechos=hechos))
         if es_fallo(informe):

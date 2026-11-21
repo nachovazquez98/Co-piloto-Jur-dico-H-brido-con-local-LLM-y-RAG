@@ -3,7 +3,7 @@
 - `EJEMPLOS_PENALES` (v11): casos redactados como los plantearía un defensor que prepara o contesta una
   apelación ante las Salas Penales del STJ, con distintos delitos y actos impugnados. `tipo_corpus` es el tipo
   del corpus que debería encontrarse; si es None, el tema no tiene tipo en el corpus y la app debería avisarlo.
-- Las 18 consultas multimateria de v10 ya no se muestran en la app; están en `evaluacion/regresion.py`.
+- Las consultas penales de v10 ya no se muestran en la app; están en `evaluacion/regresion.py`.
 
 Estos ejemplos son para demostrar la app: **no** forman parte del conjunto de evaluación (que debe redactarse
 de forma independiente, ver `evaluacion/README.md`).

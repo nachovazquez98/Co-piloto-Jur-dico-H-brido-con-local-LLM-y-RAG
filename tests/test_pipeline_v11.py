@@ -155,7 +155,7 @@ def test_filtro_expande_familias_a_tipos():
 def test_prompt_penal_v11_y_datos_de_la_ficha(monkeypatch):
     assert prompts.prompts_penal("v10")[0] is prompts.PROMPT_EXTRACCION_PENAL
     assert config.PROMPT_PENAL_VERSION == "v11"  # por defecto v11
-    ext, rep = prompts.prompts_para("penal")
+    ext, rep = prompts.prompts_penal()
     for campo in ("Acto Impugnado", "Agravios Planteados", "Calificación de los Agravios", "Sentido del Fallo"):
         assert campo in ext
     assert "CONFIRMA, MODIFICA, REVOCA, REPONE u OTRO" in ext and "Agravios y su Calificación" in rep
@@ -269,7 +269,7 @@ def test_ejemplos_penales_existen_en_el_corpus():
 
     tipos = set(pd.concat([pd.read_parquet(f, columns=["tipo"])
                            for f in sorted(glob.glob(str(config.CORPUS_DIR / "sentencias-*.parquet")))])["tipo"])
-    assert len(EJEMPLOS_PENALES) >= 12 and len(EJEMPLOS_V10) == 18
+    assert len(EJEMPLOS_PENALES) >= 12 and len(EJEMPLOS_V10) == 6
     for e in EJEMPLOS_PENALES:
         if e.sin_tipo_en_corpus:
             assert "sin tipo en el corpus" in e.etiqueta

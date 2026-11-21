@@ -38,8 +38,9 @@ def tipo_key(materia: str, delito_o_accion: str) -> str:
     return f"{slugify(materia)}/{_normalizar_accion(delito_o_accion)}"
 
 
-def load_catalogo(path: Path = config.CATALOGO_PATH) -> pd.DataFrame:
-    """Catálogo de tipos publicado por el STJ con el número de sentencias disponibles de cada uno."""
+def load_catalogo(path: Path = config.CATALOGO_PATH, todas: bool = False) -> pd.DataFrame:
+    """Catálogo de tipos publicado por el STJ con el número de sentencias disponibles de cada uno; solo las materias
+    del alcance (`config.MATERIAS_ACTIVAS`) salvo con `todas`."""
     rows = []
     with open(path, encoding="utf-8") as f:
         for nombre, total in csv.reader(f):
@@ -51,7 +52,7 @@ def load_catalogo(path: Path = config.CATALOGO_PATH) -> pd.DataFrame:
     df = pd.DataFrame(rows).groupby(["tipo", "materia", "delito_o_accion"], as_index=False).agg(
         nombre=("nombre", "first"), disponibles=("disponibles", "sum"))
     df["meta"] = df["disponibles"].clip(upper=config.MAX_SENTENCIAS_POR_TIPO)
-    return df
+    return df if todas else df[df["materia"].isin(config.MATERIAS_ACTIVAS)].reset_index(drop=True)
 
 
 def select_balanced(corpus: pd.DataFrame, max_por_tipo: int = config.MAX_SENTENCIAS_POR_TIPO,

@@ -1,9 +1,9 @@
 """Regresión con consultas fijas (sin LLM: los conceptos clave están precalculados).
 
 Dos conjuntos:
-- `EJEMPLOS_V10`: las 18 consultas multimateria del notebook, con las que se midió el "15 de 18" de v10
-  (Hit@3 de categoría = 0.83, IC 95 % [0.61, 0.94], n = 18, no independiente del ajuste). Cada una lleva el patrón
-  de tipos que cuenta como acierto, tomado de su propia etiqueta; None = tema sin tipo en el corpus.
+- `EJEMPLOS_V10`: las 6 consultas penales de las 18 del notebook v10 (las de otras materias salieron con el corpus
+  solo penal; las corridas anteriores las conservan). Cada una lleva el patrón de tipos que cuenta como acierto;
+  None = tema sin tipo en el corpus.
 - Los 16 ejemplos penales de la app (`ejemplos.EJEMPLOS_PENALES`), evaluados por familia.
 
 No es una evaluación (las consultas no son independientes ni representativas): sirve para detectar si un cambio
@@ -43,38 +43,9 @@ EJEMPLOS_V10: list[Ejemplo] = [
             "Un adolescente es señalado por sustraer mercancía de una tienda departamental. Se busca determinar la medida socioeducativa aplicable conforme a la Ley Nacional del Sistema Integral de Justicia Penal para Adolescentes."),
     Ejemplo("Penal", "Orden de aprehensión (amparo)",
             "Se promueve amparo indirecto contra una orden de aprehensión por considerarla violatoria de derechos fundamentales, argumentando falta de fundamentación y motivación."),
-    Ejemplo("Mercantil", "Acción cambiaria directa (pagaré)",
-            "Se ejercita acción cambiaria directa por falta de pago de un pagaré vencido. El demandado se niega a pagar alegando que su firma fue falsificada."),
-    Ejemplo("Mercantil", "Incumplimiento de contrato de suministro",
-            "Una empresa demanda a otra por incumplimiento de contrato de suministro de mercancías, ya que la entrega se realizó fuera de plazo y con productos defectuosos. Se reclaman daños y perjuicios."),
-    Ejemplo("Mercantil", "Pago de cheque devuelto",
-            "Se demanda el pago de un cheque que fue devuelto por insuficiencia de fondos. El librador argumenta que el cheque fue robado y llenado sin su consentimiento."),
-    Ejemplo("Civil", "Rescisión de contrato de arrendamiento",
-            "Se demanda la rescisión de un contrato de arrendamiento por falta de pago de rentas por más de tres meses. El inquilino argumenta problemas económicos imprevistos debido a la pérdida de su empleo y solicita una prórroga."),
-    Ejemplo("Civil", "Acción reivindicatoria",
-            "El propietario de un terreno demanda la acción reivindicatoria contra el poseedor actual, quien construyó una barda invadiendo parte de su propiedad. El demandado alega prescripción adquisitiva."),
-    Ejemplo("Civil", "Daños y perjuicios (accidente vehicular)",
-            "Se demanda el pago de daños y perjuicios por un accidente vehicular causado por negligencia. El vehículo del demandante sufrió pérdida total. El demandado niega su responsabilidad."),
-    Ejemplo("Civil", "Rescisión de compraventa (vicios ocultos)",
-            "Un comprador demanda la rescisión de un contrato de compraventa de un inmueble debido a vicios ocultos (humedades estructurales) no informados por el vendedor."),
-    Ejemplo("Civil", "Información ad perpetuam / usucapión",
-            "Se promueven diligencias de información ad perpetuam para acreditar la posesión de un inmueble no inscrito en el Registro Público, con el fin de obtener un título de propiedad por prescripción."),
-    Ejemplo("Familiar", "Divorcio",
-            "Se solicita el divorcio necesario por causal de abandono del hogar conyugal por más de seis meses sin causa justificada. Se pide la disolución del vínculo matrimonial y la liquidación de la sociedad conyugal."),
-    Ejemplo("Familiar", "Aumento de pensión alimenticia",
-            "Se demanda el aumento de la pensión alimenticia para dos menores de edad, argumentando un incremento en las necesidades escolares y médicas, y una mejora en la capacidad económica del deudor alimentario."),
-    Ejemplo("Familiar", "Modificación de guarda y custodia",
-            "Un progenitor solicita la modificación de la guarda y custodia de un menor, alegando que el otro progenitor expone al niño a un ambiente inadecuado y negligencia en sus cuidados."),
-    Ejemplo("Familiar", "Régimen de convivencias",
-            "Se demanda la regulación del régimen de convivencias con un menor, ya que el progenitor custodio impide u obstaculiza el contacto del niño con el progenitor no custodio."),
 ]
 
-_PATRONES_V10 = [
-    r"^penal/robo-calificado", r"^penal/lesiones", r"^penal/homicidio.*culp", r"^penal/fraude", None, None,
-    r"^mercantil/accion-cambiaria", None, None, r"arrendamiento", r"reivindicatoria", r"danos-y-perjuicios",
-    r"compraventa", r"perpetuam|usucapion|prescripcion-positiva", r"divorcio", r"alimentos|pension",
-    r"custodia", r"convivenc|visitas",
-]
+_PATRONES_V10 = [r"^penal/robo-calificado", r"^penal/lesiones", r"^penal/homicidio.*culp", r"^penal/fraude", None, None]
 CASOS_V10 = [CasoRegresion(e, p) for e, p in zip(EJEMPLOS_V10, _PATRONES_V10)]
 
 
@@ -104,7 +75,7 @@ def conceptos_para(texto: str, version: str, cache: dict[str, str]) -> str:
 
 
 def calcular_conceptos(llm, path: Path = CONCEPTOS_PATH, log=print) -> dict[str, str]:
-    """Precalcula con el LLM los conceptos de las 18 consultas v10 (prompt v10, como se midieron) y de los 16
+    """Precalcula con el LLM los conceptos de las consultas v10 (prompt v10, como se midieron) y de los 16
     ejemplos penales (prompts v10 y v11)."""
     from .. import prompts
     from ..pipeline import limpiar_conceptos
@@ -146,7 +117,7 @@ def _top3(store, clasif, texto, conceptos, materias, pesos, embed_query):
 
 
 def correr_regresion(store, log=print):
-    """Hit@3 de cada variante en las 18 consultas v10 (tipo, todas las materias, conceptos v10) y en los 16
+    """Hit@3 de cada variante en las consultas penales v10 (tipo, conceptos v10) y en los 16
     ejemplos penales (familia, solo penal, conceptos v11). Devuelve la corrida con resumen y detalle."""
     import pandas as pd
 
@@ -163,7 +134,7 @@ def correr_regresion(store, log=print):
     tipos = store.corpus["tipo"].unique().tolist()
     penales = [t for t in tipos if t.startswith("penal/")]
     familias = cargar_familias(tipos)
-    log("Clasificadores: tipo (todas las materias) y familia (penal, con y sin enriquecer)...")
+    log("Clasificadores: tipo y familia (con y sin enriquecer)...")
     clas_tipo = ClasificadorHibrido(tipos, "tipo")
     clas_fam = {e: ClasificadorHibrido(penales, "familia", familias, enriquecer=e) for e in (False, True)}
 
@@ -174,11 +145,11 @@ def correr_regresion(store, log=print):
         hits_v10, hits_pen = [], []
         for c in CASOS_V10:
             top = _top3(store, clas_tipo, c.ejemplo.texto, conceptos_para(c.ejemplo.texto, "v10", cache),
-                        config.MATERIAS, pesos, embed_query)
+                        config.MATERIAS_ACTIVAS, pesos, embed_query)
             h = acierta(top, c.patron_esperado)
             if h is not None:
                 hits_v10.append(h)
-            detalle.append({"conjunto": "v10 (18)", "variante": nombre, "ejemplo": c.ejemplo.tipo,
+            detalle.append({"conjunto": f"v10 ({len(CASOS_V10)})", "variante": nombre, "ejemplo": c.ejemplo.tipo,
                             "acierto": "—" if h is None else ("sí" if h else "no"), "top-3": " · ".join(top)})
         for e in EJEMPLOS_PENALES:
             top = _top3(store, cf, e.texto, conceptos_para(e.texto, "v11", cache), ["penal"], pesos, embed_query)
@@ -189,7 +160,7 @@ def correr_regresion(store, log=print):
             detalle.append({"conjunto": "penal (16)", "variante": nombre, "ejemplo": e.etiqueta,
                             "acierto": "—" if h is None else ("sí" if h else "no"),
                             "top-3": " · ".join(etiqueta_familia(f) for f in fams)})
-        resumen.append({"variante": nombre, "Hit@3 tipo (v10, 18)": f"{sum(hits_v10)}/{len(hits_v10)}",
+        resumen.append({"variante": nombre, f"Hit@3 tipo (v10, {len(CASOS_V10)})": f"{sum(hits_v10)}/{len(hits_v10)}",
                         "Hit@3 familia (penal, 16)": f"{sum(hits_pen)}/{len(hits_pen)}"})
     log("   Candidatos: orden RRF vs. orden por facetas (familia + acto impugnado)...")
     orden = candidatos_por_orden(store, clas_fam[config.ENRIQUECER_FAMILIAS], familias, cache, embed_query)
