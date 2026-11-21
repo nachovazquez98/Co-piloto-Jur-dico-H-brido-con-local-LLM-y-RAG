@@ -59,9 +59,10 @@ MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
 # 0.80), por recursos y antes de construir la referencia. En la validación completa, mistral:7b no alcanzó el mínimo
 # (0.795 en las 1,412 sentencias, corrida 20261117-065346_a60ca4f_referencias) y quedó fuera; la referencia es la
 # mayoría entre las reglas y gemma2:9b.
-# v11.2, corpus final: el mínimo se aplica en las sentencias de tipos de la tabla revisada (familias_penal.csv), la
-# población con que se fijó; en los tipos nuevos agrupados por reglas la etiqueta es ambigua. gemma2:9b: 0.807 en
-# revisados (n = 554), 0.739 con todas (20261121-003449_5311dc1_referencias). Ver referencias.validacion_jueces.
+# v11.2, corpus final: el mínimo se aplica en las sentencias de los tipos del corpus original (familias_penal.csv),
+# la población con que se fijó; en los tipos nuevos, raros y compuestos, la familia por reglas es ambigua. gemma2:9b:
+# 0.807 en tipos originales (n = 554), 0.739 con todas (20261121-003449_5311dc1_referencias). Decisión posterior,
+# aprobada por el autor y declarada. Ver referencias.validacion_jueces.
 MODELOS_JUECES = ["gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
 # Muestra al azar de los jueces (v11.2): juzgar todo con dos modelos tomaba ~7 h por juez. Cada elemento entra a la

@@ -209,9 +209,9 @@ def test_ampliar_plantilla_no_toca_las_existentes():
 
 
 
-def test_el_juez_se_valida_en_los_tipos_revisados():
+def test_el_juez_se_valida_en_los_tipos_originales():
     penal, familias, meta, resp = _sentencias()
-    revisados = set(penal["tipo"].iloc[:2])  # la tercera sentencia es de un tipo agrupado por reglas
-    tabla = R.tabla_sentencias(penal, familias, meta, resp, revisados=revisados)
+    originales = set(penal["tipo"].iloc[:2])  # la tercera sentencia es de un tipo que llegó después
+    tabla = R.tabla_sentencias(penal, familias, meta, resp, originales=originales)
     fila = R.validacion_jueces(tabla, ["j1"]).iloc[0]
-    assert fila["sentencias (tipos revisados)"] == int(tabla["tipo_revisado"].sum()) and fila["todas las sentencias"] == 3
+    assert fila["sentencias (tipos originales)"] == int(tabla["tipo_original"].sum()) and fila["todas las sentencias"] == 3

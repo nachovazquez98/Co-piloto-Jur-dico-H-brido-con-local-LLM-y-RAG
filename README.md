@@ -54,8 +54,8 @@ evaluación guardada.
 **Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
 de la API antes de que exigiera reCAPTCHA y las que se bajaron después a mano desde el portal (`construir-corpus
 --pdfs` las valida). El sistema trabaja con las 2,495 sentencias penales; sus 546 tipos del portal se agrupan en 24
-familias de delito (289 tipos en `evaluacion/familias_penal.csv`, para revisión de un abogado penalista; los demás,
-por las mismas reglas).
+familias de delito (asignadas por reglas: 289 tipos del corpus original en `evaluacion/familias_penal.csv`, ninguno revisado por
+una persona; los demás, con las mismas reglas al cargar).
 
 ## Instalación
 
@@ -135,8 +135,8 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
 
 **Evaluación automática (v11.2).** El delito sale de la categoría que asignó el STJ en su portal; el acto
 impugnado, el apelante y el sentido del fallo, de la mayoría entre las reglas y el juez `gemma2:9b` (0.807 de
-exactitud en la familia contra el STJ en las sentencias de tipos de la tabla revisada, n = 554; 0.739 con todas, por
-la familia ambigua de los tipos nuevos agrupados por reglas: `20261121-010354_07a04bb_referencias`; `mistral:7b` no
+exactitud en la familia contra el STJ en las sentencias de los tipos del corpus original, n = 554; 0.739 con todas, por
+la familia ambigua de los tipos nuevos, raros y compuestos: `20261121-010354_07a04bb_referencias`; `mistral:7b` no
 alcanzó el mínimo de 0.80 fijado antes de correrlo: `20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
 las consultas con todos sus pares).
 

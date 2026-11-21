@@ -63,21 +63,23 @@ def particion_documento(doc_id: str) -> str:
 # --------------------------------------------------------------------------------------------------------------
 
 
-def tipos_revisados(path: Path = config.FAMILIAS_CSV) -> set[str]:
-    """Tipos cuya familia está en la tabla para revisión (`familias_penal.csv`); los demás se agrupan por reglas."""
+def tipos_originales(path: Path = config.FAMILIAS_CSV) -> set[str]:
+    """Tipos del corpus con que se fijó el mínimo del juez: los exportados a `familias_penal.csv` (con su familia por
+    reglas; ninguna fila ha sido revisada por una persona). Los tipos que llegaron después se agrupan con las mismas
+    reglas al cargar."""
     return set(pd.read_csv(path, dtype=str)["tipo"]) if path.exists() else set()
 
 
 def tabla_sentencias(penal: pd.DataFrame, familias: dict[str, str], metadatos: dict[str, dict],
-                     respuestas: dict[str, dict[str, dict | None]], revisados: set[str] | None = None) -> pd.DataFrame:
+                     respuestas: dict[str, dict[str, dict | None]], originales: set[str] | None = None) -> pd.DataFrame:
     """Una fila por sentencia: familia del STJ y lo que leyó cada lector. `respuestas` = {modelo: {doc_id:
     respuesta normalizada o None}} (sentencias sin juzgar: ausentes)."""
-    revisados = tipos_revisados() if revisados is None else revisados
+    originales = tipos_originales() if originales is None else originales
     filas = []
     for d, tipo in zip(penal["id"], penal["tipo"]):
         meta = metadatos.get(d, {})
         f = {"doc_id": d, "particion": particion_documento(d), "familia_stj": etiqueta_familia(familias[tipo]),
-             "tipo_revisado": tipo in revisados}
+             "tipo_original": tipo in originales}
         for campo in CAMPOS:
             f[f"{campo}:{REGLAS}"] = meta.get(campo, NO_DETERMINADO)
         for modelo, resp in respuestas.items():
@@ -94,21 +96,21 @@ def validacion_jueces(tabla: pd.DataFrame, modelos: list[str],
     """Exactitud de cada juez en la familia del delito contra la categoría del STJ (una respuesta inválida o
     ausente cuenta como error) y si alcanza el mínimo para usarse.
 
-    Se decide con las sentencias de tipos de la tabla revisada (`familias_penal.csv`), la población con que se fijó el
-    mínimo: entonces todos los tipos del corpus estaban en ella. Al ampliar el corpus, la familia de los tipos nuevos
-    se asigna por reglas y es ambigua en los compuestos (daño en las cosas a título de culpa: "delitos culposos" o
-    "daño en las cosas"); gemma2:9b acertó 0.807 en los revisados (n = 554) y 0.520 en los nuevos (n = 171),
-    0.739 en total (20261121-003449_5311dc1_referencias). Decisión posterior a ver ese resultado, aprobada por el autor
-    y declarada; la exactitud con todas las sentencias se sigue reportando."""
+    Se decide con las sentencias de los tipos del corpus original (`familias_penal.csv`), la población con que se
+    fijó el mínimo. Los tipos que llegaron con el corpus final son en su mayoría raros y compuestos, y su familia por
+    reglas es ambigua (daño en las cosas a título de culpa: "delitos culposos" o "daño en las cosas"); gemma2:9b acertó
+    0.807 en los tipos originales (n = 554), 0.520 en los nuevos (n = 171) y 0.739 en total
+    (20261121-003449_5311dc1_referencias). Decisión posterior a ver ese resultado, aprobada por el autor y declarada;
+    la exactitud con todas se sigue reportando. Ninguna familia ha sido revisada por una persona."""
     filas = []
     for modelo in modelos:
         col = f"familia:{lector(modelo)}"
         if col not in tabla:
             continue
-        base = tabla[tabla["tipo_revisado"]] if "tipo_revisado" in tabla and tabla["tipo_revisado"].any() else tabla
+        base = tabla[tabla["tipo_original"]] if "tipo_original" in tabla and tabla["tipo_original"].any() else tabla
         r = m.proporcion_con_ic((base[col] == base["familia_stj"]).astype(float).tolist())
         todas = m.proporcion_con_ic((tabla[col] == tabla["familia_stj"]).astype(float).tolist())
-        filas.append({"juez": modelo, "sentencias (tipos revisados)": len(base),
+        filas.append({"juez": modelo, "sentencias (tipos originales)": len(base),
                       "con respuesta válida": int(base[col].notna().sum()),
                       "exactitud familia (STJ)": r["valor"], "IC95": f"[{r['ic_inf']:.3f}, {r['ic_sup']:.3f}]",
                       "todas las sentencias": len(tabla), "exactitud (todas)": todas["valor"],
@@ -373,8 +375,9 @@ def construir(modelos: list[str] | None = None, log=print, completa: bool = Fals
     tabla.to_csv(REFERENCIAS_PATH, index=False)
     corrida.tabla("Validación de los jueces", "Exactitud de la familia del delito que lee cada juez contra la "
                   "categoría que asignó el STJ (referencia externa; una respuesta inválida cuenta como error). Un juez "
-                  "se usa si alcanza el mínimo, fijado antes de correrlos, en las sentencias de tipos de la tabla "
-                  "revisada (familias_penal.csv); la exactitud con todas se reporta aparte.", val)
+                  "se usa si alcanza el mínimo, fijado antes de correrlos, en las sentencias de los tipos del corpus "
+                  "original (familias_penal.csv), la población con que se fijó; la exactitud con todas se reporta "
+                  "aparte.", val)
     corrida.tabla("Acuerdo entre lectores de la sentencia", "Reglas y jueces leen acto impugnado, apelante y "
                   "sentido; kappa de Cohen sobre las sentencias donde ambos respondieron.",
                   acuerdo_lectores(tabla, list(respuestas)))
