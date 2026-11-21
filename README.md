@@ -164,6 +164,13 @@ Los valores por defecto son los del alcance penal. Las opciones de la versión 1
 entorno solo para comparar en la evaluación (ver `.env.example` y los comentarios de `config.py`, donde cada decisión
 cita la corrida que la respalda).
 
+**Modelo de lenguaje:** `llama3.1:8b`, el evaluado. Cabe íntegro en 8 GB de GPU con la ventana de 8,192 tokens
+(`gemma2:9b` y `qwen2.5:14b` no). `qwen2.5:7b` también cabe y fue más rápido en el diagnóstico de modelos
+(`20261113-125326_fb1f3fe_modelos`, 20 fichas sin referencia), pero como juez no alcanzó 0.80 al leer la familia del
+delito, y cambiarlo invalida las 2,495 fichas precalculadas y la evaluación. Puede elegirse en la barra lateral como
+alternativa no evaluada (las fichas se generan en el momento). El análisis completo y el protocolo para adoptarlo
+están en el notebook (`notebooks/`, sección 2.1).
+
 **Resultados guardados:** la app guarda cada consulta analizada y su resultado en `data/cache/resultados/` (local,
 fuera de git) y, si se repite con la misma configuración, modelo, índice y código, lo muestra con la línea
 "Resultado guardado el <fecha>". Si las consultas traen datos de clientes, apágalo con
