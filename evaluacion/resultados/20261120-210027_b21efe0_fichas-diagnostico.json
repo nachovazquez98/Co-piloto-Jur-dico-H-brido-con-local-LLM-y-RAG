@@ -1,13 +1,13 @@
 {
   "comando": "fichas-diagnostico",
-  "fecha": "2026-11-19T22:46:32",
-  "commit": "96142b0",
+  "fecha": "2026-11-20T21:00:27",
+  "commit": "b21efe0",
   "sucio": false,
   "semilla": 42,
   "parametros": {
     "version_ficha": "v11-9e84ac8f47"
   },
-  "corpus_fingerprint": "81731ac307ba383c",
+  "corpus_fingerprint": "e3c3ff004e3af705",
   "modelo_embeddings": "intfloat/multilingual-e5-base",
   "modelo_llm": "llama3.1:8b",
   "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
@@ -136,7 +136,7 @@
       "seed": 42
     }
   },
-  "n_fichas": 1463,
+  "n_fichas": 2337,
   "congelado": null,
   "tablas": {
     "Resumen": {
@@ -149,35 +149,35 @@
       "filas": [
         {
           "indicador": "Fichas de esta versión",
-          "valor": "1463"
+          "valor": "2337"
         },
         {
           "indicador": "JSON inválido tras el reintento",
-          "valor": "4/1463 (0.3%)"
+          "valor": "14/2337 (0.6%)"
         },
         {
           "indicador": "Necesitaron reintento (y quedaron válidas)",
-          "valor": "85/1459 (5.8%)"
+          "valor": "163/2323 (7.0%)"
         },
         {
           "indicador": "Sentido leído por reglas (cobertura)",
-          "valor": "880/1459 (60.3%)"
+          "valor": "1784/2323 (76.8%)"
         },
         {
           "indicador": "Sentido LLM = reglas (donde hay ambos)",
-          "valor": "617/880 (70.1%)"
+          "valor": "1274/1784 (71.4%)"
         },
         {
           "indicador": "Fichas con algún artículo no encontrado en la sentencia",
-          "valor": "24/1459 (1.6%)"
+          "valor": "36/2323 (1.5%)"
         },
         {
           "indicador": "Artículos citados no encontrados en la sentencia",
-          "valor": "32/5788 (0.6%)"
+          "valor": "44/9622 (0.5%)"
         },
         {
           "indicador": "Segundos por ficha (p50 / p95)",
-          "valor": "25 / 38"
+          "valor": "22 / 37"
         }
       ]
     },
@@ -194,31 +194,31 @@
       "filas": [
         {
           "LLM \\ reglas": "CONFIRMA",
-          "CONFIRMA": 428,
-          "MODIFICA": 27,
-          "REPONE": 50,
-          "REVOCA": 135
+          "CONFIRMA": 859,
+          "MODIFICA": 95,
+          "REPONE": 92,
+          "REVOCA": 218
         },
         {
           "LLM \\ reglas": "MODIFICA",
-          "CONFIRMA": 3,
-          "MODIFICA": 84,
+          "CONFIRMA": 5,
+          "MODIFICA": 204,
           "REPONE": 3,
-          "REVOCA": 0
+          "REVOCA": 1
         },
         {
           "LLM \\ reglas": "REPONE",
           "CONFIRMA": 0,
           "MODIFICA": 0,
-          "REPONE": 23,
+          "REPONE": 53,
           "REVOCA": 0
         },
         {
           "LLM \\ reglas": "REVOCA",
-          "CONFIRMA": 0,
-          "MODIFICA": 2,
-          "REPONE": 43,
-          "REVOCA": 82
+          "CONFIRMA": 1,
+          "MODIFICA": 3,
+          "REPONE": 92,
+          "REVOCA": 158
         }
       ]
     },
@@ -232,59 +232,59 @@
       "filas": [
         {
           "campo": "tribunal",
-          "dato no disponible": "0/1459 (0.0%)"
+          "dato no disponible": "0/2323 (0.0%)"
         },
         {
           "campo": "fecha_resolucion",
-          "dato no disponible": "310/1459 (21.2%)"
+          "dato no disponible": "426/2323 (18.3%)"
         },
         {
           "campo": "identificador",
-          "dato no disponible": "3/1459 (0.2%)"
+          "dato no disponible": "6/2323 (0.3%)"
         },
         {
           "campo": "etapa_procesal",
-          "dato no disponible": "9/1459 (0.6%)"
+          "dato no disponible": "10/2323 (0.4%)"
         },
         {
           "campo": "acto_impugnado",
-          "dato no disponible": "16/1459 (1.1%)"
+          "dato no disponible": "23/2323 (1.0%)"
         },
         {
           "campo": "apelante",
-          "dato no disponible": "56/1459 (3.8%)"
+          "dato no disponible": "97/2323 (4.2%)"
         },
         {
           "campo": "delitos",
-          "dato no disponible": "0/1459 (0.0%)"
+          "dato no disponible": "0/2323 (0.0%)"
         },
         {
           "campo": "hechos_clave",
-          "dato no disponible": "0/1459 (0.0%)"
+          "dato no disponible": "2/2323 (0.1%)"
         },
         {
           "campo": "decision",
-          "dato no disponible": "11/1459 (0.8%)"
+          "dato no disponible": "12/2323 (0.5%)"
         },
         {
           "campo": "resumen",
-          "dato no disponible": "0/1459 (0.0%)"
+          "dato no disponible": "0/2323 (0.0%)"
         },
         {
           "campo": "agravios",
-          "dato no disponible": "493/1459 (33.8%)"
+          "dato no disponible": "745/2323 (32.1%)"
         },
         {
           "campo": "fundamento_legal",
-          "dato no disponible": "46/1459 (3.2%)"
+          "dato no disponible": "66/2323 (2.8%)"
         },
         {
           "campo": "pruebas_decisivas",
-          "dato no disponible": "369/1459 (25.3%)"
+          "dato no disponible": "564/2323 (24.3%)"
         },
         {
           "campo": "sentido_fallo = OTRO",
-          "dato no disponible": "0/1459 (0.0%)"
+          "dato no disponible": "0/2323 (0.0%)"
         }
       ]
     }

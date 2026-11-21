@@ -3,7 +3,7 @@ A001,desarrollo,False,False,gemma2:9b: no se identifica el delito
 A002,prueba,False,False,gemma2:9b: no se identifica el delito
 A003,desarrollo,False,True,
 A005,prueba,False,True,
-A007,prueba,False,True,
+A007,prueba,False,False,copiaba estas frases de la sentencia: «acreditado los elementos del cuerpo del delito»
 A008,prueba,False,True,
 A010,desarrollo,False,False,gemma2:9b: no se identifica el delito
 A011,prueba,False,True,
@@ -18,7 +18,7 @@ A027,prueba,False,True,
 A028,prueba,False,False,"copiaba estas frases de la sentencia: «auto de no vinculacion a proceso y», «un auto de no vinculacion a proceso»"
 A032,desarrollo,False,True,
 A033,prueba,False,True,
-A034,prueba,False,True,
+A034,prueba,False,False,"copiaba estas frases de la sentencia: «le atribuye la comision de un delito», «se le atribuye la comision de un»"
 A035,desarrollo,False,False,incluía datos que identifican la sentencia: siete años
 A036,prueba,False,True,
 A039,desarrollo,False,True,
@@ -80,7 +80,7 @@ A139,prueba,False,False,gemma2:9b: no se identifica el delito
 A142,desarrollo,False,True,
 A144,prueba,False,True,
 A146,desarrollo,False,True,
-A147,desarrollo,False,True,
+A147,desarrollo,False,False,copiaba estas frases de la sentencia: «un auto de no vinculacion a proceso»
 A148,desarrollo,False,False,gemma2:9b: no se identifica el delito
 A149,prueba,False,False,"copiaba estas frases de la sentencia: «el sobreseimiento total de la causa penal», «su responsabilidad criminal en la comision del»"
 A153,prueba,False,True,
@@ -94,11 +94,11 @@ A170,desarrollo,False,False,"copiaba estas frases de la sentencia: «232 bis fra
 A172,prueba,False,True,
 A177,prueba,False,True,
 A185,prueba,False,True,
-A187,desarrollo,False,True,
+A187,desarrollo,False,False,copiaba estas frases de la sentencia: «improcedente el incidente de inimputabilidad promovido en»
 A188,prueba,False,True,
 A190,desarrollo,False,False,"copiaba estas frases de la sentencia: «ampliacion del termino constitucional de ciento cuarenta», «constitucional de ciento cuarenta y cuatro horas», «del termino constitucional de ciento cuarenta y»"
 A191,desarrollo,False,False,gemma2:9b: no se identifica el delito
-A192,prueba,False,True,
+A192,prueba,False,False,copiaba estas frases de la sentencia: «el auto de no vinculacion a proceso»
 A193,prueba,False,True,
 A194,prueba,False,False,gemma2:9b: no se identifica el delito
 A196,prueba,False,False,copiaba estas frases de la sentencia: «vinculacion a proceso y la imposicion de»
