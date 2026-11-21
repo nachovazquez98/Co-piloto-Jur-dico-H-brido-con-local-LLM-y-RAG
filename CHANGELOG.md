@@ -9,6 +9,9 @@ del texto de la sentencia (reglas) y de un juez LLM de otra familia que la del m
 usarse. Corpus penal ampliado con descargas a mano desde el portal.
 
 ### Añadido
+- Evaluación final en la partición de prueba, una sola corrida por comando (congelado `a15b83c852281010`): Hit@3 de
+  familia 0.717, exactitud de la familia en la ficha 0.917, precisión del fundamento legal 0.644, recall de QC_1 0.721,
+  p50 de 30.8 s por consulta; tabla completa en el README y guía de lectura en `evaluacion/README.md`.
 - `evaluacion jueces`: pares (consulta, sentencia) por agrupamiento y tandas de un juez a la vez, reanudables y con
   la clave del prompt, sobre una muestra estable por hash (30 % de las sentencias, 50 % de las consultas con todos sus
   pares; `--completa` para todo). Si el juez de relevancia omite la calificación, un tercer intento pide solo esa clave.
@@ -95,7 +98,7 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 - Familias de delito: 25 (nueva «cuestiones procesales» para quejas, excusas y conflictos de competencia; plagio,
   prostitución infantil, uso de documento falso, sustracción de menores y ejercicio indebido del servicio público con su
   familia). `familias_penal.csv` lista los 546 tipos; ninguna asignación revisada por un especialista.
-- Juez `gemma2:9b` con el corpus final: 0.739 en 725 sentencias, **no se usa** (mínimo 0.80 fijado de antemano;
+- Juez `gemma2:9b` con el corpus final: 0.742 en 725 sentencias con las 25 familias (`20261121-031724_723fe6b`), **no se usa** (mínimo 0.80 fijado de antemano;
   `20261121-003449_5311dc1_referencias`). La referencia de acto, apelante y sentido queda con las reglas.
 
 ### Quitado

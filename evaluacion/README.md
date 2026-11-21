@@ -27,7 +27,7 @@ criterio fijado antes de correrlos:
 | `qwen2.5:14b` | Descartado por recursos: no cabe en 8 GB y la laptop no lo sostiene en tandas largas | comentario en `config.py` |
 | `mistral:7b` | **No usable:** 0.795 en las 1,412 sentencias | `resultados/20261117-065346_a60ca4f_referencias` |
 | `gemma2:9b` | **Usable:** 0.845, IC 95 % [0.807, 0.877], en la muestra de 401 del corpus anterior | `resultados/20261117-065346_a60ca4f_referencias` |
-| `gemma2:9b`, corpus final | **No usable:** 0.739, IC 95 % [0.706, 0.770], en las 725 sentencias de la muestra | `resultados/20261121-003449_5311dc1_referencias`, `errores/juez_familia.md` |
+| `gemma2:9b`, corpus final (25 familias) | **No usable:** 0.742, IC 95 % [0.709, 0.773], en las 725 sentencias de la muestra | `resultados/20261121-031724_723fe6b_referencias`; con 24 familias, 0.739 (`20261121-003449_5311dc1`), errores en `errores/juez_familia.md` |
 
 **Consecuencia.** Sin juez usable, el acto impugnado, el apelante y el sentido de la referencia salen de las reglas, que
 la app también usa para ordenar candidatos: esas métricas no son independientes y se reportan como tales. Las métricas
@@ -78,6 +78,27 @@ efectiva, texto de cada prompt y digest del modelo. Cada corrida de prueba se ni
 (lo dice en una línea) y solo se permite **una vez** por comando y congelado (`prueba_corridas.jsonl` guarda la
 marca). Repetirla exige `--forzar "motivo"`, y el motivo queda en el reporte. Las corridas de desarrollo solo avisan
 si algo cambió. Solo cuentan las consultas validadas por `referencias`.
+
+## Guía de interpretación de las métricas
+
+Valores de la corrida final (partición de prueba, congelado `a15b83c852281010`, 46 consultas validadas).
+
+| Métrica | Pregunta que responde | Cálculo | Resultado y lectura |
+|---|---|---|---|
+| **Hit@3 de familia** (`recuperacion`) | ¿El filtro de búsqueda contiene el delito correcto? | Fracción de consultas cuya familia del STJ está entre las 3 que elige el clasificador; la sentencia de origen no vota (*leave-one-out*); IC 95 % de Wilson | 0.717 [0.575, 0.827]: en 7 de cada 10 consultas el sistema busca en la familia correcta; la línea base k-NN, 0.435 |
+| **Hit@k** | ¿Aparece la sentencia de la que se redactó la consulta? | Fracción de consultas con esa sentencia entre los k primeros | Hit@5 de la app 0.174; con re-ranker 0.370. Mide un solo documento: hay otros precedentes útiles |
+| **MRR** | ¿Qué tan arriba aparece esa sentencia? | Promedio de 1/posición (1 = primera, 0.5 = segunda; lista de 30) | App 0.152; BM25 solo 0.233 |
+| **nDCG@5** | ¿Los 5 primeros están bien ordenados por utilidad? | Ganancia con descuento por posición, normalizada por el orden ideal; relevancia 2 = mismo delito y mismo problema procesal, 1 = uno de los dos | App 0.285; BM25 0.243; embeddings 0.304; 1 = orden perfecto |
+| **P@5** | ¿Cuántos de los 5 primeros son pertinentes? | Fracción del top 5 con relevancia ≥ 1 | App 0.265: 1.3 de los 5 primeros |
+| **Diferencia pareada** | ¿Una variante supera a otra? | Media por consulta de (A − B), IC 95 % por *bootstrap* pareado (1,000 remuestreos); efecto mínimo detectable con alfa 5 % y potencia 80 % | Significativa si el intervalo no incluye 0: el híbrido supera a k-NN en Hit@3 (+0.283); el re-ranker mejora Hit@5 (+0.196) pero no nDCG@5 |
+| **Exactitud de la ficha** (`fichas-referencia`) | ¿La ficha lee bien delito, acto, apelante y sentido? | Coincidencia con la referencia por campo; IC de Wilson | Familia 0.917, acto 0.883, apelante 0.830, sentido 0.722 |
+| **Precisión del fundamento legal** | ¿Los artículos que cita la ficha son los que invocó la Sala? | Por ficha, citados que figuran en el fundamento ÷ citados; promedio con IC *bootstrap* | 0.644 [0.600, 0.690]: casi 2 de cada 3 artículos citados son fundamento de la Sala |
+| **Exhaustividad del fundamento** | ¿Cuánto del fundamento recoge la ficha? | Citados en el fundamento ÷ artículos del fundamento | 0.133: la ficha resume los principales; la sentencia invoca muchos |
+| **Artículos no encontrados** | ¿La ficha cita artículos ausentes de la sentencia? | Artículos de la ficha que no aparecen en el texto | 7 de 350 fichas; la app los marca con «verificar» |
+| **Precisión / recall / kappa de QC_1** (`qc`) | ¿El control de relevancia descarta precedentes útiles? | Veredictos contra la referencia en 776 pares; kappa descuenta el acuerdo por azar | Recall 0.721: conserva 7 de cada 10 relevantes; precisión 0.322 y kappa 0.051: deja pasar muchos no relevantes: está diseñado para no descartar; el orden por facetas y QC_2 actúan después |
+| **Esfuerzo** (`esfuerzo`) | ¿Cuántas sentencias hay que abrir para hallar 3 útiles? | Sentencias abiertas hasta reunir 3 útiles (misma familia y mismo acto impugnado), tope 30 (31 = no llegó); 9 consultas | Con el delito elegido, mediana 22 frente a 31 del portal; elegir el delito ahorra 7.0 [+1.8, +13.2] |
+| **Coherencia de familias** (`familias --coherencia`) | ¿Los tipos agrupados se parecen entre sí? | Tipos (≥ 3 sentencias) cuyo centroide queda más cerca de su familia que de otra | 166 de 246 |
+| **Latencia p50 / p95** (`latencia`) | ¿Cuánto espera el usuario? | Mediana y percentil 95 por consulta | 30.8 s / 52.6 s, 5 llamadas al LLM (p50) |
 
 ## Archivos
 

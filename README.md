@@ -53,9 +53,9 @@ evaluación guardada.
 
 **Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
 de la API antes de que exigiera reCAPTCHA y las que se bajaron después a mano desde el portal (`construir-corpus
---pdfs` las valida). El sistema trabaja con las 2,495 sentencias penales; sus 546 tipos del portal se agrupan en 24
-familias de delito (asignadas por reglas: 289 tipos del corpus original en `evaluacion/familias_penal.csv`, ninguno revisado por
-una persona; los demás, con las mismas reglas al cargar).
+--pdfs` las valida). El corpus contiene solo resoluciones penales: 2,495 sentencias, cuyos 546 tipos del portal se
+agrupan en 25 familias de delito, incluida «cuestiones procesales» para quejas, excusas y conflictos de competencia,
+que no son delitos (`evaluacion/familias_penal.csv`, asignadas por reglas; ninguna revisada por un especialista).
 
 ## Instalación
 
@@ -81,17 +81,26 @@ El protocolo separa cada componente y lo mide con datos que no se usaron para aj
 commit, configuración, semilla y huella del corpus. No hay abogados disponibles: la referencia es automática (la
 categoría del STJ, reglas y un juez LLM validado) y se describe en [`evaluacion/README.md`](evaluacion/README.md).
 
-| Qué se mide | Métrica | Comando | Estado |
+Resultados de la evaluación final: partición de prueba, una sola corrida por comando con el congelado
+`a15b83c852281010` (commit `4b1529e`); 46 consultas validadas (más 2 sin respuesta en el corpus), IC 95 %.
+
+| Qué se mide | Métrica | Resultado | Corrida |
 |---|---|---|---|
-| ¿El filtro conserva la familia correcta? | Hit@3 de familia, IC 95 % (Wilson) | `recuperacion` | por medir |
-| ¿La búsqueda híbrida supera a BM25 y a embeddings solos? | Hit@5, MRR, nDCG@5, diferencia pareada con IC bootstrap | `recuperacion` | por medir |
-| ¿QC_1 pierde precedentes útiles? | precisión, recall, kappa contra la referencia | `qc` | por medir |
-| ¿La ficha es correcta? | exactitud por campo contra la referencia, artículos que no están en la sentencia | `fichas-referencia` | por medir |
-| ¿Ahorra trabajo? | sentencias que hay que abrir para encontrar 3 útiles | `esfuerzo` | por medir |
-| ¿Cuánto tarda? | p50/p95 por etapa, llamadas al LLM | `latencia` | ver abajo |
+| ¿El filtro conserva la familia correcta? | Hit@3 de familia (Wilson) | **0.717** [0.575, 0.827]; línea base k-NN 0.435; diferencia +0.283 [+0.130, +0.435], significativa | `20261121-032545_4b1529e_recuperacion` |
+| ¿La búsqueda híbrida supera a BM25 y a embeddings solos? | nDCG@5 contra la referencia, diferencia pareada (bootstrap) | app 0.285 [0.211, 0.355]; BM25 0.243; embeddings 0.304; diferencias no significativas con n = 46. Con metadatos, RRF supera a embeddings: +0.093 [+0.042, +0.143] | `20261121-032545_4b1529e_recuperacion` |
+| ¿Conviene el re-ranker? | criterio fijado: nDCG@5 contra la referencia | Hit@5 del documento fuente +0.196 [+0.065, +0.326]; nDCG@5 −0.029 [−0.094, +0.039]: no cumple el criterio y queda apagado | `20261121-032545_4b1529e_recuperacion` |
+| ¿QC_1 pierde precedentes útiles? | recall, precisión, kappa (776 pares) | recall **0.721** [0.660, 0.775]; precisión 0.322; kappa 0.051 | `20261121-052256_4b1529e_qc` |
+| ¿La ficha es correcta? | exactitud por campo (Wilson) | familia **0.917** [0.884, 0.942] (n = 350); acto impugnado 0.883; apelante 0.830; sentido del fallo 0.722 [0.665, 0.772] | `20261121-032553_4b1529e_fichas-referencia` |
+| ¿El fundamento legal de la ficha es el de la Sala? | precisión y exhaustividad de los artículos (bootstrap) | precisión **0.644** [0.600, 0.690]; exhaustividad 0.133 (la ficha resume los principales); 48.2 % de las fichas con todas sus citas en el fundamento; 7 de 350 fichas citan algún artículo que no está en la sentencia | `20261121-032553_4b1529e_fichas-referencia` |
+| ¿Ahorra trabajo? | sentencias que hay que abrir para encontrar 3 útiles (9 consultas) | con el delito elegido, mediana 22 frente a 31 del portal; elegir el delito ahorra 7.0 [+1.8, +13.2], significativo | `20261121-032625_4b1529e_esfuerzo` |
+| ¿Cuánto tarda? | p50/p95 por consulta, llamadas al LLM | 30.8 s / 52.6 s; 5 llamadas (p50) | `20261121-052935_4b1529e_latencia` |
+| ¿Resiste consultas difíciles? | 8 consultas de robustez | 8/8 terminan; aviso de otra materia en las 3 que lo requieren; ninguna síntesis pronostica el resultado; ningún archivo guarda los datos personales de prueba | `20261121-053544_4b1529e_robustez` |
+
+Análisis de los fallos por tipo en `evaluacion/errores/` (`errores --corrida`). Guía para leer cada métrica en
+[`evaluacion/README.md`](evaluacion/README.md).
 
 Orden de la evaluación final: corpus definitivo → fichas → juez y `referencias` → `congelar` → corridas con
-`--particion prueba`, una sola vez. Lo que sigue en esta sección es **diagnóstico**, no evaluación.
+`--particion prueba`, una sola vez. Lo que sigue en esta sección es **diagnóstico** de versiones anteriores.
 
 **Referencia histórica (v10):** en 15 de 18 consultas de ejemplo el filtro incluyó la categoría correcta:
 Hit@3 = 0.83, IC 95 % [0.61, 0.94], n = 18. Son consultas de cinco materias (no un conjunto penal) y los pesos se
@@ -106,6 +115,7 @@ en `evaluacion/resultados/`):
 | v11.0: ficha en una llamada JSON + QC_2 determinista | `20261112-173610_0a20152` | 138 s | 168 s | 8 (9) |
 | v11.1, fichas generadas en el momento | `20261113-111047_fb1f3fe` | 121 s | 140 s | 8 (9) |
 | v11.1, fichas precalculadas (la app por defecto) | `20261113-111602_fb1f3fe` | 30 s | 34 s | 5 (6) |
+| v11.2, solo penal, fichas precalculadas | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
 
 Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 41 s
 (`20261113-112440_fb1f3fe`). Con un resultado ya guardado (`demo --ejemplos`) la app lo muestra en 0.005 s
@@ -127,16 +137,17 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
   | `llama3.1:8b` (el de la app) | 125 s / 167 s | 19/20 | 4/6 | 11/96 | 7,311 MiB |
   | `qwen2.5:7b` | 83 s / 121 s | 20/20 | 5/6 | 7/106 | 7,049 MiB |
 
-  Con 20 fichas sin anotar no alcanza para cambiar de modelo; la comparación con fichas anotadas queda por medir.
+  Con 20 fichas no alcanza para cambiar de modelo; `qwen2.5:7b` se usa como modelo de respaldo de las fichas precalculadas.
 - Consultas difíciles (`20261113-115133_fb1f3fe_robustez`): las 8 terminaron, ninguna síntesis pronosticó el
   resultado (tampoco con instrucciones inyectadas en la consulta) y los datos personales de prueba no quedaron en
   ningún archivo; pero las consultas civil, familiar y fuera de tema **no** recibieron el aviso de "no hay
-  precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia (ver [Limitaciones](#limitaciones)).
+  precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia, que aparece en las 3
+  (`20261121-053544_4b1529e_robustez`).
 
 **Evaluación automática (v11.2).** El delito sale de la categoría que asignó el STJ en su portal; el acto
 impugnado, el apelante y el sentido del fallo, de las reglas sobre el texto: el juez `gemma2:9b` acertó la familia del
-STJ en 0.739 de 725 sentencias del corpus final, por debajo del mínimo de 0.80 fijado antes de correrlo, y no se usa
-(`20261121-003449_5311dc1_referencias`, análisis en `evaluacion/errores/juez_familia.md`); `mistral:7b` tampoco
+STJ en 0.742 de 725 sentencias del corpus final, por debajo del mínimo de 0.80 fijado antes de correrlo, y no se usa
+(`20261121-031724_723fe6b_referencias`, análisis en `evaluacion/errores/juez_familia.md`); `mistral:7b` tampoco
 alcanzó el mínimo (`20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
 las consultas con todos sus pares).
 
