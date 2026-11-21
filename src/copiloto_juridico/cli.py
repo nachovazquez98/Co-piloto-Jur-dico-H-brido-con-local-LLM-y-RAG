@@ -65,6 +65,12 @@ def cmd_construir_corpus(args) -> None:
     # muestreada); entre iguales, la primera fuente (PDFs > corpus actual > chroma).
     todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
+    # v11.2: el corpus contiene solo las materias del alcance (penal); las demás ya no se guardan ni se indexan.
+    fuera = ~todo["materia"].isin(config.MATERIAS_ACTIVAS)
+    if fuera.any():
+        _log(f"Fuera del alcance ({', '.join(config.MATERIAS_ACTIVAS)}): {int(fuera.sum())} sentencias de "
+             f"{', '.join(sorted(todo.loc[fuera, 'materia'].unique()))}.")
+        todo = todo[~fuera]
     # La misma sentencia publicada dos veces con distinto nombre: contaría doble en la búsqueda y podía quedar una
     # copia en desarrollo y otra en prueba. Se queda la que es fuente de consultas o, si no, la primera por fecha.
     fuentes_consultas = set()
@@ -72,7 +78,8 @@ def cmd_construir_corpus(args) -> None:
         fuentes_consultas = {json.loads(x).get("doc_id_fuente") for x in config.CONSULTAS_PATH.read_text(
             encoding="utf-8").splitlines() if x.strip() and not x.lstrip().startswith("#")}
     dup = duplicados_de_texto(todo, fuentes_consultas)
-    dup.to_csv(config.CORPUS_DIR / "duplicados.csv", index=False)  # el de esta construcción, aunque esté vacío
+    if args.pdfs or args.chroma:  # el de esta construcción con fuentes nuevas, aunque esté vacío
+        dup.to_csv(config.CORPUS_DIR / "duplicados.csv", index=False)
     if len(dup):
         _log(f"⚠️ {len(dup)} sentencias repetidas (mismo texto con otro nombre); se quita la copia.")
         todo = todo[~todo["id"].isin(dup["id"])]
@@ -91,12 +98,18 @@ def cmd_construir_corpus(args) -> None:
 
 def cmd_indexar(args) -> None:
     from .datos.corpus import load_corpus
-    from .datos.indice import build_index
+    from .datos.indice import build_index, recortar_indice
 
     corpus = load_corpus()
     if corpus.empty:
         sys.exit("El corpus está vacío. Ejecuta primero 'construir-corpus'.")
-    build_index(corpus, log=_log)
+    if args.recortar:
+        try:
+            recortar_indice(corpus, log=_log)
+        except ValueError as e:
+            sys.exit(f"❌ {e}")
+    else:
+        build_index(corpus, log=_log)
     cmd_metadatos(args, corpus)  # los metadatos procesales van siempre con el corpus indexado
 
 
@@ -301,8 +314,11 @@ def main(argv=None) -> None:
     c.add_argument("--reiniciar", action="store_true", help="Ignora el corpus actual")
     c.set_defaults(func=cmd_construir_corpus)
 
-    sub.add_parser("indexar", help="Genera los embeddings del corpus en data/indice (y los metadatos procesales)"
-                   ).set_defaults(func=cmd_indexar)
+    ix = sub.add_parser("indexar", help="Genera los embeddings del corpus en data/indice (y los metadatos procesales)")
+    ix.add_argument("--recortar", action="store_true",
+                    help="Sin recalcular: conserva del índice actual solo los fragmentos de las sentencias del corpus "
+                         "(cuando el corpus es un subconjunto con los mismos textos)")
+    ix.set_defaults(func=cmd_indexar)
     sub.add_parser("metadatos", help="Solo los metadatos procesales por reglas y su cobertura"
                    ).set_defaults(func=cmd_metadatos)
 

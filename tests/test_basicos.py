@@ -1,3 +1,4 @@
+import pytest
 import pandas as pd
 
 from copiloto_juridico.datos.balance import select_balanced, slugify, tipo_key
@@ -180,3 +181,24 @@ def test_extraccion_conserva_inicio_numerado_y_resolutivos():
     texto = extract_and_clean_legal_text(crudo)
     assert texto.startswith("1.vistos para resolver")
     assert "se confirma el auto" in texto and "anexo de datos testados" not in texto
+
+
+def test_recortar_indice_conserva_los_vectores_de_las_sentencias_que_quedan(tmp_path, monkeypatch):
+    import numpy as np
+    import pandas as pd
+
+    from copiloto_juridico.datos import indice
+
+    monkeypatch.setattr(indice, "embed_texts", lambda textos, kind="passage": np.array(
+        [[len(t), i] for i, t in enumerate(textos)], dtype=np.float32))
+    corpus = pd.DataFrame({"id": ["p1", "c1", "p2"], "materia": ["penal", "civil", "penal"],
+                           "texto": ["robo " * 400, "pagaré " * 300, "homicidio " * 500]})
+    indice.build_index(corpus, tmp_path, log=lambda m: None)
+    _, chunks0, emb0 = indice.load_index(tmp_path)
+    penal = corpus[corpus["materia"] == "penal"]
+    m = indice.recortar_indice(penal, tmp_path, log=lambda m: None)
+    _, chunks, emb = indice.load_index(tmp_path)
+    assert m["num_docs"] == 2 and set(chunks["doc_id"]) == {"p1", "p2"}
+    assert (emb == emb0[chunks0["doc_id"].isin({"p1", "p2"}).to_numpy()]).all()
+    with pytest.raises(ValueError):  # un texto distinto exige reindexar
+        indice.recortar_indice(penal.assign(texto=penal["texto"] + " otro texto" * 300), tmp_path, log=lambda m: None)

@@ -63,18 +63,43 @@ def build_index(corpus: pd.DataFrame, directory: Path = config.INDICE_DIR,
         parts.append(embed_texts(chunks["texto"].iloc[start:start + lote].tolist(), kind="passage"))
         log(f"   -> {min(start + lote, len(chunks))}/{len(chunks)} fragmentos ({time.time() - t0:.0f}s)")
     emb = np.vstack(parts).astype(np.float16)
+    manifest = {**index_params(), "corpus_fingerprint": corpus_fingerprint(corpus), "num_docs": len(corpus),
+                "num_chunks": len(chunks), "dim": int(emb.shape[1])}
+    _guardar(chunks, emb, manifest, directory)
+    log(f"Índice guardado en '{directory}' ({time.time() - t0:.0f}s).")
+    return manifest
 
+
+def _guardar(chunks: pd.DataFrame, emb: np.ndarray, manifest: dict, directory: Path) -> None:
     for old in list(directory.glob("embeddings-*.npy")) + list(directory.glob("fragmentos.parquet")):
         old.unlink()
     chunks[["chunk_id", "doc_id", "chunk_idx"]].to_parquet(directory / "fragmentos.parquet", compression="zstd",
                                                            index=False)
     for n, start in enumerate(range(0, len(emb), _SHARD_ROWS)):
         np.save(directory / f"embeddings-{n:03d}.npy", emb[start:start + _SHARD_ROWS])
+    (directory / MANIFEST).write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
 
+
+def recortar_indice(corpus: pd.DataFrame, directory: Path = config.INDICE_DIR,
+                    log: Callable[[str], None] = print) -> dict:
+    """Conserva del índice actual solo los fragmentos de las sentencias del corpus, sin recalcular embeddings (v11.2:
+    el corpus pasó a ser solo penal). Exige los mismos parámetros y, por sentencia, el mismo número de fragmentos que
+    produciría `build_chunks`; si no, hay que reindexar."""
+    manifest, chunks, emb = load_index(directory)
+    if {k: manifest.get(k) for k in index_params()} != index_params():
+        raise ValueError("El índice se construyó con otros parámetros: corre `indexar` sin --recortar.")
+    esperado = build_chunks(corpus).groupby("doc_id").size()
+    actual = chunks.groupby("doc_id").size().reindex(esperado.index)
+    distintos = esperado.index[actual.ne(esperado)].tolist()
+    if distintos:
+        raise ValueError(f"{len(distintos)} sentencias sin sus fragmentos en el índice actual (p. ej. {distintos[0]}): "
+                         "corre `indexar` sin --recortar.")
+    quedan = chunks["doc_id"].isin(set(corpus["id"])).to_numpy()
+    chunks, emb = chunks[quedan].reset_index(drop=True), emb[quedan]
     manifest = {**index_params(), "corpus_fingerprint": corpus_fingerprint(corpus), "num_docs": len(corpus),
                 "num_chunks": len(chunks), "dim": int(emb.shape[1])}
-    (directory / MANIFEST).write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
-    log(f"Índice guardado en '{directory}' ({time.time() - t0:.0f}s).")
+    _guardar(chunks, emb, manifest, directory)
+    log(f"Índice recortado: {int(quedan.sum()):,} de {len(quedan):,} fragmentos, {len(corpus):,} sentencias.")
     return manifest
 
 
