@@ -1,7 +1,7 @@
 {
   "comando": "referencias",
-  "fecha": "2026-11-21T01:03:54",
-  "commit": "07a04bb",
+  "fecha": "2026-11-21T01:20:37",
+  "commit": "c909a5c",
   "sucio": false,
   "semilla": 42,
   "parametros": {
@@ -152,10 +152,10 @@
   "congelado": null,
   "tablas": {
     "Validación de los jueces": {
-      "descripcion": "Exactitud de la familia del delito que lee cada juez contra la categoría que asignó el STJ (referencia externa; una respuesta inválida cuenta como error). Un juez se usa si alcanza el mínimo, fijado antes de correrlos, en las sentencias de tipos de la tabla revisada (familias_penal.csv); la exactitud con todas se reporta aparte.",
+      "descripcion": "Exactitud de la familia del delito que lee cada juez contra la categoría que asignó el STJ (referencia externa; una respuesta inválida cuenta como error). Un juez se usa si alcanza el mínimo, fijado antes de correrlos, en las sentencias de los tipos del corpus original (familias_penal.csv), la población con que se fijó; la exactitud con todas se reporta aparte.",
       "columnas": [
         "juez",
-        "sentencias (tipos revisados)",
+        "sentencias (tipos originales)",
         "con respuesta válida",
         "exactitud familia (STJ)",
         "IC95",
@@ -169,7 +169,7 @@
       "filas": [
         {
           "juez": "gemma2:9b",
-          "sentencias (tipos revisados)": 554,
+          "sentencias (tipos originales)": 554,
           "con respuesta válida": 554,
           "exactitud familia (STJ)": 0.8068592057761733,
           "IC95": "[0.772, 0.838]",

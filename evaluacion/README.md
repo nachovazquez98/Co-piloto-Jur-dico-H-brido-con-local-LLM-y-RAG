@@ -27,7 +27,7 @@ criterio fijado antes de correrlos:
 | `qwen2.5:14b` | Descartado por recursos: no cabe en 8 GB y la laptop no lo sostiene en tandas largas | comentario en `config.py` |
 | `mistral:7b` | **No usable:** 0.795 en las 1,412 sentencias | `resultados/20261117-065346_a60ca4f_referencias` |
 | `gemma2:9b` | **Usable:** 0.845, IC 95 % [0.807, 0.877], en la muestra de 401 del corpus anterior | `resultados/20261117-065346_a60ca4f_referencias` |
-| `gemma2:9b`, corpus final | **Usable:** 0.807, IC 95 % [0.772, 0.838], en las 554 sentencias de la muestra con tipo del corpus original; 0.739 [0.706, 0.770] con las 725 | `resultados/20261121-010354_07a04bb_referencias` |
+| `gemma2:9b`, corpus final | **Usable:** 0.807, IC 95 % [0.772, 0.838], en las 554 sentencias de la muestra con tipo del corpus original; 0.739 [0.706, 0.770] con las 725 | `resultados/20261121-012037_c909a5c_referencias` |
 
 **Población de la validación (decisión posterior, declarada).** El mínimo se fijó cuando todos los tipos del corpus
 estaban en `familias_penal.csv` (familias asignadas por reglas; ninguna revisada por una persona). Con el corpus final
