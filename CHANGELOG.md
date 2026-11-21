@@ -23,7 +23,13 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 - `construir-corpus` rechaza un PDF con el nombre de una sentencia del corpus pero el texto de otra (se conserva el
   anterior; `data/corpus/descargas_rechazadas.csv`) y quita las sentencias publicadas dos veces con distinto nombre
   (`data/corpus/duplicados.csv`): contaban doble en la búsqueda y podían quedar en desarrollo y en prueba a la vez.
-- `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas y nuevas).
+- `evaluacion/descargas/`: lista de las sentencias penales por descargar a mano (incompletas, nuevas y
+  `3_volver_a_bajar.csv` con las que llegaron equivocadas).
+- App: el usuario puede elegir, si quiere, uno o varios delitos (con cuántas sentencias hay de cada uno). La app
+  sugiere los de la descripción sin llamar al LLM (botón "Usar la sugerencia"). Los elegidos sustituyen a las 3
+  categorías del clasificador en el filtro, el orden por familia y QC_2; la búsqueda sin filtro sigue completando, y
+  si la elección difiere de lo que habría buscado la app, lo dice. `esfuerzo` mide también "app con el delito
+  elegido" frente a la app sola.
 
 ### Corregido
 - Sentido del fallo por reglas: también "lo procedente es confirmar/revocar…" y el verbo sin "se" (cobertura 557 →
@@ -33,6 +39,14 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 - Ficha JSON: tercer intento que pide solo los campos obligatorios que faltan; las fichas inválidas se reintentan en
   `fichas-batch`, que además recalcula las verificaciones sin LLM.
 - `construir-corpus` conserva las sentencias que ya estaban al aplicar el tope de 30 por tipo.
+- Extracción de PDF: el inicio acepta un párrafo numerado ("1.VISTOS") y el corte final se busca después de los
+  resolutivos. Un "Notifíquese" citado de primera instancia dejaba hasta el 1 % del documento (9 de 1,889 PDF
+  conservaban menos del 30 %). 17 PDF cambian y todos conservan más texto. El PDF procesado reemplaza al texto
+  guardado de la misma sentencia.
+- `construir-corpus`: `descargas_rechazadas.csv` y `duplicados.csv` cubren todas las carpetas de la construcción
+  (antes la segunda carpeta podía sobrescribir los rechazos de la primera).
+- `fichas-batch`: si una sentencia deja al LLM sin respuesta en los 3 intentos y el servidor sigue activo, queda
+  sin ficha y el lote sigue (antes se detenía todo).
 - `evaluacion qc` medía QC_1 con el prompt v10; ahora usa el de la app (`prompt_qc1`, v11).
 - `evaluacion jueces --pares` saca de la VRAM los modelos de Ollama antes de cargar el de embeddings (fallaba con
   `CUBLAS_STATUS_ALLOC_FAILED` en 8 GB).
@@ -43,6 +57,11 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 - Corpus: 357 sentencias penales vueltas a descargar completas, 51 nuevas y 22 repetidas fuera (11 penales; una
   consulta, A132, apunta ahora a la copia que se queda). Penal: 1,412 → 1,451 sentencias; con páginas omitidas,
   ~800 → 439. Sentido leído por reglas: 875 de 1,451 (`20261119-195104_3995979_metadatos-cobertura`).
+- Corpus final (c27877e): con las listas 1 y 2 de `evaluacion/descargas/` y la extracción corregida, penal 2,495
+  sentencias; índice de 211,572 fragmentos; 54 todavía con páginas omitidas (`evaluacion/paginas_omitidas.csv`).
+  De los 56 PDF vueltos a bajar, 54 traían otra resolución del mismo día o del mismo toca, se rechazaron y conservan
+  su texto anterior (`data/corpus/descargas_rechazadas.csv`). Sentido leído por reglas: 1,966 de 2,495
+  (`20261120-014423_c27877e_metadatos-cobertura`).
 - Jueces: `qwen2.5:7b` no pasó la prueba piloto, `qwen2.5:14b` no cabe en 8 GB, `mistral:7b` no alcanzó 0.80 (0.795
   en 1,412) y queda solo `gemma2:9b` (0.845 en la muestra de 401): `20261117-065346_a60ca4f_referencias`.
 - La app avisa cuando la consulta no menciona ningún delito ni término del proceso penal (antes, las consultas
