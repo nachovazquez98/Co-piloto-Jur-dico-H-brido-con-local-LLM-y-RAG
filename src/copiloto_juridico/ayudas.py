@@ -85,7 +85,9 @@ FUNDAMENTOS = {
     "Modelos y confidencialidad": (
         "El modelo de lenguaje (`llama3.1:8b`) y el de embeddings se ejecutan en el propio equipo mediante Ollama: "
         "la descripción del caso no se envía a ningún servicio externo, lo que resguarda el secreto profesional. "
-        "Las respuestas son reproducibles (temperatura 0 y semilla fija)."),
+        "Las respuestas son reproducibles (temperatura 0 y semilla fija). Las fichas se calculan de antemano; las "
+        "pocas que el modelo principal no completó las elabora un modelo de respaldo (`qwen2.5:7b`), y el registro "
+        "del análisis indica con qué modelo se hizo cada una."),
 }
 
 AVISO_LEGAL = ("Herramienta académica de apoyo basada en sentencias públicas del Supremo Tribunal de Justicia del "
