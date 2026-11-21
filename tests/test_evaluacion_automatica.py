@@ -207,3 +207,11 @@ def test_ampliar_plantilla_no_toca_las_existentes():
     assert nuevas[0].tipo == "penal/robo-calificado"  # primero el tipo aún no cubierto
 
 
+
+
+def test_el_juez_se_valida_en_los_tipos_revisados():
+    penal, familias, meta, resp = _sentencias()
+    revisados = set(penal["tipo"].iloc[:2])  # la tercera sentencia es de un tipo agrupado por reglas
+    tabla = R.tabla_sentencias(penal, familias, meta, resp, revisados=revisados)
+    fila = R.validacion_jueces(tabla, ["j1"]).iloc[0]
+    assert fila["sentencias (tipos revisados)"] == int(tabla["tipo_revisado"].sum()) and fila["todas las sentencias"] == 3
