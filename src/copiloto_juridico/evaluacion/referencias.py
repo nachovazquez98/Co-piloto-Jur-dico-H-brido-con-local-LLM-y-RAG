@@ -242,10 +242,11 @@ def leer_validadas(path=CONSULTAS_VALIDADAS_PATH) -> dict[str, bool] | None:
 # --------------------------------------------------------------------------------------------------------------
 
 
-def comparar_fichas(fichas: pd.DataFrame, ref: pd.DataFrame) -> pd.DataFrame:
+def comparar_fichas(fichas: pd.DataFrame, ref: pd.DataFrame, textos: dict[str, str] | None = None) -> pd.DataFrame:
     """Una fila por sentencia con ficha válida: lo que dice la ficha de la app (normalizado a los mismos valores
-    cerrados) junto a la referencia, y si coinciden."""
-    from ..fichas import FichaPenal, familia_del_delito
+    cerrados) junto a la referencia, y si coinciden. Con `textos`, también los artículos del fundamento legal de la
+    ficha frente a los que la sentencia invoca como fundamento (`fichas.fundamento_de_sentencia`)."""
+    from ..fichas import FichaPenal, extraer_articulos, familia_del_delito, fundamento_de_sentencia
     from ..metadatos import _acto, _apelante
 
     r = ref.set_index("doc_id")
@@ -263,7 +264,37 @@ def comparar_fichas(fichas: pd.DataFrame, ref: pd.DataFrame) -> pd.DataFrame:
             fila.update({f"{c}_ref": ref_c, f"{c}_ficha": pred[c],
                          f"{c}_ok": None if ref_c == NO_DETERMINADO else pred[c] == ref_c})
         fila["articulos_no_encontrados"] = len(json.loads(row.articulos_no_encontrados))
+        fila["modelo"] = getattr(row, "modelo", None)
+        if textos is not None and row.doc_id in textos:
+            citados = set().union(set(), *(extraer_articulos(x) for x in f.fundamento_legal))
+            invocados = fundamento_de_sentencia(textos[row.doc_id])
+            fila.update({"fundamento_ficha": len(citados), "fundamento_sentencia": len(invocados),
+                         "fundamento_comunes": len(citados & invocados)})
         filas.append(fila)
+    return pd.DataFrame(filas)
+
+
+def tabla_fundamento(comp: pd.DataFrame) -> pd.DataFrame:
+    """Precisión y exhaustividad (recall) de los artículos que cita la ficha frente a los que la sentencia invoca como
+    fundamento, por ficha y promediadas, con IC 95 % por bootstrap. Solo fichas que citan algún artículo y sentencias
+    en que las reglas leen fundamento."""
+    if "fundamento_ficha" not in comp:
+        return pd.DataFrame()
+    c = comp[(comp["fundamento_ficha"] > 0) & (comp["fundamento_sentencia"] > 0)]
+    precision = (c["fundamento_comunes"] / c["fundamento_ficha"]).tolist()
+    recall = (c["fundamento_comunes"] / c["fundamento_sentencia"]).tolist()
+    filas = []
+    for nombre, valores, lectura in (
+            ("precisión", precision, "de los artículos que cita la ficha, fracción que la Sala invoca como fundamento"),
+            ("exhaustividad (recall)", recall, "de los artículos que invoca la Sala, fracción que recoge la ficha; baja "
+                                               "por construcción: la ficha resume los principales"),
+            ("fichas con todas sus citas en el fundamento", [float(p == 1.0) for p in precision], "")):
+        inf, sup = m.bootstrap_ic(valores)
+        filas.append({"medida": nombre, "fichas": len(valores),
+                      "valor": float(np.mean(valores)) if valores else float("nan"),
+                      "IC95": f"[{inf:.3f}, {sup:.3f}]" if valores else "—", "lectura": lectura})
+    filas.append({"medida": "fichas sin artículos citados", "fichas": int((comp.get("fundamento_ficha", 0) == 0).sum()),
+                  "valor": float("nan"), "IC95": "—", "lectura": "la ficha no cita fundamento legal"})
     return pd.DataFrame(filas)
 
 
@@ -403,10 +434,17 @@ def evaluar_fichas(particion: str, log=print):
     ref = pd.read_csv(REFERENCIAS_PATH, dtype=str).fillna(NO_DETERMINADO)
     if particion != "todas":
         ref = ref[ref["particion"] == particion]
-    comp = comparar_fichas(cargar(), ref)
+    from ..datos.corpus import load_corpus
+
+    corpus = load_corpus()
+    comp = comparar_fichas(cargar(), ref, corpus.set_index("id")["texto"].to_dict())
     corrida = Corrida("fichas-referencia", parametros={"particion": particion})
     corrida.tabla("Exactitud de las fichas", "Ficha precalculada (la que muestra la app) contra la referencia "
                   "automática; IC95 de Wilson. Solo cuentan las sentencias con referencia.", tabla_exactitud_fichas(comp))
+    corrida.tabla("Fundamento legal de la ficha", "Artículos que cita la ficha frente a los que la sentencia invoca "
+                  "como fundamento («con fundamento en», «de conformidad con», «en términos de», «con base en» y puntos "
+                  "resolutivos), leídos por reglas. Promedio por ficha; IC95 por bootstrap. No distingue el "
+                  "ordenamiento (Código Penal o Código Nacional de Procedimientos Penales).", tabla_fundamento(comp))
     faltan = comp["articulos_no_encontrados"] if len(comp) else pd.Series(dtype=int)
     corrida.tabla("Artículos que no aparecen en la sentencia", "Posibles alucinaciones (o artículos en páginas que "
                   "el PDF no trae).", pd.DataFrame([{"fichas": len(comp), "fichas con alguno": int((faltan > 0).sum()),

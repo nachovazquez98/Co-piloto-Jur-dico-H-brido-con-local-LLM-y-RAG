@@ -191,6 +191,30 @@ def sentido_por_reglas(texto_sentencia: str, fraccion_final: float = 0.5, seccio
     return None
 
 
+# v11.2: referencia del fundamento legal sin anotadores. Los artículos que la Sala invoca como fundamento de su
+# decisión: los que siguen a una fórmula de fundamentación ("con fundamento en", "de conformidad con", "con apoyo en",
+# "en términos de", "con base en") hasta el primer punto (como máximo `_VENTANA_FUNDAMENTO` caracteres), y los de los
+# puntos resolutivos. Lectura por reglas: no distingue el ordenamiento (ver `extraer_articulos`).
+_RE_FUNDAMENTACION = re.compile(r"con\s+fundamento\s+en|de\s+conformidad\s+con|con\s+apoyo\s+en|"
+                                r"en\s+t[eé]rminos\s+de|con\s+base\s+en", re.IGNORECASE)
+_VENTANA_FUNDAMENTO = 400
+
+
+def fundamento_de_sentencia(texto: str) -> set[str]:
+    """Artículos que la sentencia invoca como fundamento de la decisión (referencia por reglas de la ficha)."""
+    from .datos.procesamiento import RE_RESOLUTIVOS
+
+    texto = texto or ""
+    out: set[str] = set()
+    for m in _RE_FUNDAMENTACION.finditer(texto):
+        ventana = re.split(r"\.(?!\s*\d)", texto[m.end():m.end() + _VENTANA_FUNDAMENTO], maxsplit=1)[0]
+        out |= articulos_en_sentencia(ventana)
+    resolutivos = list(RE_RESOLUTIVOS.finditer(texto))
+    if resolutivos:
+        out |= articulos_en_sentencia(texto[resolutivos[-1].start():])
+    return out
+
+
 def verificar_articulos(texto_ficha: str, texto_sentencia: str) -> list[str]:
     """Artículos citados en la ficha que NO aparecen en el texto de la sentencia (posibles alucinaciones).
 

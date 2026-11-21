@@ -207,3 +207,16 @@ def test_ampliar_plantilla_no_toca_las_existentes():
     assert nuevas[0].tipo == "penal/robo-calificado"  # primero el tipo aún no cubierto
 
 
+
+
+def test_fundamento_de_la_ficha_contra_el_de_la_sentencia():
+    from copiloto_juridico.fichas import fundamento_de_sentencia
+
+    texto = ("considerando. con fundamento en los artículos 316 y 318 del código nacional de procedimientos penales, "
+             "se analiza. el artículo 999 se menciona de paso. resolutivos. primero. se confirma con apoyo en el "
+             "artículo 461.")
+    assert fundamento_de_sentencia(texto) >= {"316", "318", "461"} and "999" not in fundamento_de_sentencia(texto)
+    comp = pd.DataFrame({"fundamento_ficha": [2, 1, 0], "fundamento_sentencia": [3, 2, 4], "fundamento_comunes": [2, 0, 0]})
+    t = R.tabla_fundamento(comp).set_index("medida")
+    assert t.loc["precisión", "fichas"] == 2 and t.loc["precisión", "valor"] == 0.5
+    assert t.loc["fichas sin artículos citados", "fichas"] == 1
