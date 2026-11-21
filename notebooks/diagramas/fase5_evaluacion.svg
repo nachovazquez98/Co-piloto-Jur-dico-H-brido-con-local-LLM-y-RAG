@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1062 348" width="1062" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+<rect width="1062" height="348" fill="#fcfcfc" rx="10"/>
+<text x="18" y="34" font-size="16" font-weight="bold" fill="#222">Fase V. Evaluación sin anotadores humanos</text>
+<rect x="18" y="52" width="178" height="66" rx="8" fill="#eef3fb" stroke="#3b6fb6" stroke-width="1.6"/>
+<text x="107.0" y="73.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Categoría del STJ</text>
+<text x="107.0" y="89.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">(etiqueta externa)</text>
+<text x="107.0" y="105.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">→ familia de delito</text>
+<rect x="18" y="158" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="107.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Reglas sobre el texto</text>
+<text x="107.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">acto impugnado, apelante,</text>
+<text x="107.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">sentido del fallo</text>
+<rect x="18" y="264" width="178" height="66" rx="8" fill="#fbf1e6" stroke="#b86b1f" stroke-width="1.6"/>
+<text x="107.0" y="285.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Juez LLM de otra familia</text>
+<text x="107.0" y="301.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">gemma2:9b: 0.742</text>
+<text x="107.0" y="317.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">&lt; 0.80, no se usa</text>
+<rect x="230" y="158" width="178" height="66" rx="8" fill="#edf7ef" stroke="#2f7d43" stroke-width="1.6"/>
+<text x="319.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Referencia</text>
+<text x="319.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">categoría del STJ + reglas</text>
+<text x="319.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">relevancia 0 / 1 / 2</text>
+<rect x="442" y="158" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="531.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Congelar</text>
+<text x="531.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">huella de código, datos,</text>
+<text x="531.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">prompts y modelo</text>
+<rect x="654" y="158" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="743.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Partición de prueba</text>
+<text x="743.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">una sola corrida</text>
+<text x="743.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">por comando</text>
+<rect x="866" y="158" width="178" height="66" rx="8" fill="#f3eefb" stroke="#6b4bb6" stroke-width="1.6"/>
+<text x="955.0" y="187.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Métricas</text>
+<text x="955.0" y="203.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">con IC 95 %</text>
+<line x1="196" y1="85.0" x2="319.0" y2="158" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="196" y1="191.0" x2="230" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="196" y1="297.0" x2="319.0" y2="224" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="408" y1="191.0" x2="442" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="620" y1="191.0" x2="654" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="832" y1="191.0" x2="866" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+</svg>

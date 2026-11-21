@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1062 242" width="1062" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+<rect width="1062" height="242" fill="#fcfcfc" rx="10"/>
+<text x="18" y="34" font-size="16" font-weight="bold" fill="#222">Fase II. Procesamiento y depuración</text>
+<rect x="18" y="52" width="178" height="66" rx="8" fill="#eef3fb" stroke="#3b6fb6" stroke-width="1.6"/>
+<text x="107.0" y="81.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">PDF completo</text>
+<text x="107.0" y="97.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">todas las páginas</text>
+<rect x="230" y="52" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="319.0" y="81.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Extracción</text>
+<text x="319.0" y="97.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">de texto</text>
+<rect x="442" y="52" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="531.0" y="73.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Recorte estructural</text>
+<text x="531.0" y="89.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">(expresiones regulares)</text>
+<text x="531.0" y="105.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">inicio · resolutivos · cierre</text>
+<rect x="654" y="52" width="178" height="66" rx="8" fill="#ffffff" stroke="#4a4a4a" stroke-width="1.6"/>
+<text x="743.0" y="73.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Limpieza</text>
+<text x="743.0" y="89.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">anexo testado,</text>
+<text x="743.0" y="105.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">encabezados repetidos</text>
+<rect x="654" y="158" width="178" height="66" rx="8" fill="#edf7ef" stroke="#2f7d43" stroke-width="1.6"/>
+<text x="743.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Validación</text>
+<text x="743.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">¿el texto es de la misma</text>
+<text x="743.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">resolución? (≥ 0.5)</text>
+<rect x="442" y="158" width="178" height="66" rx="8" fill="#edf7ef" stroke="#2f7d43" stroke-width="1.6"/>
+<text x="531.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Repetidas</text>
+<text x="531.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">mismo texto con</text>
+<text x="531.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">otro nombre: una sola</text>
+<rect x="230" y="158" width="178" height="66" rx="8" fill="#eef3fb" stroke="#3b6fb6" stroke-width="1.6"/>
+<text x="319.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Corpus penal</text>
+<text x="319.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">2,495 sentencias</text>
+<text x="319.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">546 tipos → 25 familias</text>
+<rect x="866" y="158" width="178" height="66" rx="8" fill="#fdecec" stroke="#b33a3a" stroke-width="1.6"/>
+<text x="955.0" y="179.0" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#222">Rechazadas: 54</text>
+<text x="955.0" y="195.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">se conserva el</text>
+<text x="955.0" y="211.0" font-size="11" font-weight="normal" text-anchor="middle" fill="#222">texto anterior</text>
+<line x1="196" y1="85.0" x2="230" y2="85.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="408" y1="85.0" x2="442" y2="85.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="620" y1="85.0" x2="654" y2="85.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="743.0" y1="118" x2="743.0" y2="158" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<line x1="654" y1="191.0" x2="620" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<text x="637.0" y="183.0" font-size="10.5" text-anchor="middle" fill="#555">sí</text>
+<line x1="832" y1="191.0" x2="866" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+<text x="849.0" y="183.0" font-size="10.5" text-anchor="middle" fill="#555">no</text>
+<line x1="442" y1="191.0" x2="408" y2="191.0" stroke="#555" stroke-width="1.5" marker-end="url(#f)"/>
+</svg>

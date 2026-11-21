@@ -119,7 +119,7 @@ en `evaluacion/resultados/`):
 
 Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 41 s
 (`20261113-112440_fb1f3fe`). Con un resultado ya guardado (`demo --ejemplos`) la app lo muestra en 0.005 s
-(`20261113-120016_fb1f3fe_demo`). Clasificación y búsqueda tardan menos de 0.2 s.
+(`20261113-120016_fb1f3fe_demo`; con el corpus final, los 16 ejemplos guardados se leen en 0.005–0.008 s, `20261121-054503_c9a03a8_demo`). Clasificación y búsqueda tardan menos de 0.2 s.
 
 **Diagnóstico sin anotación** (no son tasas de error del sistema):
 
