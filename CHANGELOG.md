@@ -45,8 +45,9 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   guardado de la misma sentencia.
 - `construir-corpus`: `descargas_rechazadas.csv` y `duplicados.csv` cubren todas las carpetas de la construcción
   (antes la segunda carpeta podía sobrescribir los rechazos de la primera).
-- `fichas-batch`: si una sentencia deja al LLM sin respuesta en los 3 intentos y el servidor sigue activo, queda
-  sin ficha y el lote sigue (antes se detenía todo).
+- `fichas-batch`: si una sentencia deja al LLM sin respuesta en los 3 intentos, queda sin ficha y el lote sigue;
+  si pasa con dos seguidas, el problema es el servidor y se detiene. `--muestra` genera solo las fichas de la
+  muestra de la referencia.
 - `evaluacion qc` medía QC_1 con el prompt v10; ahora usa el de la app (`prompt_qc1`, v11).
 - `evaluacion jueces --pares` saca de la VRAM los modelos de Ollama antes de cargar el de embeddings (fallaba con
   `CUBLAS_STATUS_ALLOC_FAILED` en 8 GB).
@@ -71,7 +72,18 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   conocido. Con el corpus penal completo, "homicidio culposo" desplaza a "pago de daños y perjuicios" del top 3; es un
   cambio de datos, fuera del alcance penal.
 
+- App en registro profesional: la página "Cómo funciona" documenta el método para el usuario (objeto y alcance,
+  guía de uso, flujo, fundamentos de fragmentos, embeddings, ChromaDB, BM25, RRF, clasificación y controles,
+  glosario procesal, evaluación y limitaciones); textos y avisos sin tuteo.
+- Notebook reescrito como documentación técnica: llama al paquete en lugar de copiar código, con un diagrama por
+  fase, el porqué de cada modelo y del equipo (con fuentes), el catálogo de prompts y la decisión sobre la materia
+  civil; sin las versiones viejas del descargador.
+- Sugerencia inicial de delito medida sin LLM: familia correcta en 73 de 100 consultas de desarrollo y 13 de 14
+  ejemplos (`evaluacion/errores/sugerencia_delito.md`).
+
 ### Quitado
+- Código sin uso: `f1_conjuntos`, `coincide_texto` y el atributo `veredicto_relevancia`.
+- Corridas obsoletas que nada citaba (una regresión intermedia y dos coberturas de metadatos de corpus intermedios).
 - Camino de anotación humana, que nunca se usó: hojas de juicios y fichas, piloto de anotación (`hojas-anotacion`,
   `kappa-piloto`), `generacion`, estudio de uso (`estudio`), consultas reales vacías, plantilla inicial (`plantilla`)
   y la opción `COPILOTO_EVALUACION_AUTOMATICA`. Las hojas estaban vacías.
