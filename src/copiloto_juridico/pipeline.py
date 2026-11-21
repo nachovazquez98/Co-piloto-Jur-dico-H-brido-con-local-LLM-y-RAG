@@ -545,12 +545,13 @@ class Copiloto:
         """Ficha penal estructurada: la precalculada si existe para esta sentencia, este texto y esta versión del
         prompt y del modelo (`fichas-batch`); si no, una llamada al LLM (JSON validado, con un reintento)."""
         from .fichas import generar_ficha_json
-        from .fichas_precalculadas import ficha_guardada
+        from .fichas_precalculadas import ficha_guardada, fila_guardada
 
         if config.FICHAS_PRECALCULADAS:
             guardada = ficha_guardada(cand.doc_id, cand.texto, self.llm.settings)
             if guardada is not None:
-                logs.append("   -> Ficha penal precalculada (sin llamar al LLM).")
+                modelo = (fila_guardada(cand.doc_id) or {}).get("modelo") or self.llm.settings.model
+                logs.append(f"   -> Ficha penal precalculada con {modelo} (sin llamar al LLM).")
                 return guardada
         logs.append(f"   -> Ficha penal en una llamada ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
         ficha, info = generar_ficha_json(self._llm, contexto)

@@ -176,6 +176,12 @@ RERANKER_DISPOSITIVO = _env("COPILOTO_RERANKER_DISPOSITIVO", "auto")  # "auto" |
 # texto y la versión (prompt + modelo); si no, la genera en la consulta. Activado por defecto solo si existe el archivo.
 FICHAS_PRECALCULADAS_PATH = DATA_DIR / "fichas" / "fichas-penal.parquet"
 FICHAS_PRECALCULADAS = _env("COPILOTO_FICHAS_PRECALCULADAS", FICHAS_PRECALCULADAS_PATH.exists())
+# Modelo de respaldo de las fichas precalculadas (v11.2): `fichas-batch --respaldo` genera con él, por lotes y sin otro
+# modelo cargado, las fichas de las sentencias que no tienen una válida del modelo principal, fuera de la muestra de
+# la referencia (la evaluación mide solo las del modelo principal). La app usa primero la del modelo principal y, si
+# no hay, la de respaldo, en lugar de generarla durante la consulta. qwen2.5:7b: cabe en 8 GB y en `modelos`
+# (20261113-125326_fb1f3fe) tardó 18 s por ficha frente a 29 s, con JSON válido 20/20. Vacío = sin respaldo.
+FICHAS_MODELO_RESPALDO = _env("COPILOTO_FICHAS_MODELO_RESPALDO", "qwen2.5:7b") or None
 # QC_2: "determinista" (sin LLM: el delito de la ficha debe ser de una familia clasificada o de la etiqueta de la
 # sentencia; además se marcan sentido del fallo y artículos no encontrados) o "llm" (verificador LLM de v10).
 QC2_MODO = _env("COPILOTO_QC2_MODO", "determinista")

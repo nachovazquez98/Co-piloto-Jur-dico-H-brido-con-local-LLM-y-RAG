@@ -47,16 +47,29 @@ def _indice(path: str, mtime: float) -> dict[str, dict]:
     return {r["doc_id"]: r for r in cargar(Path(path)).to_dict("records")}
 
 
+def versiones_aceptadas(settings: config.LLMSettings) -> set[str]:
+    """Versión del modelo en uso y, si hay modelo de respaldo, la misma versión (prompt y parámetros) con ese modelo."""
+    import dataclasses
+
+    versiones = {version_ficha(settings)}
+    if config.FICHAS_MODELO_RESPALDO:
+        versiones.add(version_ficha(dataclasses.replace(settings, model=config.FICHAS_MODELO_RESPALDO)))
+    return versiones
+
+
 def ficha_guardada(doc_id: str, texto: str, settings: config.LLMSettings,
                    path: Path = config.FICHAS_PRECALCULADAS_PATH) -> FichaPenal | None:
-    """La ficha precalculada de una sentencia si es válida y vigente (mismo texto, misma versión); si no, None."""
-    if not path.exists():
-        return None
-    r = _indice(str(path), path.stat().st_mtime).get(doc_id)
+    """La ficha precalculada de una sentencia si es válida y vigente (mismo texto; versión del modelo en uso o del
+    de respaldo); si no, None."""
+    r = fila_guardada(doc_id, path)
     if r is None or not r["json_valido"] or r["huella_texto"] != huella_texto(texto) \
-            or r["version"] != version_ficha(settings):
+            or r["version"] not in versiones_aceptadas(settings):
         return None
     return FichaPenal.desde_guardada(r["ficha"])
+
+
+def fila_guardada(doc_id: str, path: Path = config.FICHAS_PRECALCULADAS_PATH) -> dict | None:
+    return _indice(str(path), path.stat().st_mtime).get(doc_id) if path.exists() else None
 
 
 REINTENTOS_SERVIDOR, ESPERA_REINTENTO = 3, 30

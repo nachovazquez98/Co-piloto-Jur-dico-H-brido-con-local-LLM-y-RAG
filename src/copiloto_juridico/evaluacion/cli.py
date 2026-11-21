@@ -291,7 +291,28 @@ def cmd_fichas_batch(args) -> None:
         # --muestra: solo las sentencias de la muestra de la referencia (las únicas que evalúa fichas-referencia);
         # las demás las genera la app en el momento si hacen falta.
         lote = corpus[[en_muestra(d, config.MUESTRA_SENTENCIAS) for d in corpus["id"]]] if args.muestra else corpus
-        generar_todas(lote, _llm(con_cache=False), limite=args.max, log=_log)
+        llm = _llm(con_cache=False)
+        if args.respaldo:
+            # --respaldo: con el modelo de respaldo, solo las sentencias sin ficha válida del principal y fuera de la
+            # muestra de la referencia (la evaluación mide únicamente las fichas del modelo principal).
+            import dataclasses
+
+            from ..llm import get_client
+            from .modelos import descargar_de_memoria
+
+            if not config.FICHAS_MODELO_RESPALDO:
+                sys.exit("❌ No hay modelo de respaldo (config.FICHAS_MODELO_RESPALDO).")
+            tabla = cargar()
+            principal = version_ficha(settings)
+            con_ficha = set(tabla.loc[(tabla["version"] == principal) & tabla["json_valido"].astype(bool), "doc_id"])
+            lote = lote[~lote["id"].isin(con_ficha) & ~lote["id"].map(lambda d: en_muestra(d, config.MUESTRA_SENTENCIAS))]
+            descargar_de_memoria(settings)  # nunca dos modelos cargados a la vez
+            llm = get_client(dataclasses.replace(settings, model=config.FICHAS_MODELO_RESPALDO))
+            _log(f"Respaldo {config.FICHAS_MODELO_RESPALDO}: {int((lote['materia'] == 'penal').sum())} sentencias "
+                 "penales sin ficha del modelo principal, fuera de la muestra.")
+        generar_todas(lote, llm, limite=args.max, log=_log)
+        if args.respaldo:
+            descargar_de_memoria(llm.settings)
     _log(f"Verificaciones recalculadas con las reglas actuales: {actualizar_verificaciones(corpus)} fichas cambiaron.")
     _guardar(diagnostico_fichas(cargar(), version_ficha(settings)))
 
@@ -459,6 +480,8 @@ def main(argv=None) -> None:
     s.add_argument("--solo-diagnostico", action="store_true", help="Solo el reporte, sin llamar al LLM")
     s.add_argument("--muestra", action="store_true",
                    help="Solo las sentencias de la muestra de la referencia (config.MUESTRA_SENTENCIAS)")
+    s.add_argument("--respaldo", action="store_true",
+                   help="Con config.FICHAS_MODELO_RESPALDO, las que no tienen ficha del modelo principal (fuera de la muestra)")
     s.set_defaults(func=cmd_fichas_batch)
 
     s = sub.add_parser("qc-diagnostico", help="Tasa de descarte de QC_1 por versión y contexto (sin anotaciones)")

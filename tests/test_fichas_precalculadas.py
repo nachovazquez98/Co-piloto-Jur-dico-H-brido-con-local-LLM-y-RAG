@@ -109,3 +109,18 @@ def test_fichas_batch_sigue_si_una_sentencia_cuelga_al_llm(tmp_path, monkeypatch
                              log=lambda m: None).set_index("doc_id")
     assert tabla.loc["a", "json_valido"] and not tabla.loc["b", "json_valido"]
     assert "sin respuesta" in tabla.loc["b", "error"]
+
+
+def test_ficha_del_modelo_de_respaldo_se_acepta(tmp_path, monkeypatch):
+    import dataclasses
+
+    path = tmp_path / "f.parquet"
+    respaldo = LLMFicha([json.dumps(FICHA)])
+    respaldo.settings = dataclasses.replace(respaldo.settings, model="respaldo")
+    fp.generar_todas(_corpus(("a", TEXTO)), respaldo, path, log=lambda m: None)
+    principal = config.LLMSettings(provider="openai", model="falso")
+    monkeypatch.setattr(config, "FICHAS_MODELO_RESPALDO", None)
+    assert fp.ficha_guardada("a", TEXTO, principal, path) is None  # sin respaldo configurado
+    monkeypatch.setattr(config, "FICHAS_MODELO_RESPALDO", "respaldo")
+    assert fp.ficha_guardada("a", TEXTO, principal, path).sentido_fallo == "CONFIRMA"
+    assert fp.fila_guardada("a", path)["modelo"] == "respaldo"
