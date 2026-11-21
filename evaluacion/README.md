@@ -26,7 +26,15 @@ criterio fijado antes de correrlos:
 | `qwen2.5:7b` | Descartado en la prueba piloto (60 sentencias): no llegó a 0.80 | comentario en `config.py` |
 | `qwen2.5:14b` | Descartado por recursos: no cabe en 8 GB y la laptop no lo sostiene en tandas largas | comentario en `config.py` |
 | `mistral:7b` | **No usable:** 0.795 en las 1,412 sentencias | `resultados/20261117-065346_a60ca4f_referencias` |
-| `gemma2:9b` | **Usable:** 0.845, IC 95 % [0.807, 0.877], en la muestra de 401 | `resultados/20261117-065346_a60ca4f_referencias` |
+| `gemma2:9b` | **Usable:** 0.845, IC 95 % [0.807, 0.877], en la muestra de 401 del corpus anterior | `resultados/20261117-065346_a60ca4f_referencias` |
+| `gemma2:9b`, corpus final | **Usable:** 0.807, IC 95 % [0.772, 0.838], en las 554 sentencias de la muestra con tipo de la tabla revisada; 0.739 [0.706, 0.770] con las 725 | `resultados/20261121-010354_07a04bb_referencias` |
+
+**Población de la validación (decisión posterior, declarada).** El mínimo se fijó cuando todos los tipos del corpus
+estaban en `familias_penal.csv`. Con el corpus final, la familia de 257 tipos nuevos se asigna por reglas y es ambigua
+en los compuestos (daño en las cosas a título de culpa: «delitos culposos» o «daño en las cosas»; delitos sexuales en
+el ámbito familiar). En esas sentencias el juez acertó 0.520 (n = 171) y la exactitud total cayó a 0.739
+(`20261121-003449_5311dc1_referencias`, juez no usable). Tras ver ese resultado, y con la aprobación del autor, la
+validación se aplica a la población original (tipos de la tabla revisada); la exactitud con todas se sigue reportando.
 
 **Muestra.** Juzgar todo con un juez tomaba ~7 h. Los jueces y la referencia usan una muestra fija por hash del id
 con la semilla de evaluación (`config.MUESTRA_SENTENCIAS` = 0.30, `MUESTRA_CONSULTAS` = 0.50): al crecer el corpus,
