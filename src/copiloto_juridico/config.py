@@ -59,10 +59,11 @@ MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
 # 0.80), por recursos y antes de construir la referencia. En la validación completa, mistral:7b no alcanzó el mínimo
 # (0.795 en las 1,412 sentencias, corrida 20261117-065346_a60ca4f_referencias) y quedó fuera; la referencia es la
 # mayoría entre las reglas y gemma2:9b.
-# v11.2, corpus final: el mínimo se aplica en las sentencias de los tipos del corpus original (familias_penal.csv),
-# la población con que se fijó; en los tipos nuevos, raros y compuestos, la familia por reglas es ambigua. gemma2:9b:
-# 0.807 en tipos originales (n = 554), 0.739 con todas (20261121-003449_5311dc1_referencias). Decisión posterior,
-# aprobada por el autor y declarada. Ver referencias.validacion_jueces.
+# v11.2, corpus final: gemma2:9b acertó la familia del STJ en 0.739 de las 725 sentencias de la muestra
+# (20261121-003449_5311dc1_referencias) y, con el criterio fijado de antemano, no se usa: la referencia de acto
+# impugnado, apelante y sentido queda con las reglas. Sus errores: daños y homicidio a título de culpa leídos por el bien
+# afectado pese a la instrucción del prompt, violación en contexto familiar leída como violencia familiar y la familia
+# residual "otros" (evaluacion/errores/juez_familia.md).
 MODELOS_JUECES = ["gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
 # Muestra al azar de los jueces (v11.2): juzgar todo con dos modelos tomaba ~7 h por juez. Cada elemento entra a la
