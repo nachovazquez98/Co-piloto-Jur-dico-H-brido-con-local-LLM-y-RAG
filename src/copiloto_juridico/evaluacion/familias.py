@@ -7,9 +7,9 @@ un abogado consideraría el mismo delito base.
 
 Cómo se construye: reglas sobre el *slug* del tipo (`penal/robo-calificado-y-otro`). El delito que aparece
 primero en el nombre se toma como el principal; si el nombre menciona delitos de otras familias, el tipo se
-marca para revisión. Las reglas son un **borrador**: `exportar_csv` genera `evaluacion/familias_penal.csv` para
-que un abogado penalista lo revise y corrija la columna `familia`; si ese archivo existe, `cargar_familias` lo
-usa en lugar de las reglas (el archivo revisado manda).
+marca `revisar`. `exportar_csv` escribe la tabla completa en `evaluacion/familias_penal.csv` (todos los tipos penales
+del corpus, con la regla que decidió cada familia); si una fila se corrige a mano, `cargar_familias` usa el archivo.
+Ninguna asignación ha sido revisada por un especialista: es una limitación declarada.
 """
 
 from __future__ import annotations
@@ -22,13 +22,16 @@ from pathlib import Path
 
 from .. import config
 
-# Prefijos de grado de ejecución que no cambian el delito base.
-_PREFIJOS_TENTATIVA = re.compile(r"^(tentativa|tentantiva)-de-")
+# Prefijos de grado de ejecución o de continuidad que no cambian el delito base.
+_PREFIJOS_TENTATIVA = re.compile(r"^(tentativa|tentantiva|continuado)-de-")
 
 # Reglas ordenadas: (familia, expresión aplicada al inicio del slug, nota para el revisor o "").
 # El orden importa: "violacion-de-deposito" debe evaluarse antes que "violacion", y "robo-de-infante" antes que "robo".
 REGLAS: list[tuple[str, str, str]] = [
-    ("sustraccion-de-menores", r"robo-de-infante|substraccion-de-menores|sustraccion-de-menores",
+    # v11.2: asuntos sin delito (recursos e incidencias del procedimiento); antes caían en "otros".
+    ("cuestiones-procesales", r"queja|conflicto-de-competencia|excusa",
+     "No es un delito: recurso o incidencia del procedimiento."),
+    ("sustraccion-de-menores", r"robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo",
      "Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial)."),
     ("robo", r"robo|asalto|abigeato", ""),
     ("feminicidio", r"feminicidio",
@@ -40,6 +43,8 @@ REGLAS: list[tuple[str, str, str]] = [
     ("delitos-sexuales",
      r"violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio",
      ""),
+    ("delitos-sexuales", r"prostitucion",
+     "Prostitución infantil y explotación sexual agrupadas con delitos sexuales, como el lenocinio."),
     ("delitos-sexuales", r"corrupcion-de-menores",
      "Corrupción de menores agrupada con delitos sexuales; confirmar."),
     ("violencia-familiar", r"violencia-familiar|violencia-intrafamiliar", ""),
@@ -49,7 +54,7 @@ REGLAS: list[tuple[str, str, str]] = [
     ("fraude-y-abuso-de-confianza", r"fraude|administracion-fraudulenta|abuso-de-confianza", ""),
     ("despojo", r"despojo", ""),
     ("dano-en-las-cosas", r"danos?-(en|a)-las-cosas", ""),
-    ("privacion-de-la-libertad-y-secuestro", r"secuestro|privacion-ilegal|delitos-en-materia-de-secuestro", ""),
+    ("privacion-de-la-libertad-y-secuestro", r"secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro", ""),
     ("desaparicion-de-personas", r"desaparicion", ""),
     ("contra-la-salud", r"contra-la-salud|narcomenudeo", ""),
     ("abandono-de-familiares", r"abandono", ""),
@@ -58,9 +63,10 @@ REGLAS: list[tuple[str, str, str]] = [
     ("servidores-publicos-y-administracion-de-justicia",
      r"abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento"
      r"|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social"
-     r"|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento",
+     r"|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento"
+     r"|ejercicio-indebido",
      ""),
-    ("falsedad-y-falsificacion", r"falsificacion|falsedad|suplantacion-de-identidad", ""),
+    ("falsedad-y-falsificacion", r"falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso", ""),
     ("armas", r"portacion-de-arma|armas-y-objetos|disparo-de-arma", ""),
     ("delincuencia-organizada", r"delincuencia-organizada|asociacion-delictuosa", ""),
     ("contra-la-dignidad-de-las-personas", r"contra-la-dignidad", ""),
@@ -84,7 +90,7 @@ class AsignacionFamilia:
     tipo: str
     familia: str
     regla: str        # qué regla decidió la familia
-    revisar: bool     # True si un abogado debe confirmarla
+    revisar: bool     # True si conviene confirmarla (tipo compuesto o sin regla)
     nota: str
 
 
@@ -136,13 +142,13 @@ def asignar_todas(tipos: list[str]) -> list[AsignacionFamilia]:
 
 def exportar_csv(tipos_con_conteo: dict[str, int], path: Path = config.FAMILIAS_CSV,
                  forzar: bool = False) -> Path:
-    """Escribe la tabla tipo → familia para revisión humana.
+    """Escribe la tabla tipo → familia.
 
-    Columnas: tipo, sentencias, familia (editable), regla, revisar, nota, revisado (el abogado pone "si").
+    Columnas: tipo, sentencias, familia (editable), regla, revisar, nota, revisado ("si" si una persona la corrigió).
     No sobrescribe un archivo existente salvo con `forzar`, para no perder una revisión.
     """
     if path.exists() and not forzar:
-        raise FileExistsError(f"{path} ya existe (puede contener la revisión del abogado). Usa forzar=True.")
+        raise FileExistsError(f"{path} ya existe (puede contener correcciones a mano). Usa forzar=True.")
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
@@ -161,7 +167,7 @@ def _leer_csv(path_str: str, mtime: float) -> dict[str, str]:
 
 
 def cargar_familias(tipos: list[str], path: Path = config.FAMILIAS_CSV) -> dict[str, str]:
-    """Mapa tipo → familia. Usa el CSV (revisado por el abogado) si existe; los tipos que no estén en el CSV
+    """Mapa tipo → familia. Usa el CSV si existe; los tipos que no estén en el CSV
     (p. ej. nuevos tras ampliar el corpus) se asignan con las reglas."""
     revisado = _leer_csv(str(path), path.stat().st_mtime) if path.exists() else {}
     return {t: revisado.get(t) or asignar_familia(t).familia for t in tipos}
@@ -169,7 +175,7 @@ def cargar_familias(tipos: list[str], path: Path = config.FAMILIAS_CSV) -> dict[
 
 
 def coherencia(doc_ids, emb, doc_tipo: dict[str, str], familias: dict[str, str], min_docs: int = 3):
-    """Sustituye a la revisión del abogado (v11.2) con una comprobación sin LLM: para cada tipo con al menos
+    """Comprobación sin LLM de la agrupación (v11.2): para cada tipo con al menos
     `min_docs` sentencias, a qué familia se parece más su centroide de embeddings (el promedio de los fragmentos de
     sus sentencias, centrado). La familia de comparación se calcula SIN ese tipo. Un tipo más cercano a otra familia que a la
     suya es un posible error de agrupación (o un tipo con varios delitos): diagnóstico, no una decisión."""

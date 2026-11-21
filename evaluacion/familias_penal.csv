@@ -1,279 +1,519 @@
 tipo,sentencias,familia,regla,revisar,nota,revisado
 penal/abandono-de-familiares,30,abandono-de-familiares,^(?:abandono),no,,no
 penal/abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares,1,abandono-de-familiares,^(?:abandono),no,,no
+penal/abandono-de-familiares-y-otro,5,abandono-de-familiares,^(?:abandono),no,,no
 penal/abandono-de-personas,2,abandono-de-familiares,^(?:abandono),no,,no
+penal/abandono-de-personas-y-familiares,1,abandono-de-familiares,^(?:abandono),no,,no
+penal/abigeato,2,robo,^(?:robo|asalto|abigeato),no,,no
+penal/abigeato-calificado,10,robo,^(?:robo|asalto|abigeato),no,,no
 penal/abigeato-y-robo-calificado,1,robo,^(?:robo|asalto|abigeato),no,,no
 penal/abigeato-y-robo-de-animales,1,robo,^(?:robo|asalto|abigeato),no,,no
-penal/abogados-patronos-y-litigantes,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-autoridad,8,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-autoridad-cohecho-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-autoridad-y-lesiones,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),si,Tipo compuesto: menciona también lesiones.,no
-penal/abuso-de-autoridad-y-otro,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-autoridad-y-otros,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/abuso-de-confianza,7,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/abogados-patronos-y-litigantes,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/aborto,9,otros,ninguna,si,Ninguna regla coincide.,no
+penal/abuso-de-autoridad,15,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/abuso-de-autoridad-cohecho-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/abuso-de-autoridad-y-lesiones,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),si,Tipo compuesto: menciona también lesiones.,no
+penal/abuso-de-autoridad-y-lesiones-calificadas,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),si,Tipo compuesto: menciona también lesiones.,no
+penal/abuso-de-autoridad-y-otro,3,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/abuso-de-autoridad-y-otros,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/abuso-de-autoridad-y-robo-calificado,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),si,Tipo compuesto: menciona también robo.,no
+penal/abuso-de-confianza,11,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/abuso-de-confianza-equiparado,3,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/abuso-de-confianza-tentado,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
 penal/abuso-sexual,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-agravado,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil,30,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-agravado,3,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil,27,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/abuso-sexual-infantil-agravado,30,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-agravado-y-corrupcion-de-menores,3,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-agravado-y-otro,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-agravado-corrupcion-de-menores-y-violencia-intrafamiliar,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/abuso-sexual-infantil-agravado-en-grado-de-tentativa,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-agravado-y-corrupcion-de-menores,5,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-agravado-y-maltrato-infantil,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/abuso-sexual-infantil-agravado-y-otro,10,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/abuso-sexual-infantil-agravado-y-otros,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-agravado-y-violencia-intrafamiliar,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/abuso-sexual-infantil-agravado-y-violacion,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-agravado-y-violencia-intrafamiliar,4,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/abuso-sexual-infantil-en-grado-de-tentativa,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/abuso-sexual-infantil-equiparado,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-y-corrupcion-de-menores,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-y-otro,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/abuso-sexual-infantil-y-otros,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-y-corrupcion-de-menores,14,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-y-otro,3,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-y-otros,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/abuso-sexual-infantil-y-violencia-intrafamiliar,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
 penal/acoso-sexual,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/administracion-fraudulenta,12,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/administracion-fraudulenta,19,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
 penal/administracion-fraudulenta-y-otros,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/adquisicion-ilegitima-de-bienes-materia-de-un-delito-o-una-fraccion-penal,9,otros,ninguna,si,Ninguna regla coincide.,no
+penal/adquisicion-ilegitima-de-bienes-materia-de-un-delito-o-una-infraccion-penal,2,otros,ninguna,si,Ninguna regla coincide.,no
+penal/adulterio,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/allanamiento-de-morada,5,otros,ninguna,si,Ninguna regla coincide.,no
+penal/allanamiento-de-morada-y-lesiones,1,otros,ninguna,si,Ninguna regla coincide. Tipo compuesto: menciona también lesiones.,no
 penal/allanamiento-de-morada-y-otros,1,otros,ninguna,si,Ninguna regla coincide.,no
 penal/amenazas,23,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),no,,no
 penal/amenazas-y-lesiones,1,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),si,Tipo compuesto: menciona también lesiones.,no
 penal/amenzas-y-lesiones,1,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),si,Tipo compuesto: menciona también lesiones.,no
 penal/aprovechamiento-sexual,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/armas-y-objetos-prohibidos,2,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
+penal/armas-y-objetos-prohibidos,1,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
 penal/asalto,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/asalto-y-robo-calificado,1,robo,^(?:robo|asalto|abigeato),no,,no
 penal/asociacion-delictuosa,1,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
-penal/atentados-al-pudor,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/asociacion-delictuosa-y-otros,5,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
+penal/ataque-peligroso,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/ataque-peligroso-y-delitos-cometidos-en-contra-de-representantes-de-la-autoridad,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/atentados-al-pudor,7,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/atentados-al-pudor-y-lesiones,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también lesiones.,no
 penal/chantaje,1,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),no,,no
-penal/cohecho,7,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/cohecho-y-abuso-sexual-infantil-agravado,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),si,Tipo compuesto: menciona también delitos-sexuales.,no
-penal/cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/cohecho,13,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/cohecho-y-abuso-sexual-infantil-agravado,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/cohecho-y-otros,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/conflicto-de-competencia,8,cuestiones-procesales,^(?:queja|conflicto-de-competencia|excusa),si,No es un delito: recurso o incidencia del procedimiento.,no
+penal/continuado-de-atentados-al-pudor-y-continuado-de-violacion-equiparada-y-otro,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/contra-el-ambiente,2,otros,ninguna,si,Ninguna regla coincide.,no
-penal/contra-la-dignidad-de-las-personas,18,contra-la-dignidad-de-las-personas,^(?:contra-la-dignidad),no,,no
+penal/contra-el-desarrollo-urbano,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/contra-el-desarrollo-urbano-y-otro,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/contra-la-dignidad-de-las-personas,20,contra-la-dignidad-de-las-personas,^(?:contra-la-dignidad),no,,no
 penal/contra-la-dignidad-de-las-personas-y-amenazas,1,contra-la-dignidad-de-las-personas,^(?:contra-la-dignidad),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
 penal/contra-la-salud,7,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
-penal/contra-la-salud-en-su-modalidad-de-narcomenudeo,19,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
-penal/contra-la-salud-en-su-modalidad-de-narcomenudeo-con-fines-de-comercio,1,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
-penal/contra-la-salud-y-otro,1,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
-penal/corrupcion-de-menores,2,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
-penal/corrupcion-de-menores-agravado-y-abuso-sexual-infantil-agravado,3,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/contra-la-salud-en-su-modalidad-de-narcomenudeo,28,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/contra-la-salud-en-su-modalidad-de-narcomenudeo-con-fines-de-comercio,10,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/contra-la-salud-y-narcomenudeo,10,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/contra-la-salud-y-otro,4,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/contra-la-salud-y-otros,2,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/corrupcion-de-menores,3,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-abuso-sexual-infantil-agravado-y-prostitucion-infantil,4,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-agravado-y-abuso-sexual-infantil-agravado,4,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-prostitucion-infantil-y-abuso-sexual-infantil,1,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
 penal/corrupcion-de-menores-violencia-intrafamiliar-equiparada-y-violacion,1,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar. Tipo compuesto: menciona también violencia-familiar.,no
-penal/corrupcion-de-menores-y-abuso-sexual-infantil,1,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
-penal/corrupcion-de-menores-y-abuso-sexual-infantil-agravado,1,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-y-abuso-sexual-infantil,3,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-y-abuso-sexual-infantil-agravado,2,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-y-otro,3,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-y-otros,3,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar.,no
+penal/corrupcion-de-menores-y-violencia-intrafamiliar,1,delitos-sexuales,^(?:corrupcion-de-menores),si,Corrupción de menores agrupada con delitos sexuales; confirmar. Tipo compuesto: menciona también violencia-familiar.,no
 penal/crueldad-animal,1,otros,ninguna,si,Ninguna regla coincide.,no
-penal/dano-a-las-cosas,1,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),no,,no
-penal/dano-en-las-cosas,17,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),no,,no
-penal/dano-en-las-cosas-a-titulo-de-culpa,7,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-a-las-cosas,3,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),no,,no
+penal/dano-a-las-cosas-a-titulo-de-culpa,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas,20,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),no,,no
+penal/dano-en-las-cosas-a-titulo-de-culpa,10,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-a-titulo-de-culpa-por-imprudencia,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-a-titulo-de-culpa-y-lesiones-a-titulo-de-culpa,5,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-a-titulo-de-culpa-y-otro,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-cometido-a-titulo-de-culpa,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-culposo,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-y-despojo,1,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),si,Tipo compuesto: menciona también despojo.,no
+penal/dano-en-las-cosas-y-homicidio-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/dano-en-las-cosas-y-homicidio-culposo,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/dano-en-las-cosas-y-lesiones,1,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),si,Tipo compuesto: menciona también lesiones.,no
-penal/dano-en-las-cosas-y-lesiones-culposas,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-y-lesiones,5,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),si,Tipo compuesto: menciona también lesiones.,no
+penal/dano-en-las-cosas-y-lesiones-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-y-lesiones-ambos-a-titulo-de-culpa,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/dano-en-las-cosas-y-lesiones-culposas,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/dano-en-las-cosas-y-lesiones-culposo,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/dano-en-las-cosas-y-otros,4,dano-en-las-cosas,^(?:danos?-(en|a)-las-cosas),no,,no
-penal/danos-en-las-cosas-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/danos-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/danos-en-las-cosas-a-titulo-de-culpa,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/delincuencia-organizada,2,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
 penal/delincuencia-organizada-y-otro,1,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
-penal/delincuencia-organizada-y-otros,1,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
-penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,4,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/delitos-en-materia-de-secuestro-agravado,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/delitos-en-materia-de-seguridad-social-de-los-servidores-publicos,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/delincuencia-organizada-y-otros,2,delincuencia-organizada,^(?:delincuencia-organizada|asociacion-delictuosa),no,,no
+penal/delitos-cometidos-contra-representantes-de-la-autoridad,6,otros,ninguna,si,Ninguna regla coincide.,no
+penal/delitos-cometidos-en-contra-de-representantes-de-la-autoridad-pandillerismo-desobediencia-o-resistencia-de-particulares-y-lesiones,1,otros,ninguna,si,Ninguna regla coincide. Tipo compuesto: menciona también lesiones.,no
+penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,4,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico-a-titulo-de-dolo,3,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/delitos-en-materia-de-secuestro-agravado,7,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/delitos-en-materia-de-secuestro-en-su-modalidad-de-secuestro-express-con-la-finalidad-de-extorsion,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/delitos-en-materia-de-seguridad-social-de-los-servidores-publicos,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
 penal/desaparicion-cometida-por-particulares,22,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-cometida-por-particulares-y-del-sistema-nacional-de-busqueda-de-personas,1,desaparicion-de-personas,^(?:desaparicion),no,,no
-penal/desaparicion-cometida-por-particulares-y-otros,1,desaparicion-de-personas,^(?:desaparicion),no,,no
+penal/desaparicion-cometida-por-particulares-y-otros,2,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-de-personas,1,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-forzada,1,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-forzada-de-persona,5,desaparicion-de-personas,^(?:desaparicion),no,,no
-penal/desaparicion-forzada-de-personas,13,desaparicion-de-personas,^(?:desaparicion),no,,no
+penal/desaparicion-forzada-de-personas,20,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-forzada-de-personas-agravada,3,desaparicion-de-personas,^(?:desaparicion),no,,no
 penal/desaparicion-forzada-y-homicidio-calificado,1,desaparicion-de-personas,^(?:desaparicion),si,Tipo compuesto: menciona también homicidio.,no
-penal/desobediencia-o-resistencia-de-particulares-y-otro,1,otros,ninguna,si,Ninguna regla coincide.,no
-penal/despojo,12,despojo,^(?:despojo),no,,no
+penal/desobediencia-o-resistencia-de-particulares,3,otros,ninguna,si,Ninguna regla coincide.,no
+penal/desobediencia-o-resistencia-de-particulares-y-otro,4,otros,ninguna,si,Ninguna regla coincide.,no
+penal/despojo,13,despojo,^(?:despojo),no,,no
+penal/despojo-de-aguas,1,despojo,^(?:despojo),no,,no
 penal/despojo-de-inmueble,3,despojo,^(?:despojo),no,,no
+penal/despojo-de-inmueble-y-otro,2,despojo,^(?:despojo),no,,no
 penal/despojo-de-inmuebles,26,despojo,^(?:despojo),no,,no
+penal/despojo-de-inmuebles-en-grado-de-tentativa,1,despojo,^(?:despojo),no,,no
 penal/despojo-de-inmuebles-y-aguas,30,despojo,^(?:despojo),no,,no
+penal/despojo-de-inmuebles-y-aguas-y-dano-en-las-cosas,1,despojo,^(?:despojo),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
 penal/despojo-de-inmuebles-y-aguas-y-otros,1,despojo,^(?:despojo),no,,no
-penal/despojo-de-inmuebles-y-dano-en-las-cosas,1,despojo,^(?:despojo),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
-penal/despojo-de-inmuebles-y-otros,1,despojo,^(?:despojo),no,,no
-penal/despojo-y-dano-en-las-cosas,1,despojo,^(?:despojo),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
-penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades,4,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/despojo-de-inmuebles-y-dano-en-las-cosas,3,despojo,^(?:despojo),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/despojo-de-inmuebles-y-otros,5,despojo,^(?:despojo),no,,no
+penal/despojo-de-inmuebles-y-robo-calificado,2,despojo,^(?:despojo),si,Tipo compuesto: menciona también robo.,no
+penal/despojo-y-dano-en-las-cosas,3,despojo,^(?:despojo),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/despojo-y-robo-calificado,1,despojo,^(?:despojo),si,Tipo compuesto: menciona también robo.,no
+penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades,5,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/disparo-de-arma-de-fuego-sobre-persona,3,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
 penal/disparo-de-arma-de-fuego-sobre-persona-y-abuso-sexual-infantil-agravado,1,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/disparo-de-arma-de-fuego-sobre-persona-y-delitos-cometidos-contra-representantes-de-la-autoridad,4,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
+penal/disparo-de-arma-de-fuego-sobre-persona-y-otros,3,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
+penal/disparo-de-arma-de-fuego-y-otros,3,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
 penal/ecocidio,1,otros,ninguna,si,Ninguna regla coincide.,no
-penal/encubrimiento,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/extorsion,9,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),no,,no
-penal/falsedad-de-declaracion-e-informes-dados-a-una-autoridad,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsedad-en-declaraciones,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsedad-en-declaraciones-e-informes-dados-a-una-autoridad-y-otros,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsedad-en-declaraciones-y-en-informes-dados-a-una-autoridad,3,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-certificaciones,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-documentos,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-documentos-en-general,3,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso-de-documento-falso,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-documentos-en-general-y-otro,3,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-ayuntamientos-o-de-los-documentos-de-credito,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,6,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/feminicidio,25,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
+penal/ejercicio-indebido-y-abandono-del-servicio-publico,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),si,Tipo compuesto: menciona también abandono-de-familiares.,no
+penal/encubrimiento,3,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/evasion-de-presos,3,otros,ninguna,si,Ninguna regla coincide.,no
+penal/excusa,2,cuestiones-procesales,^(?:queja|conflicto-de-competencia|excusa),si,No es un delito: recurso o incidencia del procedimiento.,no
+penal/extorsion,14,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),no,,no
+penal/extorsion-y-otros,9,amenazas-y-extorsion,^(?:amenazas|amenzas|chantaje|extorsion),no,,no
+penal/falsedad-de-declaracion-e-informes-dados-a-una-autoridad,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsedad-en-declaraciones,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsedad-en-declaraciones-e-informes-dados-a-una-autoridad-y-otros,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsedad-en-declaraciones-y-en-informes-dados-a-una-autoridad,10,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-certificaciones,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-en-general,4,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso-de-documento-falso,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-en-general-y-otro,3,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-ayuntamientos-o-de-los-documentos-de-credito,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalid,4,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalidad-de-uso,2,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,9,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/feminicidio,29,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
 penal/feminicidio-en-grado-de-tentativa,9,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
-penal/feminicidio-y-otro,1,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
-penal/feminicidio-y-robo-calificado,1,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio. Tipo compuesto: menciona también robo.,no
+penal/feminicidio-en-grado-de-tentativa-y-otro,1,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
+penal/feminicidio-y-otro,2,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
+penal/feminicidio-y-robo-calificado,2,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio. Tipo compuesto: menciona también robo.,no
 penal/fraude,30,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
-penal/fraude-especifico,30,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/fraude-en-grado-de-tentativa,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/fraude-especifico,29,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/fraude-especifico-y-falsedad-en-declaraciones-e-informes-dados-a-una-autoridad,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
+penal/fraude-especifico-y-otro,3,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
 penal/fraude-especifico-y-otros,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
 penal/fraude-generico,30,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
-penal/fraude-procesal,12,fraude-y-abuso-de-confianza,^(?:fraude-procesal),si,Fraude procesal afecta a la administración de justicia; se agrupa con fraude por afinidad. Confirmar.,no
+penal/fraude-generico-y-fraude-especifico,2,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/fraude-procesal,15,fraude-y-abuso-de-confianza,^(?:fraude-procesal),si,Fraude procesal afecta a la administración de justicia; se agrupa con fraude por afinidad. Confirmar.,no
 penal/fraude-procesal-y-falsedad-en-declaracion,1,fraude-y-abuso-de-confianza,^(?:fraude-procesal),si,Fraude procesal afecta a la administración de justicia; se agrupa con fraude por afinidad. Confirmar. Tipo compuesto: menciona también falsedad-y-falsificacion.,no
 penal/fraude-y-despojo-de-inmuebles-y-aguas,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),si,Tipo compuesto: menciona también despojo.,no
+penal/fraude-y-falsificacion-de-documentos-en-general,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
 penal/fraude-y-otros,3,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
 penal/fraude-y-suplantacion-de-identidad,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
-penal/homicidio,6,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-a-titulo-de-culpa,14,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-a-titulo-de-culpa-grave,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-a-titulo-de-culpa-grave-y-otro,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-a-titulo-de-culpa-y-otro,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio,7,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-a-titulo-de-culpa,20,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-dano-en-las-cosas-y-lesiones-a-titulo-de-culpa,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-grave,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-grave-y-otro,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-grave-y-otros,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-por-imprudencia,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,5,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-y-otro,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-a-titulo-de-culpa-y-otros,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/homicidio-a-titulo-doloso,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/homicidio-agravado-y-robo-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
 penal/homicidio-calificado,30,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-en-grado-de-tentativa,24,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-en-su-modalidad-de-ventaja,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-calificado-en-grado-de-tentativa,28,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-en-grado-de-tentativa-y-dano-en-las-cosas,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/homicidio-calificado-en-grado-de-tentativa-y-delincuencia-organizada,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/homicidio-calificado-en-grado-de-tentativa-y-otro,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-en-grado-de-tentativa-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-en-grado-de-tentativa-y-robo-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-calificado-en-su-modalidad-de-ventaja,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-homicidio-tentado-y-dano-en-las-cosas,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/homicidio-calificado-tentado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/homicidio-calificado-y-abuso-sexual-infantil,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/homicidio-calificado-y-dano-en-las-cosas-a-titulo-de-culpa,5,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/homicidio-calificado-y-delincuencia-organizada,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delincuencia-organizada.,no
-penal/homicidio-calificado-y-homicidio-calificado-en-grado-de-tentativa,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-y-otro,11,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-y-otros,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-y-otros-delitos,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-y-robo-calificado,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-calificado-y-delitos-en-materia-de-inhumacion-y-exhumacion,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-homicidio-calificado-en-grado-de-tentativa,11,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-homicidio-en-grado-de-tentativa,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-lesiones,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también lesiones.,no
+penal/homicidio-calificado-y-lesiones-calificadas,9,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también lesiones.,no
+penal/homicidio-calificado-y-otro,13,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-otros,4,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-otros-delitos,11,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-parricidio,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-robo-calificado,8,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-calificado-y-robo-de-infante,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,"Tipo compuesto: menciona también robo, sustraccion-de-menores.",no
+penal/homicidio-calificado-y-robo-simple,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-calificado-y-secuestro,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también privacion-de-la-libertad-y-secuestro.,no
 penal/homicidio-calificado-y-tentativa-de-homicidio,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-calificado-y-tentativa-de-homicidio-calificado,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-culposo,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-en-grado-de-tentativa,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-en-rina,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-en-rina-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-calificado-y-tentativa-de-homicidio-calificado,9,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-calificado-y-tentativa-de-robo-calificado,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-calificado-y-violacion,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/homicidio-calificado-y-violacion-equiparada,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/homicidio-culposo,13,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-culposo-y-lesiones,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-culposo-y-otro,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-culposo-y-responsabilidad-medica,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-dano-en-las-cosas-y-lesiones,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,"Tipo compuesto: menciona también dano-en-las-cosas, lesiones.",no
+penal/homicidio-doloso,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-grado-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-en-grado-de-tentativa,4,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-grado-de-tentativa-y-otros,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-rina,11,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-rina-como-provocado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-rina-inesperada,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-rina-inesperada-como-provocado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-en-rina-y-otros,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-imprudencial-y-dano-en-las-cosas-culposo,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-imprudencial-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,6,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-lesiones-y-dano-en-las-cosas-culposos,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-lesiones-y-danos-todos-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-por-culpa-grave,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-por-culpa-grave-y-otros,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/homicidio-simple,6,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-simple-intencional,10,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-simple-intencional,15,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/homicidio-simple-intencional-doloso,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-simple-intencional-en-grado-de-tentativa,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/homicidio-y-lesiones-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-simple-intencional-en-grado-de-tentativa,4,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-simple-intencional-y-lesiones-simples,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también lesiones.,no
+penal/homicidio-simple-intencional-y-otro,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-simple-intencional-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-simple-intencional-y-robo-calificado,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-tentado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/homicidio-y-dano-en-las-cosas,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa,9,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-y-dano-en-las-cosas-culposo,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-y-dano-en-las-cosas-imprudencial,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/homicidio-y-lesiones-a-titulo-de-culpa,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-y-lesiones-ambos-a-titulo-de-culpa-grave,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/homicidio-y-otro,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/homicidio-y-otros,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/homicidio-y-robo-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
-penal/hostigamiento-acoso-sexual-y-contra-la-dignidad-de-las-personas,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también contra-la-dignidad-de-las-personas.,no
-penal/hostigamiento-sexual,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/homicidio-y-robo-calificado,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/homicidio-y-tentativa-de-homicidio,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/hostigamiento-acoso-sexual-y-contra-la-dignidad-de-las-personas,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también contra-la-dignidad-de-las-personas.,no
+penal/hostigamiento-sexual,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/instigacion-o-ayuda-al-suicidio,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/lenocinio,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/lesiones,13,lesiones,^(?:lesiones),no,,no
-penal/lesiones-a-titulo-de-culpa,10,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-a-titulo-de-culpa-grave,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-a-titulo-de-culpa-y-otro,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-calificadas,23,lesiones,^(?:lesiones),no,,no
+penal/lesiones,15,lesiones,^(?:lesiones),no,,no
+penal/lesiones-a-titulo-de-culpa,19,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-grave,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-grave-y-otro,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-por-imprudencia,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,9,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-a-titulo-de-culpa-y-otro,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-calificadas,29,lesiones,^(?:lesiones),no,,no
 penal/lesiones-calificadas-en-rina,1,lesiones,^(?:lesiones),no,,no
-penal/lesiones-calificadas-y-otro,1,lesiones,^(?:lesiones),no,,no
+penal/lesiones-calificadas-y-abuso-de-autoridad,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también servidores-publicos-y-administracion-de-justicia.,no
+penal/lesiones-calificadas-y-maltrato-al-infante,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/lesiones-calificadas-y-otro,3,lesiones,^(?:lesiones),no,,no
 penal/lesiones-calificadas-y-otros,1,lesiones,^(?:lesiones),no,,no
-penal/lesiones-culposas,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-dolosas,12,lesiones,^(?:lesiones),no,,no
+penal/lesiones-calificadas-y-violencia-intrafamiliar,2,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/lesiones-cometidas-a-titulo-de-culpa,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-culposas,7,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-dano-en-las-cosas-y-homicidio-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-dolosas,18,lesiones,^(?:lesiones),no,,no
 penal/lesiones-dolosas-agravadas,1,lesiones,^(?:lesiones),no,,no
 penal/lesiones-dolosas-calificadas,2,lesiones,^(?:lesiones),no,,no
-penal/lesiones-dolosas-y-amenazas,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/lesiones-dolosas-y-amenazas,2,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
 penal/lesiones-dolosas-y-lesiones-calificadas,1,lesiones,^(?:lesiones),no,,no
 penal/lesiones-dolosas-y-violencia-familiar,2,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
-penal/lesiones-en-rina,4,lesiones,^(?:lesiones),no,,no
-penal/lesiones-intencionales,3,lesiones,^(?:lesiones),no,,no
+penal/lesiones-dolosas-y-violencia-intrafamiliar,3,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/lesiones-en-rina,5,lesiones,^(?:lesiones),no,,no
+penal/lesiones-en-rina-inesperada,1,lesiones,^(?:lesiones),no,,no
+penal/lesiones-graves-a-titulo-de-culpa-por-imprudencia,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-intencionales,4,lesiones,^(?:lesiones),no,,no
 penal/lesiones-simples,2,lesiones,^(?:lesiones),no,,no
-penal/lesiones-y-amenazas,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
-penal/lesiones-y-dano-en-las-cosas,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
-penal/lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa,4,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
-penal/lesiones-y-homicidio-ambos-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-simples-dolosas,2,lesiones,^(?:lesiones),no,,no
+penal/lesiones-simples-intencionales,5,lesiones,^(?:lesiones),no,,no
+penal/lesiones-y-allanamiento-de-morada,2,lesiones,^(?:lesiones),no,,no
+penal/lesiones-y-amenazas,3,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/lesiones-y-dano-en-las-cosas,3,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,8,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa,10,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-dano-en-las-cosas-culposos,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-danos-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-danos-culposos,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-danos-en-las-cosas,4,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/lesiones-y-danos-en-las-cosas-a-titulo-de-culpa,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-delitos-cometidos-contra-representantes-de-la-autoridad,2,lesiones,^(?:lesiones),no,,no
+penal/lesiones-y-homicidio-ambos-a-titulo-de-culpa,3,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/lesiones-y-maltrato-al-infante,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
 penal/lesiones-y-otro,4,lesiones,^(?:lesiones),no,,no
-penal/lesiones-y-otros,1,lesiones,^(?:lesiones),no,,no
+penal/lesiones-y-otros,3,lesiones,^(?:lesiones),no,,no
 penal/lesiones-y-responsabilidad-medica,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también responsabilidad-profesional.,no
 penal/lesiones-y-violencia-familiar-equiparada,1,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/lesiones-y-violencia-intrafamiliar,4,lesiones,^(?:lesiones),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/maltrato-al-infante,1,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar.,no
 penal/maltrato-al-infante-y-lesiones,1,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar. Tipo compuesto: menciona también lesiones.,no
+penal/maltrato-al-infante-y-otros,1,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar.,no
 penal/maltrato-infantil,16,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar.,no
 penal/maltrato-infantil-y-lesiones,1,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar. Tipo compuesto: menciona también lesiones.,no
-penal/materia-de-informacion-publica,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/maltrato-infantil-y-otro,1,violencia-familiar,^(?:maltrato),si,Maltrato infantil agrupado con violencia familiar; confirmar.,no
+penal/materia-de-informacion-publica,1,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
 penal/materia-de-inhumaciones-y-exhumaciones,1,otros,ninguna,si,Ninguna regla coincide.,no
-penal/narcomenudeo,2,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
-penal/parricidio,15,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/parricidio-en-grado-de-tentativa,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/parricidio-y-homicidio-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/narcomenudeo,3,contra-la-salud,^(?:contra-la-salud|narcomenudeo),no,,no
+penal/pandillerismo-y-allanamiento-de-morada,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/pandillerismo-y-homicidio-calificado-en-grado-de-tentativa,1,otros,ninguna,si,Ninguna regla coincide. Tipo compuesto: menciona también homicidio.,no
+penal/pandillerismo-y-otros,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/parricidio,23,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/parricidio-en-grado-de-tentativa,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/parricidio-maltrato-al-infante-y-violencia-intrafamiliar,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/parricidio-y-homicidio-calificado,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
 penal/parricidio-y-otro,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/peculado,4,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/parricidio-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/parricidio-y-violacion,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/parricidio-y-violencia-familiar,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/peculado,4,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/plagio-o-secuestro,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
 penal/portacion-de-arma-de-fuego,4,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
 penal/portacion-de-arma-de-fuego-sin-licencia,3,armas,^(?:portacion-de-arma|armas-y-objetos|disparo-de-arma),no,,no
-penal/privacion-ilegal-de-la-libertad,9,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/privacion-ilegal-de-la-libertad-y-homicidio,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también homicidio.,no
-penal/privacion-ilegal-de-la-libertad-y-otros-derechos,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/privacion-ilegal-de-la-libertad-y-robo-calificado,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también robo.,no
+penal/posesion-de-cosa-mueble-robada,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/privacion-ilegal-de-la-libertad,11,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/privacion-ilegal-de-la-libertad-y-homicidio,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también homicidio.,no
+penal/privacion-ilegal-de-la-libertad-y-otros-derechos,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/privacion-ilegal-de-la-libertad-y-robo-calificado,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también robo.,no
+penal/privacion-ilegal-de-la-libertad-y-violacion,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/prostitucion-ajena-u-otras-formas-de-explotacion-sexual-y-lenocinio,1,delitos-sexuales,^(?:prostitucion),si,"Prostitución infantil y explotación sexual agrupadas con delitos sexuales, como el lenocinio.",no
+penal/prostitucion-infantil,1,delitos-sexuales,^(?:prostitucion),si,"Prostitución infantil y explotación sexual agrupadas con delitos sexuales, como el lenocinio.",no
+penal/prostitucion-infantil-y-abuso-sexual-infantil-agravado,1,delitos-sexuales,^(?:prostitucion),si,"Prostitución infantil y explotación sexual agrupadas con delitos sexuales, como el lenocinio.",no
+penal/prostitucion-infantil-y-violacion,1,delitos-sexuales,^(?:prostitucion),si,"Prostitución infantil y explotación sexual agrupadas con delitos sexuales, como el lenocinio.",no
+penal/queja,4,cuestiones-procesales,^(?:queja|conflicto-de-competencia|excusa),si,No es un delito: recurso o incidencia del procedimiento.,no
+penal/queja-procesal,7,cuestiones-procesales,^(?:queja|conflicto-de-competencia|excusa),si,No es un delito: recurso o incidencia del procedimiento.,no
 penal/responsabilidad-medica,2,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),no,,no
+penal/responsabilidad-medica-y-homicidio-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/responsabilidad-medica-y-homicidio-culposo,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
 penal/responsabilidad-medica-y-lesiones,6,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),si,Tipo compuesto: menciona también lesiones.,no
+penal/responsabilidad-medica-y-lesiones-a-titulo-de-culpa,1,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/responsabilidad-medica-y-lesiones-culposas,2,delitos-culposos,culpa,si,"Delitos a título de culpa (homicidio, lesiones o daño culposos, típicamente de tránsito) se separan de los dolosos. Confirmar.",no
+penal/responsabilidad-medica-y-otro,1,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),no,,no
+penal/responsabilidad-medica-y-otros,2,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),no,,no
 penal/responsabilidad-profesional-y-tecnica,5,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),no,,no
 penal/responsabilidad-profesional-y-tecnica-y-otro,1,responsabilidad-profesional,^(?:responsabilidad-medica|responsabilidad-profesional),no,,no
 penal/robo,5,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-agraviado,1,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-calificado,30,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-calificado-en-grado-de-tentativa,6,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-calificado-en-grado-de-tentativa,14,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-calificado-en-grado-de-tentativa-y-otro,2,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-calificado-tentado,2,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-calificado-y-corrupcion-de-menores,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delitos-sexuales.,no
-penal/robo-calificado-y-delincuencia-organizada,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/robo-calificado-y-abigeato,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-calificado-y-abuso-de-autoridad,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también servidores-publicos-y-administracion-de-justicia.,no
+penal/robo-calificado-y-asociacion-delictuosa,2,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/robo-calificado-y-cohecho,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también servidores-publicos-y-administracion-de-justicia.,no
+penal/robo-calificado-y-contra-la-salud,5,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también contra-la-salud.,no
+penal/robo-calificado-y-corrupcion-de-menores,3,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/robo-calificado-y-dano-en-las-cosas-a-titulo-doloso,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también dano-en-las-cosas.,no
+penal/robo-calificado-y-delincuencia-organizada,9,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delincuencia-organizada.,no
 penal/robo-calificado-y-despojo,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también despojo.,no
-penal/robo-calificado-y-lesiones,3,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también lesiones.,no
-penal/robo-calificado-y-lesiones-calificadas,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también lesiones.,no
-penal/robo-calificado-y-otro,11,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-calificado-y-otros,6,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-calificado-y-falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,3,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
+penal/robo-calificado-y-homicidio-calificado,5,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también homicidio.,no
+penal/robo-calificado-y-homicidio-calificado-en-grado-de-tentativa,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también homicidio.,no
+penal/robo-calificado-y-homicidio-en-grado-de-tentativa,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también homicidio.,no
+penal/robo-calificado-y-lesiones,9,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también lesiones.,no
+penal/robo-calificado-y-lesiones-calificadas,2,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también lesiones.,no
+penal/robo-calificado-y-otro,15,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-calificado-y-otros,10,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-calificado-y-portacion-de-armas-y-objetos-prohibidos,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también armas.,no
 penal/robo-calificado-y-privacion-ilegal-de-la-libertad,4,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también privacion-de-la-libertad-y-secuestro.,no
+penal/robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos,4,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también privacion-de-la-libertad-y-secuestro.,no
 penal/robo-calificado-y-robo-equiparado,1,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-de-infante,2,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/robo-calificado-y-secuestro-express-agravado,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también privacion-de-la-libertad-y-secuestro.,no
+penal/robo-calificado-y-tentativa-de-robo-calificado,2,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-calificado-y-violacion,2,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/robo-de-infante,9,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/robo-de-infante-y-asociacion-delictuosa,1,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial). Tipo compuesto: menciona también delincuencia-organizada.",no
+penal/robo-de-uso,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-en-grado-de-tentativa,4,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-equiparado,30,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-equiparado-en-su-modalidad-de-desmantelamiento,3,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-equiparado-en-su-modalidad-de-uso,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-desmantelamiento,6,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-un-vehiculo-a-sabiendas-de-su-procedencia,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-vehiculos-a-sabiendas-de-su-origen-ilicito,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-vehiculos-robados,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-y-robo-calificado,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-enajenar-con-vehiculos-o-vehiculos-robados,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-uso,8,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-equiparado-en-su-modalidad-de-uso-y-otros,3,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-equiparado-en-su-modalidad-de-utilizacion,30,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-utilizacion-de-un-vehiculo-robado-a-sabiendas-de-su-procedencia-ilicita,5,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-utilizacion-de-vehiculos-robados-a-sabiendas-de-su-origen-ilicito,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-en-su-modalidad-de-utilizar-los-automotores-robados-a-sabiendas-de-su-origen-ilicito,3,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-equiparado-falsificacion-de-sellos-marcas-llaves-y-troqueles,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
-penal/robo-equiparado-y-falsificacion-y-uso-indebido-de-sellos-marcas-y-troqueles,2,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
-penal/robo-equiparado-y-otros,2,robo,^(?:robo|asalto|abigeato),no,,no
-penal/robo-simple,6,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-y-falsificacion-y-uso-indebido-de-sellos-marcas-y-troqueles,4,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también falsedad-y-falsificacion.,no
+penal/robo-equiparado-y-otro,3,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-equiparado-y-otros,4,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-simple,14,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-simple-en-grado-de-tentativa,2,robo,^(?:robo|asalto|abigeato),no,,no
 penal/robo-y-homicidio-calificado,1,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también homicidio.,no
-penal/secuestro,28,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-agravado,24,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-agravado-y-otro,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-agravado-y-otros,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-en-su-modalidad-de-exigir-rescate,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-express,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/secuestro-express-y-robo-calificado,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también robo.,no
-penal/secuestro-y-abuso-sexual-infantil,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delitos-sexuales.,no
-penal/secuestro-y-asociacion-delictuosa,3,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delincuencia-organizada.,no
-penal/secuestro-y-delincuencia-organizada,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delincuencia-organizada.,no
-penal/secuestro-y-otros,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
-penal/substraccion-de-menores,1,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
-penal/suplantacion-de-identidad,3,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/suplantacion-de-identidad-y-otro,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad),no,,no
-penal/sustraccion-de-menores,1,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
-penal/tentantiva-de-robo-calificado,2,robo,^(?:robo|asalto|abigeato),no,,no
+penal/robo-y-homicidio-en-grado-de-tentativa,2,robo,^(?:robo|asalto|abigeato),si,Tipo compuesto: menciona también homicidio.,no
+penal/secuestro,30,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-agravado,29,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-agravado-y-delincuencia-organizada,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/secuestro-agravado-y-otro,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-agravado-y-otros,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-con-el-proposito-de-obtener-un-rescate,5,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-en-grado-de-tentativa,2,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-en-su-modalidad-de-exigir-rescate,5,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-express,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-express-agravado,3,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-express-con-la-finalidad-de-extorsion,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/secuestro-express-y-robo-calificado,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también robo.,no
+penal/secuestro-y-abuso-sexual-infantil,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/secuestro-y-asociacion-delictuosa,6,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/secuestro-y-delincuencia-organizada,8,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también delincuencia-organizada.,no
+penal/secuestro-y-extorsion,3,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/secuestro-y-otros,7,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),no,,no
+penal/secuestro-y-tentativa-de-homicidio,1,privacion-de-la-libertad-y-secuestro,^(?:secuestro|plagio|privacion-ilegal|delitos-en-materia-de-secuestro),si,Tipo compuesto: menciona también homicidio.,no
+penal/substraccion-de-menores,10,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/suplantacion-de-identidad,4,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/suplantacion-de-identidad-equiparada,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/suplantacion-de-identidad-y-otro,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/sustraccion-de-menores,9,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/sustraccion-de-menores-y-abandono-de-familiares,3,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial). Tipo compuesto: menciona también abandono-de-familiares.",no
+penal/sustraccion-robo-y-trafico-de-menores,1,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/tentantiva-de-robo-calificado,10,robo,^(?:robo|asalto|abigeato),no,,no
+penal/tentativa-de-abuso-sexual-infantil-agravado,3,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/tentativa-de-despojo,1,despojo,^(?:despojo),no,,no
+penal/tentativa-de-despojo-de-inmuebles-y-aguas,1,despojo,^(?:despojo),no,,no
 penal/tentativa-de-feminicidio,5,feminicidio,^(?:feminicidio),si,Se separa de homicidio por su tratamiento propio; confirmar si debe ir dentro de homicidio.,no
-penal/tentativa-de-fraude-generico,1,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
-penal/tentativa-de-homicidio,6,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/tentativa-de-homicidio-calificado,9,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
-penal/tentativa-de-homicidio-calificado-y-otros,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-fraude-generico,2,fraude-y-abuso-de-confianza,^(?:fraude|administracion-fraudulenta|abuso-de-confianza),no,,no
+penal/tentativa-de-homicidio,9,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado,12,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado-con-ventaja-y-alevosia,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado-y-otro,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado-y-otros,7,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado-y-pandillerismo,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-calificado-y-robo-calificado,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
 penal/tentativa-de-homicidio-calificado-y-tentativa-de-robo-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
-penal/tentativa-de-robo-calificado,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/tentativa-de-homicidio-en-rina-inesperada,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-simple,2,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-simple-intencional,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-homicidio-y-robo-calificado,1,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también robo.,no
+penal/tentativa-de-parricidio,5,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),no,,no
+penal/tentativa-de-parricidio-y-violencia-familiar,3,homicidio,^(?:homicidio|parricidio|instigacion-o-ayuda-al-suicidio),si,Tipo compuesto: menciona también violencia-familiar.,no
+penal/tentativa-de-robo,1,robo,^(?:robo|asalto|abigeato),no,,no
+penal/tentativa-de-robo-calificado,7,robo,^(?:robo|asalto|abigeato),no,,no
 penal/tentativa-de-robo-calificado-y-otro,1,robo,^(?:robo|asalto|abigeato),no,,no
-penal/tortura,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/tentativa-de-robo-de-infante,3,sustraccion-de-menores,^(?:robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo),si,"Robo de infante agrupado con sustracción de menores (delito contra las personas, no patrimonial).",no
+penal/tortura,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
 penal/trata-de-personas,4,trata-de-personas,^(?:trata-de-personas),no,,no
-penal/trata-de-personas-con-fines-de-explotacion-sexual-y-otros,1,trata-de-personas,^(?:trata-de-personas),no,,no
+penal/trata-de-personas-con-fines-de-explotacion-sexual-y-otros,3,trata-de-personas,^(?:trata-de-personas),no,,no
 penal/trata-de-personas-en-su-modalidad-de-explotacion-laboral,1,trata-de-personas,^(?:trata-de-personas),no,,no
-penal/uso-ilicito-de-atribuciones-y-facultades,3,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
-penal/utilizacion-ilicita-de-informacion-confidencial,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento),no,,no
+penal/ultrajes-a-la-moral-y-a-las-buenas-costumbres,3,otros,ninguna,si,Ninguna regla coincide.,no
+penal/ultrajes-a-la-moral-y-a-las-buenas-costumbres-e-incitacion-a-la-prostitucion,1,otros,ninguna,si,Ninguna regla coincide. Tipo compuesto: menciona también delitos-sexuales.,no
+penal/uso-de-documento-falso,1,falsedad-y-falsificacion,^(?:falsificacion|falsedad|suplantacion-de-identidad|uso-de-documento-falso),no,,no
+penal/uso-ilicito-de-atribuciones-y-facultades,3,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
+penal/usurpacion-de-funciones-publicas-o-de-profesion,1,otros,ninguna,si,Ninguna regla coincide.,no
+penal/usurpacion-de-funciones-publicas-o-de-profesion-y-uso-indebido-de-uniformes-o-insignias,5,otros,ninguna,si,Ninguna regla coincide.,no
+penal/utilizacion-ilicita-de-informacion-confidencial,2,servidores-publicos-y-administracion-de-justicia,^(?:abuso-de-autoridad|cohecho|peculado|uso-ilicito-de-atribuciones|desvio-y-aprovechamiento|delitos-cometidos-en-la-administracion|cometidos-en-la-administracion|delitos-en-materia-de-seguridad-social|tortura|abogados-patronos|materia-de-informacion-publica|utilizacion-ilicita-de-informacion|encubrimiento|ejercicio-indebido),no,,no
 penal/violacion,30,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/violacion-de-deposito,1,fraude-y-abuso-de-confianza,^(?:violacion-de-deposito),si,"Violación de depósito es un delito patrimonial, no sexual.",no
-penal/violacion-de-deposito-y-fraude-especifico,1,fraude-y-abuso-de-confianza,^(?:violacion-de-deposito),si,"Violación de depósito es un delito patrimonial, no sexual.",no
-penal/violacion-en-grado-de-tentantiva,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/violacion-equiparada,7,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-agravada,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-de-deposito,5,fraude-y-abuso-de-confianza,^(?:violacion-de-deposito),si,"Violación de depósito es un delito patrimonial, no sexual.",no
+penal/violacion-de-deposito-y-fraude-especifico,9,fraude-y-abuso-de-confianza,^(?:violacion-de-deposito),si,"Violación de depósito es un delito patrimonial, no sexual.",no
+penal/violacion-en-grado-de-tentantiva,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-equiparada,13,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-equiparada-violencia-intrafamiliar-equiparada-y-lesiones-simples-dolosas,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,"Tipo compuesto: menciona también lesiones, violencia-familiar.",no
+penal/violacion-equiparada-y-otros,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/violacion-equiparada-y-violencia-familiar,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
 penal/violacion-y-abuso-de-autoridad,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también servidores-publicos-y-administracion-de-justicia.,no
-penal/violacion-y-abuso-sexual-infantil,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/violacion-y-otro,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
-penal/violacion-y-otros,4,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-y-abuso-sexual-infantil,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-y-abuso-sexual-infantil-agravado,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-y-corrupcion-de-menores,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-y-lesiones-dolosas,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también lesiones.,no
+penal/violacion-y-otro,4,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
+penal/violacion-y-otros,6,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),no,,no
 penal/violacion-y-privacion-ilegal-de-la-libertad-y-otros-derechos,1,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también privacion-de-la-libertad-y-secuestro.,no
-penal/violacion-y-robo-calificado,2,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también robo.,no
+penal/violacion-y-robo-calificado,5,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también robo.,no
+penal/violacion-y-violencia-intrafamiliar,5,delitos-sexuales,^(?:violacion|abuso-sexual|acoso-sexual|hostigamiento|aprovechamiento-sexual|atentados-al-pudor|lenocinio),si,Tipo compuesto: menciona también violencia-familiar.,no
 penal/violencia-en-espectaculos-publicos,1,otros,ninguna,si,Ninguna regla coincide.,no
 penal/violencia-familiar,30,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
 penal/violencia-familiar-amenazas-y-lesiones,7,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,"Tipo compuesto: menciona también amenazas-y-extorsion, lesiones.",no
-penal/violencia-familiar-equiparada,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-familiar-equiparada,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
 penal/violencia-familiar-equiparada-y-lesiones,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
 penal/violencia-familiar-equiparada-y-otro,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
 penal/violencia-familiar-y-abandono-de-familiares,4,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también abandono-de-familiares.,no
@@ -284,7 +524,24 @@ penal/violencia-familiar-y-lesiones-dolosas,9,violencia-familiar,^(?:violencia-f
 penal/violencia-familiar-y-lesiones-simples,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
 penal/violencia-familiar-y-otros,13,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
 penal/violencia-familiar-y-violacion,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/violencia-familiar-y-violacion-equiparada,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también delitos-sexuales.,no
 penal/violencia-intrafamiliar,9,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
-penal/violencia-intrafamiliar-y-lesiones,3,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
-penal/violencia-intrafamiliar-y-lesiones-dolosas,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
-penal/violencia-intrafamiliar-y-otros,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-intrafamiliar-amenazas-y-lesiones,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,"Tipo compuesto: menciona también amenazas-y-extorsion, lesiones.",no
+penal/violencia-intrafamiliar-equiparada,5,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-intrafamiliar-equiparada-y-abuso-sexual-infantil-agravado,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también delitos-sexuales.,no
+penal/violencia-intrafamiliar-equiparada-y-lesiones,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-equiparada-y-lesiones-dolosas,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-maltrato-al-infante-y-lesiones,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-maltrato-al-infante-y-lesiones-simples,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-abandono-de-familiares,3,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también abandono-de-familiares.,no
+penal/violencia-intrafamiliar-y-abandono-de-personas,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también abandono-de-familiares.,no
+penal/violencia-intrafamiliar-y-amenazas,9,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también amenazas-y-extorsion.,no
+penal/violencia-intrafamiliar-y-desobediencia-o-resistencia-de-particulares,2,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-intrafamiliar-y-lesiones,9,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-lesiones-calificadas,5,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-lesiones-dolosas,10,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-lesiones-dolosas-calificadas,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-lesiones-simples,3,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),si,Tipo compuesto: menciona también lesiones.,no
+penal/violencia-intrafamiliar-y-maltrato-al-infante,4,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-intrafamiliar-y-otro,1,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no
+penal/violencia-intrafamiliar-y-otros,5,violencia-familiar,^(?:violencia-familiar|violencia-intrafamiliar),no,,no

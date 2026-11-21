@@ -116,8 +116,8 @@ def cmd_familias(args) -> None:
     _log(f"{len(asig)} tipos penales -> {len(por_fam)} familias. Para revisar: {sum(a.revisar for a in asig)}.")
     for f, n in por_fam.most_common():
         _log(f"   {n:5d}  {f}")
-    _log(f"\nCSV para el abogado: {path}\nEdita la columna 'familia' y pon 'si' en 'revisado'. "
-         "El código usará este archivo en lugar de las reglas.")
+    _log(f"\nTabla tipo -> familia: {path}. Una corrección a mano en 'familia' (con 'si' en 'revisado') prevalece "
+         "sobre las reglas.")
 
 
 def _coherencia_familias(penal):
@@ -131,8 +131,8 @@ def _coherencia_familias(penal):
     corrida = Corrida("familias-coherencia", parametros={"min_sentencias_por_tipo": 3})
     ok = int(t["coincide"].sum()) if len(t) else 0
     corrida.tabla("Resumen", "Tipos con al menos 3 sentencias cuyo centroide de embeddings queda más cerca de su "
-                  "propia familia (calculada sin ese tipo) que de cualquier otra. Sustituye a la revisión del abogado "
-                  "como comprobación de consistencia; no dice qué agrupación es la jurídicamente correcta.",
+                  "propia familia (calculada sin ese tipo) que de cualquier otra. Es una comprobación de "
+                  "consistencia sin LLM; no dice qué agrupación es la jurídicamente correcta.",
                   pd.DataFrame([{"tipos": len(t), "más cerca de su familia": ok,
                                  "más cerca de otra": len(t) - ok}]))
     if len(t) - ok:

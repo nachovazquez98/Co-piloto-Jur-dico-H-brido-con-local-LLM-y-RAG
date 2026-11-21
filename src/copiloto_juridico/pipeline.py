@@ -38,7 +38,7 @@ DESCRIPCION_PASOS = {
     "entidades": "El modelo de lenguaje identifica en la consulta de 1 a 3 conceptos jurídicos: primero el delito, "
                  "con su modalidad (deducido de los hechos si no se nombra), y después el problema procesal (p. ej. "
                  "vinculación a proceso, prisión preventiva). Si no logra extraerlos, se utiliza la consulta íntegra.",
-    "clasificacion": "La consulta se compara con las 24 familias de delito del corpus penal mediante cuatro señales: "
+    "clasificacion": "La consulta se compara con las familias de delito del corpus penal mediante cuatro señales: "
                      "similitud semántica (coseno de embeddings), coincidencia de lemas (Jaccard), concisión de la "
                      "categoría y el voto de las sentencias más parecidas. Resultado: las categorías más probables, "
                      "en orden.",
