@@ -7796,7 +7796,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=78c8dbea">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d73157d2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7937,7 +7937,7 @@ que aparecen en el texto citan la corrida guardada en <code>evaluacion/resultado
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bf0be9eb">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f2d604af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7980,7 +7980,7 @@ Modelo de embeddings: intfloat/multilingual-e5-base · materias en la búsqueda:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9291ea59">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8aa39bfa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8013,7 +8013,7 @@ redacta exclusivamente a partir del texto de las resoluciones recuperadas, no de
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=259a464b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c863d3b6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8038,7 +8038,7 @@ externos.</p>
 <td><code>llama3.1:8b</code> (Meta), cuantizado Q4_K_M, servido por Ollama</td>
 <td>4.9 GB en disco; 6.9 GB cargado con ventana de 8,192 tokens</td>
 <td>conceptos clave, QC_1, ficha, síntesis</td>
-<td>Cabe íntegro en la GPU de 8 GB con la ventana necesaria para leer una resolución; uso local permitido por su licencia; salida JSON restringida</td>
+<td>Cabe íntegro en la GPU de 8 GB con la ventana necesaria para leer una resolución cuando el modelo de embeddings se ejecuta en CPU (sección 6); uso local permitido por su licencia; salida JSON restringida</td>
 </tr>
 <tr>
 <td>Modelo de embeddings</td>
@@ -8089,7 +8089,9 @@ externos.</p>
 <li><em>Requisito de memoria (excluyente).</em> El modelo debe caber íntegro en los 8 GB de la GPU con la ventana de 8,192
 tokens necesaria para leer una resolución; si una parte se desborda a la RAM, cada llamada se vuelve mucho más
 lenta. Quedan excluidos <code>gemma2:9b</code> (10.2 GB cargado, de los cuales 2.2 GB en RAM, según Ollama) y <code>qwen2.5:14b</code>
-(9.0 GB solo en disco). Cumplen el requisito <code>llama3.1:8b</code> (6.9 GB cargado) y <code>qwen2.5:7b</code>.</li>
+(9.0 GB solo en disco). Cumplen el requisito <code>llama3.1:8b</code> (6.9 GB cargado según <code>ollama ps</code>, 6.3 GiB en la
+GPU según <code>nvidia-smi</code>, con el modelo de embeddings en CPU) y <code>qwen2.5:7b</code>. Si el modelo de embeddings ocupa la GPU
+antes que el de lenguaje, Ollama coloca en ella las capas que caben y el resto en la RAM (medición de la sección 6).</li>
 <li><em>Entre los que cumplen: continuidad y costo del cambio.</em> <code>llama3.1:8b</code> es el modelo con el que se desarrollaron y
 ajustaron las instrucciones, la ficha JSON, las regresiones y las 2,495 fichas precalculadas.</li>
 </ol>
@@ -8238,7 +8240,7 @@ profesional, no sale del equipo; (ii) costo marginal nulo por consulta una vez a
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a8832e58">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1dc339e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8277,7 +8279,7 @@ detiene; el proyecto no evade dicha verificación.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e06a7514">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=01469423">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8321,7 +8323,7 @@ detiene; el proyecto no evade dicha verificación.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=945f54c4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5086c748">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8368,7 +8370,7 @@ una sola vez.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a19fe0d7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e6bd6982">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8406,7 +8408,7 @@ v i s t o s para resolver los autos del toca penal número 8922017 formado con m
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3b69d6a2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=77281af3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8442,7 +8444,7 @@ Resoluciones repetidas retiradas: 8
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a25a37b2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=be6825b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8462,7 +8464,7 @@ los hechos con precisión.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=486cf1d2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a9e53a0e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8667,7 +8669,7 @@ Resoluciones penales que aún tienen páginas omitidas: 54
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a55e3b96">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2993c66e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8705,7 +8707,7 @@ literal) y ocupa los primeros lugares. k = 60 es el valor propuesto por sus auto
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c2f36faa">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5577d362">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8739,7 +8741,7 @@ Fragmentos de resoluciones penales: 186,971 (mediana de 51 por resolución)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=af392d94">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f31e1835">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8779,7 +8781,7 @@ Fragmentos de resoluciones penales: 186,971 (mediana de 51 por resolución)
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 15439.63it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 17584.14it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -8799,7 +8801,7 @@ Fragmentos de resoluciones penales: 186,971 (mediana de 51 por resolución)
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7e512b78">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c99f744">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8810,7 +8812,7 @@ según cada búsqueda y según su fusión.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ba8ed812">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f04d2257">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8911,7 +8913,7 @@ según cada búsqueda y según su fusión.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1a995ec8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6c7a1ee1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8924,7 +8926,7 @@ consulta: primero extrae los conceptos clave y clasifica la familia del delito, 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9b359b58">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8760cd94">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8984,7 +8986,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d12fe0bc">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fd7c1255">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9040,7 +9042,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 16375.64it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 13933.63it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9114,7 +9116,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <tr>
 <th>Memoria RAM de este proceso (índice + BM25 + modelo)</th>
 <td></td>
-<td>4.05 GB</td>
+<td>4.04 GB</td>
 </tr>
 <tr>
 <th>RAM total del equipo</th>
@@ -9134,7 +9136,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3d6507be">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ed1ab8c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9179,7 +9181,7 @@ filtro automático (<code>evaluacion/errores/sugerencia_delito.md</code>).</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9753a0f8">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fd7bcfa3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9214,7 +9216,7 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cd5cb93b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9e9a383e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9279,7 +9281,7 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=21f789e3">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9eeb5666">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9338,15 +9340,15 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 <tr>
 <th>0</th>
 <td>PENAL · familia: robo</td>
-<td>0.515122</td>
-<td>0.822862</td>
+<td>0.515078</td>
+<td>0.822655</td>
 <td>0.125</td>
 <td>1.000000</td>
 </tr>
 <tr>
 <th>1</th>
 <td>PENAL · familia: homicidio</td>
-<td>0.282121</td>
+<td>0.284342</td>
 <td>0.819376</td>
 <td>0.000</td>
 <td>0.567163</td>
@@ -9362,16 +9364,16 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 <tr>
 <th>3</th>
 <td>PENAL · familia: delitos culposos</td>
-<td>0.264620</td>
-<td>0.835984</td>
+<td>0.262646</td>
+<td>0.835738</td>
 <td>0.000</td>
 <td>0.130110</td>
 </tr>
 <tr>
 <th>4</th>
 <td>PENAL · familia: delitos sexuales</td>
-<td>0.260137</td>
-<td>0.820712</td>
+<td>0.261848</td>
+<td>0.820673</td>
 <td>0.000</td>
 <td>0.511684</td>
 </tr>
@@ -9383,7 +9385,7 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87107fd6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f53aede2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9394,7 +9396,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7b8e4ddb">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=49e8d468">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9426,7 +9428,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f64b1e5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51ba3b01">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9436,7 +9438,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a3907bfd">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7416b3a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9512,7 +9514,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0bf8bc86">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=22bb7da1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9536,7 +9538,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <h1 id="Informe-del-Co-piloto-Jur%C3%ADdico">Informe del Co-piloto Jurídico<a class="anchor-link" href="#Informe-del-Co-piloto-Jur%C3%ADdico">¶</a></h1><p><strong>Consulta:</strong> Mi defendido fue vinculado a proceso porque supuestamente le arrebató el celular a una mujer en una parada de camión, amagándola con un cuchillo. La única prueba es el señalamiento de la víctima en un reconocimiento por fotografía hecho sin presencia de defensor. Quiero apelar el auto de vinculación.</p>
 <p><strong>Categoría detectada:</strong> PENAL · familia: robo<br/>
 <strong>Búsqueda:</strong> Filtro estricto<br/>
-<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 26 s · <strong>Veredictos ambiguos:</strong> 0</p>
+<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 27 s · <strong>Veredictos ambiguos:</strong> 0</p>
 <hr/>
 <h2 id="S%C3%ADntesis-de-precedentes-relevantes">Síntesis de precedentes relevantes<a class="anchor-link" href="#S%C3%ADntesis-de-precedentes-relevantes">¶</a></h2><h3 id="Precedentes-a-favor-y-en-contra">Precedentes a favor y en contra<a class="anchor-link" href="#Precedentes-a-favor-y-en-contra">¶</a></h3><ul>
 <li><strong>Precedente 1:</strong> apeló defensa contra auto de vinculación a proceso; la Sala CONFIRMA → <strong>desfavorable para la defensa</strong>.</li>
@@ -9687,7 +9689,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f9b0a2f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6e87c0cc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9703,7 +9705,7 @@ texto completo ni conocimiento externo, y debe citar cada afirmación.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b8f7965a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4cecdeef">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9843,7 +9845,7 @@ texto completo ni conocimiento externo, y debe citar cada afirmación.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5783c482">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1594d92e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9899,7 +9901,7 @@ Sentencia:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9644fdf9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af1f20ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9944,7 +9946,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8ca32006">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cdd49c1f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -10155,7 +10157,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c4d400d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b1fd86ef">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -10261,7 +10263,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2190df5b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9f79946d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12568,7 +12570,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ab3415fa">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6732c559">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12732,7 +12734,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0215fcd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d2fea3ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12763,7 +12765,7 @@ penales de 211,572), y con ellas las instrucciones de otras materias.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f76f18e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=908e4f19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
