@@ -1,0 +1,22 @@
+{
+  "id": "a15b83c852281010",
+  "fecha": "2026-11-21T03:17:26",
+  "codigo": "af5d47ce01350a6b",
+  "corpus": "75c71466a879bdde",
+  "indice": "dea0efb25c96c5fc",
+  "fichas_precalculadas": "8a4b486bb6dfcaf2",
+  "configuracion": "95e65dccf6a23be3",
+  "prompts": {
+    "conceptos": "v11 · bb4e0c3a50c7d535",
+    "qc1": "v11 · cf954277f181b38d",
+    "ficha_json": "json · 3f5f94451be8f7a8",
+    "penal_dos_llamadas": "v11 · 69808649103a58f1",
+    "qc2_llm": "determinista · 8b77c7ac5a8c6f2f",
+    "sintesis": "v11 · f7aba22e758141e9",
+    "juez_sentencia": "v11.2 · af6fc666dacff4f8",
+    "juez_relevancia": "v11.2 · 5359f38ea4e80b99",
+    "juez_consulta": "v11.2 · e974458740c45a9c"
+  },
+  "modelo": "llama3.1:8b",
+  "digest_modelo": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e"
+}

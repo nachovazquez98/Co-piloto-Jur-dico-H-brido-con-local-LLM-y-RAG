@@ -1,0 +1,911 @@
+{
+  "comando": "fichas-referencia",
+  "fecha": "2026-11-21T03:25:52",
+  "commit": "4b1529e",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "particion": "prueba"
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "congelado": "a15b83c852281010",
+  "motivo_forzar": null,
+  "tablas": {
+    "Exactitud de las fichas": {
+      "descripcion": "Ficha precalculada (la que muestra la app) contra la referencia automática; IC95 de Wilson. Solo cuentan las sentencias con referencia.",
+      "columnas": [
+        "campo",
+        "referencia",
+        "sentencias con referencia",
+        "exactitud",
+        "IC95"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "campo": "familia",
+          "referencia": "categoría del STJ",
+          "sentencias con referencia": 350,
+          "exactitud": 0.9171428571428571,
+          "IC95": "[0.884, 0.942]"
+        },
+        {
+          "campo": "acto_impugnado",
+          "referencia": "mayoría de lectores",
+          "sentencias con referencia": 290,
+          "exactitud": 0.8827586206896552,
+          "IC95": "[0.841, 0.915]"
+        },
+        {
+          "campo": "apelante",
+          "referencia": "mayoría de lectores",
+          "sentencias con referencia": 283,
+          "exactitud": 0.8303886925795053,
+          "IC95": "[0.782, 0.870]"
+        },
+        {
+          "campo": "sentido",
+          "referencia": "mayoría de lectores",
+          "sentencias con referencia": 266,
+          "exactitud": 0.7218045112781954,
+          "IC95": "[0.665, 0.772]"
+        }
+      ]
+    },
+    "Fundamento legal de la ficha": {
+      "descripcion": "Artículos que cita la ficha frente a los que la sentencia invoca como fundamento («con fundamento en», «de conformidad con», «en términos de», «con base en» y puntos resolutivos), leídos por reglas. Promedio por ficha; IC95 por bootstrap. No distingue el ordenamiento (Código Penal o Código Nacional de Procedimientos Penales).",
+      "columnas": [
+        "medida",
+        "fichas",
+        "valor",
+        "IC95",
+        "lectura"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "medida": "precisión",
+          "fichas": 336,
+          "valor": 0.6437525024578596,
+          "IC95": "[0.600, 0.690]",
+          "lectura": "de los artículos que cita la ficha, fracción que la Sala invoca como fundamento"
+        },
+        {
+          "medida": "exhaustividad (recall)",
+          "fichas": 336,
+          "valor": 0.13315977508997806,
+          "IC95": "[0.117, 0.151]",
+          "lectura": "de los artículos que invoca la Sala, fracción que recoge la ficha; baja por construcción: la ficha resume los principales"
+        },
+        {
+          "medida": "fichas con todas sus citas en el fundamento",
+          "fichas": 336,
+          "valor": 0.48214285714285715,
+          "IC95": "[0.429, 0.536]",
+          "lectura": ""
+        },
+        {
+          "medida": "fichas sin artículos citados",
+          "fichas": 10,
+          "valor": null,
+          "IC95": "—",
+          "lectura": "la ficha no cita fundamento legal"
+        }
+      ]
+    },
+    "Artículos que no aparecen en la sentencia": {
+      "descripcion": "Posibles alucinaciones (o artículos en páginas que el PDF no trae).",
+      "columnas": [
+        "fichas",
+        "fichas con alguno",
+        "artículos no encontrados"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "fichas": 350,
+          "fichas con alguno": 7,
+          "artículos no encontrados": 11
+        }
+      ]
+    },
+    "Fichas que no coinciden": {
+      "descripcion": "Sentido o familia distintos de la referencia.",
+      "columnas": [
+        "doc_id",
+        "familia_ref",
+        "familia_ficha",
+        "sentido_ref",
+        "sentido_ficha"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "doc_id": "2021-10-04-121122_penal_lesiones-simples-intencionales.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2022-01-14-125009_penal_dano-en-las-cosas-a-titulo-de-culpa-y-lesiones-a-titulo-de-culpa.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2022-03-30-122606_penal_pandillerismo-y-allanamiento-de-morada.pdf",
+          "familia_ref": "otros",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-03-31-133200_penal_corrupcion-de-menores-y-violencia-intrafamiliar.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "violencia familiar",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REPONE"
+        },
+        {
+          "doc_id": "2022-03-31-133727_penal_violencia-intrafamiliar-y-lesiones-dolosas-calificadas.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "violencia familiar",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-04-22-153704_penal_violencia-intrafamiliar-equiparada-y-abuso-sexual-infantil-agravado.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-04-29-132854_penal_contra-el-desarrollo-urbano-y-otro.pdf",
+          "familia_ref": "otros",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2022-04-29-144015_penal_violencia-intrafamiliar-y-abandono-de-familiares.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "violencia familiar",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-04-30-224832_penal_disparo-de-arma-de-fuego-y-otros.pdf",
+          "familia_ref": "armas",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2022-06-22-110817_penal_queja-procesal.pdf",
+          "familia_ref": "cuestiones procesales",
+          "familia_ficha": "desaparicion de personas",
+          "sentido_ref": "no determinado",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-07-14-113753_penal_secuestro-con-el-proposito-de-obtener-un-rescate.pdf",
+          "familia_ref": "privacion de la libertad y secuestro",
+          "familia_ficha": "privacion de la libertad y secuestro",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-09-23-134841_penal_violacion-y-corrupcion-de-menores.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-09-30-113033_penal_falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalid.pdf",
+          "familia_ref": "falsedad y falsificacion",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "no determinado",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2022-10-19-110229_penal_ataque-peligroso-y-delitos-cometidos-en-contra-de-representantes-de-la-autoridad.pdf",
+          "familia_ref": "otros",
+          "familia_ficha": "servidores publicos y administracion de justicia",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-01-03-110551_penal_abuso-sexual-infantil-agravado-y-otro.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2023-01-10-143143_penal_desobediencia-o-resistencia-de-particulares-y-otro.pdf",
+          "familia_ref": "otros",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-02-01-121303_penal_abuso-sexual-infantil-y-violencia-intrafamiliar.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-03-02-133025_penal_homicidio-a-titulo-de-culpa-dano-en-las-cosas-y-lesiones-a-titulo-de-culpa.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2023-05-23-144609_penal_queja.pdf",
+          "familia_ref": "cuestiones procesales",
+          "familia_ficha": "robo",
+          "sentido_ref": "no determinado",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-07-03-105333_penal_homicidio-por-culpa-grave.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-08-21-101818_penal_homicidio-lesiones-y-dano-en-las-cosas-a-titulo-de-culpa.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-08-29-105019_penal_queja.pdf",
+          "familia_ref": "cuestiones procesales",
+          "familia_ficha": "otros",
+          "sentido_ref": "no determinado",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-09-12-130129_penal_conflicto-de-competencia.pdf",
+          "familia_ref": "cuestiones procesales",
+          "familia_ficha": "robo",
+          "sentido_ref": "no determinado",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-09-30-133642_penal_extorsion-y-otros.pdf",
+          "familia_ref": "amenazas y extorsion",
+          "familia_ficha": "amenazas y extorsion",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-11-09-111622_penal_despojo-y-dano-en-las-cosas.pdf",
+          "familia_ref": "despojo",
+          "familia_ficha": "despojo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-11-17-143937_penal_asociacion-delictuosa-y-otros.pdf",
+          "familia_ref": "delincuencia organizada",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-12-05-123322_penal_robo-calificado-y-delincuencia-organizada.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2023-12-08-142323_penal_homicidio-por-culpa-grave-y-otros.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2024-04-19-105901_penal_allanamiento-de-morada.pdf",
+          "familia_ref": "otros",
+          "familia_ficha": "otros",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2024-06-05-121032_penal_robo-calificado-y-delincuencia-organizada.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2024-07-01-144930_penal_abuso-sexual-infantil-en-grado-de-tentativa.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2025-01-15-160706_penal_robo-equiparado-en-su-modalidad-de-uso.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-20-115105_penal_violacion.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-20-142149_penal_falsificacion-de-documentos-en-general.pdf",
+          "familia_ref": "falsedad y falsificacion",
+          "familia_ficha": "falsedad y falsificacion",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-26-113543_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-27-102453_penal_fraude-especifico.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-27-112847_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-03-27-140144_penal_despojo-de-inmuebles-y-aguas.pdf",
+          "familia_ref": "despojo",
+          "familia_ficha": "despojo",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2025-04-01-132512_penal_abuso-sexual-infantil-agravado.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-02-141908_penal_falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles.pdf",
+          "familia_ref": "falsedad y falsificacion",
+          "familia_ficha": "falsedad y falsificacion",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-07-134327_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-08-151920_penal_secuestro.pdf",
+          "familia_ref": "privacion de la libertad y secuestro",
+          "familia_ficha": "privacion de la libertad y secuestro",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-10-131912_penal_violacion.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-11-110315_penal_responsabilidad-medica.pdf",
+          "familia_ref": "responsabilidad profesional",
+          "familia_ficha": "responsabilidad profesional",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-16-125511_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-17-165404_penal_fraude-y-suplantacion-de-identidad.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "falsedad y falsificacion",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-21-130659_penal_fraude-generico.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-04-28-101657_penal_despojo-de-inmuebles-y-aguas.pdf",
+          "familia_ref": "despojo",
+          "familia_ficha": "despojo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-05-16-131037_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-05-28-102250_penal_robo-calificado-y-otros.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "delincuencia organizada",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-05-29-120741_penal_delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico.pdf",
+          "familia_ref": "servidores publicos y administracion de justicia",
+          "familia_ficha": "otros",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-06-02-115134_penal_contra-la-salud-en-su-modalidad-de-narcomenudeo.pdf",
+          "familia_ref": "contra la salud",
+          "familia_ficha": "contra la salud",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-06-10-121656_penal_robo-calificado-y-robo-equiparado.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "otros",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-06-16-122740_penal_dano-en-las-cosas.pdf",
+          "familia_ref": "dano en las cosas",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2025-06-23-102851_penal_abuso-sexual-infantil-agravado-y-otro.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-06-30-100657_penal_narcomenudeo.pdf",
+          "familia_ref": "contra la salud",
+          "familia_ficha": "contra la salud",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-06-30-110427_penal_fraude.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-07-02-114655_penal_violacion.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-07-02-135629_penal_trata-de-personas-en-su-modalidad-de-explotacion-laboral.pdf",
+          "familia_ref": "trata de personas",
+          "familia_ficha": "trata de personas",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-07-10-123004_penal_robo-equiparado.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-07-11-133002_penal_feminicidio-en-grado-de-tentativa.pdf",
+          "familia_ref": "feminicidio",
+          "familia_ficha": "feminicidio",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-07-15-093801_penal_robo-equiparado.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-08-08-140413_penal_robo-y-homicidio-calificado.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-08-15-134516_penal_fraude.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-08-29-131051_penal_fraude.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-09-04-094005_penal_maltrato-infantil.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "violencia familiar",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-09-05-141459_penal_abuso-sexual-infantil.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-09-12-104807_penal_feminicidio.pdf",
+          "familia_ref": "feminicidio",
+          "familia_ficha": "feminicidio",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-09-18-140105_penal_fraude-procesal-y-falsedad-en-declaracion.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "falsedad y falsificacion",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-09-22-112616_penal_robo.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2025-09-23-132114_penal_lesiones-y-violencia-familiar-equiparada.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "violencia familiar",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-10-07-133838_penal_fraude-especifico.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "despojo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2025-10-09-104839_penal_lesiones-calificadas.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-10-10-144418_penal_feminicidio-en-grado-de-tentativa.pdf",
+          "familia_ref": "feminicidio",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-10-20-093108_penal_violencia-familiar-y-abandono-de-familiares.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "abandono de familiares",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-10-21-113253_penal_violencia-familiar-y-lesiones.pdf",
+          "familia_ref": "violencia familiar",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2025-11-13-114725_penal_robo-calificado-en-grado-de-tentativa-y-otro.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2025-11-13-143601_penal_robo-equiparado-en-su-modalidad-de-utilizacion.pdf",
+          "familia_ref": "robo",
+          "familia_ficha": "robo",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-11-18-111343_penal_robo-de-infante.pdf",
+          "familia_ref": "sustraccion de menores",
+          "familia_ficha": "sustraccion de menores",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-12-01-142520_penal_lesiones-calificadas.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-12-03-120334_penal_abuso-sexual-infantil-y-corrupcion-de-menores.pdf",
+          "familia_ref": "delitos sexuales",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-12-11-121746_penal_lesiones-calificadas.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "lesiones",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2025-12-19-134222_penal_portacion-de-arma-de-fuego.pdf",
+          "familia_ref": "armas",
+          "familia_ficha": "armas",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-01-09-150247_penal_lesiones-en-rina.pdf",
+          "familia_ref": "lesiones",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-01-12-093258_penal_homicidio-y-tentativa-de-homicidio.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-02-06-151744_penal_falsificacion-de-documentos-en-general-en-su-modalidad-de-uso.pdf",
+          "familia_ref": "falsedad y falsificacion",
+          "familia_ficha": "falsedad y falsificacion",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-04-06-133525_penal_homicidio-simple-intencional-y-otro.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2026-05-15-141521_penal_tentativa-de-homicidio.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "REVOCA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-08-11-093545_penal_homicidio-calificado-y-lesiones-calificadas.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        },
+        {
+          "doc_id": "2026-08-31-104447_penal_lesiones-a-titulo-de-culpa.pdf",
+          "familia_ref": "delitos culposos",
+          "familia_ficha": "delitos sexuales",
+          "sentido_ref": "CONFIRMA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-08-31-112622_penal_violacion-de-deposito.pdf",
+          "familia_ref": "fraude y abuso de confianza",
+          "familia_ficha": "fraude y abuso de confianza",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-10-06-115131_penal_abuso-de-autoridad.pdf",
+          "familia_ref": "servidores publicos y administracion de justicia",
+          "familia_ficha": "servidores publicos y administracion de justicia",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-10-30-111953_penal_homicidio-calificado-en-grado-de-tentativa.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "CONFIRMA"
+        },
+        {
+          "doc_id": "2026-10-30-130611_penal_dano-en-las-cosas.pdf",
+          "familia_ref": "dano en las cosas",
+          "familia_ficha": "delitos culposos",
+          "sentido_ref": "MODIFICA",
+          "sentido_ficha": "MODIFICA"
+        },
+        {
+          "doc_id": "2026-11-06-104220_penal_homicidio-calificado-y-homicidio-calificado-en-grado-de-tentativa.pdf",
+          "familia_ref": "homicidio",
+          "familia_ficha": "homicidio",
+          "sentido_ref": "REPONE",
+          "sentido_ficha": "REVOCA"
+        }
+      ]
+    }
+  }
+}

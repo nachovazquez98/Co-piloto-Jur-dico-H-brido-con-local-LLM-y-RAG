@@ -1,0 +1,352 @@
+{
+  "comando": "esfuerzo",
+  "fecha": "2026-11-21T03:26:25",
+  "commit": "4b1529e",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "particion": "prueba",
+    "k": 3,
+    "tope": 30,
+    "acto_impugnado": "mayoría de lectores"
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Consultas validadas automáticamente (comprobaciones de la guía + jueces LLM): 48; descartadas: 58 (A007, A009, A014, A017, A019, A024, A028, A030, A034, A038...)."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "n_consultas": 48,
+  "nivel_clasificacion": "familia",
+  "prompt_conceptos": "v11",
+  "materias_activas": [
+    "penal"
+  ],
+  "fuente_juicios": "referencia automática (mismo delito por la categoría del STJ; mismo problema procesal por mayoría de las reglas y el juez LLM)",
+  "congelado": "a15b83c852281010",
+  "motivo_forzar": null,
+  "tablas": {
+    "Sentencias que hay que abrir para encontrar 3 útiles": {
+      "descripcion": "Útil = misma familia (categoría del STJ) y mismo acto impugnado (mayoría de lectores) que la sentencia de la consulta, sin contarla. Si no se llega en 30, cuenta 31. El portal supone que se elige la categoría exacta y 'app con el delito elegido', que se elige su familia (optimistas).",
+      "columnas": [
+        "estrategia",
+        "consultas",
+        "mediana de sentencias abiertas",
+        "promedio",
+        "encontró 3 en 30"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "estrategia": "portal: delito",
+          "consultas": 9,
+          "mediana de sentencias abiertas": 31.0,
+          "promedio": 30.333333333333332,
+          "encontró 3 en 30": 0.1111111111111111
+        },
+        {
+          "estrategia": "portal: delito + tipo de sentencia",
+          "consultas": 9,
+          "mediana de sentencias abiertas": 31.0,
+          "promedio": 27.88888888888889,
+          "encontró 3 en 30": 0.1111111111111111
+        },
+        {
+          "estrategia": "búsqueda por palabras",
+          "consultas": 9,
+          "mediana de sentencias abiertas": 31.0,
+          "promedio": 28.444444444444443,
+          "encontró 3 en 30": 0.1111111111111111
+        },
+        {
+          "estrategia": "app",
+          "consultas": 9,
+          "mediana de sentencias abiertas": 31.0,
+          "promedio": 26.88888888888889,
+          "encontró 3 en 30": 0.2222222222222222
+        },
+        {
+          "estrategia": "app con el delito elegido",
+          "consultas": 9,
+          "mediana de sentencias abiertas": 22.0,
+          "promedio": 19.88888888888889,
+          "encontró 3 en 30": 0.5555555555555556
+        }
+      ]
+    },
+    "Comparaciones pareadas": {
+      "descripcion": "Δ = media(B − A) por consulta: sentencias que A ahorra (positivo = A abre menos). La última fila mide cuánto ayuda elegir el delito en la app. IC95 bootstrap pareado.",
+      "columnas": [
+        "A",
+        "B",
+        "métrica",
+        "n",
+        "Δ",
+        "Δ IC95",
+        "¿significativa?",
+        "gana A / B / empate",
+        "efecto mínimo detectable"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "A": "app",
+          "B": "portal: delito",
+          "métrica": "sentencias que ahorra A",
+          "n": 9,
+          "Δ": 3.4444444444444446,
+          "Δ IC95": "[+0.000, +9.444]",
+          "¿significativa?": "no",
+          "gana A / B / empate": "2 / 0 / 7",
+          "efecto mínimo detectable": "±8.341"
+        },
+        {
+          "A": "app",
+          "B": "portal: delito + tipo de sentencia",
+          "métrica": "sentencias que ahorra A",
+          "n": 9,
+          "Δ": 1.0,
+          "Δ IC95": "[-6.000, +9.000]",
+          "¿significativa?": "no",
+          "gana A / B / empate": "1 / 1 / 7",
+          "efecto mínimo detectable": "±10.668"
+        },
+        {
+          "A": "app",
+          "B": "búsqueda por palabras",
+          "métrica": "sentencias que ahorra A",
+          "n": 9,
+          "Δ": 1.5555555555555556,
+          "Δ IC95": "[+0.000, +3.778]",
+          "¿significativa?": "no",
+          "gana A / B / empate": "2 / 0 / 7",
+          "efecto mínimo detectable": "±3.205"
+        },
+        {
+          "A": "app con el delito elegido",
+          "B": "app",
+          "métrica": "sentencias que ahorra A",
+          "n": 9,
+          "Δ": 7.0,
+          "Δ IC95": "[+1.778, +13.225]",
+          "¿significativa?": "sí",
+          "gana A / B / empate": "4 / 0 / 5",
+          "efecto mínimo detectable": "±8.673"
+        }
+      ]
+    },
+    "Por consulta": {
+      "descripcion": "Sentencias abiertas con cada estrategia.",
+      "columnas": [
+        "id",
+        "útiles en el corpus",
+        "portal: delito",
+        "portal: delito + tipo de sentencia",
+        "búsqueda por palabras",
+        "app",
+        "app con el delito elegido"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "id": "A033",
+          "útiles en el corpus": 4,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 31
+        },
+        {
+          "id": "A075",
+          "útiles en el corpus": 4,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 31
+        },
+        {
+          "id": "A100",
+          "útiles en el corpus": 22,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 15
+        },
+        {
+          "id": "A105",
+          "útiles en el corpus": 16,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 31
+        },
+        {
+          "id": "A108",
+          "útiles en el corpus": 13,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 31
+        },
+        {
+          "id": "A119",
+          "útiles en el corpus": 22,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 22
+        },
+        {
+          "id": "A153",
+          "útiles en el corpus": 19,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 8,
+          "app": 4,
+          "app con el delito elegido": 4
+        },
+        {
+          "id": "A163",
+          "útiles en el corpus": 7,
+          "portal: delito": 31,
+          "portal: delito + tipo de sentencia": 31,
+          "búsqueda por palabras": 31,
+          "app": 31,
+          "app con el delito elegido": 6
+        },
+        {
+          "id": "A172",
+          "útiles en el corpus": 4,
+          "portal: delito": 25,
+          "portal: delito + tipo de sentencia": 3,
+          "búsqueda por palabras": 31,
+          "app": 21,
+          "app con el delito elegido": 8
+        }
+      ]
+    }
+  }
+}

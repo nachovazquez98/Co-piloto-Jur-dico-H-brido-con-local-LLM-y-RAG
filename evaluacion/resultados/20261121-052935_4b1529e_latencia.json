@@ -1,0 +1,231 @@
+{
+  "comando": "latencia",
+  "fecha": "2026-11-21T05:29:35",
+  "commit": "4b1529e",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "consultas": "ejemplos penales de la app",
+    "ficha": "json",
+    "qc2": "determinista",
+    "max_consultas": 10
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "vram_pico_embeddings_gb": 1.5,
+  "congelado": "a15b83c852281010",
+  "tablas": {
+    "Latencia (segundos)": {
+      "descripcion": "p50 = experiencia típica; p95 = la peor razonable.",
+      "columnas": [
+        "etapa",
+        "n",
+        "p50",
+        "p95"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "etapa": "Extracción de conceptos clave",
+          "n": 10,
+          "p50": 0.8179348707199097,
+          "p95": 1.1743099212646484
+        },
+        {
+          "etapa": "Clasificación híbrida de la consulta",
+          "n": 10,
+          "p50": 0.41153204441070557,
+          "p95": 2.7675181150436363
+        },
+        {
+          "etapa": "Búsqueda adaptativa de precedentes",
+          "n": 10,
+          "p50": 1.2993812561035156e-05,
+          "p95": 1.7535686492919918e-05
+        },
+        {
+          "etapa": "Análisis de precedentes (verificación, extracción e informe)",
+          "n": 10,
+          "p50": 15.163208365440369,
+          "p95": 32.476191222667666
+        },
+        {
+          "etapa": "Síntesis comparativa final",
+          "n": 10,
+          "p50": 16.01903522014618,
+          "p95": 19.41869090795517
+        },
+        {
+          "etapa": "Total por consulta",
+          "n": 10,
+          "p50": 30.829520106315613,
+          "p95": 52.556175422668424
+        }
+      ]
+    },
+    "Llamadas al LLM y descartes": {
+      "descripcion": "Por consulta ejecutada.",
+      "columnas": [
+        "consultas",
+        "sin resultado",
+        "llamadas p50",
+        "llamadas p95",
+        "llamadas promedio",
+        "descartes QC_2 delito de otra familia",
+        "veredictos ambiguos por consulta"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "consultas": 10,
+          "sin resultado": 0,
+          "llamadas p50": 5.0,
+          "llamadas p95": 6.0,
+          "llamadas promedio": 5.2,
+          "descartes QC_2 delito de otra familia": 0.1,
+          "veredictos ambiguos por consulta": 0.0
+        }
+      ]
+    },
+    "Citas de la síntesis (diagnóstico)": {
+      "descripcion": "Afirmaciones = frases de 30+ caracteres de la síntesis del LLM (sin la lista a favor / en contra, que arma el código). Cita válida = cita un precedente existente y, si menciona un sentido del fallo o un delito, coincide con la ficha citada. Sin anotación: no dice si la afirmación es verdadera, solo si es verificable.",
+      "columnas": [
+        "consultas",
+        "afirmaciones",
+        "con cita válida",
+        "sin cita",
+        "marcadas verificar"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "consultas": 10,
+          "afirmaciones": 65,
+          "con cita válida": "49 (75.4%)",
+          "sin cita": "11 (16.9%)",
+          "marcadas verificar": "5 (7.7%)"
+        }
+      ]
+    }
+  }
+}

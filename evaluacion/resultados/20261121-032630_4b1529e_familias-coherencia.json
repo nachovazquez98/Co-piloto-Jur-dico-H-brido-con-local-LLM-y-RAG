@@ -1,0 +1,804 @@
+{
+  "comando": "familias-coherencia",
+  "fecha": "2026-11-21T03:26:30",
+  "commit": "4b1529e",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "min_sentencias_por_tipo": 3
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "congelado": "a15b83c852281010",
+  "tablas": {
+    "Resumen": {
+      "descripcion": "Tipos con al menos 3 sentencias cuyo centroide de embeddings queda más cerca de su propia familia (calculada sin ese tipo) que de cualquier otra. Es una comprobación de consistencia sin LLM; no dice qué agrupación es la jurídicamente correcta.",
+      "columnas": [
+        "tipos",
+        "más cerca de su familia",
+        "más cerca de otra"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "tipos": 246,
+          "más cerca de su familia": 166,
+          "más cerca de otra": 80
+        }
+      ]
+    },
+    "Tipos más cercanos a otra familia": {
+      "descripcion": "Posibles errores de agrupación o tipos con varios delitos.",
+      "columnas": [
+        "tipo",
+        "sentencias",
+        "familia asignada",
+        "familia más cercana",
+        "similitud asignada",
+        "similitud más cercana"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "tipo": "penal/amenazas",
+          "sentencias": 23,
+          "familia asignada": "amenazas-y-extorsion",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.7051607370376587,
+          "similitud más cercana": 0.8965340852737427
+        },
+        {
+          "tipo": "penal/parricidio",
+          "sentencias": 23,
+          "familia asignada": "homicidio",
+          "familia más cercana": "feminicidio",
+          "similitud asignada": 0.4182075560092926,
+          "similitud más cercana": 0.47664710879325867
+        },
+        {
+          "tipo": "penal/contra-la-dignidad-de-las-personas",
+          "sentencias": 20,
+          "familia asignada": "contra-la-dignidad-de-las-personas",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.6833033561706543,
+          "similitud más cercana": 0.8548426628112793
+        },
+        {
+          "tipo": "penal/maltrato-infantil",
+          "sentencias": 16,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "sustraccion-de-menores",
+          "similitud asignada": 0.7199203968048096,
+          "similitud más cercana": 0.7495114207267761
+        },
+        {
+          "tipo": "penal/robo-calificado-y-otro",
+          "sentencias": 15,
+          "familia asignada": "robo",
+          "familia más cercana": "servidores-publicos-y-administracion-de-justicia",
+          "similitud asignada": 0.7059793472290039,
+          "similitud más cercana": 0.7272127866744995
+        },
+        {
+          "tipo": "penal/extorsion",
+          "sentencias": 14,
+          "familia asignada": "amenazas-y-extorsion",
+          "familia más cercana": "servidores-publicos-y-administracion-de-justicia",
+          "similitud asignada": 0.6334720253944397,
+          "similitud más cercana": 0.705298125743866
+        },
+        {
+          "tipo": "penal/privacion-ilegal-de-la-libertad",
+          "sentencias": 11,
+          "familia asignada": "privacion-de-la-libertad-y-secuestro",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.1217758059501648,
+          "similitud más cercana": 0.6765012145042419
+        },
+        {
+          "tipo": "penal/abigeato-calificado",
+          "sentencias": 10,
+          "familia asignada": "robo",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.5078968405723572,
+          "similitud más cercana": 0.5884800553321838
+        },
+        {
+          "tipo": "penal/falsedad-en-declaraciones-y-en-informes-dados-a-una-autoridad",
+          "sentencias": 10,
+          "familia asignada": "falsedad-y-falsificacion",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.7387300729751587,
+          "similitud más cercana": 0.7962191104888916
+        },
+        {
+          "tipo": "penal/tentantiva-de-robo-calificado",
+          "sentencias": 10,
+          "familia asignada": "robo",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.5692364573478699,
+          "similitud más cercana": 0.6106853485107422
+        },
+        {
+          "tipo": "penal/dano-en-las-cosas-a-titulo-de-culpa",
+          "sentencias": 10,
+          "familia asignada": "delitos-culposos",
+          "familia más cercana": "dano-en-las-cosas",
+          "similitud asignada": 0.7461894750595093,
+          "similitud más cercana": 0.7753153443336487
+        },
+        {
+          "tipo": "penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles",
+          "sentencias": 9,
+          "familia asignada": "falsedad-y-falsificacion",
+          "familia más cercana": "robo",
+          "similitud asignada": 0.3895876705646515,
+          "similitud más cercana": 0.7029758095741272
+        },
+        {
+          "tipo": "penal/adquisicion-ilegitima-de-bienes-materia-de-un-delito-o-una-fraccion-penal",
+          "sentencias": 9,
+          "familia asignada": "otros",
+          "familia más cercana": "robo",
+          "similitud asignada": 0.19661226868629456,
+          "similitud más cercana": 0.4026387333869934
+        },
+        {
+          "tipo": "penal/aborto",
+          "sentencias": 9,
+          "familia asignada": "otros",
+          "familia más cercana": "responsabilidad-profesional",
+          "similitud asignada": -0.047928620129823685,
+          "similitud más cercana": 0.27784523367881775
+        },
+        {
+          "tipo": "penal/violencia-familiar-y-lesiones-dolosas",
+          "sentencias": 9,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.813703179359436,
+          "similitud más cercana": 0.8448560833930969
+        },
+        {
+          "tipo": "penal/violencia-intrafamiliar-y-lesiones",
+          "sentencias": 9,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.7393989562988281,
+          "similitud más cercana": 0.767750084400177
+        },
+        {
+          "tipo": "penal/feminicidio-en-grado-de-tentativa",
+          "sentencias": 9,
+          "familia asignada": "feminicidio",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.765839695930481,
+          "similitud más cercana": 0.7663938403129578
+        },
+        {
+          "tipo": "penal/extorsion-y-otros",
+          "sentencias": 9,
+          "familia asignada": "amenazas-y-extorsion",
+          "familia más cercana": "cuestiones-procesales",
+          "similitud asignada": 0.539408266544342,
+          "similitud más cercana": 0.6145240068435669
+        },
+        {
+          "tipo": "penal/robo-calificado-y-lesiones",
+          "sentencias": 9,
+          "familia asignada": "robo",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.5155737400054932,
+          "similitud más cercana": 0.5717647671699524
+        },
+        {
+          "tipo": "penal/homicidio-calificado-y-robo-calificado",
+          "sentencias": 8,
+          "familia asignada": "homicidio",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.29263702034950256,
+          "similitud más cercana": 0.5794721841812134
+        },
+        {
+          "tipo": "penal/secuestro-y-delincuencia-organizada",
+          "sentencias": 8,
+          "familia asignada": "privacion-de-la-libertad-y-secuestro",
+          "familia más cercana": "servidores-publicos-y-administracion-de-justicia",
+          "similitud asignada": 0.3201577365398407,
+          "similitud más cercana": 0.5894023180007935
+        },
+        {
+          "tipo": "penal/lesiones-culposas",
+          "sentencias": 7,
+          "familia asignada": "delitos-culposos",
+          "familia más cercana": "responsabilidad-profesional",
+          "similitud asignada": 0.3728857934474945,
+          "similitud más cercana": 0.6128953099250793
+        },
+        {
+          "tipo": "penal/tentativa-de-robo-calificado",
+          "sentencias": 7,
+          "familia asignada": "robo",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.5592321753501892,
+          "similitud más cercana": 0.6538993120193481
+        },
+        {
+          "tipo": "penal/homicidio",
+          "sentencias": 7,
+          "familia asignada": "homicidio",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.2606985867023468,
+          "similitud más cercana": 0.6850250959396362
+        },
+        {
+          "tipo": "penal/delitos-cometidos-contra-representantes-de-la-autoridad",
+          "sentencias": 6,
+          "familia asignada": "otros",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": -0.3619850277900696,
+          "similitud más cercana": 0.4042147099971771
+        },
+        {
+          "tipo": "penal/danos-en-las-cosas-a-titulo-de-culpa",
+          "sentencias": 6,
+          "familia asignada": "delitos-culposos",
+          "familia más cercana": "dano-en-las-cosas",
+          "similitud asignada": 0.5921633839607239,
+          "similitud más cercana": 0.801563024520874
+        },
+        {
+          "tipo": "penal/hostigamiento-sexual",
+          "sentencias": 6,
+          "familia asignada": "delitos-sexuales",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.7109460830688477,
+          "similitud más cercana": 0.79120934009552
+        },
+        {
+          "tipo": "penal/secuestro-y-asociacion-delictuosa",
+          "sentencias": 6,
+          "familia asignada": "privacion-de-la-libertad-y-secuestro",
+          "familia más cercana": "cuestiones-procesales",
+          "similitud asignada": 0.427339643239975,
+          "similitud más cercana": 0.525372326374054
+        },
+        {
+          "tipo": "penal/usurpacion-de-funciones-publicas-o-de-profesion-y-uso-indebido-de-uniformes-o-insignias",
+          "sentencias": 5,
+          "familia asignada": "otros",
+          "familia más cercana": "falsedad-y-falsificacion",
+          "similitud asignada": 0.5171879529953003,
+          "similitud más cercana": 0.6674303412437439
+        },
+        {
+          "tipo": "penal/dano-en-las-cosas-y-lesiones",
+          "sentencias": 5,
+          "familia asignada": "dano-en-las-cosas",
+          "familia más cercana": "delitos-culposos",
+          "similitud asignada": 0.6596063375473022,
+          "similitud más cercana": 0.8357186317443848
+        },
+        {
+          "tipo": "penal/asociacion-delictuosa-y-otros",
+          "sentencias": 5,
+          "familia asignada": "delincuencia-organizada",
+          "familia más cercana": "falsedad-y-falsificacion",
+          "similitud asignada": 0.1835194081068039,
+          "similitud más cercana": 0.43647435307502747
+        },
+        {
+          "tipo": "penal/allanamiento-de-morada",
+          "sentencias": 5,
+          "familia asignada": "otros",
+          "familia más cercana": "despojo",
+          "similitud asignada": 0.3685762286186218,
+          "similitud más cercana": 0.6071921586990356
+        },
+        {
+          "tipo": "penal/responsabilidad-profesional-y-tecnica",
+          "sentencias": 5,
+          "familia asignada": "responsabilidad-profesional",
+          "familia más cercana": "violencia-familiar",
+          "similitud asignada": 0.48900535702705383,
+          "similitud más cercana": 0.659731924533844
+        },
+        {
+          "tipo": "penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades",
+          "sentencias": 5,
+          "familia asignada": "servidores-publicos-y-administracion-de-justicia",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.6609238386154175,
+          "similitud más cercana": 0.754721462726593
+        },
+        {
+          "tipo": "penal/homicidio-en-rina-inesperada",
+          "sentencias": 5,
+          "familia asignada": "homicidio",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": 0.1169835776090622,
+          "similitud más cercana": 0.2600823640823364
+        },
+        {
+          "tipo": "penal/homicidio-calificado-y-dano-en-las-cosas-a-titulo-de-culpa",
+          "sentencias": 5,
+          "familia asignada": "delitos-culposos",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": -0.11941266804933548,
+          "similitud más cercana": 0.2823757827281952
+        },
+        {
+          "tipo": "penal/violencia-intrafamiliar-equiparada",
+          "sentencias": 5,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "otros",
+          "similitud asignada": 0.4990048110485077,
+          "similitud más cercana": 0.6092632412910461
+        },
+        {
+          "tipo": "penal/violacion-y-violencia-intrafamiliar",
+          "sentencias": 5,
+          "familia asignada": "delitos-sexuales",
+          "familia más cercana": "violencia-familiar",
+          "similitud asignada": 0.6828653812408447,
+          "similitud más cercana": 0.7643219232559204
+        },
+        {
+          "tipo": "penal/robo",
+          "sentencias": 5,
+          "familia asignada": "robo",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.584919273853302,
+          "similitud más cercana": 0.7106999158859253
+        },
+        {
+          "tipo": "penal/dano-en-las-cosas-y-otros",
+          "sentencias": 4,
+          "familia asignada": "dano-en-las-cosas",
+          "familia más cercana": "despojo",
+          "similitud asignada": 0.42060577869415283,
+          "similitud más cercana": 0.49575239419937134
+        },
+        {
+          "tipo": "penal/violencia-familiar-y-abandono-de-familiares",
+          "sentencias": 4,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "abandono-de-familiares",
+          "similitud asignada": 0.6631377935409546,
+          "similitud más cercana": 0.7666165232658386
+        },
+        {
+          "tipo": "penal/lesiones-y-violencia-intrafamiliar",
+          "sentencias": 4,
+          "familia asignada": "lesiones",
+          "familia más cercana": "violencia-familiar",
+          "similitud asignada": 0.6257073283195496,
+          "similitud más cercana": 0.773722767829895
+        },
+        {
+          "tipo": "penal/lesiones-y-danos-en-las-cosas",
+          "sentencias": 4,
+          "familia asignada": "lesiones",
+          "familia más cercana": "delitos-culposos",
+          "similitud asignada": 0.5178872346878052,
+          "similitud más cercana": 0.6608899235725403
+        },
+        {
+          "tipo": "penal/contra-la-salud-y-otro",
+          "sentencias": 4,
+          "familia asignada": "contra-la-salud",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.4641413688659668,
+          "similitud más cercana": 0.5938804745674133
+        },
+        {
+          "tipo": "penal/falsificacion-de-documentos-en-general",
+          "sentencias": 4,
+          "familia asignada": "falsedad-y-falsificacion",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.6829562187194824,
+          "similitud más cercana": 0.7293772101402283
+        },
+        {
+          "tipo": "penal/lesiones-a-titulo-de-culpa-grave",
+          "sentencias": 4,
+          "familia asignada": "delitos-culposos",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.6884531378746033,
+          "similitud más cercana": 0.7212813496589661
+        },
+        {
+          "tipo": "penal/disparo-de-arma-de-fuego-sobre-persona-y-delitos-cometidos-contra-representantes-de-la-autoridad",
+          "sentencias": 4,
+          "familia asignada": "armas",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": 0.040048807859420776,
+          "similitud más cercana": 0.1871323138475418
+        },
+        {
+          "tipo": "penal/desobediencia-o-resistencia-de-particulares-y-otro",
+          "sentencias": 4,
+          "familia asignada": "otros",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.3550504744052887,
+          "similitud más cercana": 0.6886157393455505
+        },
+        {
+          "tipo": "penal/homicidio-en-grado-de-tentativa",
+          "sentencias": 4,
+          "familia asignada": "homicidio",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.27650323510169983,
+          "similitud más cercana": 0.5716539621353149
+        },
+        {
+          "tipo": "penal/suplantacion-de-identidad",
+          "sentencias": 4,
+          "familia asignada": "falsedad-y-falsificacion",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.5777348279953003,
+          "similitud más cercana": 0.61448734998703
+        },
+        {
+          "tipo": "penal/abuso-de-confianza-equiparado",
+          "sentencias": 3,
+          "familia asignada": "fraude-y-abuso-de-confianza",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.5097655653953552,
+          "similitud más cercana": 0.6366006135940552
+        },
+        {
+          "tipo": "penal/dano-a-las-cosas",
+          "sentencias": 3,
+          "familia asignada": "dano-en-las-cosas",
+          "familia más cercana": "cuestiones-procesales",
+          "similitud asignada": 0.5135505199432373,
+          "similitud más cercana": 0.554440438747406
+        },
+        {
+          "tipo": "penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico-a-titulo-de-dolo",
+          "sentencias": 3,
+          "familia asignada": "servidores-publicos-y-administracion-de-justicia",
+          "familia más cercana": "cuestiones-procesales",
+          "similitud asignada": 0.6150826811790466,
+          "similitud más cercana": 0.6214843988418579
+        },
+        {
+          "tipo": "penal/homicidio-calificado-y-delincuencia-organizada",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": 0.28366145491600037,
+          "similitud más cercana": 0.2894551455974579
+        },
+        {
+          "tipo": "penal/homicidio-calificado-y-parricidio",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.35094332695007324,
+          "similitud más cercana": 0.40288519859313965
+        },
+        {
+          "tipo": "penal/fraude-y-otros",
+          "sentencias": 3,
+          "familia asignada": "fraude-y-abuso-de-confianza",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.6188312768936157,
+          "similitud más cercana": 0.6428368091583252
+        },
+        {
+          "tipo": "penal/desobediencia-o-resistencia-de-particulares",
+          "sentencias": 3,
+          "familia asignada": "otros",
+          "familia más cercana": "servidores-publicos-y-administracion-de-justicia",
+          "similitud asignada": 0.44495531916618347,
+          "similitud más cercana": 0.6654684543609619
+        },
+        {
+          "tipo": "penal/evasion-de-presos",
+          "sentencias": 3,
+          "familia asignada": "otros",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.4922562539577484,
+          "similitud más cercana": 0.6555298566818237
+        },
+        {
+          "tipo": "penal/disparo-de-arma-de-fuego-y-otros",
+          "sentencias": 3,
+          "familia asignada": "armas",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.399763286113739,
+          "similitud más cercana": 0.49323907494544983
+        },
+        {
+          "tipo": "penal/disparo-de-arma-de-fuego-sobre-persona-y-otros",
+          "sentencias": 3,
+          "familia asignada": "armas",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.4328627288341522,
+          "similitud más cercana": 0.5578418970108032
+        },
+        {
+          "tipo": "penal/falsificacion-de-documentos-en-general-y-otro",
+          "sentencias": 3,
+          "familia asignada": "falsedad-y-falsificacion",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.7502014636993408,
+          "similitud más cercana": 0.7610372304916382
+        },
+        {
+          "tipo": "penal/encubrimiento",
+          "sentencias": 3,
+          "familia asignada": "servidores-publicos-y-administracion-de-justicia",
+          "familia más cercana": "feminicidio",
+          "similitud asignada": 0.24168619513511658,
+          "similitud más cercana": 0.3260582983493805
+        },
+        {
+          "tipo": "penal/fraude-especifico-y-otro",
+          "sentencias": 3,
+          "familia asignada": "fraude-y-abuso-de-confianza",
+          "familia más cercana": "despojo",
+          "similitud asignada": 0.30368533730506897,
+          "similitud más cercana": 0.4778518080711365
+        },
+        {
+          "tipo": "penal/homicidio-en-grado-de-tentativa-y-otros",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.23925423622131348,
+          "similitud más cercana": 0.32271111011505127
+        },
+        {
+          "tipo": "penal/lesiones-dolosas-y-violencia-intrafamiliar",
+          "sentencias": 3,
+          "familia asignada": "lesiones",
+          "familia más cercana": "violencia-familiar",
+          "similitud asignada": 0.08727570623159409,
+          "similitud más cercana": 0.12502421438694
+        },
+        {
+          "tipo": "penal/instigacion-o-ayuda-al-suicidio",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "feminicidio",
+          "similitud asignada": 0.002643089508637786,
+          "similitud más cercana": 0.42713505029678345
+        },
+        {
+          "tipo": "penal/homicidio-en-rina-y-otros",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.4276737868785858,
+          "similitud más cercana": 0.6053146719932556
+        },
+        {
+          "tipo": "penal/homicidio-simple-intencional-y-robo-calificado",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.23926034569740295,
+          "similitud más cercana": 0.3946339786052704
+        },
+        {
+          "tipo": "penal/lesiones-y-dano-en-las-cosas",
+          "sentencias": 3,
+          "familia asignada": "lesiones",
+          "familia más cercana": "delitos-culposos",
+          "similitud asignada": 0.3783402740955353,
+          "similitud más cercana": 0.6782751679420471
+        },
+        {
+          "tipo": "penal/secuestro-express-agravado",
+          "sentencias": 3,
+          "familia asignada": "privacion-de-la-libertad-y-secuestro",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": 0.24780991673469543,
+          "similitud más cercana": 0.28885310888290405
+        },
+        {
+          "tipo": "penal/robo-calificado-y-corrupcion-de-menores",
+          "sentencias": 3,
+          "familia asignada": "robo",
+          "familia más cercana": "delincuencia-organizada",
+          "similitud asignada": -0.05348343029618263,
+          "similitud más cercana": 0.4610755443572998
+        },
+        {
+          "tipo": "penal/robo-equiparado-en-su-modalidad-de-utilizar-los-automotores-robados-a-sabiendas-de-su-origen-ilicito",
+          "sentencias": 3,
+          "familia asignada": "robo",
+          "familia más cercana": "armas",
+          "similitud asignada": 0.3610205054283142,
+          "similitud más cercana": 0.4789977967739105
+        },
+        {
+          "tipo": "penal/robo-equiparado-y-otro",
+          "sentencias": 3,
+          "familia asignada": "robo",
+          "familia más cercana": "contra-la-salud",
+          "similitud asignada": 0.5111242532730103,
+          "similitud más cercana": 0.5414378643035889
+        },
+        {
+          "tipo": "penal/uso-ilicito-de-atribuciones-y-facultades",
+          "sentencias": 3,
+          "familia asignada": "servidores-publicos-y-administracion-de-justicia",
+          "familia más cercana": "amenazas-y-extorsion",
+          "similitud asignada": 0.7054060697555542,
+          "similitud más cercana": 0.7584605813026428
+        },
+        {
+          "tipo": "penal/tentativa-de-homicidio-calificado-y-robo-calificado",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "robo",
+          "similitud asignada": 0.2943739891052246,
+          "similitud más cercana": 0.5003294348716736
+        },
+        {
+          "tipo": "penal/tentativa-de-homicidio-calificado-y-otro",
+          "sentencias": 3,
+          "familia asignada": "homicidio",
+          "familia más cercana": "servidores-publicos-y-administracion-de-justicia",
+          "similitud asignada": 0.272327721118927,
+          "similitud más cercana": 0.5171253085136414
+        },
+        {
+          "tipo": "penal/secuestro-y-extorsion",
+          "sentencias": 3,
+          "familia asignada": "privacion-de-la-libertad-y-secuestro",
+          "familia más cercana": "fraude-y-abuso-de-confianza",
+          "similitud asignada": 0.3769560754299164,
+          "similitud más cercana": 0.42960405349731445
+        },
+        {
+          "tipo": "penal/ultrajes-a-la-moral-y-a-las-buenas-costumbres",
+          "sentencias": 3,
+          "familia asignada": "otros",
+          "familia más cercana": "contra-la-dignidad-de-las-personas",
+          "similitud asignada": 0.4176260828971863,
+          "similitud más cercana": 0.6598786115646362
+        },
+        {
+          "tipo": "penal/violencia-intrafamiliar-y-abandono-de-familiares",
+          "sentencias": 3,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "abandono-de-familiares",
+          "similitud asignada": 0.5104884505271912,
+          "similitud más cercana": 0.7362508177757263
+        },
+        {
+          "tipo": "penal/violencia-intrafamiliar-y-lesiones-simples",
+          "sentencias": 3,
+          "familia asignada": "violencia-familiar",
+          "familia más cercana": "lesiones",
+          "similitud asignada": 0.5732446312904358,
+          "similitud más cercana": 0.6796048879623413
+        }
+      ]
+    }
+  }
+}
