@@ -51,9 +51,11 @@ evaluación guardada.
 | 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
 | 5. Síntesis | fichas → respuesta a la consulta | lista a favor / en contra de la defensa por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
 
-**Datos:** sentencias públicas del STJ Jalisco descargadas antes de que la API exigiera reCAPTCHA, con un máximo de
-30 por tipo (materia + delito). El sistema trabaja con las sentencias penales; los 289 tipos penales del portal se
-agrupan en 24 familias de delito (`evaluacion/familias_penal.csv`, para revisión de un abogado penalista).
+**Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
+de la API antes de que exigiera reCAPTCHA y las que se bajaron después a mano desde el portal (`construir-corpus
+--pdfs` las valida). El sistema trabaja con las 2,495 sentencias penales; sus 546 tipos del portal se agrupan en 24
+familias de delito (289 tipos en `evaluacion/familias_penal.csv`, para revisión de un abogado penalista; los demás,
+por las mismas reglas).
 
 ## Instalación
 
