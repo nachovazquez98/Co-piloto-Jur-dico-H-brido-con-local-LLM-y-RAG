@@ -31,6 +31,14 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   si la elección difiere de lo que habría buscado la app, lo dice. `esfuerzo` mide también "app con el delito
   elegido" frente a la app sola.
 
+- `fichas-referencia`: precisión y exhaustividad del **fundamento legal** de la ficha frente a los artículos que la
+  sentencia invoca como fundamento («con fundamento en», «de conformidad con», «con apoyo en», «en términos de», «con
+  base en» y puntos resolutivos), leídos por reglas.
+- Modelo de respaldo de las fichas (`FICHAS_MODELO_RESPALDO = qwen2.5:7b`, `fichas-batch --respaldo`): 181 fichas de
+  sentencias sin ficha de llama3.1:8b, fuera de la muestra; la app las usa en lugar de generarlas en la consulta.
+- `indexar --recortar`: reduce el índice al corpus sin recalcular embeddings.
+- `evaluacion/errores/juez_familia.md` y `evaluacion/errores/sugerencia_delito.md`.
+
 ### Corregido
 - Sentido del fallo por reglas: también "lo procedente es confirmar/revocar…" y el verbo sin "se" (cobertura 557 →
   608 de 1,412, sin cambiar ningún valor ya leído; `evaluacion/errores/sentido_fallo.md`).
@@ -80,6 +88,15 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   civil; sin las versiones viejas del descargador.
 - Sugerencia inicial de delito medida sin LLM: familia correcta en 73 de 100 consultas de desarrollo y 13 de 14
   ejemplos (`evaluacion/errores/sugerencia_delito.md`).
+
+- **Solo materia penal:** fuera del corpus y del índice las 2,119 sentencias de civil, familiar, mercantil y laboral
+  (186,971 de 211,572 fragmentos), los prompts de esas materias y las 12 consultas v10 de otras materias;
+  `construir-corpus` guarda solo `MATERIAS_ACTIVAS`.
+- Familias de delito: 25 (nueva «cuestiones procesales» para quejas, excusas y conflictos de competencia; plagio,
+  prostitución infantil, uso de documento falso, sustracción de menores y ejercicio indebido del servicio público con su
+  familia). `familias_penal.csv` lista los 546 tipos; ninguna asignación revisada por un especialista.
+- Juez `gemma2:9b` con el corpus final: 0.739 en 725 sentencias, **no se usa** (mínimo 0.80 fijado de antemano;
+  `20261121-003449_5311dc1_referencias`). La referencia de acto, apelante y sentido queda con las reglas.
 
 ### Quitado
 - Código sin uso: `f1_conjuntos`, `coincide_texto` y el atributo `veredicto_relevancia`.
