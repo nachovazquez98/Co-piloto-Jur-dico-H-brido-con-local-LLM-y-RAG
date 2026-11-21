@@ -1,0 +1,448 @@
+{
+  "comando": "referencias",
+  "fecha": "2026-11-21T03:17:24",
+  "commit": "723fe6b",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "jueces": [
+      "gemma2:9b"
+    ],
+    "exactitud_minima": 0.8,
+    "muestra": {
+      "sentencias": 0.3,
+      "consultas": 0.5,
+      "semilla": 42,
+      "n_sentencias": 725,
+      "n_consultas": 107,
+      "n_pares": 1718
+    }
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "gemma2:9b: 360 de 1718 elementos de 'relevancia' sin juzgar con el prompt y el texto actuales.",
+    "Ningún juez usable: la referencia queda solo con las reglas (no es una evaluación independiente).",
+    "Sin congelado: corrida de desarrollo no atada a una versión."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "digest_gemma2:9b": "ff02c3702f322b9e075e9568332d96c0a7028002f1a5a056e0a6784320a4db0b",
+  "congelado": null,
+  "tablas": {
+    "Validación de los jueces": {
+      "descripcion": "Exactitud de la familia del delito que lee cada juez contra la categoría que asignó el STJ (referencia externa; una respuesta inválida cuenta como error). Un juez se usa si alcanza el mínimo, fijado antes de correrlos.",
+      "columnas": [
+        "juez",
+        "sentencias",
+        "con respuesta válida",
+        "exactitud familia (STJ)",
+        "IC95",
+        "mínimo",
+        "se usa"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "juez": "gemma2:9b",
+          "sentencias": 725,
+          "con respuesta válida": 725,
+          "exactitud familia (STJ)": 0.7420689655172413,
+          "IC95": "[0.709, 0.773]",
+          "mínimo": 0.8,
+          "se usa": "no"
+        }
+      ]
+    },
+    "Acuerdo entre lectores de la sentencia": {
+      "descripcion": "Reglas y jueces leen acto impugnado, apelante y sentido; kappa de Cohen sobre las sentencias donde ambos respondieron.",
+      "columnas": [
+        "campo",
+        "lector A",
+        "lector B",
+        "sentencias",
+        "acuerdo",
+        "kappa"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "campo": "acto_impugnado",
+          "lector A": "reglas",
+          "lector B": "juez:gemma2:9b",
+          "sentencias": 583,
+          "acuerdo": 0.6500857632933105,
+          "kappa": 0.5854670170717936
+        },
+        {
+          "campo": "apelante",
+          "lector A": "reglas",
+          "lector B": "juez:gemma2:9b",
+          "sentencias": 567,
+          "acuerdo": 0.8518518518518519,
+          "kappa": 0.7900361049025961
+        },
+        {
+          "campo": "sentido",
+          "lector A": "reglas",
+          "lector B": "juez:gemma2:9b",
+          "sentencias": 557,
+          "acuerdo": 0.8456014362657092,
+          "kappa": 0.7699618219799745
+        }
+      ]
+    },
+    "Cobertura de la referencia": {
+      "descripcion": "Sentencias con mayoría absoluta entre reglas y jueces usables (ninguno); sin mayoría no cuentan.",
+      "columnas": [
+        "campo",
+        "sentencias",
+        "con referencia (mayoría)"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "campo": "acto_impugnado",
+          "sentencias": 725,
+          "con referencia (mayoría)": 583
+        },
+        {
+          "campo": "apelante",
+          "sentencias": 725,
+          "con referencia (mayoría)": 568
+        },
+        {
+          "campo": "sentido",
+          "sentencias": 725,
+          "con referencia (mayoría)": 561
+        }
+      ]
+    },
+    "Acuerdo en la relevancia": {
+      "descripcion": "Entre cada par de lectores, sobre los mismos pares (consulta, sentencia). La referencia sale de las facetas: mismo delito por la categoría del STJ y mismo problema procesal por mayoría.",
+      "columnas": [
+        "lector A",
+        "lector B",
+        "pares",
+        "acuerdo exacto",
+        "kappa 0/1/2",
+        "kappa relevante sí/no"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "lector A": "reglas",
+          "lector B": "juez:gemma2:9b",
+          "pares": 1358,
+          "acuerdo exacto": 0.6097201767304861,
+          "kappa 0/1/2": 0.17964324385934927,
+          "kappa relevante sí/no": 0.22057807787508815
+        }
+      ]
+    },
+    "Pares juzgados": {
+      "descripcion": "Pares (consulta, sentencia) por agrupamiento: los 10 primeros de la app y los 5 primeros de BM25 y de embeddings.",
+      "columnas": [
+        "pares",
+        "con referencia",
+        "relevancia 0",
+        "relevancia 1",
+        "relevancia 2"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "pares": 1718,
+          "con referencia": 1718,
+          "relevancia 0": 1243,
+          "relevancia 1": 436,
+          "relevancia 2": 39
+        }
+      ]
+    },
+    "Consultas validadas": {
+      "descripcion": "Sustituye a la revisión humana: comprobaciones de la guía y aceptación de cada juez usable. Solo las validadas entran a la evaluación.",
+      "columnas": [
+        "particion",
+        "sin_respuesta",
+        "consultas",
+        "validadas"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "consultas": 46,
+          "validadas": 39
+        },
+        {
+          "particion": "desarrollo",
+          "sin_respuesta": true,
+          "consultas": 3,
+          "validadas": 3
+        },
+        {
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "consultas": 56,
+          "validadas": 46
+        },
+        {
+          "particion": "prueba",
+          "sin_respuesta": true,
+          "consultas": 2,
+          "validadas": 2
+        }
+      ]
+    },
+    "Consultas descartadas": {
+      "descripcion": "Por qué no pasaron la validación.",
+      "columnas": [
+        "id",
+        "particion",
+        "sin_respuesta",
+        "validada",
+        "motivo"
+      ],
+      "diagnostico": true,
+      "filas": [
+        {
+          "id": "A007",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «acreditado los elementos del cuerpo del delito»"
+        },
+        {
+          "id": "A028",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «auto de no vinculacion a proceso y», «un auto de no vinculacion a proceso»"
+        },
+        {
+          "id": "A034",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «le atribuye la comision de un delito», «se le atribuye la comision de un»"
+        },
+        {
+          "id": "A035",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "incluía datos que identifican la sentencia: siete años"
+        },
+        {
+          "id": "A077",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «19 fraccion i incisos a b c», «9 fraccion i inciso a en relacion», «a b c y e de la»"
+        },
+        {
+          "id": "A103",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «auto de no vinculacion a proceso en»"
+        },
+        {
+          "id": "A106",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «37 del codigo nacional de procedimientos penales», «articulo 37 del codigo nacional de procedimientos», «del articulo 37 del codigo nacional de»"
+        },
+        {
+          "id": "A132",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «existe litis sobre la cual se sustente», «litis sobre la cual se sustente el», «no existe litis sobre la cual se»"
+        },
+        {
+          "id": "A134",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "incluía datos que identifican la sentencia: 25 años"
+        },
+        {
+          "id": "A147",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «un auto de no vinculacion a proceso»"
+        },
+        {
+          "id": "A149",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «el sobreseimiento total de la causa penal», «su responsabilidad criminal en la comision del»"
+        },
+        {
+          "id": "A170",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «232 bis fracciones i iv y ix», «atribuye su probable participacion en la comision», «bis fracciones i iv y ix del»"
+        },
+        {
+          "id": "A187",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «improcedente el incidente de inimputabilidad promovido en»"
+        },
+        {
+          "id": "A190",
+          "particion": "desarrollo",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «ampliacion del termino constitucional de ciento cuarenta», «constitucional de ciento cuarenta y cuatro horas», «del termino constitucional de ciento cuarenta y»"
+        },
+        {
+          "id": "A192",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «el auto de no vinculacion a proceso»"
+        },
+        {
+          "id": "A196",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «vinculacion a proceso y la imposicion de»"
+        },
+        {
+          "id": "A201",
+          "particion": "prueba",
+          "sin_respuesta": false,
+          "validada": false,
+          "motivo": "copiaba estas frases de la sentencia: «que nego la suspension condicional del proceso»"
+        }
+      ]
+    }
+  }
+}
