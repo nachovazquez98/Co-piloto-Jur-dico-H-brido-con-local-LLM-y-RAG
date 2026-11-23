@@ -58,8 +58,8 @@ qc --particion prueba
 fichas-referencia --particion prueba
 esfuerzo --particion prueba
 familias --coherencia
-latencia --ejemplos --max 10
-regresion                        # diagnóstico con los ejemplos de la app
+latencia --ejemplos --max 10      # mismos 16 ejemplos de regresión
+regresion                        # diagnóstico con los 16 ejemplos penales de regresión (ejemplos.EJEMPLOS_PENALES)
 errores --corrida ID [ID ...]    # un caso por fallo, con su tipo
 ```
 

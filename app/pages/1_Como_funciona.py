@@ -38,8 +38,8 @@ st.markdown("El sistema apoya al abogado en la preparación o contestación del 
 
 st.header("Guía de uso")
 st.markdown("""
-1. **Describa el caso** en la pantalla principal: los hechos, el delito imputado, la resolución que se impugna y
-   los motivos de inconformidad. También puede partir de uno de los ejemplos.
+1. **Elija el perfil de usuario y describa el caso** en la pantalla principal: los hechos, el delito imputado, la
+   resolución que se impugna y los motivos de inconformidad. También puede partir de un ejemplo del perfil.
 2. **Delito (opcional).** El sistema sugiere los delitos que deduce de la descripción. La sugerencia es una
    orientación: puede aceptarse, modificarse, seleccionar varios o dejar el campo vacío para que el sistema lo
    determine. Si la selección difiere de lo que indican los hechos, el sistema lo advierte.
