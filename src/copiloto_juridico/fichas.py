@@ -432,13 +432,13 @@ def familia_del_delito(delitos: str) -> str:
     return FAMILIA_OTROS
 
 
-def generar_ficha_json(generate, contexto: str) -> tuple["FichaPenal | None", dict]:
+def generar_ficha_json(generate, contexto: str, plantilla: str | None = None) -> tuple["FichaPenal | None", dict]:
     """Ficha penal en una llamada (JSON validado); si no se puede interpretar, un reintento que le dice al LLM el
     error. `generate(prompt, json_mode=True)` es la función del cliente. Devuelve (ficha | None, info) con
-    info = {"intentos": 1 | 2, "error": mensaje del último error}."""
+    info = {"intentos": 1 | 2, "error": mensaje del último error}. `plantilla`: otro prompt de ficha (experimentos)."""
     from . import prompts
 
-    prompt = prompts.PROMPT_FICHA_PENAL_JSON.format(contexto=contexto)
+    prompt = (plantilla or prompts.PROMPT_FICHA_PENAL_JSON).format(contexto=contexto)
     try:
         return FichaPenal.desde_json(generate(prompt, json_mode=True)), {"intentos": 1, "error": ""}
     except ValueError as e:

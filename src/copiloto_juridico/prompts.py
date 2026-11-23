@@ -358,6 +358,21 @@ Sentencia:
 {contexto}
 """
 
+# v11.2, solo para el experimento `fundamento-prompt` (no es la ficha de la app): la misma ficha con el fundamento
+# legal restringido a lo que invoca la Sala para fundar SU resolución. Los artículos que la ficha precalculada cita
+# fuera de ese fundamento casi siempre aparecen en la sentencia (agravios, primera instancia): no son alucinaciones
+# sino artículos de otra parte del texto (conteo en la corrida). Adoptarlo exige regenerar las fichas precalculadas.
+_FUNDAMENTO_ACTUAL = '  "fundamento_legal": ["cada artículo o jurisprudencia citada como base de la decisión, tal como aparece"],'
+_FUNDAMENTO_SALA = ('  "fundamento_legal": ["cada artículo que la SALA invoca para fundar SU resolución (p. ej., después de '
+                    '\'con fundamento en\' o \'de conformidad con\', o en los puntos resolutivos), con su ordenamiento"],')
+_REGLA_FINAL = "- Responde ÚNICAMENTE con el JSON, en español."
+_REGLA_FUNDAMENTO = ('- En "fundamento_legal" NO incluyas los artículos que solo menciona el apelante en sus agravios, los que '
+                     'solo aplicó el juez de primera instancia ni los que la Sala cita al transcribir o resumir; si no hay, '
+                     'deja la lista vacía.\n' + _REGLA_FINAL)
+assert _FUNDAMENTO_ACTUAL in PROMPT_FICHA_PENAL_JSON and _REGLA_FINAL in PROMPT_FICHA_PENAL_JSON
+PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA = PROMPT_FICHA_PENAL_JSON.replace(_FUNDAMENTO_ACTUAL, _FUNDAMENTO_SALA).replace(
+    _REGLA_FINAL, _REGLA_FUNDAMENTO)
+
 # v11.2: tercer intento de la ficha JSON. 62 de las 66 fichas inválidas de llama3.1:8b solo carecían de 'delitos'
 # (o 'resumen'), aun después del reintento (fichas-diagnostico 20261116-213316_1fc6dd4). Se piden únicamente esos
 # campos y se unen a la respuesta anterior; no cambia la versión de la ficha (el prompt principal es el mismo).

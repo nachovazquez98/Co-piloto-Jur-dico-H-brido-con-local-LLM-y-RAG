@@ -400,3 +400,14 @@ def test_detalles_identificables():
     assert d("Mi cliente fue detenido sin orden y apelo la vinculación a proceso") == []
     assert d("abusó de una menor de 14 años") == []
     assert d("le impusieron una pena de 8 años de prisión") == ["8 años"]
+
+
+def test_prompt_ficha_con_fundamento_de_la_sala():
+    """Variante del experimento `fundamento-prompt`: solo cambian la clave fundamento_legal y una regla."""
+    from copiloto_juridico import prompts
+
+    base, variante = prompts.PROMPT_FICHA_PENAL_JSON, prompts.PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA
+    assert variante != base and "SALA invoca para fundar SU resolución" in variante
+    assert variante.replace(prompts._FUNDAMENTO_SALA, prompts._FUNDAMENTO_ACTUAL).replace(
+        prompts._REGLA_FUNDAMENTO, prompts._REGLA_FINAL) == base
+    assert "{contexto}" in variante.format(contexto="{contexto}")

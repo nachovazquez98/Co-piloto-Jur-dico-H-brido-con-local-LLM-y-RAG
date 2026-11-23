@@ -23,6 +23,7 @@ Referencia automática, sin anotadores humanos (v11.2):
     jueces --modelo M [--tareas ...] Una tanda de un juez LLM (un modelo a la vez; reanudable)
     referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
     fichas-referencia --particion P  Fichas precalculadas contra la referencia (sin LLM)
+    fundamento-prompt --n N          Prompt de la ficha con el fundamento de la Sala, en desarrollo (con LLM)
     esfuerzo --particion P           Esfuerzo simulado: portal, búsqueda por palabras y app
 """
 
@@ -408,6 +409,12 @@ def cmd_fichas_referencia(args) -> None:
     _guardar(corrida)
 
 
+def cmd_fundamento_prompt(args) -> None:
+    from .referencias import experimento_fundamento
+
+    _guardar(experimento_fundamento(args.n, _llm(), log=_log))
+
+
 def cmd_errores(args) -> None:
     from ..clasificador import construir_clasificador
     from ..vectorstore import SentenciasStore
@@ -522,6 +529,10 @@ def main(argv=None) -> None:
     s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
     s.set_defaults(func=cmd_fichas_referencia)
+
+    s = sub.add_parser("fundamento-prompt", help="Prompt de la ficha con el fundamento de la Sala (desarrollo, con LLM)")
+    s.add_argument("--n", type=int, default=120, help="Sentencias de desarrollo de la muestra estable por hash")
+    s.set_defaults(func=cmd_fundamento_prompt)
 
     args = p.parse_args(argv)
     args.func(args)

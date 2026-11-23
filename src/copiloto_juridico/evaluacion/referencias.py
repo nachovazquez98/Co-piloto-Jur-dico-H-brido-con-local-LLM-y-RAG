@@ -456,3 +456,82 @@ def evaluar_fichas(particion: str, log=print):
                       diagnostico=True)
     log(f"{len(comp)} fichas comparadas ({particion}).")
     return corrida
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Experimento: prompt de la ficha con el fundamento legal de la Sala (v11.2)
+# --------------------------------------------------------------------------------------------------------------
+
+
+def experimento_fundamento(n: int, llm, log=print):
+    """¿Mejora la precisión del fundamento legal si el prompt pide solo los artículos que la Sala invoca para fundar
+    su resolución? Muestra estable por hash de `n` sentencias de DESARROLLO con ficha precalculada que cita algún
+    artículo y en que las reglas leen fundamento; se genera la ficha con `PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA` y
+    se compara, por pares, con la ficha precalculada de la misma sentencia (misma referencia, mismo modelo). La
+    partición de prueba no se toca."""
+    from .. import prompts
+    from ..datos.corpus import load_corpus
+    from ..fichas import (FichaPenal, articulos_en_sentencia, extraer_articulos, fundamento_de_sentencia,
+                          generar_ficha_json)
+    from ..fichas_precalculadas import cargar
+    from ..pipeline import recortar_contexto
+    from .reporte import Corrida
+
+    def articulos(f) -> set[str]:
+        return set().union(set(), *(extraer_articulos(x) for x in f.fundamento_legal))
+
+    ref = pd.read_csv(REFERENCIAS_PATH, dtype=str).fillna(NO_DETERMINADO)
+    dev = set(ref.loc[ref["particion"] == "desarrollo", "doc_id"])
+    textos = load_corpus().set_index("id")["texto"].to_dict()
+    tabla = cargar()
+    candidatas = []
+    for row in tabla[tabla["json_valido"].astype(bool)].itertuples():
+        if row.doc_id in dev and row.doc_id in textos:
+            citados, invocados = articulos(FichaPenal.desde_guardada(row.ficha)), fundamento_de_sentencia(textos[row.doc_id])
+            if citados and invocados:
+                candidatas.append((hashlib.sha256(row.doc_id.encode()).hexdigest(), row.doc_id, citados, invocados))
+    muestra = sorted(candidatas)[:n]
+    filas = []
+    for i, (_, doc, antes, invocados) in enumerate(muestra, 1):
+        contexto = recortar_contexto(textos[doc], llm.settings.max_context_chars)
+        ficha, _ = generar_ficha_json(llm.generate, contexto, plantilla=prompts.PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA)
+        despues = articulos(ficha) if ficha is not None else None
+        fuera = antes - invocados
+        filas.append({"doc_id": doc, "invocados": len(invocados), "citados_antes": len(antes),
+                      "comunes_antes": len(antes & invocados), "fuera_antes": len(fuera),
+                      "fuera_en_sentencia": len(fuera & articulos_en_sentencia(textos[doc])),
+                      "citados_despues": None if despues is None else len(despues),
+                      "comunes_despues": None if despues is None else len(despues & invocados)})
+        log(f"[{i}/{len(muestra)}] {doc[:60]}")
+    d = pd.DataFrame(filas)
+    validas = d.dropna(subset=["citados_despues"])
+    pares = validas[validas["citados_despues"] > 0]
+    p_antes = (pares["comunes_antes"] / pares["citados_antes"]).tolist()
+    p_despues = (pares["comunes_despues"] / pares["citados_despues"]).tolist()
+    r_antes = (validas["comunes_antes"] / validas["invocados"]).tolist()
+    r_despues = (validas["comunes_despues"] / validas["invocados"]).tolist()
+    corrida = Corrida("fundamento-prompt", parametros={"n": n, "particion": "desarrollo",
+                                                       "muestra": "primeras n por sha256(doc_id)"})
+    resumen = []
+    for medida, a, b in (("precisión", p_antes, p_despues), ("exhaustividad (recall)", r_antes, r_despues)):
+        dif = m.bootstrap_diferencia_pareada(b, a)
+        resumen.append({"medida": medida, "fichas": dif["n"], "ficha precalculada": round(float(np.mean(a)), 3),
+                        "prompt con fundamento de la Sala": round(float(np.mean(b)), 3),
+                        "diferencia": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, {dif['ic_sup']:+.3f}]",
+                        "significativa": "sí" if dif["significativa"] else "no",
+                        "efecto mínimo detectable": round(m.efecto_minimo_detectable(b, a) or float("nan"), 3)})
+    corrida.tabla("Fundamento legal: ficha precalculada frente al prompt con el fundamento de la Sala",
+                  "Mismas sentencias de desarrollo y misma referencia (artículos que la Sala invoca como fundamento, "
+                  "leídos por reglas). Diferencia pareada (prompt nuevo − ficha precalculada) con IC 95 % por "
+                  "bootstrap; se acepta la mejora solo si el intervalo no incluye el cero.", pd.DataFrame(resumen))
+    corrida.tabla("Artículos citados por ficha", "Promedio por ficha válida.", pd.DataFrame([{
+        "fichas generadas": len(d), "JSON válido": len(validas), "sin artículos con el prompt nuevo":
+            int((validas["citados_despues"] == 0).sum()),
+        "citados antes": round(float(validas["citados_antes"].mean()), 2),
+        "citados después": round(float(validas["citados_despues"].mean()), 2)}]))
+    corrida.tabla("Ficha precalculada: artículos citados fuera del fundamento de la Sala",
+                  "Si aparecen en otra parte de la sentencia (agravios, primera instancia), el error es de selección y "
+                  "no una alucinación.", pd.DataFrame([{
+                      "citados fuera del fundamento": int(d["fuera_antes"].sum()),
+                      "aparecen en la sentencia": int(d["fuera_en_sentencia"].sum())}]))
+    return corrida
