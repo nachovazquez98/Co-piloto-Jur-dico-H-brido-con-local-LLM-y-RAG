@@ -57,6 +57,14 @@ de la API antes de que exigiera reCAPTCHA y las que se bajaron después a mano d
 agrupan en 25 familias de delito, incluida «cuestiones procesales» para quejas, excusas y conflictos de competencia,
 que no son delitos (`evaluacion/familias_penal.csv`, asignadas por reglas; ninguna revisada por un especialista).
 
+**Qué incluye el repositorio:** el texto depurado de las 2,495 sentencias (`data/corpus/`), sus embeddings
+precalculados (`data/indice/`: 186,971 fragmentos × 768, float16, en archivos de 23 MB), las fichas precalculadas
+(`data/fichas/`), las corridas de la evaluación (`evaluacion/resultados/`), el notebook técnico (`notebooks/`) y la
+presentación al jurado con sus notas del orador (`docs/v11.2 Co-piloto Jurídico - Presentación.pdf` y
+`... - Notas del orador.pdf`). Los 1,899 PDF originales descargados a mano (1.3 GB) no van en git: están como
+archivos adjuntos de la versión publicada [`v11.2`](https://github.com/nachovazquez98/Co-piloto-Jur-dico-H-brido-con-local-LLM-y-RAG/releases/tag/v11.2)
+(`sentencias-penales-pdf-parte1.zip` y `-parte2.zip`); se descomprimen en `data/raw/` solo para reconstruir el corpus.
+
 ## Instalación
 
 Requisitos: Python 3.10+, [Ollama](https://ollama.com) con `llama3.1:8b` (4.9 GB). Una GPU NVIDIA de 8 GB acelera
@@ -71,8 +79,10 @@ ollama pull llama3.1:8b
 streamlit run app/Copiloto.py
 ```
 
-En el primer arranque se descarga el modelo de embeddings (~1 GB) y se construye la base ChromaDB local a partir del
-índice incluido (unos minutos). Después arranca en segundos.
+En el primer arranque se descarga el modelo de embeddings (~1 GB), se construye la base ChromaDB local a partir del
+índice incluido (unos minutos) y se guarda el índice BM25 en `data/cache/`. Después la app abre en unos 8 s (medido con
+el corpus final: 22.5 s si tuviera que reconstruir BM25 en cada arranque); las consultas de los ejemplos ya
+analizadas (`python -m copiloto_juridico.cli demo --ejemplos`) se muestran al instante.
 
 ## Evaluación
 

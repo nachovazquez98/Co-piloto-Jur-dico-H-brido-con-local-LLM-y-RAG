@@ -202,3 +202,20 @@ def test_recortar_indice_conserva_los_vectores_de_las_sentencias_que_quedan(tmp_
     assert (emb == emb0[chunks0["doc_id"].isin({"p1", "p2"}).to_numpy()]).all()
     with pytest.raises(ValueError):  # un texto distinto exige reindexar
         indice.recortar_indice(penal.assign(texto=penal["texto"] + " otro texto" * 300), tmp_path, log=lambda m: None)
+
+
+def test_bm25_guardado_da_los_mismos_puntajes_y_se_rehace_si_cambia_el_corpus(tmp_path):
+    import numpy as np
+
+    from copiloto_juridico.vectorstore import BM25
+
+    textos = ["robo calificado con violencia en la via publica", "homicidio calificado con arma blanca",
+              "robo simple de vehiculo estacionado", "lesiones dolosas en riña con arma"]
+    nuevo = BM25.cargado(textos, directorio=tmp_path)
+    assert len(list(tmp_path.glob("bm25-*.pkl"))) == 1
+    leido = BM25.cargado(textos, directorio=tmp_path)
+    consulta = "robo calificado con arma"
+    assert np.allclose(leido.scores(consulta), BM25(textos).scores(consulta))
+    assert np.allclose(leido.scores(consulta), nuevo.scores(consulta))
+    BM25.cargado(textos + ["fraude especifico con documento falso"], directorio=tmp_path)
+    assert len(list(tmp_path.glob("bm25-*.pkl"))) == 1  # el anterior se reemplaza

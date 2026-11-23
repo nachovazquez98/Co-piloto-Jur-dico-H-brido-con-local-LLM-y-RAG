@@ -9,6 +9,10 @@ del texto de la sentencia (reglas) y de un juez LLM de otra familia que la del m
 usarse. Corpus penal ampliado con descargas a mano desde el portal.
 
 ### Añadido
+- Índice BM25 guardado en `data/cache/` (se rehace solo si cambian el corpus o su código): la app abre en ~8 s en
+  lugar de 22.5 s. Mismo resultado; cambia la huella del código, así que los ejemplos de la demo se volvieron a
+  precalcular. Las corridas de prueba siguen atadas al congelado `a15b83c852281010`.
+- Presentación al jurado y notas del orador en PDF (`docs/`); PDF de las sentencias como adjuntos de la versión `v11.2`.
 - Evaluación final en la partición de prueba, una sola corrida por comando (congelado `a15b83c852281010`): Hit@3 de
   familia 0.717, exactitud de la familia en la ficha 0.917, precisión del fundamento legal 0.644, recall de QC_1 0.721,
   p50 de 30.8 s por consulta; tabla completa en el README y guía de lectura en `evaluacion/README.md`.

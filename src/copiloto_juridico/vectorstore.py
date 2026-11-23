@@ -62,6 +62,38 @@ class BM25:
         x.data = tf * (k1 + 1) / (tf + k1 * (1 - b + b * dl[filas] / dl.mean())) * idf[x.indices]
         self.matrix = x
 
+    @classmethod
+    def cargado(cls, textos: list[str], directorio=None, k1: float = 1.5, b: float = 0.75) -> "BM25":
+        """El índice guardado en data/cache si el corpus y este código no cambiaron; si no, lo construye (~15 s al
+        arrancar la app) y lo guarda. Mismo resultado que `BM25(textos)`: solo evita recalcularlo."""
+        import hashlib
+        import inspect
+        import pickle
+
+        directorio = config.DATA_DIR / "cache" if directorio is None else directorio
+        h = hashlib.sha256(f"{inspect.getsource(cls)}\x00{k1}\x00{b}".encode())
+        for t in textos:
+            h.update(t.encode())
+            h.update(b"\x00")
+        path = directorio / f"bm25-{h.hexdigest()[:20]}.pkl"
+        try:
+            with path.open("rb") as f:
+                return pickle.load(f)
+        except (OSError, EOFError, pickle.UnpicklingError, AttributeError):
+            pass
+        bm25 = cls(textos, k1, b)
+        try:
+            directorio.mkdir(parents=True, exist_ok=True)
+            for viejo in directorio.glob("bm25-*.pkl"):
+                viejo.unlink()
+            tmp = path.with_suffix(".tmp")
+            with tmp.open("wb") as f:
+                pickle.dump(bm25, f, protocol=pickle.HIGHEST_PROTOCOL)
+            tmp.replace(path)
+        except OSError:
+            pass  # sin permiso de escritura: funciona igual, solo vuelve a construirlo en el siguiente arranque
+        return bm25
+
     def scores(self, consulta: str) -> np.ndarray:
         q = self.vectorizer.transform([consulta])
         q.data[:] = 1.0
@@ -82,7 +114,7 @@ class SentenciasStore:
         self.doc_ids = self.corpus["id"].to_numpy()
         self.doc_tipos = self.corpus["tipo"].to_numpy()
         self.doc_materias = self.corpus["materia"].to_numpy()
-        self.bm25 = BM25(self.corpus["texto"].tolist())
+        self.bm25 = BM25.cargado(self.corpus["texto"].tolist())
         log(f"✅ Base lista: {len(self.corpus)} sentencias · {self.collection.count()} fragmentos.")
 
     def _abrir_chroma(self, chunks: pd.DataFrame, emb: np.ndarray, log: Callable[[str], None]):
