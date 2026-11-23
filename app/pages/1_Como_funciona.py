@@ -25,8 +25,12 @@ st.markdown("Esta página documenta el método del Co-piloto Jurídico: qué inf
             "cómo deben interpretarse sus resultados.")
 
 st.header("Objeto y alcance")
-st.markdown("El sistema apoya a la defensa penal en la preparación o contestación del recurso de apelación ante las "
-            "Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco. A partir de la descripción de un "
+st.markdown("El sistema apoya al abogado en la preparación o contestación del recurso de apelación ante las "
+            "Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco. Atiende tres perfiles de "
+            "usuario, seleccionables en la pantalla principal: el abogado (defensor o asesor jurídico de la "
+            "víctima), usuario principal; la persona justiciable, que busca conocer el criterio del tribunal en "
+            "asuntos semejantes al suyo, y el tribunal de alzada, que contrasta el criterio de las Salas. A partir "
+            "de la descripción de un "
             "caso, localiza las resoluciones públicas del propio tribunal que resolvieron supuestos afines y elabora "
             "una ficha de cada una: delito, acto impugnado, apelante, agravios y su calificación, sentido del fallo "
             "y fundamento legal. El corpus comprende exclusivamente resoluciones en **materia penal**.\n\n"
@@ -42,7 +46,7 @@ st.markdown("""
    determine. Si la selección difiere de lo que indican los hechos, el sistema lo advierte.
 3. **Buscar precedentes.** El avance se muestra en cinco pasos; con fichas precalculadas, el análisis tarda
    alrededor de medio minuto.
-4. **Síntesis.** Indica qué precedentes fueron favorables o desfavorables para la defensa y qué argumentos acogió o
+4. **Síntesis.** Indica qué parte favoreció cada precedente y qué argumentos acogió o
    desestimó la Sala, con la cita de cada precedente ([P1], [P2]…).
 5. **Tarjetas de precedentes.** Cada una contiene la ficha de la resolución. La leyenda **verificar** indica que un
    dato de la ficha no coincide con el texto (sentido del fallo distinto de los puntos resolutivos, o artículo

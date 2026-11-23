@@ -269,7 +269,7 @@ def _lista(v) -> list[str]:
 
 @dataclass
 class FichaPenal:
-    """Ficha de un precedente penal para la defensa. Se valida al construirse desde el JSON del LLM."""
+    """Ficha de un precedente penal de apelación. Se valida al construirse desde el JSON del LLM."""
 
     tribunal: str
     fecha_resolucion: str
@@ -358,7 +358,7 @@ class FichaPenal:
         sentido = self.sentido_fallo
         if sentido_resolutivos and sentido_resolutivos != sentido:
             sentido = f"{sentido_resolutivos} (según los puntos resolutivos; el modelo leyó {sentido}: verificar)"
-        para_defensa = resultado_para_defensa(self.apelante, sentido_resolutivos or self.sentido_fallo)
+        favorecida = parte_favorecida(self.apelante, sentido_resolutivos or self.sentido_fallo)
 
         def fundamento(f: str) -> str:
             ausentes = sorted(extraer_articulos(f) & faltan)
@@ -375,7 +375,7 @@ class FichaPenal:
             f"- **Acto impugnado:** {self.acto_impugnado} · **Apelante:** {self.apelante}",
             f"- **Delito(s):** {self.delitos}",
             f"- **Sentido del fallo:** {sentido}",
-            f"- **Resultado para la defensa:** {para_defensa or DATO_NO_DISPONIBLE}", "",
+            f"- **Parte favorecida:** {favorecida or DATO_NO_DISPONIBLE}", "",
             "#### Agravios y su calificación", agravios, "",
             "#### Hechos y decisión", f"**Hechos:** {self.hechos_clave}", "", f"**Decisión:** {self.decision}", "",
             "#### Fundamento legal",
@@ -391,6 +391,19 @@ _RESULTADO_APELANTE = {"CONFIRMA": "desfavorable", "REVOCA": "favorable", "MODIF
                        "REPONE": "favorable (se repone el procedimiento)"}
 _RESULTADO_CONTRARIO = {"CONFIRMA": "favorable", "REVOCA": "desfavorable", "MODIFICA": "parcialmente desfavorable",
                         "REPONE": "desfavorable (se repone el procedimiento)"}
+
+
+def parte_favorecida(apelante: str, sentido: str | None) -> str | None:
+    """Parte que obtuvo la resolución de la Sala, en términos neutrales para los tres perfiles de usuario (abogado
+    defensor o asesor jurídico de la víctima, persona justiciable y tribunal de alzada). Se deduce con las mismas
+    reglas que `resultado_para_defensa`; None si no se puede determinar."""
+    r = resultado_para_defensa(apelante, sentido)
+    if r is None:
+        return None
+    lado = "el acusado" if r.startswith(("favorable", "parcialmente favorable")) else \
+        "la acusación (Ministerio Público o víctima)"
+    return ("en parte, " if r.startswith("parcialmente") else "") + lado + \
+        ("; se repone el procedimiento" if "repone" in r else "")
 
 
 def resultado_para_defensa(apelante: str, sentido: str | None) -> str | None:

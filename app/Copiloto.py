@@ -16,7 +16,7 @@ import streamlit as st
 
 from copiloto_juridico import cache_resultados
 from copiloto_juridico.ayudas import AYUDA, AVISO_LEGAL
-from copiloto_juridico.ejemplos import EJEMPLOS
+from copiloto_juridico.ejemplos import PERFILES, ejemplos_de
 from copiloto_juridico.fichas import extraer_articulos
 from copiloto_juridico.llm import get_client
 from copiloto_juridico.evaluacion.familias import etiqueta_familia
@@ -33,13 +33,34 @@ clasificador = get_clasificador()
 
 st.title("⚖️ Co-piloto Jurídico")
 st.markdown("Recuperación y análisis de precedentes de las Salas Penales del Supremo Tribunal de Justicia del Estado "
-            "de Jalisco para la defensa en el recurso de apelación. Describa los hechos y la resolución que se "
-            "impugna; el sistema localiza las resoluciones más afines y elabora una ficha de cada una. La página "
-            "**Cómo funciona** explica el método.")
+            "de Jalisco en el recurso de apelación, para tres perfiles de usuario: el abogado (defensor o asesor "
+            "jurídico de la víctima), la persona justiciable y el tribunal de alzada. El sistema localiza las "
+            "resoluciones más afines a la descripción del caso y elabora una ficha de cada una. La página **Cómo "
+            "funciona** expone el método.")
 
 # --- Consulta ---
 ESCRIBIR = "Escribir mi propia consulta"
-por_etiqueta = {e.etiqueta: e for e in EJEMPLOS}
+# Por perfil de usuario: contenido esperado de la descripción y advertencia sobre el alcance de los resultados.
+GUIA = {
+    "abogado": ("Hechos, delito, resolución que se apela y motivos de inconformidad...", None),
+    "persona": ("Hechos, delito y resolución del juez, en sus propias palabras...",
+                "Los resultados muestran el criterio con que el tribunal ha resuelto asuntos semejantes; no anticipan "
+                "la resolución de un caso concreto. Para ejercer sus derechos, acuda a un abogado o a la asesoría "
+                "jurídica de víctimas."),
+    "tribunal": ("Toca en estudio: hechos, acto impugnado, apelante y agravios...",
+                 "Los resultados permiten contrastar el criterio de las Salas en supuestos semejantes; el sentido de "
+                 "la resolución corresponde exclusivamente a la Sala."),
+}
+
+
+def _cambiar_perfil() -> None:
+    st.session_state.update(ejemplo=ESCRIBIR, consulta="")
+    st.session_state.pop("resultado", None)
+
+
+perfil = st.radio("Perfil de usuario", list(PERFILES), format_func=PERFILES.get, key="perfil", horizontal=True,
+                  on_change=_cambiar_perfil)
+por_etiqueta = {e.etiqueta: e for e in ejemplos_de(perfil)}
 
 
 def _cargar_ejemplo() -> None:
@@ -57,9 +78,10 @@ if "consulta" not in st.session_state:
 col_ej, col_otro = st.columns([5, 1], vertical_alignment="bottom")
 col_ej.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
 col_otro.button("Otro ejemplo", on_click=_otro_ejemplo, width="stretch",
-                help="Carga al azar otro de los ejemplos de la lista")
-consulta = st.text_area("Descripción del caso", key="consulta", height=140,
-                        placeholder="Hechos, delito imputado, resolución que se apela y motivos de inconformidad...")
+                help="Carga al azar otro ejemplo del perfil de usuario elegido")
+consulta = st.text_area("Descripción del caso", key="consulta", height=140, placeholder=GUIA[perfil][0])
+if GUIA[perfil][1]:
+    st.caption(GUIA[perfil][1])
 
 
 @st.cache_data(show_spinner=False)
@@ -157,8 +179,8 @@ def tarjeta(p) -> None:
         verificar_sentido = any(v.startswith("sentido") for v in t["verificar"])
         c.metric("Sentido del fallo", t["sentido_fallo"] + (" · verificar" if verificar_sentido else ""),
                  help=AYUDA["sentido_fallo"])
-        if t["para_defensa"]:
-            c.markdown(f"**Para la defensa:** {t['para_defensa']}", help=AYUDA["para_defensa"])
+        if t["parte_favorecida"]:
+            c.markdown(f"**Parte favorecida:** {t['parte_favorecida']}", help=AYUDA["parte_favorecida"])
         if t["agravios"]:
             st.markdown("**Agravios y cómo los calificó la Sala**")
             st.markdown("\n".join(f"- {ag}" + (f" — **{cal}**" if cal else "") for ag, cal in t["agravios"]))

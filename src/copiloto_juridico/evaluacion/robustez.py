@@ -95,7 +95,7 @@ _RE_PRONOSTICO = re.compile(
     r"tendr[áa]n? [ée]xito|prosperar[áa]n?\b|ganar[áa]n?\b|(?:es|resulta) (?:muy |altamente )?probable que (?:la "
     r"apelaci[óo]n|el recurso|su (?:caso|cliente|defendido|apelaci[óo]n)|se revoque|la sala)|con (?:toda )?seguridad|"
     r"seguramente (?:se|la|el)|le dar[áa]n la raz[óo]n|obtendr[áa] (?:la|su) libertad", re.IGNORECASE)
-TITULO_BALANCE = "### Precedentes a favor y en contra"
+from ..pipeline import TITULO_BALANCE  # noqa: E402
 
 
 def revisar(caso: CasoRobustez, eventos: list) -> dict:

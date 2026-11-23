@@ -79,10 +79,12 @@ def test_pantalla_principal_con_resultado():
     assert [e.label for e in at.sidebar.expander] == ["Configuración"]
     assert at.metric[0].label == "Sentido del fallo" and at.metric[0].value == "MODIFICA · verificar"
     # «Otro ejemplo» carga al azar un ejemplo distinto del actual y su texto en la consulta.
-    from copiloto_juridico.ejemplos import EJEMPLOS
+    from copiloto_juridico.ejemplos import PERFILES, ejemplos_de
+    assert at.radio[0].label == "Perfil de usuario" and at.radio[0].value == "abogado"
+    assert list(at.radio[0].options) == list(PERFILES.values())
     at.button[0].click().run()
     primero = at.selectbox[0].value
-    ej = {e.etiqueta: e.texto for e in EJEMPLOS}
+    ej = {e.etiqueta: e.texto for e in ejemplos_de("abogado")}
     assert primero in ej and at.text_area[0].value == ej[primero]
     at.button[0].click().run()
     assert at.selectbox[0].value != primero and at.text_area[0].value == ej[at.selectbox[0].value]
@@ -97,3 +99,8 @@ def test_pantalla_principal_con_resultado():
     at.session_state["guardado_el"] = "2026-11-13T10:00"  # v11.1: resultado de la caché, una sola línea discreta
     at.run()
     assert [c.value for c in at.caption if "Resultado guardado" in c.value] == ["Resultado guardado el 2026-11-13 10:00"]
+    # Con el perfil de tribunal de alzada, sus propios ejemplos; el resultado anterior se descarta.
+    at.radio[0].set_value("tribunal").run()
+    assert at.text_area[0].value == "" and set(at.selectbox[0].options) - {"Escribir mi propia consulta"} == \
+        {e.etiqueta for e in ejemplos_de("tribunal")}
+    assert "resultado" not in at.session_state

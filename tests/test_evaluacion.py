@@ -380,6 +380,17 @@ def test_resultado_para_defensa():
     assert r("Defensa", "OTRO") is None and r("[DATO NO DISPONIBLE]", "CONFIRMA") is None
 
 
+def test_parte_favorecida():
+    """La misma regla, dicha como la parte que obtuvo la resolución (sirve a los tres perfiles de usuario)."""
+    from copiloto_juridico.fichas import parte_favorecida as f
+
+    assert f("Defensa del imputado", "CONFIRMA") == "la acusación (Ministerio Público o víctima)"
+    assert f("el sentenciado", "REVOCA") == "el acusado"
+    assert f("Asesor jurídico de la víctima", "MODIFICA") == "en parte, la acusación (Ministerio Público o víctima)"
+    assert f("Defensa", "REPONE") == "el acusado; se repone el procedimiento"
+    assert f("el imputado y el fiscal", "CONFIRMA") is None
+
+
 def test_detalles_identificables():
     from copiloto_juridico.evaluacion.conjuntos import detalles_identificables as d
 

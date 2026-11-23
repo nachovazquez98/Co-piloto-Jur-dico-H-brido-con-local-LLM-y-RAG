@@ -19,7 +19,7 @@ def test_pipeline_completo_con_llm_simulado(tmp_path):
     assert out["errores"] == []
     assert len(out["precedentes"]) == 3 and all(t.startswith("penal/robo") for t in out["precedentes"])
     assert set(out["sentidos"]) == {"CONFIRMA"} and set(out["para_defensa"]) == {"desfavorable"}
-    assert out["sintesis"].startswith("### Precedentes a favor y en contra")
+    assert out["sintesis"].startswith("### Resultado de cada precedente")
     assert out["citas"] == {"afirmaciones": 3, "con_cita_valida": 2, "sin_cita": 0, "marcadas": 1}
     assert "_(verificar: la ficha citada dice CONFIRMA)_" in out["sintesis"]
     assert out["llamadas"] == ["conceptos"] + ["qc1", "ficha"] * 3 + ["sintesis"]

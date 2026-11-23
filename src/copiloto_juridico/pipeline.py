@@ -52,8 +52,7 @@ DESCRIPCION_PASOS = {
                 "calificación, sentido del fallo, fundamento legal) y verificaciones automáticas contra el texto "
                 "(sentido del fallo según los puntos resolutivos, artículos citados, QC_2 del delito), hasta reunir "
                 "el número de precedentes solicitado.",
-    "sintesis": "Con reglas, se determina qué precedentes resultaron favorables o desfavorables para la defensa "
-                "(quién apeló y sentido del fallo). El modelo redacta, exclusivamente con esas fichas, qué "
+    "sintesis": "Con reglas, se determina qué parte favoreció cada precedente (quién apeló y sentido del fallo). El modelo redacta, exclusivamente con esas fichas, qué "
                 "argumentos acogió o desestimó la Sala; cada afirmación cita su precedente y se verifica. No se "
                 "pronostica el resultado del asunto.",
 }
@@ -110,7 +109,7 @@ class Precedente:
 
     def tarjeta(self) -> dict:
         """Lo que ve el abogado en la tarjeta del precedente (sirve igual para la ficha JSON y la de dos llamadas)."""
-        from .fichas import DATO_NO_DISPONIBLE, campo, parsear_campos, resultado_para_defensa
+        from .fichas import DATO_NO_DISPONIBLE, campo, parsear_campos, parte_favorecida, resultado_para_defensa
 
         c, d = self.candidato, self.datos_penales
         f = self.ficha
@@ -131,6 +130,7 @@ class Precedente:
             "agravios": agravios, "fundamento": fundamento, "verificar": list(self.verificar),
             "no_verificado_qc1": self.no_verificado_qc1, "articulos_no_encontrados": self.articulos_no_encontrados,
             "para_defensa": resultado_para_defensa(f.apelante, d.get("sentido_fallo")) if f is not None else None,
+            "parte_favorecida": parte_favorecida(f.apelante, d.get("sentido_fallo")) if f is not None else None,
         }
 
     def markdown(self) -> str:
@@ -214,19 +214,23 @@ def qc2_determinista(prec: "Precedente", familias_clasificadas: set[str]) -> tup
     return True, f"delito de la ficha coherente ({etiqueta_familia(fam)})"
 
 
-def balance_para_defensa(precedentes: list["Precedente"]) -> str:
-    """Lista "a favor / en contra" armada con código a partir de cada ficha (quién apeló, qué se apeló, sentido del
-    fallo): el LLM de 8B confundía al apelante al redactarla. Vacía si ninguna ficha es estructurada."""
+TITULO_BALANCE = "### Resultado de cada precedente"
+
+
+def balance_precedentes(precedentes: list["Precedente"]) -> str:
+    """Resultado de cada precedente armado con código a partir de su ficha (quién apeló, qué se apeló, sentido del
+    fallo y parte favorecida): el LLM de 8B confundía al apelante al redactarlo. Vacío si ninguna ficha es
+    estructurada."""
     filas = []
     for p in precedentes:
         if p.ficha is None:
             continue
         t = p.tarjeta()
-        resultado = f"**{t['para_defensa']} para la defensa**" if t["para_defensa"] else "resultado para la defensa no determinado"
+        resultado = f"favorece a **{t['parte_favorecida']}**" if t["parte_favorecida"] else "parte favorecida no determinada"
         filas.append(f"- **Precedente {p.numero}:** apeló {p.ficha.apelante.lower()} contra "
                      f"{t['acto_impugnado'][:1].lower() + t['acto_impugnado'][1:]}; la Sala {t['sentido_fallo']} → "
                      f"{resultado}.")
-    return "### Precedentes a favor y en contra\n" + "\n".join(filas) if filas else ""
+    return TITULO_BALANCE + "\n" + "\n".join(filas) if filas else ""
 
 
 _RE_CITA = re.compile(r"\[\s*P\s?\d+(?:\s*[,;y]\s*P?\s?\d+)*\s*\]|\bprecedente\s+(\d+)\b", re.IGNORECASE)
@@ -790,7 +794,7 @@ class Copiloto:
             marcadas = f"; {citas['marcadas']} marcadas para verificar" if citas["marcadas"] else ""
             yield log(f"   -> Citas: {citas['con_cita_valida']}/{citas['afirmaciones']} afirmaciones con cita válida"
                       f"{marcadas}.", "sintesis")
-        balance = balance_para_defensa(precedentes)
+        balance = balance_precedentes(precedentes)
         if balance and config.PROMPT_SINTESIS_VERSION == "v11":
             sintesis = balance + "\n\n" + sintesis.strip()
         yield Evento("paso_fin", "sintesis")

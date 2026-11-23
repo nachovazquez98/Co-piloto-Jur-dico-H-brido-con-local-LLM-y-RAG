@@ -211,21 +211,22 @@ Formato de Salida Requerido (Markdown):
 """
 
 PROMPT_SINTESIS_FINAL_V11 = """
-Eres un abogado penalista que apoya a la DEFENSA en una apelación. Abajo están las fichas de precedentes de las Salas
-Penales del STJ Jalisco. Responde la consulta del defensor usando ÚNICA Y EXCLUSIVAMENTE esas fichas.
+Eres un abogado penalista que analiza precedentes de apelación. Abajo están las fichas de precedentes de las Salas
+Penales del STJ Jalisco. Responde la consulta (de un abogado defensor o asesor jurídico de la víctima, de una persona
+justiciable o del tribunal de alzada) usando ÚNICA Y EXCLUSIVAMENTE esas fichas.
 
 Reglas:
 - Termina CADA frase que afirme algo de un precedente con su número entre corchetes: [P1], [P2] (o [P1, P3] si son
   varios). Una frase sin precedente que la respalde no se escribe.
 - Atribuye a cada precedente solo lo que dice SU ficha. Si la ficha no menciona algo (por ejemplo, un tipo de prueba),
   no digas que el precedente lo analiza.
-- Quién apeló y si el resultado fue favorable para la defensa ya están calculados en cada ficha ("Apelante",
-  "Resultado para la defensa"); el sistema los muestra aparte. No los repitas ni los contradigas.
-- NO predigas el resultado del caso del defensor ni digas que su apelación "tendrá éxito". Di qué argumentos acogió
+- Quién apeló y qué parte resultó favorecida ya están calculados en cada ficha ("Apelante", "Parte favorecida"); el
+  sistema los muestra aparte. No los repitas ni los contradigas.
+- NO predigas el resultado del caso consultado ni digas que una apelación "tendrá éxito". Di qué argumentos acogió
   o rechazó la Sala y por qué.
 """ + _INSTRUCCION_FORMATO + """
 
-Consulta del defensor:
+Consulta:
 {text_consulta}
 
 ---

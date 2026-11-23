@@ -3,6 +3,8 @@
 - `EJEMPLOS_VICTIMA` (los que muestra la app): casos redactados por el abogado, cuyo cliente fue la víctima del
   delito (o su familia), que quiere saber cómo han resuelto las Salas Penales del STJ asuntos parecidos. `tipo_corpus` es el tipo del corpus
   que debería encontrarse; si es None, el tema no tiene tipo en el corpus y la app debería avisarlo.
+- `EJEMPLOS_PERSONA` y `EJEMPLOS_TRIBUNAL`: los mismos temas planteados por la persona justiciable (sin formación
+  jurídica) y por el tribunal de alzada que estudia un toca (perfiles de usuario de la interfaz, `PERFILES`).
 - `EJEMPLOS_PENALES` (v11): los mismos temas redactados como los plantearía un defensor en apelación. Ya no se
   muestran en la app; se conservan sin cambios porque la evaluación (`evaluacion/regresion.py`, errores, modelos)
   y sus corridas guardadas se hicieron con ellos.
@@ -22,6 +24,7 @@ class Ejemplo:
     texto: str
     etapa: str | None = None          # acto impugnado o etapa del caso
     tipo_corpus: str | None = ""      # "" = no verificado (v10); None = sin tipo en el corpus
+    perfil: str = "abogado"           # quién consulta: una de las claves de PERFILES
 
     @property
     def sin_tipo_en_corpus(self) -> bool:
@@ -201,5 +204,61 @@ EJEMPLOS_VICTIMA: list[Ejemplo] = [
 ]
 
 
-# La interfaz muestra los ejemplos en que el cliente del abogado es la víctima (penal, el alcance del proyecto).
-EJEMPLOS: list[Ejemplo] = EJEMPLOS_VICTIMA
+# Otros perfiles de usuario (v11.2): la persona justiciable (víctima, ofendido o familiar, sin formación jurídica) y
+# el tribunal de alzada que estudia un toca.
+EJEMPLOS_PERSONA: list[Ejemplo] = [
+    Ejemplo("Penal", "Robo calificado",
+            "A mi hijo lo asaltaron con una pistola y le quitaron la moto. Ya detuvieron a uno de los asaltantes y nos "
+            "dijeron que su abogado apeló. ¿Qué ha decidido el tribunal en casos parecidos?",
+            None, "penal/robo-calificado", "persona"),
+    Ejemplo("Penal", "Violencia familiar",
+            "Mi hermana denunció a su pareja porque la golpeaba y la insultaba. Lo condenaron, pero él apeló. ¿Qué ha "
+            "pasado en otros casos parecidos cuando el agresor apela?",
+            None, "penal/violencia-familiar", "persona"),
+    Ejemplo("Penal", "Fraude",
+            "Le compré un terreno a un señor, le pagué todo y nunca me lo entregó. El juez dijo que no era delito y el "
+            "Ministerio Público apeló. ¿Cómo ha resuelto el tribunal casos así?",
+            None, "penal/fraude", "persona"),
+    Ejemplo("Penal", "Homicidio culposo (tránsito)",
+            "Mi papá murió atropellado. Al conductor lo condenaron, pero apeló porque no quiere pagar la reparación "
+            "del daño que le fijaron. ¿Qué ha decidido el tribunal en casos parecidos?",
+            None, "penal/homicidio-a-titulo-de-culpa", "persona"),
+]
+
+EJEMPLOS_TRIBUNAL: list[Ejemplo] = [
+    Ejemplo("Penal", "Robo calificado",
+            "Toca en estudio: la defensa apela el auto de vinculación a proceso por robo calificado; el único dato "
+            "de prueba es un reconocimiento por fotografía hecho sin defensor. Busco cómo han calificado las Salas "
+            "agravios semejantes, para resolver con un criterio congruente.",
+            "Vinculación a proceso", "penal/robo-calificado", "tribunal"),
+    Ejemplo("Penal", "Homicidio calificado",
+            "Toca en estudio: la defensa apela la prisión preventiva impuesta por homicidio calificado; alega arraigo "
+            "y que no se justificó el riesgo de fuga. Busco resoluciones previas de las Salas sobre esta medida "
+            "cautelar.",
+            "Prisión preventiva", "penal/homicidio-calificado", "tribunal"),
+    Ejemplo("Penal", "Abuso sexual infantil",
+            "Toca en estudio: la defensa apela la sentencia condenatoria por abuso sexual infantil y alega "
+            "contradicciones en el testimonio de la menor. Busco cómo han valorado las Salas el testimonio de "
+            "menores en apelación.",
+            "Sentencia de juicio oral", "penal/abuso-sexual-infantil", "tribunal"),
+    Ejemplo("Penal", "Fraude",
+            "Toca en estudio: el Ministerio Público apela el auto de no vinculación a proceso por fraude en la venta "
+            "de un terreno; el juez consideró que es un incumplimiento civil. Busco cómo han resuelto las Salas esa "
+            "distinción.",
+            "No vinculación (apela el MP)", "penal/fraude", "tribunal"),
+]
+
+# Perfiles de usuario de la interfaz. Los tres resuelven el mismo problema (localizar y leer los precedentes de las
+# Salas Penales); el abogado es el usuario principal.
+PERFILES: dict[str, str] = {
+    "abogado": "Abogado (defensor o asesor jurídico)",
+    "persona": "Persona justiciable",
+    "tribunal": "Tribunal de alzada (Sala Penal)",
+}
+
+# La interfaz muestra los ejemplos de los tres perfiles, cada uno con los suyos (penal, el alcance del proyecto).
+EJEMPLOS: list[Ejemplo] = EJEMPLOS_VICTIMA + EJEMPLOS_PERSONA + EJEMPLOS_TRIBUNAL
+
+
+def ejemplos_de(perfil: str) -> list[Ejemplo]:
+    return [e for e in EJEMPLOS if e.perfil == perfil]
