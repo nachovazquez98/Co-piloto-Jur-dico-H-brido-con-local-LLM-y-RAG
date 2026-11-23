@@ -192,8 +192,10 @@ python -m copiloto_juridico.cli demo --ejemplos                      # deja guar
 python -m copiloto_juridico.evaluacion --help
 ```
 
-La API pública del STJ exige reCAPTCHA; el descargador lo detecta y se detiene (no intenta evadirlo). Para ampliar el
-corpus, descarga los PDF desde el portal y procésalos con `construir-corpus --pdfs`.
+**Descarga de sentencias de cualquier materia:** [`descarga_datos/descargar.py`](descarga_datos/) recorre el portal
+del STJ con filtros por materia y delito, tope por tipo, validación de cada PDF y reanudación. Desde octubre de 2026 la
+API exige reCAPTCHA: en el modo `navegador` una persona lo resuelve y el script continúa con esa sesión (nunca lo
+resuelve ni lo evita). Los PDF se incorporan con `construir-corpus --pdfs`.
 
 ## Configuración
 

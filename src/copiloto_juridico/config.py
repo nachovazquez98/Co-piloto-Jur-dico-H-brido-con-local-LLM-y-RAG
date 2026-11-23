@@ -88,11 +88,6 @@ MAX_CHUNKS_PENAL = 0          # Sentencias penales: todos los fragmentos (0 = si
 # --- Balance del corpus ---
 MAX_SENTENCIAS_POR_TIPO = _env("COPILOTO_MAX_POR_TIPO", 30)
 
-# --- Descarga (API pública del STJ Jalisco) ---
-API_BASE_URL = "https://publica-sentencias-backend.stjjalisco.gob.mx"
-DOWNLOAD_TIMEOUT = 60
-DOWNLOAD_MAX_RETRIES = 4
-
 # --- Procesamiento de PDFs (Fase 1) ---
 # v11: los PDF se leen completos (0 = sin límite). Antes, los de más de 50 páginas se muestreaban a 40 y se perdía
 # contexto: el 57 % de las sentencias penales del corpus actual tiene páginas omitidas.

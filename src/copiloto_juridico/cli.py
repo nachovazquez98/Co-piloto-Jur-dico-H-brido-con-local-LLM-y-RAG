@@ -2,7 +2,6 @@
 
     python -m copiloto_juridico.cli construir-corpus --chroma ../chroma_db_juridica_8.2 --pdfs ruta/a/pdfs
     python -m copiloto_juridico.cli indexar            # embeddings + metadatos procesales por reglas
-    python -m copiloto_juridico.cli descargar          # descarga balanceada (si la API lo permite)
     python -m copiloto_juridico.cli estado
     python -m copiloto_juridico.cli pendientes --materia penal   # qué descargar a mano, por prioridad
 """
@@ -133,17 +132,6 @@ def cmd_metadatos(args, corpus=None) -> None:
     _log(f"Metadatos procesales: {path} · cobertura en {pj.name}")
 
 
-def cmd_descargar(args) -> None:
-    from .datos.corpus import load_corpus
-    from .datos.descarga import VerificacionRequerida, descargar_balanceado
-
-    corpus = load_corpus()
-    try:
-        descargar_balanceado(Path(args.destino), log=_log, ya_en_corpus=Counter(corpus["tipo"]))
-    except VerificacionRequerida as e:
-        sys.exit(f"❌ {e}")
-
-
 def cmd_estado(args) -> None:
     from .datos.balance import balance_report, load_catalogo
     from .datos.corpus import load_corpus
@@ -240,8 +228,8 @@ def cmd_pendientes(args) -> None:
     if args.salida:
         rep[cols + ["sentencias_familia"]].to_csv(args.salida, index=False)
         _log(f"\nLista completa: {args.salida}")
-    _log("\nLa API exige reCAPTCHA: descarga los PDFs desde el portal, cópialos a la carpeta de PDFs y corre "
-         "`construir-corpus --pdfs <carpeta>` y luego `indexar`. Congela el corpus antes de medir.")
+    _log("\nDescarga los PDF con `python descarga_datos/descargar.py --modo navegador` (una persona resuelve el "
+         "reCAPTCHA), corre `construir-corpus --pdfs <carpeta>` y luego `indexar`. Congela el corpus antes de medir.")
 
 
 def cmd_demo(args) -> None:
@@ -322,9 +310,6 @@ def main(argv=None) -> None:
     sub.add_parser("metadatos", help="Solo los metadatos procesales por reglas y su cobertura"
                    ).set_defaults(func=cmd_metadatos)
 
-    d = sub.add_parser("descargar", help="Descarga balanceada desde la API del STJ Jalisco")
-    d.add_argument("--destino", default=str(config.RAW_PDF_DIR))
-    d.set_defaults(func=cmd_descargar)
 
     es = sub.add_parser("estado", help="Muestra el balance del corpus")
     es.add_argument("--salida", help="CSV con el balance por tipo")

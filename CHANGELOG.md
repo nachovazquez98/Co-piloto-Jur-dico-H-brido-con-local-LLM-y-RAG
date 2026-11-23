@@ -20,6 +20,12 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   síntesis, en lugar de «resultado para la defensa»; misma regla (apelante + sentido del fallo), probada en
   `tests/test_evaluacion.py`. La síntesis responde a los dos perfiles.
 - README: problema, perfiles de usuario, alcance y próximos pasos del proyecto.
+- `descarga_datos/descargar.py`: descargador de sentencias de cualquier materia (penal, civil, familiar, mercantil)
+  que reúne las dos celdas de descarga del notebook original: filtros por materia y delito, tope por tipo (que puede
+  descontar el corpus), validación de cada PDF, escritura atómica, reanudación, registro y catálogo de asuntos sin PDF.
+  En el modo `navegador` una persona resuelve el reCAPTCHA; el script nunca lo resuelve ni lo evita. Sustituye a
+  `datos/descarga.py` y al comando `cli descargar`, que solo usaban la API (hoy con reCAPTCHA). Pruebas sin red en
+  `tests/test_descarga_datos.py`.
 - Índice BM25 guardado en `data/cache/` (se rehace solo si cambian el corpus o su código): la app abre en ~8 s en
   lugar de 22.5 s. Mismo resultado; cambia la huella del código, así que los ejemplos de la demo se volvieron a
   precalcular. Las corridas de prueba siguen atadas al congelado `a15b83c852281010`.
