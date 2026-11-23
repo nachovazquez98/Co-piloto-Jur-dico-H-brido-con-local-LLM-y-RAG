@@ -16,6 +16,7 @@ Con LLM:
     fichas-batch                     Ficha de cada sentencia penal, una vez (reanudable) + diagnóstico sin anotación
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
     robustez                         Consultas difíciles con la app completa (diagnóstico)
+    perfil-tribunal --particion P    Las consultas planteadas como toca en estudio frente a la redacción del abogado
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 Referencia automática, sin anotadores humanos (v11.2):
@@ -409,6 +410,13 @@ def cmd_fichas_referencia(args) -> None:
     _guardar(corrida)
 
 
+def cmd_perfil_tribunal(args) -> None:
+    from .experimentos import experimento_perfil_tribunal
+
+    env = _entorno(args, "perfil-tribunal", args.particion)
+    _guardar(experimento_perfil_tribunal(env, _llm(), log=_log))
+
+
 def cmd_fundamento_prompt(args) -> None:
     from .referencias import experimento_fundamento
 
@@ -529,6 +537,11 @@ def main(argv=None) -> None:
     s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
     s.set_defaults(func=cmd_fichas_referencia)
+
+    s = sub.add_parser("perfil-tribunal", help="Consultas como toca en estudio frente a la redacción del abogado (LLM)")
+    s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
+    s.add_argument("--consultas", default=str(config.CONSULTAS_PATH))
+    s.set_defaults(func=cmd_perfil_tribunal)
 
     s = sub.add_parser("fundamento-prompt", help="Prompt de la ficha con el fundamento de la Sala (desarrollo, con LLM)")
     s.add_argument("--n", type=int, default=120, help="Sentencias de desarrollo de la muestra estable por hash")

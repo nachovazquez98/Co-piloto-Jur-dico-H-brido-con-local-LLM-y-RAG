@@ -868,6 +868,69 @@ def calcular_conceptos(consultas: list[Consulta], llm, path: Path = config.CONCE
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Perfil del tribunal de alzada (v11.2)
+# --------------------------------------------------------------------------------------------------------------
+
+
+def experimento_perfil_tribunal(env: Entorno, llm, log: Callable[[str], None] = print) -> Corrida:
+    """¿Recupera la app igual de bien cuando la consulta la plantea el tribunal de alzada? Cada consulta validada se
+    reescribe con el LLM como «Toca en estudio: ...» (mismos hechos, acto y agravios; `PROMPT_CONSULTA_TRIBUNAL`) y
+    se mide con la misma referencia que la redacción del abogado: Hit@3 de familia (sin la sentencia fuente) y nDCG@5
+    de la lista de la app. Diferencia pareada por consulta con IC 95 % por bootstrap."""
+    import dataclasses
+
+    from ..embeddings import embed_texts
+    from ..pipeline import limpiar_conceptos
+
+    corrida = env.corrida
+    abogado = [p for p in preparar(env) if not p.consulta.sin_respuesta]
+    log(f"Reescribiendo {len(abogado)} consultas como toca en estudio...")
+    textos, conceptos = [], []
+    for p in abogado:
+        t = llm.generate(prompts.PROMPT_CONSULTA_TRIBUNAL.format(consulta=p.consulta.consulta)).strip().strip('"')
+        textos.append(t)
+        conceptos.append(limpiar_conceptos(llm.generate(prompts.prompt_conceptos().format(texto_consulta=t)), t)[0])
+    tribunal = [Preparada(dataclasses.replace(p.consulta, consulta=t), q, k, f"{t} {k}")
+                for p, t, q, k in zip(abogado, textos, embed_texts(textos, kind="query"), conceptos)]
+
+    def medir(p: Preparada) -> dict:
+        c = p.consulta
+        sin = {c.doc_id_fuente} if c.documento_conocido else None
+        fila = {}
+        if c.documento_conocido:
+            _, _, rk = _clasificacion(env, p, excluir=sin)
+            fila["hit3_familia"] = resumen_categorias(c.tipo, c.familia, rk, env.clasificador.tipos_de,
+                                                      env.familias)["hit3_familia"]
+        if c.id in env.juicios:
+            amplios = env.store.buscar(c.consulta, query_embedding=p.q, consulta_lexica=p.lexica)
+            _, _, rk = _clasificacion(env, p, excluir=sin)
+            ids = _lista_pipeline(env, p, rk, amplios, config.NUM_CATEGORIAS_FILTRO, None)
+            fila["ndcg5"] = metricas_graduadas(ids, env.juicios[c.id])["ndcg5"]
+        return fila
+
+    filas = [(medir(a), medir(t)) for a, t in zip(abogado, tribunal)]
+    resumen = []
+    for clave, nombre in (("hit3_familia", "Hit@3 de familia"), ("ndcg5", "nDCG@5 contra la referencia")):
+        pares = [(a[clave], t[clave]) for a, t in filas if clave in a and clave in t]
+        va, vt = [x for x, _ in pares], [y for _, y in pares]
+        dif = m.bootstrap_diferencia_pareada(vt, va)
+        resumen.append({"métrica": nombre, "consultas": dif["n"], "abogado": round(float(np.mean(va)), 3),
+                        "tribunal de alzada": round(float(np.mean(vt)), 3),
+                        "diferencia (tribunal − abogado)": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, "
+                                                           f"{dif['ic_sup']:+.3f}]",
+                        "significativa": "sí" if dif["significativa"] else "no"})
+    corrida.tabla("Perfil del tribunal de alzada frente al del abogado",
+                  "Mismas consultas validadas, reescritas por el LLM como toca en estudio; misma referencia "
+                  "automática. Hit@3 de familia sin la sentencia fuente (leave-one-out); nDCG@5 de la lista de la app "
+                  "(filtro top-3, RRF k=60). Diferencia pareada con IC 95 % por bootstrap.", pd.DataFrame(resumen))
+    corrida.tabla("Ejemplos de reescritura", "Las tres primeras consultas, en ambas redacciones.", pd.DataFrame(
+        [{"id": a.consulta.id, "abogado": a.consulta.consulta, "tribunal de alzada": t.consulta.consulta}
+         for a, t in zip(abogado[:3], tribunal[:3])]), diagnostico=True)
+    corrida.parametros["prompt"] = "PROMPT_CONSULTA_TRIBUNAL"
+    return corrida
+
+
+# --------------------------------------------------------------------------------------------------------------
 # Controles de calidad (LLM)
 # --------------------------------------------------------------------------------------------------------------
 

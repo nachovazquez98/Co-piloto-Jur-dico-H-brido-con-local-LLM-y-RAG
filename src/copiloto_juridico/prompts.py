@@ -409,6 +409,18 @@ def prompts_penal(version: str | None = None) -> tuple[str, str]:
     return PROMPTS_PENAL_VERSIONES[version]
 
 
+# --- Solo para la evaluación: la misma consulta planteada por el tribunal de alzada (experimento `perfil-tribunal`) ---
+PROMPT_CONSULTA_TRIBUNAL = """
+Eres secretario de estudio y cuenta de una Sala Penal del Supremo Tribunal de Justicia del Estado de Jalisco.
+Reescribe la consulta de abajo como la plantearías al buscar precedentes para el toca que estudias: empieza con
+"Toca en estudio:", en tercera persona y en 2 a 4 frases. Conserva los hechos, el delito, la resolución apelada, quién
+apela y sus agravios. No agregues hechos, nombres ni datos que la consulta no diga, y no digas cómo debe resolverse.
+Responde ÚNICAMENTE con la consulta reescrita.
+
+Consulta:
+{consulta}
+"""
+
 # --- Solo para la evaluación: borrador de consulta a partir de una sentencia (lo revisa una persona) ---
 PROMPT_BORRADOR_CONSULTA = """
 Eres un defensor penal en Jalisco. A partir del extracto de una sentencia de segunda instancia, escribe la consulta
