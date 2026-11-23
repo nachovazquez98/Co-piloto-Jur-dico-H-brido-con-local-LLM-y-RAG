@@ -264,19 +264,23 @@ def test_materias_filtro_del_store():
 def test_ejemplos_penales_existen_en_el_corpus():
     import glob
 
-    from copiloto_juridico.ejemplos import EJEMPLOS, EJEMPLOS_PENALES
+    from copiloto_juridico.ejemplos import EJEMPLOS, EJEMPLOS_PENALES, EJEMPLOS_VICTIMA
     from copiloto_juridico.evaluacion.regresion import EJEMPLOS_V10
 
     tipos = set(pd.concat([pd.read_parquet(f, columns=["tipo"])
                            for f in sorted(glob.glob(str(config.CORPUS_DIR / "sentencias-*.parquet")))])["tipo"])
     assert len(EJEMPLOS_PENALES) >= 12 and len(EJEMPLOS_V10) == 6
-    for e in EJEMPLOS_PENALES:
+    for e in EJEMPLOS_PENALES + EJEMPLOS_VICTIMA:
         if e.sin_tipo_en_corpus:
             assert "sin tipo en el corpus" in e.etiqueta
         else:
             assert e.tipo_corpus in tipos, e.tipo_corpus
     assert {e.etapa for e in EJEMPLOS_PENALES} >= {"Vinculación a proceso", "Prisión preventiva", "Sentencia de juicio oral"}
-    assert EJEMPLOS == EJEMPLOS_PENALES and all(e.materia == "Penal" for e in EJEMPLOS)
+    assert EJEMPLOS == EJEMPLOS_VICTIMA and all(e.materia == "Penal" for e in EJEMPLOS)
+    # Los de la app los cuenta quien sufrió el delito: ninguno es la versión del acusado.
+    assert len({e.etiqueta for e in EJEMPLOS}) == len(EJEMPLOS)
+    assert not any(x in e.texto.lower() for e in EJEMPLOS for x in ("mi defendido", "mi cliente", "mi representado",
+                                                                        "inocente"))
 
 
 def test_prompt_conceptos_v11(monkeypatch):

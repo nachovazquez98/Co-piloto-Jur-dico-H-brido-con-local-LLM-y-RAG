@@ -71,13 +71,21 @@ def test_pantalla_principal_con_resultado():
     at.session_state["resultado"] = res
     at.run()
     assert not at.exception
-    assert [b.label for b in at.button] == ["Buscar precedentes"]
+    assert [b.label for b in at.button] == ["Otro ejemplo", "Buscar precedentes"]
     assert [m.label for m in at.multiselect] == ["Delito (opcional): uno o varios"]  # v11.2
     assert any(o.startswith("robo (") for o in at.multiselect[0].options)  # familia con su número de sentencias
     assert not at.tabs  # sin pestañas: un solo desplegable de detalles técnicos
     assert [e.label for e in at.main.expander] == ["Ficha completa", "Detalles técnicos"]
     assert [e.label for e in at.sidebar.expander] == ["Configuración"]
     assert at.metric[0].label == "Sentido del fallo" and at.metric[0].value == "MODIFICA · verificar"
+    # «Otro ejemplo» carga al azar un ejemplo distinto del actual y su texto en la consulta.
+    from copiloto_juridico.ejemplos import EJEMPLOS
+    at.button[0].click().run()
+    primero = at.selectbox[0].value
+    ej = {e.etiqueta: e.texto for e in EJEMPLOS}
+    assert primero in ej and at.text_area[0].value == ej[primero]
+    at.button[0].click().run()
+    assert at.selectbox[0].value != primero and at.text_area[0].value == ej[at.selectbox[0].value]
     textos = " ".join(m.value for m in at.markdown)
     assert "Reconocimiento ilegal" in textos and "no encontrado en la sentencia" in textos
     assert any(AVISO_SIN_MISMO_TIPO in w.value for w in at.warning)

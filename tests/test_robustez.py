@@ -75,12 +75,12 @@ def test_busca_los_datos_inventados_solo_en_archivos_nuevos(tmp_path):
 
 def test_aviso_de_otra_materia(monkeypatch):
     """v11.2: las consultas civil, familiar y fuera de tema avisan; las penales (ejemplos de la app) no."""
-    from copiloto_juridico.ejemplos import EJEMPLOS_PENALES
+    from copiloto_juridico.ejemplos import EJEMPLOS, EJEMPLOS_PENALES
     from copiloto_juridico.pipeline import AVISO_OTRA_MATERIA, aviso_materia
 
     otra = {c.id for c in R.CASOS if c.espera_aviso}
     assert all(aviso_materia(c.consulta) == AVISO_OTRA_MATERIA for c in R.CASOS if c.id in otra)
     assert not any(aviso_materia(c.consulta) for c in R.CASOS if c.id not in otra)
-    assert not any(aviso_materia(e.texto) for e in EJEMPLOS_PENALES)
+    assert not any(aviso_materia(e.texto) for e in EJEMPLOS_PENALES + EJEMPLOS)
     monkeypatch.setattr(config, "AVISO_OTRA_MATERIA", False)
     assert aviso_materia("receta de pozole") is None

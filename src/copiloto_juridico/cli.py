@@ -251,7 +251,7 @@ def cmd_demo(args) -> None:
 
     from . import cache_resultados
     from .clasificador import construir_clasificador
-    from .ejemplos import EJEMPLOS_PENALES
+    from .ejemplos import EJEMPLOS
     from .evaluacion import metricas as m
     from .evaluacion.reporte import Corrida
     from .llm import get_client
@@ -268,7 +268,7 @@ def cmd_demo(args) -> None:
     store = SentenciasStore(log=lambda _m: None)
     clas = construir_clasificador(store.corpus["tipo"].unique().tolist())
     filas = []
-    for i, e in enumerate(EJEMPLOS_PENALES[:args.max], 1):
+    for i, e in enumerate(EJEMPLOS[:args.max], 1):
         previo = cache_resultados.buscar(e.texto, settings)
         t0 = time.time()
         if previo is None or args.rehacer:

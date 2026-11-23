@@ -7,6 +7,7 @@ Ejecutar desde la raíz del repositorio:
 from __future__ import annotations
 
 import html
+import random
 import re
 import time
 from datetime import datetime
@@ -46,9 +47,17 @@ def _cargar_ejemplo() -> None:
     st.session_state["consulta"] = ej.texto if ej else ""
 
 
+def _otro_ejemplo() -> None:
+    st.session_state["ejemplo"] = random.choice([k for k in por_etiqueta if k != st.session_state.get("ejemplo")])
+    _cargar_ejemplo()
+
+
 if "consulta" not in st.session_state:
     st.session_state["consulta"] = ""
-st.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
+col_ej, col_otro = st.columns([5, 1], vertical_alignment="bottom")
+col_ej.selectbox("Ejemplo (opcional)", [ESCRIBIR, *por_etiqueta], key="ejemplo", on_change=_cargar_ejemplo)
+col_otro.button("Otro ejemplo", on_click=_otro_ejemplo, width="stretch",
+                help="Carga al azar otro de los ejemplos de la lista")
 consulta = st.text_area("Descripción del caso", key="consulta", height=140,
                         placeholder="Hechos, delito imputado, resolución que se apela y motivos de inconformidad...")
 

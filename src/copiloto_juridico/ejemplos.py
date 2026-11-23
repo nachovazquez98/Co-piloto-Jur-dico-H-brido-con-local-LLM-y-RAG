@@ -1,9 +1,12 @@
 """Consultas de ejemplo para la interfaz.
 
-- `EJEMPLOS_PENALES` (v11): casos redactados como los plantearía un defensor que prepara o contesta una
-  apelación ante las Salas Penales del STJ, con distintos delitos y actos impugnados. `tipo_corpus` es el tipo
-  del corpus que debería encontrarse; si es None, el tema no tiene tipo en el corpus y la app debería avisarlo.
-- Las consultas penales de v10 ya no se muestran en la app; están en `evaluacion/regresion.py`.
+- `EJEMPLOS_VICTIMA` (los que muestra la app): casos contados por la víctima o su familia, que sufrieron el delito y
+  quieren saber cómo han resuelto las Salas Penales del STJ asuntos parecidos. `tipo_corpus` es el tipo del corpus
+  que debería encontrarse; si es None, el tema no tiene tipo en el corpus y la app debería avisarlo.
+- `EJEMPLOS_PENALES` (v11): los mismos temas redactados como los plantearía un defensor en apelación. Ya no se
+  muestran en la app; se conservan sin cambios porque la evaluación (`evaluacion/regresion.py`, errores, modelos)
+  y sus corridas guardadas se hicieron con ellos.
+- Las consultas penales de v10 están en `evaluacion/regresion.py`.
 
 Estos ejemplos son para demostrar la app: **no** forman parte del conjunto de evaluación (que debe redactarse
 de forma independiente, ver `evaluacion/README.md`).
@@ -114,5 +117,88 @@ EJEMPLOS_PENALES: list[Ejemplo] = [
 ]
 
 
-# La interfaz solo muestra los ejemplos penales (el alcance del proyecto).
-EJEMPLOS: list[Ejemplo] = EJEMPLOS_PENALES
+EJEMPLOS_VICTIMA: list[Ejemplo] = [
+    Ejemplo("Penal", "Robo calificado",
+            "Me asaltaron en una parada de camión: un hombre me amenazó con un cuchillo y me quitó el celular. Lo "
+            "reconocí en unas fotografías y lo vincularon a proceso, pero su defensa apeló el auto de vinculación. "
+            "Quiero saber cómo ha resuelto la Sala apelaciones parecidas y qué valor le da al reconocimiento.",
+            "Vinculación a proceso", "penal/robo-calificado"),
+    Ejemplo("Penal", "Robo equiparado",
+            "Me robaron la camioneta y la policía encontró varias de sus autopartes en un taller. Condenaron al dueño "
+            "del taller, pero apeló diciendo que las compró sin saber que eran robadas. Quiero saber cómo ha resuelto "
+            "la Sala estos casos y qué pasa con la reparación del daño.",
+            "Sentencia de juicio oral", "penal/robo-equiparado"),
+    Ejemplo("Penal", "Homicidio calificado",
+            "Mataron a mi hermano y al responsable le impusieron prisión preventiva por homicidio calificado. Su "
+            "defensa apeló la medida para que siga el proceso en libertad. Quiero saber cómo ha resuelto la Sala "
+            "las apelaciones sobre prisión preventiva en homicidios.",
+            "Prisión preventiva", "penal/homicidio-calificado"),
+    Ejemplo("Penal", "Homicidio calificado en grado de tentativa",
+            "Un vecino me disparó durante una discusión y me hirió en una pierna. El Ministerio Público lo acusa de "
+            "tentativa de homicidio calificado, pero su defensa pide que se reclasifique como lesiones. Quiero saber "
+            "cómo ha resuelto la Sala la reclasificación en apelación.",
+            "Sentencia de juicio oral", "penal/homicidio-calificado-en-grado-de-tentativa"),
+    Ejemplo("Penal", "Violencia familiar",
+            "Denuncié a mi expareja por violencia familiar y lo condenaron con mi declaración y un dictamen "
+            "psicológico. Apeló diciendo que las pruebas no son suficientes. Quiero saber cómo valora la Sala estas "
+            "pruebas y si suele confirmar las condenas.",
+            "Sentencia de juicio oral", "penal/violencia-familiar"),
+    Ejemplo("Penal", "Abuso sexual infantil",
+            "Mi hija de 9 años sufrió tocamientos de un familiar. Hubo sentencia condenatoria, pero la defensa apeló "
+            "alegando contradicciones entre la entrevista inicial de la niña y su declaración en juicio. Quiero saber "
+            "cómo valora la Sala el testimonio de menores en apelación.",
+            "Sentencia de juicio oral", "penal/abuso-sexual-infantil"),
+    Ejemplo("Penal", "Violación",
+            "Denuncié a mi expareja por violación y lo vincularon a proceso. Su defensa apeló porque teníamos una "
+            "relación previa y el examen médico no fue concluyente. Quiero saber qué criterios ha seguido la Sala "
+            "en estos casos.",
+            "Vinculación a proceso", "penal/violacion"),
+    Ejemplo("Penal", "Fraude",
+            "Pagué completo un terreno y el vendedor nunca me lo entregó. El juez no vinculó a proceso al vendedor "
+            "porque consideró que es un asunto civil, y el Ministerio Público apeló. Quiero saber cómo ha resuelto la "
+            "Sala si estos casos son fraude o incumplimiento de contrato.",
+            "No vinculación (apela el MP)", "penal/fraude"),
+    Ejemplo("Penal", "Despojo de inmuebles",
+            "Una persona se metió a vivir en mi casa y dice que el dueño anterior se la cedió de palabra. La "
+            "vincularon a proceso por despojo, pero su defensa apeló diciendo que es un conflicto civil. Quiero "
+            "saber cómo ha resuelto la Sala este argumento.",
+            "Vinculación a proceso", "penal/despojo-de-inmuebles"),
+    Ejemplo("Penal", "Homicidio culposo (tránsito)",
+            "Un conductor atropelló a mi padre, que murió. Lo condenaron por homicidio culposo, pero apeló la pena y "
+            "la reparación del daño diciendo que mi padre cruzó fuera de la zona peatonal. Quiero saber cómo "
+            "resuelve la Sala la reparación del daño en estos casos.",
+            "Sentencia de juicio oral", "penal/homicidio-a-titulo-de-culpa"),
+    Ejemplo("Penal", "Amenazas",
+            "Un vecino me amenazó varias veces con matarme a mí y a mi familia, en persona y por mensajes. Lo "
+            "denuncié por amenazas y quiero saber cómo ha resuelto la Sala estos casos y qué pruebas toma en cuenta.",
+            "Sentencia de juicio oral", "penal/amenazas"),
+    Ejemplo("Penal", "Abandono de familiares",
+            "Mi expareja dejó de pagar la pensión de nuestros hijos durante un año. Lo condenaron por abandono de "
+            "familiares y apeló diciendo que perdió su empleo. Quiero saber cómo ha resuelto la Sala estos casos y "
+            "qué pasa con el pago de lo que debe.",
+            "Sentencia de juicio oral", "penal/abandono-de-familiares"),
+    Ejemplo("Penal", "Secuestro agravado",
+            "Mi hermano fue secuestrado y lo tuvieron varios días en una casa de seguridad. Condenaron a uno de los "
+            "que lo cuidaban, pero apeló diciendo que el reconocimiento fue inducido. Quiero saber cómo ha resuelto "
+            "la Sala las apelaciones en casos de secuestro.",
+            "Sentencia de juicio oral", "penal/secuestro-agravado"),
+    Ejemplo("Penal", "Lesiones calificadas",
+            "Un vecino me golpeó con un tubo durante una discusión y me dejó lesiones graves. Lo acusan de lesiones "
+            "calificadas, pero él dice que actuó en legítima defensa. Quiero saber cómo ha resuelto la Sala la "
+            "legítima defensa en apelación.",
+            "Sentencia de juicio oral", "penal/lesiones-calificadas"),
+    Ejemplo("Penal", "Justicia para adolescentes",
+            "Un adolescente de 16 años me asaltó con violencia y le impusieron una medida de internamiento. Su "
+            "defensa apeló porque la considera desproporcionada. Quiero saber cómo se resuelven estas apelaciones "
+            "conforme a la Ley Nacional del Sistema Integral de Justicia Penal para Adolescentes.",
+            "Medida de internamiento", None),
+    Ejemplo("Penal", "Ejecución de sentencia",
+            "La persona que robó en mi negocio ya cumplió más de la mitad de su pena y pidió la libertad "
+            "condicionada; el juez de ejecución se la negó y apeló. Quiero saber qué requisitos de la Ley Nacional "
+            "de Ejecución Penal revisa la Sala en estos casos.",
+            "Libertad condicionada", None),
+]
+
+
+# La interfaz muestra los ejemplos contados por la víctima (penal, el alcance del proyecto).
+EJEMPLOS: list[Ejemplo] = EJEMPLOS_VICTIMA
