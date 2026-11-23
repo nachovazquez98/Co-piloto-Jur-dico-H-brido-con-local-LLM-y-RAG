@@ -1,0 +1,205 @@
+{
+  "comando": "fundamento-prompt",
+  "fecha": "2026-11-23T17:45:02",
+  "commit": "b8fdd94",
+  "sucio": false,
+  "semilla": 42,
+  "parametros": {
+    "n": 120,
+    "particion": "desarrollo",
+    "muestra": "primeras n por sha256(doc_id)"
+  },
+  "corpus_fingerprint": "77466c884916dd0e",
+  "modelo_embeddings": "intfloat/multilingual-e5-base",
+  "modelo_llm": "llama3.1:8b",
+  "modelo_llm_digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+  "semilla_llm": 42,
+  "borrador": false,
+  "advertencias": [
+    "Distinto de lo congelado: codigo, prompt sintesis."
+  ],
+  "configuracion": {
+    "API_BASE_URL": "https://publica-sentencias-backend.stjjalisco.gob.mx",
+    "AVISO_OTRA_MATERIA": true,
+    "CACHE_RESULTADOS": false,
+    "CATALOGO_PATH": "data/catalogo/catalogo_tipos_stj.csv",
+    "CHROMA_DIR": "data/chroma",
+    "CHUNK_OVERLAP_CHARS": 200,
+    "CHUNK_SIZE_CHARS": 1500,
+    "COLLECTION_NAME": "sentencias_judiciales",
+    "CONCEPTOS_CACHE_PATH": "evaluacion/cache/conceptos.json",
+    "CONCISION_WEIGHT": 0.05,
+    "CONSULTAS_PATH": "evaluacion/consultas_penal.jsonl",
+    "CORPUS_DIR": "data/corpus",
+    "COSINE_WEIGHT": 0.2,
+    "DATA_DIR": "data",
+    "DOWNLOAD_MAX_RETRIES": 4,
+    "DOWNLOAD_TIMEOUT": 60,
+    "EMBEDDING_BATCH_SIZE": 64,
+    "EMBEDDING_MODEL_NAME": "intfloat/multilingual-e5-base",
+    "ENRIQUECER_FAMILIAS": true,
+    "EVAL_BOOTSTRAP": 1000,
+    "EVAL_DIR": "evaluacion",
+    "EVAL_SEED": 42,
+    "FAILURE_KEYWORDS": [
+      "lo siento",
+      "no puedo",
+      "plantilla general",
+      "sin hechos",
+      "hechos extraídos que no",
+      "hipotética",
+      "asistencia legal",
+      "no proporcionar",
+      "información específica ni contexto",
+      "no tengo información",
+      "no puedo analizar"
+    ],
+    "FAMILIAS_CSV": "evaluacion/familias_penal.csv",
+    "FICHAS_MODELO_RESPALDO": "qwen2.5:7b",
+    "FICHAS_PRECALCULADAS": true,
+    "FICHAS_PRECALCULADAS_PATH": "data/fichas/fichas-penal.parquet",
+    "FICHA_MODO": "json",
+    "INDICE_DIR": "data/indice",
+    "IRRELEVANT_TOKENS": [
+      "desmantelamiento",
+      "falsedad",
+      "informe",
+      "medica",
+      "medico",
+      "violacion"
+    ],
+    "IRRELEVANT_TOKENS_PENALTY_FACTOR": 0.7,
+    "JACCARD_WEIGHT": 0.4,
+    "JUECES_DIR": "evaluacion/jueces",
+    "JUEZ_EXACTITUD_MINIMA": 0.8,
+    "KEM_THRESHOLD_FOR_PENALTY": 0.6,
+    "KEM_WEIGHT": 0.0,
+    "MATERIAS_ACTIVAS": [
+      "penal"
+    ],
+    "MAX_CHUNKS_PENAL": 0,
+    "MAX_CHUNKS_PER_DOC": 12,
+    "MAX_SENTENCIAS_POR_TIPO": 30,
+    "MAX_TOKENS_FOR_PENALTY": 5,
+    "MAX_WORKERS_FASE_1": null,
+    "MODELOS_COMPARACION": [
+      "llama3.1:8b",
+      "qwen2.5:7b",
+      "gemma2:9b",
+      "mistral:7b"
+    ],
+    "MODELOS_JUECES": [
+      "gemma2:9b"
+    ],
+    "MUESTRA_CONSULTAS": 0.5,
+    "MUESTRA_SENTENCIAS": 0.3,
+    "NIVEL_CLASIFICACION": "familia",
+    "NUM_CATEGORIAS_FILTRO": 3,
+    "ORDEN_CANDIDATOS": "familia_acto",
+    "PDF_FIXED_END_PAGES": 15,
+    "PDF_FIXED_START_PAGES": 10,
+    "PDF_MAX_PAGES_FULL_READ": 0,
+    "PDF_TARGET_TOTAL_PAGES_SAMPLE": 40,
+    "PROMPT_CONCEPTOS_VERSION": "v11",
+    "PROMPT_PENAL_VERSION": "v11",
+    "PROMPT_QC1_VERSION": "v11",
+    "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_CONTEXTO": "fragmento_similar",
+    "QC1_MAX_CHARS": 2500,
+    "QC2_MODO": "determinista",
+    "RAG_NUM_CHUNKS_TO_FETCH": 300,
+    "RAG_NUM_DOCS_TO_FETCH": 30,
+    "RAG_NUM_RESULTS_DESIRED": 3,
+    "RAW_PDF_DIR": "data/raw/pdfs",
+    "RERANKER": null,
+    "RERANKER_DISPOSITIVO": "auto",
+    "RESULTADOS_DIR": "evaluacion/resultados",
+    "ROOT_DIR": ".",
+    "RRF_K": 60,
+    "SENAL_SIN_PRECEDENTES": "kem_max",
+    "TOP_N_CANDIDATES_FINAL": 10,
+    "TOP_N_CANDIDATES_INITIAL": 20,
+    "UMBRAL_SIN_PRECEDENTES": null,
+    "USAR_LISTA_TOKENS_PENALIZADOS": false,
+    "VERIFICAR_CITAS": true,
+    "VOTE_WEIGHT": 0.35,
+    "LLM": {
+      "provider": "ollama",
+      "model": "llama3.1:8b",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "num_ctx": 8192,
+      "seed": 42
+    }
+  },
+  "congelado": "a15b83c852281010",
+  "tablas": {
+    "Fundamento legal: ficha precalculada frente al prompt con el fundamento de la Sala": {
+      "descripcion": "Mismas sentencias de desarrollo y misma referencia (artículos que la Sala invoca como fundamento, leídos por reglas). Diferencia pareada (prompt nuevo − ficha precalculada) con IC 95 % por bootstrap; se acepta la mejora solo si el intervalo no incluye el cero.",
+      "columnas": [
+        "medida",
+        "fichas",
+        "ficha precalculada",
+        "prompt con fundamento de la Sala",
+        "diferencia",
+        "significativa",
+        "efecto mínimo detectable"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "medida": "precisión",
+          "fichas": 120,
+          "ficha precalculada": 0.719,
+          "prompt con fundamento de la Sala": 0.729,
+          "diferencia": "+0.010 [-0.040, +0.060]",
+          "significativa": "no",
+          "efecto mínimo detectable": 0.071
+        },
+        {
+          "medida": "exhaustividad (recall)",
+          "fichas": 120,
+          "ficha precalculada": 0.146,
+          "prompt con fundamento de la Sala": 0.123,
+          "diferencia": "-0.023 [-0.041, -0.005]",
+          "significativa": "sí",
+          "efecto mínimo detectable": 0.026
+        }
+      ]
+    },
+    "Artículos citados por ficha": {
+      "descripcion": "Promedio por ficha válida.",
+      "columnas": [
+        "fichas generadas",
+        "JSON válido",
+        "sin artículos con el prompt nuevo",
+        "citados antes",
+        "citados después"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "fichas generadas": 120,
+          "JSON válido": 120,
+          "sin artículos con el prompt nuevo": 0,
+          "citados antes": 3.44,
+          "citados después": 2.88
+        }
+      ]
+    },
+    "Ficha precalculada: artículos citados fuera del fundamento de la Sala": {
+      "descripcion": "Si aparecen en otra parte de la sentencia (agravios, primera instancia), el error es de selección y no una alucinación.",
+      "columnas": [
+        "citados fuera del fundamento",
+        "aparecen en la sentencia"
+      ],
+      "diagnostico": false,
+      "filas": [
+        {
+          "citados fuera del fundamento": 127,
+          "aparecen en la sentencia": 126
+        }
+      ]
+    }
+  }
+}

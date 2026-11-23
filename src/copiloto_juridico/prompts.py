@@ -378,7 +378,8 @@ Sentencia:
 # v11.2, solo para el experimento `fundamento-prompt` (no es la ficha de la app): la misma ficha con el fundamento
 # legal restringido a lo que invoca la Sala para fundar SU resolución. Los artículos que la ficha precalculada cita
 # fuera de ese fundamento casi siempre aparecen en la sentencia (agravios, primera instancia): no son alucinaciones
-# sino artículos de otra parte del texto (conteo en la corrida). Adoptarlo exige regenerar las fichas precalculadas.
+# sino artículos de otra parte del texto (126 de 127). No se adoptó: precisión +0.010 [−0.040, +0.060] y
+# exhaustividad −0.023 [−0.041, −0.005] en 120 sentencias de desarrollo (20261123-174502_b8fdd94_fundamento-prompt).
 _FUNDAMENTO_ACTUAL = '  "fundamento_legal": ["cada artículo o jurisprudencia citada como base de la decisión, tal como aparece"],'
 _FUNDAMENTO_SALA = ('  "fundamento_legal": ["cada artículo que la SALA invoca para fundar SU resolución (p. ej., después de '
                     '\'con fundamento en\' o \'de conformidad con\', o en los puntos resolutivos), con su ordenamiento"],')

@@ -244,7 +244,13 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 
 Continuación, mejora y evolución del proyecto, en orden de prioridad:
 
-1. **Precisión del fundamento legal.** PASO_FUNDAMENTO
+1. **Precisión del fundamento legal.** Pedir en el prompt solo los artículos que la Sala invoca para fundar su
+   resolución no la mejora: en 120 sentencias de desarrollo, por pares, la precisión pasa de 0.719 a 0.729
+   (+0.010 [−0.040, +0.060], no significativa) y la exhaustividad baja de 0.146 a 0.123 (significativo); no se
+   adoptó (`20261123-174502_b8fdd94_fundamento-prompt`). De 127 artículos que la ficha cita fuera del fundamento de
+   la Sala, 126 sí aparecen en la sentencia: el error es de selección (agravios, primera instancia), no de invención.
+   El siguiente paso es dar al modelo la parte considerativa donde la Sala funda su decisión, no solo cambiar la
+   instrucción.
 2. **Evaluación del perfil del tribunal de alzada.** Un conjunto de consultas redactadas como toca en estudio, con la
    misma referencia automática y una partición de prueba única.
 3. **Tribunal de alzada.** Integrar la búsqueda por hechos y la ficha en el portal del STJ, lo que resolvería el
