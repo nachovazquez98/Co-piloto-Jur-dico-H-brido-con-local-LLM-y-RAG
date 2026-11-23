@@ -247,15 +247,32 @@ Formato de salida (Markdown):
 """
 
 
+# v11.2 (experimento `sintesis-citas`): la misma síntesis con un ejemplo de líneas bien citadas y una revisión final
+# de las citas. En la latencia de prueba, 16.9 % de las afirmaciones de la síntesis no citaba ningún precedente
+# (20261121-052935_4b1529e_latencia).
+_REGLA_NO_PREDECIR = ('- NO predigas el resultado del caso consultado ni digas que una apelación "tendrá éxito". Di '
+                      'qué argumentos acogió\n  o rechazó la Sala y por qué.')
+_REGLAS_CITA_V12 = (_REGLA_NO_PREDECIR + "\n- Una frase general sobre varios precedentes cita todos los que la "
+                    "respaldan: [P1, P3].\n- Antes de responder, revisa tu texto: toda línea que no sea un título "
+                    "termina con su cita [Pn].")
+_EJEMPLO_CITAS_V12 = ("\nEjemplo de líneas bien citadas (el contenido es ilustrativo, no lo copies):\n"
+                      "- La Sala declaró infundado el agravio sobre el reconocimiento porque se practicó con defensor "
+                      "presente [P1].\n- Conviene leer los considerandos donde la Sala valora el dictamen pericial "
+                      "[P2].\n")
+assert _REGLA_NO_PREDECIR in PROMPT_SINTESIS_FINAL_V11
+PROMPT_SINTESIS_FINAL_V12 = PROMPT_SINTESIS_FINAL_V11.replace(_REGLA_NO_PREDECIR, _REGLAS_CITA_V12) + _EJEMPLO_CITAS_V12
+PROMPTS_SINTESIS = {"v10": PROMPT_SINTESIS_FINAL, "v11": PROMPT_SINTESIS_FINAL_V11, "v12": PROMPT_SINTESIS_FINAL_V12}
+
+
 def prompt_sintesis(version: str | None = None) -> str:
-    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v10" o "v11": a favor / en contra, sin
-    pronosticar)."""
+    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v10"; "v11": parte favorecida, sin
+    pronosticar; "v12": v11 con ejemplo de citas y revisión final, en evaluación)."""
     from . import config
 
     version = version or config.PROMPT_SINTESIS_VERSION
-    if version not in ("v10", "v11"):
+    if version not in PROMPTS_SINTESIS:
         raise ValueError(f"Versión de síntesis desconocida: {version}")
-    return PROMPT_SINTESIS_FINAL if version == "v10" else PROMPT_SINTESIS_FINAL_V11
+    return PROMPTS_SINTESIS[version]
 
 
 

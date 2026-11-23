@@ -17,6 +17,7 @@ Con LLM:
     modelos --max N --fichas M       Compara los modelos de Ollama instalados (latencia, fichas, VRAM)
     robustez                         Consultas difíciles con la app completa (diagnóstico)
     perfil-tribunal --particion P    Las consultas planteadas como toca en estudio frente a la redacción del abogado
+    sintesis-citas --particion P     Citas de la síntesis: prompt v11 (app) frente a v12, mismos precedentes
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 Referencia automática, sin anotadores humanos (v11.2):
@@ -410,6 +411,13 @@ def cmd_fichas_referencia(args) -> None:
     _guardar(corrida)
 
 
+def cmd_sintesis_citas(args) -> None:
+    from .experimentos import experimento_sintesis_citas
+
+    env = _entorno(args, "sintesis-citas", args.particion)
+    _guardar(experimento_sintesis_citas(env, _llm(con_cache=False), args.max, log=_log))
+
+
 def cmd_perfil_tribunal(args) -> None:
     from .experimentos import experimento_perfil_tribunal
 
@@ -537,6 +545,12 @@ def main(argv=None) -> None:
     s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
     s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
     s.set_defaults(func=cmd_fichas_referencia)
+
+    s = sub.add_parser("sintesis-citas", help="Citas de la síntesis: prompt v11 frente a v12 (con LLM)")
+    s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
+    s.add_argument("--consultas", default=str(config.CONSULTAS_PATH))
+    s.add_argument("--max", type=int, default=20, help="Consultas de la muestra estable por hash")
+    s.set_defaults(func=cmd_sintesis_citas)
 
     s = sub.add_parser("perfil-tribunal", help="Consultas como toca en estudio frente a la redacción del abogado (LLM)")
     s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")

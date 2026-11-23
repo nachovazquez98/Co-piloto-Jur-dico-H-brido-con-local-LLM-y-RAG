@@ -411,3 +411,13 @@ def test_prompt_ficha_con_fundamento_de_la_sala():
     assert variante.replace(prompts._FUNDAMENTO_SALA, prompts._FUNDAMENTO_ACTUAL).replace(
         prompts._REGLA_FUNDAMENTO, prompts._REGLA_FINAL) == base
     assert "{contexto}" in variante.format(contexto="{contexto}")
+
+
+def test_prompt_sintesis_v12_solo_agrega_reglas_de_cita():
+    from copiloto_juridico import prompts
+
+    v11, v12 = prompts.prompt_sintesis("v11"), prompts.prompt_sintesis("v12")
+    assert v12.startswith(v11.split("- NO predigas")[0]) and "toda línea que no sea un título termina" in v12
+    assert "{text_consulta}" in v12 and "{informes_precedentes}" in v12
+    with pytest.raises(ValueError):
+        prompts.prompt_sintesis("v99")
