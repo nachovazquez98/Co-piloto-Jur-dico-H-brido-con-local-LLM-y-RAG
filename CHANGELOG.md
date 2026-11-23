@@ -9,8 +9,8 @@ del texto de la sentencia (reglas) y de un juez LLM de otra familia que la del m
 usarse. Corpus penal ampliado con descargas a mano desde el portal.
 
 ### Añadido
-- App: los ejemplos los cuenta la víctima del delito o su familia, que quiere saber cómo ha resuelto la Sala casos
-  parecidos (antes los contaba el defensor del acusado), y el botón «Otro ejemplo» carga uno al azar. Los ejemplos
+- App: en los ejemplos, el cliente del abogado es la víctima del delito (o su familia) y quiere saber cómo ha resuelto
+  la Sala casos parecidos (antes el cliente era el acusado), y el botón «Otro ejemplo» carga uno al azar. Los ejemplos
   de defensa siguen en `ejemplos.EJEMPLOS_PENALES` porque la evaluación guardada se hizo con ellos.
 - Índice BM25 guardado en `data/cache/` (se rehace solo si cambian el corpus o su código): la app abre en ~8 s en
   lugar de 22.5 s. Mismo resultado; cambia la huella del código, así que los ejemplos de la demo se volvieron a

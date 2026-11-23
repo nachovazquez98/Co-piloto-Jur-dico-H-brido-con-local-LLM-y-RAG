@@ -277,10 +277,10 @@ def test_ejemplos_penales_existen_en_el_corpus():
             assert e.tipo_corpus in tipos, e.tipo_corpus
     assert {e.etapa for e in EJEMPLOS_PENALES} >= {"Vinculación a proceso", "Prisión preventiva", "Sentencia de juicio oral"}
     assert EJEMPLOS == EJEMPLOS_VICTIMA and all(e.materia == "Penal" for e in EJEMPLOS)
-    # Los de la app los cuenta quien sufrió el delito: ninguno es la versión del acusado.
+    # Los de la app los redacta el abogado de la víctima: ninguno pide quitarle los cargos a su cliente.
     assert len({e.etiqueta for e in EJEMPLOS}) == len(EJEMPLOS)
-    assert not any(x in e.texto.lower() for e in EJEMPLOS for x in ("mi defendido", "mi cliente", "mi representado",
-                                                                        "inocente"))
+    assert all(("mi client" in e.texto.lower() or "represento" in e.texto.lower()) for e in EJEMPLOS)
+    assert not any(x in e.texto.lower() for e in EJEMPLOS for x in ("mi defendido", "mi representado", "inocente"))
 
 
 def test_prompt_conceptos_v11(monkeypatch):
