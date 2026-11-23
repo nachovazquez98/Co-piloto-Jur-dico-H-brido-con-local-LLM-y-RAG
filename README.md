@@ -2,9 +2,9 @@
 
 # ⚖️ Co-piloto Jurídico
 
-**Búsqueda y análisis de precedentes penales de apelación del Supremo Tribunal de Justicia de Jalisco para tres
-perfiles de usuario —el abogado (defensor o asesor jurídico de la víctima), la persona justiciable y el tribunal de
-alzada—, con búsqueda híbrida (embeddings + BM25), un LLM local y una interfaz web.**
+**Búsqueda y análisis de precedentes penales de apelación del Supremo Tribunal de Justicia de Jalisco para el
+abogado (defensor o asesor jurídico de la víctima) y el tribunal de alzada, con búsqueda híbrida (embeddings + BM25),
+un LLM local y una interfaz web.**
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=yellow)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App_web-ff4b4b?logo=streamlit)
@@ -20,23 +20,23 @@ alzada—, con búsqueda híbrida (embeddings + BM25), un LLM local y una interf
 
 **Problema:** el portal público del Supremo Tribunal de Justicia del Estado de Jalisco (STJ) localiza las sentencias
 por categoría del delito, número de toca o fecha; conocer los hechos, los agravios y cómo los calificó la Sala exige
-leer cada resolución completa. Ese costo de localización y lectura lo enfrentan por igual quienes litigan, quienes
-son parte de un proceso y el propio tribunal.
+leer cada resolución completa. Ese costo de localización y lectura lo enfrentan por igual quien litiga el recurso y
+el propio tribunal que lo resuelve.
 
-**Usuarios destinatarios.** El sistema atiende tres perfiles, seleccionables en la interfaz; los tres usan la misma
+**Usuarios destinatarios.** El sistema atiende dos perfiles, seleccionables en la interfaz; ambos usan la misma
 búsqueda y las mismas fichas, y cada uno tiene sus propios ejemplos:
 
 | Perfil | Necesidad | Uso del sistema |
 |---|---|---|
 | **Abogado** (defensor o asesor jurídico de la víctima, público o particular) — usuario principal | Interponer o contestar un recurso de apelación ante las Salas Penales | Precedentes en que la Sala calificó agravios semejantes como fundados, infundados o inoperantes |
-| **Persona justiciable** (víctima, ofendido, imputado o familiar, sin formación jurídica) | Conocer el criterio con que el tribunal ha resuelto asuntos semejantes al suyo | Fichas con la parte favorecida y el sentido del fallo; la app remite a la asesoría jurídica para actuar |
 | **Tribunal de alzada** (Sala Penal) | Resolver con un criterio congruente con sus propias resoluciones | Contraste del criterio de las Salas en supuestos semejantes; el sentido de la resolución corresponde exclusivamente a la Sala |
 
 **Objeto:** a partir de la descripción de un caso en lenguaje natural, recuperar las resoluciones penales del propio
 tribunal más afines y elaborar una ficha de cada una (delito, acto impugnado, agravios y su calificación por la Sala,
 sentido del fallo, fundamento legal), así como una síntesis comparativa.
 
-**Alcance:** el sistema no pronostica el resultado del asunto, no redacta agravios y no sustituye la lectura de la
+**Alcance:** la consulta de una persona sin formación jurídica (víctima, ofendido, imputado o familiar) queda fuera
+del alcance de esta versión: no tiene perfil en la interfaz ni se ha evaluado. El sistema no pronostica el resultado del asunto, no redacta agravios y no sustituye la lectura de la
 resolución original ni el criterio profesional. Las resoluciones del STJ constituyen precedentes orientadores, no
 jurisprudencia obligatoria.
 
@@ -186,7 +186,7 @@ python -m copiloto_juridico.cli construir-corpus --pdfs carpeta/    # añadir PD
 python -m copiloto_juridico.cli limpiar-corpus [--omitidas lista.csv]
 python -m copiloto_juridico.cli indexar                              # regenerar embeddings (GPU recomendada)
 python -m copiloto_juridico.cli redescarga                           # sentencias con páginas omitidas, por prioridad
-python -m copiloto_juridico.cli demo --ejemplos                      # deja guardados los ejemplos de los tres perfiles
+python -m copiloto_juridico.cli demo --ejemplos                      # deja guardados los ejemplos de los dos perfiles
 
 # Evaluación (ver evaluacion/README.md)
 python -m copiloto_juridico.evaluacion --help
@@ -230,9 +230,9 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
-- **Perfiles de usuario:** la evaluación mide la búsqueda y las fichas, que son las mismas para los tres perfiles;
-  las consultas de evaluación están redactadas como las plantearía un abogado, así que no hay todavía una medición
-  propia con consultas en lenguaje llano ni con el planteamiento de un toca en estudio.
+- **Perfiles de usuario:** la evaluación mide la búsqueda y las fichas, que son las mismas para los dos perfiles;
+  las consultas de evaluación están redactadas como las plantearía un abogado, así que el planteamiento de un toca en
+  estudio (tribunal de alzada) no tiene todavía una medición propia.
 - **Evaluación sin expertos:** la referencia es lo que dicen el tribunal (su categoría) y el texto de la sentencia,
   leído por reglas y por jueces LLM; mide si el sistema encuentra precedentes del mismo delito y el mismo problema
   procesal, no si un abogado los consideraría útiles.
@@ -243,19 +243,17 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 Continuación, mejora y evolución del proyecto, en orden de prioridad:
 
 1. **Precisión del fundamento legal.** PASO_FUNDAMENTO
-2. **Evaluación por perfil de usuario.** Conjuntos de consultas propios de la persona justiciable (lenguaje llano)
-   y del tribunal de alzada (toca en estudio), con la misma referencia automática y una partición de prueba única.
+2. **Evaluación del perfil del tribunal de alzada.** Un conjunto de consultas redactadas como toca en estudio, con la
+   misma referencia automática y una partición de prueba única.
 3. **Tribunal de alzada.** Integrar la búsqueda por hechos y la ficha en el portal del STJ, lo que resolvería el
-   problema de localización en su origen para los tres perfiles; normalizar el catálogo del portal con las 25
+   problema de localización en su origen; normalizar el catálogo del portal con las 25
    familias de delito (hoy 546 tipos) y señalar resoluciones de distintas Salas con sentido opuesto en supuestos
    semejantes.
-4. **Persona justiciable.** Ficha en lenguaje llano con el glosario de la app y canalización a la asesoría jurídica
-   gratuita (defensoría pública o asesoría jurídica de víctimas).
-5. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
+4. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
    reCAPTCHA), volver a descargar las sentencias con páginas omitidas y agregar OCR para los PDF escaneados.
-6. **Controles.** Mejorar la precisión de QC_1 (0.322 en prueba) sin perder exhaustividad y fijar el umbral de
+5. **Controles.** Mejorar la precisión de QC_1 (0.322 en prueba) sin perder exhaustividad y fijar el umbral de
    «sin precedentes del mismo tipo» cuando una señal lo separe mejor que `kem_max`.
-7. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
+6. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
    juicio sobre la utilidad de los precedentes.
 
 ## Desarrollo

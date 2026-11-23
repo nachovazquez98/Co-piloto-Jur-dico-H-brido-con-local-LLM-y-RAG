@@ -26,11 +26,10 @@ st.markdown("Esta página documenta el método del Co-piloto Jurídico: qué inf
 
 st.header("Objeto y alcance")
 st.markdown("El sistema apoya al abogado en la preparación o contestación del recurso de apelación ante las "
-            "Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco. Atiende tres perfiles de "
+            "Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco. Atiende dos perfiles de "
             "usuario, seleccionables en la pantalla principal: el abogado (defensor o asesor jurídico de la "
-            "víctima), usuario principal; la persona justiciable, que busca conocer el criterio del tribunal en "
-            "asuntos semejantes al suyo, y el tribunal de alzada, que contrasta el criterio de las Salas. A partir "
-            "de la descripción de un "
+            "víctima), usuario principal, y el tribunal de alzada, que contrasta el criterio de las Salas en "
+            "supuestos semejantes. A partir de la descripción de un "
             "caso, localiza las resoluciones públicas del propio tribunal que resolvieron supuestos afines y elabora "
             "una ficha de cada una: delito, acto impugnado, apelante, agravios y su calificación, sentido del fallo "
             "y fundamento legal. El corpus comprende exclusivamente resoluciones en **materia penal**.\n\n"

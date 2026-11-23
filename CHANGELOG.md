@@ -9,16 +9,17 @@ del texto de la sentencia (reglas) y de un juez LLM de otra familia que la del m
 usarse. Corpus penal ampliado con descargas a mano desde el portal.
 
 ### Añadido
-- Tres perfiles de usuario en la app, que resuelven el mismo problema de localización y lectura de precedentes: el
-  abogado (defensor o asesor jurídico de la víctima), usuario principal; la persona justiciable y el tribunal de
-  alzada. Cada perfil tiene sus ejemplos (`ejemplos.PERFILES`) y su advertencia de alcance; la búsqueda y las fichas
+- Dos perfiles de usuario en la app, que resuelven el mismo problema de localización y lectura de precedentes: el
+  abogado (defensor o asesor jurídico de la víctima), usuario principal, y el tribunal de alzada. La persona sin
+  formación jurídica queda fuera del alcance (sin perfil ni evaluación). Cada perfil tiene sus ejemplos
+  (`ejemplos.PERFILES`) y el del tribunal, su advertencia de alcance; la búsqueda y las fichas
   son las mismas. En los ejemplos del abogado, su cliente es la víctima del delito (antes era el acusado que pedía
   quitarse los cargos). «Otro ejemplo» carga uno al azar del perfil elegido. Los ejemplos de defensa siguen en
   `ejemplos.EJEMPLOS_PENALES` porque la evaluación guardada se hizo con ellos.
 - «Parte favorecida» (el acusado o la acusación) en la tarjeta, la ficha y el resultado de cada precedente de la
-  síntesis, en lugar de «resultado para la defensa»; misma regla (apelante + sentido del fallo). La síntesis ya no se
-  dirige solo al defensor.
-- README: problema, perfiles de usuario y próximos pasos del proyecto.
+  síntesis, en lugar de «resultado para la defensa»; misma regla (apelante + sentido del fallo), probada en
+  `tests/test_evaluacion.py`. La síntesis responde a los dos perfiles.
+- README: problema, perfiles de usuario, alcance y próximos pasos del proyecto.
 - Índice BM25 guardado en `data/cache/` (se rehace solo si cambian el corpus o su código): la app abre en ~8 s en
   lugar de 22.5 s. Mismo resultado; cambia la huella del código, así que los ejemplos de la demo se volvieron a
   precalcular. Las corridas de prueba siguen atadas al congelado `a15b83c852281010`.

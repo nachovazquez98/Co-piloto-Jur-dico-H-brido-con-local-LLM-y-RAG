@@ -277,7 +277,7 @@ def test_ejemplos_penales_existen_en_el_corpus():
             assert e.tipo_corpus in tipos, e.tipo_corpus
     assert {e.etapa for e in EJEMPLOS_PENALES} >= {"Vinculación a proceso", "Prisión preventiva", "Sentencia de juicio oral"}
     assert ejemplos_de("abogado") == EJEMPLOS_VICTIMA and all(e.materia == "Penal" for e in EJEMPLOS)
-    # Tres perfiles de usuario, cada uno con sus ejemplos y sin etiquetas repetidas dentro del perfil.
+    # Dos perfiles de usuario, cada uno con sus ejemplos y sin etiquetas repetidas dentro del perfil.
     assert {e.perfil for e in EJEMPLOS} == set(PERFILES)
     for p in PERFILES:
         assert ejemplos_de(p) and len({e.etiqueta for e in ejemplos_de(p)}) == len(ejemplos_de(p))

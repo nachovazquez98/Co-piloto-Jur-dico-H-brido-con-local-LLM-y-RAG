@@ -33,8 +33,8 @@ clasificador = get_clasificador()
 
 st.title("⚖️ Co-piloto Jurídico")
 st.markdown("Recuperación y análisis de precedentes de las Salas Penales del Supremo Tribunal de Justicia del Estado "
-            "de Jalisco en el recurso de apelación, para tres perfiles de usuario: el abogado (defensor o asesor "
-            "jurídico de la víctima), la persona justiciable y el tribunal de alzada. El sistema localiza las "
+            "de Jalisco en el recurso de apelación, para dos perfiles de usuario: el abogado (defensor o asesor "
+            "jurídico de la víctima) y el tribunal de alzada. El sistema localiza las "
             "resoluciones más afines a la descripción del caso y elabora una ficha de cada una. La página **Cómo "
             "funciona** expone el método.")
 
@@ -43,10 +43,6 @@ ESCRIBIR = "Escribir mi propia consulta"
 # Por perfil de usuario: contenido esperado de la descripción y advertencia sobre el alcance de los resultados.
 GUIA = {
     "abogado": ("Hechos, delito, resolución que se apela y motivos de inconformidad...", None),
-    "persona": ("Hechos, delito y resolución del juez, en sus propias palabras...",
-                "Los resultados muestran el criterio con que el tribunal ha resuelto asuntos semejantes; no anticipan "
-                "la resolución de un caso concreto. Para ejercer sus derechos, acuda a un abogado o a la asesoría "
-                "jurídica de víctimas."),
     "tribunal": ("Toca en estudio: hechos, acto impugnado, apelante y agravios...",
                  "Los resultados permiten contrastar el criterio de las Salas en supuestos semejantes; el sentido de "
                  "la resolución corresponde exclusivamente a la Sala."),

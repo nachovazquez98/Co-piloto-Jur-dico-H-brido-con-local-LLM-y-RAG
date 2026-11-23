@@ -381,7 +381,7 @@ def test_resultado_para_defensa():
 
 
 def test_parte_favorecida():
-    """La misma regla, dicha como la parte que obtuvo la resolución (sirve a los tres perfiles de usuario)."""
+    """La misma regla, dicha como la parte que obtuvo la resolución (sirve a los dos perfiles de usuario)."""
     from copiloto_juridico.fichas import parte_favorecida as f
 
     assert f("Defensa del imputado", "CONFIRMA") == "la acusación (Ministerio Público o víctima)"

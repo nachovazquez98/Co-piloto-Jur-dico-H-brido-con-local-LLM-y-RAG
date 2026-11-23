@@ -394,9 +394,9 @@ _RESULTADO_CONTRARIO = {"CONFIRMA": "favorable", "REVOCA": "desfavorable", "MODI
 
 
 def parte_favorecida(apelante: str, sentido: str | None) -> str | None:
-    """Parte que obtuvo la resolución de la Sala, en términos neutrales para los tres perfiles de usuario (abogado
-    defensor o asesor jurídico de la víctima, persona justiciable y tribunal de alzada). Se deduce con las mismas
-    reglas que `resultado_para_defensa`; None si no se puede determinar."""
+    """Parte que obtuvo la resolución de la Sala, en términos neutrales para los dos perfiles de usuario (abogado
+    defensor o asesor jurídico de la víctima, y tribunal de alzada). Se deduce con las mismas reglas que
+    `resultado_para_defensa`; None si no se puede determinar."""
     r = resultado_para_defensa(apelante, sentido)
     if r is None:
         return None
