@@ -106,6 +106,8 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
   `20261121-003449_5311dc1_referencias`). La referencia de acto, apelante y sentido queda con las reglas.
 
 ### Quitado
+- Versiones pasadas de los entregables en `docs/` (informe v8 y presentación anterior), reemplazadas por la presentación
+  v11.2; siguen en el historial de git.
 - Código sin uso: `f1_conjuntos`, `coincide_texto` y el atributo `veredicto_relevancia`.
 - Corridas obsoletas que nada citaba (una regresión intermedia y dos coberturas de metadatos de corpus intermedios).
 - Camino de anotación humana, que nunca se usó: hojas de juicios y fichas, piloto de anotación (`hojas-anotacion`,
