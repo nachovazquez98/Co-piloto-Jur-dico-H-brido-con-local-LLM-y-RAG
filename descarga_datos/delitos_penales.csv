@@ -1,0 +1,481 @@
+delito (como aparece en el portal),tipo,familia,publicadas en el portal,en el corpus,faltan para 30
+ABANDONO DE FAMILIARES,penal/abandono-de-familiares,abandono de familiares,84,30,0
+ABANDONO DE FAMILIARES Y DESOBEDIENCIA O RESISTENCIA DE PARTICULARES,penal/abandono-de-familiares-y-desobediencia-o-resistencia-de-particulares,abandono de familiares,1,1,0
+ABANDONO DE FAMILIARES Y OTRO,penal/abandono-de-familiares-y-otro,abandono de familiares,5,5,0
+ABANDONO DE PERSONAS,penal/abandono-de-personas,abandono de familiares,1,2,0
+ABANDONO DE PERSONAS Y FAMILIARES,penal/abandono-de-personas-y-familiares,abandono de familiares,1,1,0
+AMENAZAS,penal/amenazas,amenazas y extorsion,13,23,0
+EXTORSION,penal/extorsion,amenazas y extorsion,31,14,16
+EXTORSION Y OTROS,penal/extorsion-y-otros,amenazas y extorsion,9,9,0
+DISPARO DE ARMA DE FUEGO SOBRE PERSONA ,penal/disparo-de-arma-de-fuego-sobre-persona,armas,1,3,0
+DISPARO DE ARMA DE FUEGO SOBRE PERSONA Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/disparo-de-arma-de-fuego-sobre-persona-y-abuso-sexual-infantil-agravado,armas,1,1,0
+DISPARO DE ARMA DE FUEGO SOBRE PERSONA Y DELITOS COMETIDOS CONTRA REPRESENTANTES DE LA AUTORIDAD,penal/disparo-de-arma-de-fuego-sobre-persona-y-delitos-cometidos-contra-representantes-de-la-autoridad,armas,4,4,0
+DISPARO DE ARMA DE FUEGO SOBRE PERSONA Y OTROS,penal/disparo-de-arma-de-fuego-sobre-persona-y-otros,armas,2,3,0
+DISPARO DE ARMA DE FUEGO Y OTROS,penal/disparo-de-arma-de-fuego-y-otros,armas,1,3,0
+PORTACION  DE ARMA DE FUEGO SIN LICENCIA,penal/portacion-de-arma-de-fuego-sin-licencia,armas,1,3,0
+CONTRA LA DIGNIDAD DE LAS PERSONAS ,penal/contra-la-dignidad-de-las-personas,contra la dignidad de las personas,1,20,0
+CONTRA LA SALUD,penal/contra-la-salud,contra la salud,29,7,22
+CONTRA LA SALUD EN SU MODALIDAD DE NARCOMENUDEO,penal/contra-la-salud-en-su-modalidad-de-narcomenudeo,contra la salud,40,28,2
+CONTRA LA SALUD EN SU MODALIDAD DE NARCOMENUDEO CON FINES DE COMERCIO,penal/contra-la-salud-en-su-modalidad-de-narcomenudeo-con-fines-de-comercio,contra la salud,12,10,2
+CONTRA LA SALUD Y NARCOMENUDEO,penal/contra-la-salud-y-narcomenudeo,contra la salud,10,10,0
+CONTRA LA SALUD Y OTRO,penal/contra-la-salud-y-otro,contra la salud,4,4,0
+CONTRA LA SALUD Y OTROS,penal/contra-la-salud-y-otros,contra la salud,2,2,0
+NARCOMENUDEO,penal/narcomenudeo,contra la salud,8,3,5
+CONFLICTO DE COMPETENCIA,penal/conflicto-de-competencia,cuestiones procesales,8,8,0
+EXCUSA,penal/excusa,cuestiones procesales,2,2,0
+QUEJA ,penal/queja,cuestiones procesales,4,4,0
+QUEJA PROCESAL,penal/queja-procesal,cuestiones procesales,7,7,0
+DAÑO A LAS COSAS,penal/dano-a-las-cosas,dano en las cosas,3,3,0
+DAÑO EN LAS COSAS,penal/dano-en-las-cosas,dano en las cosas,41,20,10
+DAÑO EN LAS COSAS Y DESPOJO,penal/dano-en-las-cosas-y-despojo,dano en las cosas,1,1,0
+DAÑO EN LAS COSAS Y LESIONES,penal/dano-en-las-cosas-y-lesiones,dano en las cosas,5,5,0
+DAÑO EN LAS COSAS Y OTROS,penal/dano-en-las-cosas-y-otros,dano en las cosas,3,4,0
+ASOCIACION DELICTUOSA Y OTROS,penal/asociacion-delictuosa-y-otros,delincuencia organizada,1,5,0
+ASOCIACIÓN DELICTUOSA,penal/asociacion-delictuosa,delincuencia organizada,2,1,1
+DELINCUENCIA ORGANIZADA,penal/delincuencia-organizada,delincuencia organizada,7,2,5
+DELINCUENCIA ORGANIZADA Y OTRO,penal/delincuencia-organizada-y-otro,delincuencia organizada,1,1,0
+DAÑO A LAS COSAS A TITULO DE CULPA,penal/dano-a-las-cosas-a-titulo-de-culpa,delitos culposos,4,4,0
+DAÑO EN LAS COSAS A TITULO DE CULPA,penal/dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,79,10,20
+DAÑO EN LAS COSAS A TITULO DE CULPA POR IMPRUDENCIA,penal/dano-en-las-cosas-a-titulo-de-culpa-por-imprudencia,delitos culposos,1,1,0
+DAÑO EN LAS COSAS A TITULO DE CULPA Y LESIONES A TITULO DE CULPA,penal/dano-en-las-cosas-a-titulo-de-culpa-y-lesiones-a-titulo-de-culpa,delitos culposos,6,5,1
+DAÑO EN LAS COSAS A TITULO DE CULPA Y OTRO,penal/dano-en-las-cosas-a-titulo-de-culpa-y-otro,delitos culposos,1,1,0
+DAÑO EN LAS COSAS COMETIDO A TITULO DE CULPA,penal/dano-en-las-cosas-cometido-a-titulo-de-culpa,delitos culposos,4,4,0
+DAÑO EN LAS COSAS CULPOSO,penal/dano-en-las-cosas-culposo,delitos culposos,14,6,8
+DAÑO EN LAS COSAS Y HOMICIDIO A TITULO DE CULPA,penal/dano-en-las-cosas-y-homicidio-a-titulo-de-culpa,delitos culposos,1,1,0
+DAÑO EN LAS COSAS Y LESIONES A TITULO DE CULPA,penal/dano-en-las-cosas-y-lesiones-a-titulo-de-culpa,delitos culposos,1,1,0
+DAÑO EN LAS COSAS Y LESIONES AMBOS A TITULO DE CULPA,penal/dano-en-las-cosas-y-lesiones-ambos-a-titulo-de-culpa,delitos culposos,6,6,0
+DAÑO EN LAS COSAS Y LESIONES CULPOSAS,penal/dano-en-las-cosas-y-lesiones-culposas,delitos culposos,3,3,0
+DAÑO EN LAS COSAS Y LESIONES CULPOSO,penal/dano-en-las-cosas-y-lesiones-culposo,delitos culposos,1,1,0
+DAÑOS A TITULO DE CULPA,penal/danos-a-titulo-de-culpa,delitos culposos,1,1,0
+DAÑOS EN LAS COSAS A TITULO DE CULPA,penal/danos-en-las-cosas-a-titulo-de-culpa,delitos culposos,8,6,2
+HOMICIDIO A TITULO DE CULPA,penal/homicidio-a-titulo-de-culpa,delitos culposos,43,20,10
+HOMICIDIO A TITULO DE CULPA GRAVE,penal/homicidio-a-titulo-de-culpa-grave,delitos culposos,152,6,24
+HOMICIDIO A TITULO DE CULPA GRAVE Y OTRO,penal/homicidio-a-titulo-de-culpa-grave-y-otro,delitos culposos,5,3,2
+HOMICIDIO A TITULO DE CULPA GRAVE Y OTROS,penal/homicidio-a-titulo-de-culpa-grave-y-otros,delitos culposos,2,2,0
+HOMICIDIO A TITULO DE CULPA POR IMPRUDENCIA,penal/homicidio-a-titulo-de-culpa-por-imprudencia,delitos culposos,2,2,0
+HOMICIDIO A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA ,penal/homicidio-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,5,5,0
+HOMICIDIO A TITULO DE CULPA Y OTRO,penal/homicidio-a-titulo-de-culpa-y-otro,delitos culposos,4,4,0
+HOMICIDIO A TITULO DE CULPA Y OTROS,penal/homicidio-a-titulo-de-culpa-y-otros,delitos culposos,3,3,0
+"HOMICIDIO A TITULO DE CULPA, DAÑO EN LAS COSAS Y LESIONES A TITULO DE CULPA",penal/homicidio-a-titulo-de-culpa-dano-en-las-cosas-y-lesiones-a-titulo-de-culpa,delitos culposos,2,2,0
+HOMICIDIO CALIFICADO A TITULO DE CULPA,penal/homicidio-calificado-a-titulo-de-culpa,delitos culposos,1,1,0
+HOMICIDIO CALIFICADO Y DAÑO EN LAS COSAS A TITULO DE CULPA,penal/homicidio-calificado-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,5,5,0
+HOMICIDIO CULPOSO,penal/homicidio-culposo,delitos culposos,63,13,17
+HOMICIDIO CULPOSO Y LESIONES,penal/homicidio-culposo-y-lesiones,delitos culposos,1,1,0
+HOMICIDIO CULPOSO Y OTRO,penal/homicidio-culposo-y-otro,delitos culposos,2,2,0
+HOMICIDIO CULPOSO Y RESPONSABILIDAD MEDICA,penal/homicidio-culposo-y-responsabilidad-medica,delitos culposos,1,1,0
+HOMICIDIO EN GRADO DE CULPA,penal/homicidio-en-grado-de-culpa,delitos culposos,1,1,0
+HOMICIDIO IMPRUDENCIAL Y DAÑO EN LAS COSAS CULPOSO,penal/homicidio-imprudencial-y-dano-en-las-cosas-culposo,delitos culposos,1,1,0
+HOMICIDIO POR CULPA GRAVE ,penal/homicidio-por-culpa-grave,delitos culposos,1,1,0
+HOMICIDIO POR CULPA GRAVE Y OTROS,penal/homicidio-por-culpa-grave-y-otros,delitos culposos,1,1,0
+HOMICIDIO Y DAÑO EN LAS COSAS A TITULO DE CULPA,penal/homicidio-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,11,9,2
+HOMICIDIO Y DAÑO EN LAS COSAS CULPOSO ,penal/homicidio-y-dano-en-las-cosas-culposo,delitos culposos,2,2,0
+HOMICIDIO Y LESIONES A TITULO DE CULPA,penal/homicidio-y-lesiones-a-titulo-de-culpa,delitos culposos,3,3,0
+HOMICIDIO Y LESIONES AMBOS A TITULO DE CULPA GRAVE,penal/homicidio-y-lesiones-ambos-a-titulo-de-culpa-grave,delitos culposos,1,1,0
+"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS  TODOS A TITULO DE CULPA",penal/homicidio-lesiones-y-dano-en-las-cosas-todos-a-titulo-de-culpa,delitos culposos,2,2,0
+"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS A TITULO DE CULPA",penal/homicidio-lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,6,6,0
+"HOMICIDIO, LESIONES Y DAÑO EN LAS COSAS CULPOSOS",penal/homicidio-lesiones-y-dano-en-las-cosas-culposos,delitos culposos,1,1,0
+"HOMICIDIO, LESIONES Y DAÑOS TODOS A TITULO DE CULPA",penal/homicidio-lesiones-y-danos-todos-a-titulo-de-culpa,delitos culposos,1,1,0
+LESIONES A TITULO DE CULPA,penal/lesiones-a-titulo-de-culpa,delitos culposos,60,19,11
+LESIONES A TITULO DE CULPA GRAVE,penal/lesiones-a-titulo-de-culpa-grave,delitos culposos,4,4,0
+LESIONES A TITULO DE CULPA GRAVE Y OTRO,penal/lesiones-a-titulo-de-culpa-grave-y-otro,delitos culposos,2,2,0
+LESIONES A TITULO DE CULPA POR IMPRUDENCIA,penal/lesiones-a-titulo-de-culpa-por-imprudencia,delitos culposos,1,1,0
+LESIONES A TITULO DE CULPA Y DAÑO EN LAS COSAS ,penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas,delitos culposos,3,3,0
+LESIONES A TITULO DE CULPA Y DAÑO EN LAS COSAS A TITULO DE CULPA,penal/lesiones-a-titulo-de-culpa-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,12,9,3
+LESIONES A TITULO DE CULPA Y OTRO,penal/lesiones-a-titulo-de-culpa-y-otro,delitos culposos,2,2,0
+LESIONES COMETIDAS A TITULO DE CULPA,penal/lesiones-cometidas-a-titulo-de-culpa,delitos culposos,4,4,0
+LESIONES CULPOSAS,penal/lesiones-culposas,delitos culposos,15,7,8
+LESIONES GRAVES A TITULO DE CULPA POR IMPRUDENCIA,penal/lesiones-graves-a-titulo-de-culpa-por-imprudencia,delitos culposos,1,1,0
+LESIONES Y DAÑO EN LAS COSAS A TITULO DE CULPA,penal/lesiones-y-dano-en-las-cosas-a-titulo-de-culpa,delitos culposos,11,8,3
+LESIONES Y DAÑO EN LAS COSAS AMBOS A TITULO DE CULPA,penal/lesiones-y-dano-en-las-cosas-ambos-a-titulo-de-culpa,delitos culposos,11684,10,20
+LESIONES Y DAÑO EN LAS COSAS CULPOSOS,penal/lesiones-y-dano-en-las-cosas-culposos,delitos culposos,3,3,0
+LESIONES Y DAÑOS A TITULO DE CULPA,penal/lesiones-y-danos-a-titulo-de-culpa,delitos culposos,1,1,0
+LESIONES Y DAÑOS CULPOSOS,penal/lesiones-y-danos-culposos,delitos culposos,1,1,0
+LESIONES Y DAÑOS EN LAS COSAS A TITULO DE CULPA,penal/lesiones-y-danos-en-las-cosas-a-titulo-de-culpa,delitos culposos,2,2,0
+LESIONES Y HOMICIDIO AMBOS A TITULO DE CULPA,penal/lesiones-y-homicidio-ambos-a-titulo-de-culpa,delitos culposos,3,3,0
+"LESIONES, DAÑO EN LAS COSAS Y HOMICIDIO A TITULO DE CULPA",penal/lesiones-dano-en-las-cosas-y-homicidio-a-titulo-de-culpa,delitos culposos,1,1,0
+RESPONSABILIDAD MEDICA Y HOMICIDIO A TITULO DE CULPA,penal/responsabilidad-medica-y-homicidio-a-titulo-de-culpa,delitos culposos,1,1,0
+RESPONSABILIDAD MEDICA Y LESIONES A TITULO DE CULPA,penal/responsabilidad-medica-y-lesiones-a-titulo-de-culpa,delitos culposos,1,1,0
+RESPONSABILIDAD MEDICA Y LESIONES CULPOSAS,penal/responsabilidad-medica-y-lesiones-culposas,delitos culposos,2,2,0
+ABUSO  SEXUAL INFANTIL  AGRAVADO Y CORRUPCION DE MENORES,penal/abuso-sexual-infantil-agravado-y-corrupcion-de-menores,delitos sexuales,5,5,0
+ABUSO  SEXUAL INFANTIL AGRAVADO,penal/abuso-sexual-infantil-agravado,delitos sexuales,181,30,0
+ABUSO  SEXUAL INFANTIL AGRAVADO Y OTRO,penal/abuso-sexual-infantil-agravado-y-otro,delitos sexuales,58,10,20
+ABUSO SEXUAL,penal/abuso-sexual,delitos sexuales,6,6,0
+ABUSO SEXUAL AGRAVADO ,penal/abuso-sexual-agravado,delitos sexuales,3,3,0
+ABUSO SEXUAL INFANTIL,penal/abuso-sexual-infantil,delitos sexuales,137,27,3
+ABUSO SEXUAL INFANTIL AGRAVADO EN GRADO DE TENTATIVA,penal/abuso-sexual-infantil-agravado-en-grado-de-tentativa,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL AGRAVADO Y MALTRATO INFANTIL,penal/abuso-sexual-infantil-agravado-y-maltrato-infantil,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL AGRAVADO Y VIOLACION,penal/abuso-sexual-infantil-agravado-y-violacion,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL AGRAVADO Y VIOLENCIA INTRAFAMILIAR,penal/abuso-sexual-infantil-agravado-y-violencia-intrafamiliar,delitos sexuales,4,4,0
+"ABUSO SEXUAL INFANTIL AGRAVADO, CORRUPCION DE MENORES Y VIOLENCIA INTRAFAMILIAR",penal/abuso-sexual-infantil-agravado-corrupcion-de-menores-y-violencia-intrafamiliar,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL EN GRADO DE TENTATIVA,penal/abuso-sexual-infantil-en-grado-de-tentativa,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL EQUIPARADO,penal/abuso-sexual-infantil-equiparado,delitos sexuales,1,1,0
+ABUSO SEXUAL INFANTIL Y CORRUPCION DE MENORES,penal/abuso-sexual-infantil-y-corrupcion-de-menores,delitos sexuales,14,14,0
+ABUSO SEXUAL INFANTIL Y OTRO,penal/abuso-sexual-infantil-y-otro,delitos sexuales,7,3,4
+ABUSO SEXUAL INFANTIL Y OTROS,penal/abuso-sexual-infantil-y-otros,delitos sexuales,2,2,0
+ABUSO SEXUAL INFANTIL Y VIOLENCIA INTRAFAMILIAR,penal/abuso-sexual-infantil-y-violencia-intrafamiliar,delitos sexuales,176,6,24
+ATENTADOS AL PUDOR,penal/atentados-al-pudor,delitos sexuales,7,7,0
+ATENTADOS AL PUDOR Y LESIONES,penal/atentados-al-pudor-y-lesiones,delitos sexuales,2,2,0
+CONTINUADO DE ATENTADOS AL PUDOR Y CONTINUADO DE VIOLACION EQUIPARADA Y OTRO,penal/continuado-de-atentados-al-pudor-y-continuado-de-violacion-equiparada-y-otro,delitos sexuales,1,1,0
+CORRUPCION DE MENORES,penal/corrupcion-de-menores,delitos sexuales,9,3,6
+CORRUPCION DE MENORES AGRAVADO Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/corrupcion-de-menores-agravado-y-abuso-sexual-infantil-agravado,delitos sexuales,4,4,0
+CORRUPCION DE MENORES Y ABUSO SEXUAL INFANTIL,penal/corrupcion-de-menores-y-abuso-sexual-infantil,delitos sexuales,3,3,0
+CORRUPCION DE MENORES Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/corrupcion-de-menores-y-abuso-sexual-infantil-agravado,delitos sexuales,2,2,0
+CORRUPCION DE MENORES Y OTRO,penal/corrupcion-de-menores-y-otro,delitos sexuales,3,3,0
+CORRUPCION DE MENORES Y OTROS,penal/corrupcion-de-menores-y-otros,delitos sexuales,3,3,0
+CORRUPCION DE MENORES Y VIOLENCIA INTRAFAMILIAR,penal/corrupcion-de-menores-y-violencia-intrafamiliar,delitos sexuales,1,1,0
+"CORRUPCION DE MENORES, ABUSO SEXUAL INFANTIL AGRAVADO Y PROSTITUCION INFANTIL",penal/corrupcion-de-menores-abuso-sexual-infantil-agravado-y-prostitucion-infantil,delitos sexuales,4,4,0
+"CORRUPCION DE MENORES, PROSTITUCION INFANTIL Y ABUSO SEXUAL INFANTIL",penal/corrupcion-de-menores-prostitucion-infantil-y-abuso-sexual-infantil,delitos sexuales,1,1,0
+"CORRUPCION DE MENORES, VIOLENCIA INTRAFAMILIAR EQUIPARADA Y VIOLACION",penal/corrupcion-de-menores-violencia-intrafamiliar-equiparada-y-violacion,delitos sexuales,1,1,0
+HOSTIGAMIENTO SEXUAL,penal/hostigamiento-sexual,delitos sexuales,7,6,1
+"HOSTIGAMIENTO, ACOSO SEXUAL Y CONTRA LA DIGNIDAD DE LAS PERSONAS",penal/hostigamiento-acoso-sexual-y-contra-la-dignidad-de-las-personas,delitos sexuales,2,2,0
+PROSTITUCION AJENA U OTRAS FORMAS DE EXPLOTACION SEXUAL Y LENOCINIO,penal/prostitucion-ajena-u-otras-formas-de-explotacion-sexual-y-lenocinio,delitos sexuales,1,1,0
+PROSTITUCION INFANTIL,penal/prostitucion-infantil,delitos sexuales,1,1,0
+PROSTITUCION INFANTIL Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/prostitucion-infantil-y-abuso-sexual-infantil-agravado,delitos sexuales,1,1,0
+PROSTITUCION INFANTIL Y VIOLACION,penal/prostitucion-infantil-y-violacion,delitos sexuales,1,1,0
+TENTATIVA DE ABUSO SEXUAL INFANTIL AGRAVADO,penal/tentativa-de-abuso-sexual-infantil-agravado,delitos sexuales,3,3,0
+VIOLACION,penal/violacion,delitos sexuales,98,30,0
+VIOLACION AGRAVADA,penal/violacion-agravada,delitos sexuales,1,1,0
+VIOLACION EN GRADO DE TENTANTIVA,penal/violacion-en-grado-de-tentantiva,delitos sexuales,6,6,0
+VIOLACION EQUIPARADA,penal/violacion-equiparada,delitos sexuales,26,13,13
+VIOLACION EQUIPARADA Y OTROS,penal/violacion-equiparada-y-otros,delitos sexuales,1,1,0
+"VIOLACION EQUIPARADA, VIOLENCIA INTRAFAMILIAR EQUIPARADA Y LESIONES SIMPLES DOLOSAS",penal/violacion-equiparada-violencia-intrafamiliar-equiparada-y-lesiones-simples-dolosas,delitos sexuales,1,1,0
+VIOLACION Y ABUSO SEXUAL INFANTIL,penal/violacion-y-abuso-sexual-infantil,delitos sexuales,2,2,0
+VIOLACION Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/violacion-y-abuso-sexual-infantil-agravado,delitos sexuales,1,1,0
+VIOLACION Y CORRUPCION DE MENORES,penal/violacion-y-corrupcion-de-menores,delitos sexuales,2,2,0
+VIOLACION Y LESIONES DOLOSAS,penal/violacion-y-lesiones-dolosas,delitos sexuales,1,1,0
+VIOLACION Y OTRO,penal/violacion-y-otro,delitos sexuales,4,4,0
+VIOLACION Y OTROS,penal/violacion-y-otros,delitos sexuales,6,6,0
+VIOLACION Y ROBO CALIFICADO,penal/violacion-y-robo-calificado,delitos sexuales,5,5,0
+VIOLACION Y VIOLENCIA INTRAFAMILIAR,penal/violacion-y-violencia-intrafamiliar,delitos sexuales,5,5,0
+DESAPARICION COMETIDA POR PARTICULARES,penal/desaparicion-cometida-por-particulares,desaparicion de personas,6,22,0
+DESAPARICION COMETIDA POR PARTICULARES Y OTROS,penal/desaparicion-cometida-por-particulares-y-otros,desaparicion de personas,2,2,0
+DESAPARICION FORZADA DE PERSONA,penal/desaparicion-forzada-de-persona,desaparicion de personas,1,5,0
+DESAPARICIÓN FORZADA ,penal/desaparicion-forzada,desaparicion de personas,4,1,3
+DESAPARICIÓN FORZADA DE PERSONAS,penal/desaparicion-forzada-de-personas,desaparicion de personas,21,20,1
+DESPOJO,penal/despojo,despojo,55,13,17
+DESPOJO DE AGUAS,penal/despojo-de-aguas,despojo,1,1,0
+DESPOJO DE INMUEBLE,penal/despojo-de-inmueble,despojo,2,3,0
+DESPOJO DE INMUEBLE Y OTRO,penal/despojo-de-inmueble-y-otro,despojo,2,2,0
+DESPOJO DE INMUEBLES,penal/despojo-de-inmuebles,despojo,297,26,4
+DESPOJO DE INMUEBLES EN GRADO DE TENTATIVA,penal/despojo-de-inmuebles-en-grado-de-tentativa,despojo,1,1,0
+DESPOJO DE INMUEBLES Y AGUAS,penal/despojo-de-inmuebles-y-aguas,despojo,53,30,0
+DESPOJO DE INMUEBLES Y AGUAS Y DAÑO EN LAS COSAS,penal/despojo-de-inmuebles-y-aguas-y-dano-en-las-cosas,despojo,1,1,0
+DESPOJO DE INMUEBLES Y AGUAS Y OTROS,penal/despojo-de-inmuebles-y-aguas-y-otros,despojo,1,1,0
+DESPOJO DE INMUEBLES Y DAÑO EN LAS COSAS,penal/despojo-de-inmuebles-y-dano-en-las-cosas,despojo,3,3,0
+DESPOJO DE INMUEBLES Y OTROS,penal/despojo-de-inmuebles-y-otros,despojo,5,5,0
+DESPOJO DE INMUEBLES Y ROBO CALIFICADO,penal/despojo-de-inmuebles-y-robo-calificado,despojo,2,2,0
+DESPOJO Y DAÑO EN LAS COSAS,penal/despojo-y-dano-en-las-cosas,despojo,3,3,0
+DESPOJO Y ROBO CALIFICADO,penal/despojo-y-robo-calificado,despojo,1,1,0
+TENTATIVA DE DESPOJO DE INMUEBLES Y AGUAS,penal/tentativa-de-despojo-de-inmuebles-y-aguas,despojo,1,1,0
+FALSEDAD DE DECLARACION E INFORMES DADOS A UNA AUTORIDAD,penal/falsedad-de-declaracion-e-informes-dados-a-una-autoridad,falsedad y falsificacion,2,2,0
+FALSEDAD EN DECLARACIONES Y EN INFORMES DADOS A UNA AUTORIDAD,penal/falsedad-en-declaraciones-y-en-informes-dados-a-una-autoridad,falsedad y falsificacion,22,10,12
+"FALSIFICACION  Y USO INDEBIDO DE SELLOS, MARCAS, LLAVES Y TROQUELES",penal/falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,falsedad y falsificacion,9,9,0
+FALSIFICACION DE CERTIFICACIONES,penal/falsificacion-de-certificaciones,falsedad y falsificacion,1,2,0
+FALSIFICACION DE DOCUMENTOS ,penal/falsificacion-de-documentos,falsedad y falsificacion,3,1,2
+FALSIFICACION DE DOCUMENTOS EN GENERAL,penal/falsificacion-de-documentos-en-general,falsedad y falsificacion,14,4,10
+FALSIFICACION DE DOCUMENTOS EN GENERAL EN SU MODALIDAD DE USO,penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso,falsedad y falsificacion,1,1,0
+"FALSIFICACION DE DOCUMENTOS EXPEDIDOS POR LOS PODERES DEL ESTADO, ORGANISMOS AUTONOMOS EN SU MODALID",penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalid,falsedad y falsificacion,4,4,0
+"FALSIFICACION DE DOCUMENTOS EXPEDIDOS POR LOS PODERES DEL ESTADO, ORGANISMOS AUTONOMOS EN SU MODALIDAD DE USO",penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-en-su-modalidad-de-uso,falsedad y falsificacion,2,2,0
+"FALSIFICACION DE DOCUMENTOS EXPEDIDOS POR LOS PODERES DEL ESTADO, ORGANISMOS AUTONOMOS, AYUNTAMIENTOS O DE LOS DOCUMENTOS DE CREDITO ",penal/falsificacion-de-documentos-expedidos-por-los-poderes-del-estado-organismos-autonomos-ayuntamientos-o-de-los-documentos-de-credito,falsedad y falsificacion,2,2,0
+FALSIFICACIÓN DE DOCUMENTOS EN GENERAL EN SU MODALIDAD DE USO DE DOCUMENTO FALSO,penal/falsificacion-de-documentos-en-general-en-su-modalidad-de-uso-de-documento-falso,falsedad y falsificacion,2,2,0
+SUPLANTACION DE IDENTIDAD EQUIPARADA,penal/suplantacion-de-identidad-equiparada,falsedad y falsificacion,1,1,0
+SUPLANTACIÓN DE IDENTIDAD,penal/suplantacion-de-identidad,falsedad y falsificacion,4,4,0
+USO DE DOCUMENTO FALSO,penal/uso-de-documento-falso,falsedad y falsificacion,1,1,0
+FEMINICIDIO,penal/feminicidio,feminicidio,42,29,1
+FEMINICIDIO EN GRADO DE TENTATIVA,penal/feminicidio-en-grado-de-tentativa,feminicidio,3,9,0
+FEMINICIDIO EN GRADO DE TENTATIVA Y OTRO,penal/feminicidio-en-grado-de-tentativa-y-otro,feminicidio,1,1,0
+FEMINICIDIO Y OTRO,penal/feminicidio-y-otro,feminicidio,2,2,0
+FEMINICIDIO Y ROBO CALIFICADO,penal/feminicidio-y-robo-calificado,feminicidio,2,2,0
+TENTATIVA DE FEMINICIDIO,penal/tentativa-de-feminicidio,feminicidio,4,5,0
+ABUSO DE CONFIANZA,penal/abuso-de-confianza,fraude y abuso de confianza,33,11,19
+ABUSO DE CONFIANZA EQUIPARADO,penal/abuso-de-confianza-equiparado,fraude y abuso de confianza,3,3,0
+ABUSO DE CONFIANZA TENTADO,penal/abuso-de-confianza-tentado,fraude y abuso de confianza,1,1,0
+ADMINISTRACION FRAUDULENTA,penal/administracion-fraudulenta,fraude y abuso de confianza,20,19,1
+ADMINISTRACION FRAUDULENTA Y OTROS,penal/administracion-fraudulenta-y-otros,fraude y abuso de confianza,1,1,0
+FRAUDE,penal/fraude,fraude y abuso de confianza,29,30,0
+FRAUDE EN GRADO DE TENTATIVA,penal/fraude-en-grado-de-tentativa,fraude y abuso de confianza,1,1,0
+FRAUDE ESPECIFICO,penal/fraude-especifico,fraude y abuso de confianza,178,29,1
+FRAUDE ESPECIFICO Y FALSEDAD EN DECLARACIONES E INFORMES DADOS A UNA AUTORIDAD,penal/fraude-especifico-y-falsedad-en-declaraciones-e-informes-dados-a-una-autoridad,fraude y abuso de confianza,1,1,0
+FRAUDE ESPECIFICO Y OTRO,penal/fraude-especifico-y-otro,fraude y abuso de confianza,3,3,0
+FRAUDE ESPECIFICO Y OTROS ,penal/fraude-especifico-y-otros,fraude y abuso de confianza,1,1,0
+FRAUDE GENERICO,penal/fraude-generico,fraude y abuso de confianza,266,30,0
+FRAUDE GENERICO Y FRAUDE ESPECIFICO ,penal/fraude-generico-y-fraude-especifico,fraude y abuso de confianza,2,2,0
+FRAUDE PROCESAL,penal/fraude-procesal,fraude y abuso de confianza,15,15,0
+FRAUDE Y DESPOJO DE INMUEBLES Y AGUAS,penal/fraude-y-despojo-de-inmuebles-y-aguas,fraude y abuso de confianza,1,1,0
+FRAUDE Y FALSIFICACION DE DOCUMENTOS EN GENERAL,penal/fraude-y-falsificacion-de-documentos-en-general,fraude y abuso de confianza,1,1,0
+FRAUDE Y SUPLANTACION DE IDENTIDAD,penal/fraude-y-suplantacion-de-identidad,fraude y abuso de confianza,1,1,0
+TENTATIVA DE FRAUDE GENERICO,penal/tentativa-de-fraude-generico,fraude y abuso de confianza,2,2,0
+VIOLACION DE DEPOSITO Y FRAUDE ESPECIFICO,penal/violacion-de-deposito-y-fraude-especifico,fraude y abuso de confianza,9,9,0
+VIOLACIÓN DE DEPOSITO,penal/violacion-de-deposito,fraude y abuso de confianza,8,5,3
+HOMICIDIO,penal/homicidio,homicidio,28,7,21
+HOMICIDIO AGRAVADO Y ROBO CALIFICADO,penal/homicidio-agravado-y-robo-calificado,homicidio,1,1,0
+HOMICIDIO CALIFICADO,penal/homicidio-calificado,homicidio,2256,30,0
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA,penal/homicidio-calificado-en-grado-de-tentativa,homicidio,48,28,2
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA Y DAÑO EN LAS COSAS,penal/homicidio-calificado-en-grado-de-tentativa-y-dano-en-las-cosas,homicidio,2,2,0
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA Y DELINCUENCIA ORGANIZADA,penal/homicidio-calificado-en-grado-de-tentativa-y-delincuencia-organizada,homicidio,1,1,0
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA Y OTRO,penal/homicidio-calificado-en-grado-de-tentativa-y-otro,homicidio,2,2,0
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA Y OTROS,penal/homicidio-calificado-en-grado-de-tentativa-y-otros,homicidio,1,1,0
+HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA Y ROBO CALIFICADO,penal/homicidio-calificado-en-grado-de-tentativa-y-robo-calificado,homicidio,1,1,0
+HOMICIDIO CALIFICADO EN SU MODALIDAD DE VENTAJA,penal/homicidio-calificado-en-su-modalidad-de-ventaja,homicidio,5,5,0
+HOMICIDIO CALIFICADO TENTADO,penal/homicidio-calificado-tentado,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y DELINCUENCIA ORGANIZADA,penal/homicidio-calificado-y-delincuencia-organizada,homicidio,1,3,0
+HOMICIDIO CALIFICADO Y DELITOS EN MATERIA DE INHUMACION Y EXHUMACION,penal/homicidio-calificado-y-delitos-en-materia-de-inhumacion-y-exhumacion,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA,penal/homicidio-calificado-y-homicidio-calificado-en-grado-de-tentativa,homicidio,17,11,6
+HOMICIDIO CALIFICADO Y HOMICIDIO EN GRADO DE TENTATIVA,penal/homicidio-calificado-y-homicidio-en-grado-de-tentativa,homicidio,2,2,0
+HOMICIDIO CALIFICADO Y LESIONES,penal/homicidio-calificado-y-lesiones,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y LESIONES CALIFICADAS,penal/homicidio-calificado-y-lesiones-calificadas,homicidio,9,9,0
+HOMICIDIO CALIFICADO Y OTRO,penal/homicidio-calificado-y-otro,homicidio,13,13,0
+HOMICIDIO CALIFICADO Y OTROS,penal/homicidio-calificado-y-otros,homicidio,6,4,2
+HOMICIDIO CALIFICADO Y OTROS DELITOS,penal/homicidio-calificado-y-otros-delitos,homicidio,13,11,2
+HOMICIDIO CALIFICADO Y PARRICIDIO,penal/homicidio-calificado-y-parricidio,homicidio,3,3,0
+HOMICIDIO CALIFICADO Y ROBO  DE INFANTE,penal/homicidio-calificado-y-robo-de-infante,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y ROBO CALIFICADO,penal/homicidio-calificado-y-robo-calificado,homicidio,27,8,19
+HOMICIDIO CALIFICADO Y ROBO SIMPLE,penal/homicidio-calificado-y-robo-simple,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y SECUESTRO,penal/homicidio-calificado-y-secuestro,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y TENTATIVA DE HOMICIDIO,penal/homicidio-calificado-y-tentativa-de-homicidio,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y TENTATIVA DE HOMICIDIO CALIFICADO,penal/homicidio-calificado-y-tentativa-de-homicidio-calificado,homicidio,18,9,9
+HOMICIDIO CALIFICADO Y TENTATIVA DE ROBO CALIFICADO,penal/homicidio-calificado-y-tentativa-de-robo-calificado,homicidio,2,2,0
+HOMICIDIO CALIFICADO Y VIOLACION EQUIPARADA,penal/homicidio-calificado-y-violacion-equiparada,homicidio,1,1,0
+HOMICIDIO CALIFICADO Y VIOLACIÓN,penal/homicidio-calificado-y-violacion,homicidio,1,1,0
+"HOMICIDIO CALIFICADO, HOMICIDIO TENTADO Y DAÑO EN LAS COSAS",penal/homicidio-calificado-homicidio-tentado-y-dano-en-las-cosas,homicidio,1,1,0
+HOMICIDIO DOLOSO,penal/homicidio-doloso,homicidio,1,1,0
+HOMICIDIO EN GRADO DE TENTATIVA,penal/homicidio-en-grado-de-tentativa,homicidio,6,4,2
+HOMICIDIO EN GRADO DE TENTATIVA Y OTROS,penal/homicidio-en-grado-de-tentativa-y-otros,homicidio,3,3,0
+HOMICIDIO EN RIÑA,penal/homicidio-en-rina,homicidio,26,11,15
+HOMICIDIO EN RIÑA  INESPERADA,penal/homicidio-en-rina-inesperada,homicidio,5,5,0
+HOMICIDIO EN RIÑA COMO PROVOCADO,penal/homicidio-en-rina-como-provocado,homicidio,1,1,0
+HOMICIDIO EN RIÑA INESPERADA COMO PROVOCADO,penal/homicidio-en-rina-inesperada-como-provocado,homicidio,1,1,0
+HOMICIDIO EN RIÑA Y OTROS,penal/homicidio-en-rina-y-otros,homicidio,3,3,0
+HOMICIDIO IMPRUDENCIAL Y OTROS,penal/homicidio-imprudencial-y-otros,homicidio,1,1,0
+HOMICIDIO SIMPLE,penal/homicidio-simple,homicidio,2,6,0
+HOMICIDIO SIMPLE INTENCIONAL,penal/homicidio-simple-intencional,homicidio,58,15,15
+HOMICIDIO SIMPLE INTENCIONAL EN GRADO DE TENTATIVA,penal/homicidio-simple-intencional-en-grado-de-tentativa,homicidio,4,4,0
+HOMICIDIO SIMPLE INTENCIONAL Y LESIONES SIMPLES,penal/homicidio-simple-intencional-y-lesiones-simples,homicidio,1,1,0
+HOMICIDIO SIMPLE INTENCIONAL Y OTRO,penal/homicidio-simple-intencional-y-otro,homicidio,3,3,0
+HOMICIDIO SIMPLE INTENCIONAL Y OTROS,penal/homicidio-simple-intencional-y-otros,homicidio,1,1,0
+HOMICIDIO SIMPLE INTENCIONAL Y ROBO CALIFICADO,penal/homicidio-simple-intencional-y-robo-calificado,homicidio,3,3,0
+HOMICIDIO TENTADO,penal/homicidio-tentado,homicidio,1,1,0
+HOMICIDIO Y DAÑO EN LAS COSAS,penal/homicidio-y-dano-en-las-cosas,homicidio,1,1,0
+HOMICIDIO Y DAÑO EN LAS COSAS IMPRUDENCIAL,penal/homicidio-y-dano-en-las-cosas-imprudencial,homicidio,1,1,0
+HOMICIDIO Y OTRO,penal/homicidio-y-otro,homicidio,2,2,0
+HOMICIDIO Y OTROS,penal/homicidio-y-otros,homicidio,1,2,0
+HOMICIDIO Y ROBO CALIFICADO,penal/homicidio-y-robo-calificado,homicidio,5,5,0
+HOMICIDIO Y TENTATIVA DE HOMICIDIO,penal/homicidio-y-tentativa-de-homicidio,homicidio,1,1,0
+"HOMICIDIO, DAÑO EN LAS COSAS Y LESIONES",penal/homicidio-dano-en-las-cosas-y-lesiones,homicidio,1,1,0
+PARRICIDIO,penal/parricidio,homicidio,48,23,7
+PARRICIDIO EN GRADO DE TENTATIVA,penal/parricidio-en-grado-de-tentativa,homicidio,5,5,0
+PARRICIDIO Y HOMICIDIO CALIFICADO,penal/parricidio-y-homicidio-calificado,homicidio,5,5,0
+PARRICIDIO Y OTRO,penal/parricidio-y-otro,homicidio,1,1,0
+PARRICIDIO Y OTROS,penal/parricidio-y-otros,homicidio,1,1,0
+PARRICIDIO Y VIOLACION,penal/parricidio-y-violacion,homicidio,1,1,0
+PARRICIDIO Y VIOLENCIA FAMILIAR,penal/parricidio-y-violencia-familiar,homicidio,1,1,0
+"PARRICIDIO, MALTRATO AL INFANTE Y VIOLENCIA INTRAFAMILIAR",penal/parricidio-maltrato-al-infante-y-violencia-intrafamiliar,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO,penal/tentativa-de-homicidio,homicidio,14,9,5
+TENTATIVA DE HOMICIDIO CALIFICADO,penal/tentativa-de-homicidio-calificado,homicidio,41,12,18
+TENTATIVA DE HOMICIDIO CALIFICADO CON VENTAJA Y ALEVOSIA,penal/tentativa-de-homicidio-calificado-con-ventaja-y-alevosia,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO CALIFICADO Y OTRO,penal/tentativa-de-homicidio-calificado-y-otro,homicidio,3,3,0
+TENTATIVA DE HOMICIDIO CALIFICADO Y OTROS,penal/tentativa-de-homicidio-calificado-y-otros,homicidio,7,7,0
+TENTATIVA DE HOMICIDIO CALIFICADO Y PANDILLERISMO,penal/tentativa-de-homicidio-calificado-y-pandillerismo,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO CALIFICADO Y ROBO CALIFICADO,penal/tentativa-de-homicidio-calificado-y-robo-calificado,homicidio,3,3,0
+TENTATIVA DE HOMICIDIO CALIFICADO Y TENTATIVA DE ROBO CALIFICADO,penal/tentativa-de-homicidio-calificado-y-tentativa-de-robo-calificado,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO EN RIÑA INESPERADA,penal/tentativa-de-homicidio-en-rina-inesperada,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO SIMPLE,penal/tentativa-de-homicidio-simple,homicidio,2,2,0
+TENTATIVA DE HOMICIDIO SIMPLE INTENCIONAL,penal/tentativa-de-homicidio-simple-intencional,homicidio,1,1,0
+TENTATIVA DE HOMICIDIO Y ROBO CALIFICADO,penal/tentativa-de-homicidio-y-robo-calificado,homicidio,1,1,0
+TENTATIVA DE PARRICIDIO ,penal/tentativa-de-parricidio,homicidio,73,5,25
+TENTATIVA DE PARRICIDIO Y VIOLENCIA FAMILIAR,penal/tentativa-de-parricidio-y-violencia-familiar,homicidio,3,3,0
+LESIONES,penal/lesiones,lesiones,51,15,15
+LESIONES CALIFICADAS,penal/lesiones-calificadas,lesiones,141,29,1
+LESIONES CALIFICADAS Y ABUSO DE AUTORIDAD,penal/lesiones-calificadas-y-abuso-de-autoridad,lesiones,1,1,0
+LESIONES CALIFICADAS Y MALTRATO AL INFANTE,penal/lesiones-calificadas-y-maltrato-al-infante,lesiones,1,1,0
+LESIONES CALIFICADAS Y OTRO,penal/lesiones-calificadas-y-otro,lesiones,3,3,0
+LESIONES CALIFICADAS Y OTROS,penal/lesiones-calificadas-y-otros,lesiones,1,1,0
+LESIONES CALIFICADAS Y VIOLENCIA INTRAFAMILIAR,penal/lesiones-calificadas-y-violencia-intrafamiliar,lesiones,2,2,0
+LESIONES DOLOSAS,penal/lesiones-dolosas,lesiones,26,18,8
+LESIONES DOLOSAS CALIFICADAS,penal/lesiones-dolosas-calificadas,lesiones,1,2,0
+LESIONES DOLOSAS Y AMENAZAS,penal/lesiones-dolosas-y-amenazas,lesiones,2,2,0
+LESIONES DOLOSAS Y VIOLENCIA FAMILIAR,penal/lesiones-dolosas-y-violencia-familiar,lesiones,1,2,0
+LESIONES DOLOSAS Y VIOLENCIA INTRAFAMILIAR,penal/lesiones-dolosas-y-violencia-intrafamiliar,lesiones,3,3,0
+LESIONES EN RIÑA,penal/lesiones-en-rina,lesiones,5,5,0
+LESIONES EN RIÑA INESPERADA,penal/lesiones-en-rina-inesperada,lesiones,1,1,0
+LESIONES INTENCIONALES,penal/lesiones-intencionales,lesiones,4,4,0
+LESIONES SIMPLES DOLOSAS,penal/lesiones-simples-dolosas,lesiones,2,2,0
+LESIONES SIMPLES INTENCIONALES,penal/lesiones-simples-intencionales,lesiones,5,5,0
+LESIONES Y ALLANAMIENTO DE MORADA,penal/lesiones-y-allanamiento-de-morada,lesiones,2,2,0
+LESIONES Y AMENAZAS,penal/lesiones-y-amenazas,lesiones,3,3,0
+LESIONES Y DAÑO EN LAS COSAS,penal/lesiones-y-dano-en-las-cosas,lesiones,6,3,3
+LESIONES Y DAÑOS EN LAS COSAS,penal/lesiones-y-danos-en-las-cosas,lesiones,4,4,0
+LESIONES Y DELITOS COMETIDOS CONTRA REPRESENTANTES DE LA AUTORIDAD,penal/lesiones-y-delitos-cometidos-contra-representantes-de-la-autoridad,lesiones,2,2,0
+LESIONES Y MALTRATO AL INFANTE,penal/lesiones-y-maltrato-al-infante,lesiones,1,1,0
+LESIONES Y OTRO,penal/lesiones-y-otro,lesiones,3,4,0
+LESIONES Y OTROS,penal/lesiones-y-otros,lesiones,3,3,0
+LESIONES Y VIOLENCIA INTRAFAMILIAR ,penal/lesiones-y-violencia-intrafamiliar,lesiones,4,4,0
+ABORTO,penal/aborto,otros,25,9,16
+ADQUISICION ILEGITIMA DE BIENES MATERIA DE UN DELITO O UNA FRACCION PENAL,penal/adquisicion-ilegitima-de-bienes-materia-de-un-delito-o-una-fraccion-penal,otros,44,9,21
+ADQUISICION ILEGITIMA DE BIENES MATERIA DE UN DELITO O UNA INFRACCION PENAL,penal/adquisicion-ilegitima-de-bienes-materia-de-un-delito-o-una-infraccion-penal,otros,2,2,0
+ADULTERIO,penal/adulterio,otros,1,1,0
+ALLANAMIENTO DE MORADA,penal/allanamiento-de-morada,otros,5,5,0
+ALLANAMIENTO DE MORADA Y LESIONES,penal/allanamiento-de-morada-y-lesiones,otros,1,1,0
+ATAQUE PELIGROSO,penal/ataque-peligroso,otros,1,1,0
+ATAQUE PELIGROSO Y DELITOS COMETIDOS EN CONTRA DE REPRESENTANTES DE LA AUTORIDAD,penal/ataque-peligroso-y-delitos-cometidos-en-contra-de-representantes-de-la-autoridad,otros,1,1,0
+CONTRA EL AMBIENTE,penal/contra-el-ambiente,otros,1,2,0
+CONTRA EL DESARROLLO URBANO,penal/contra-el-desarrollo-urbano,otros,1,1,0
+CONTRA EL DESARROLLO URBANO Y OTRO,penal/contra-el-desarrollo-urbano-y-otro,otros,1,1,0
+DELITOS COMETIDOS  CONTRA REPRESENTANTES DE LA AUTORIDAD,penal/delitos-cometidos-contra-representantes-de-la-autoridad,otros,6,6,0
+"DELITOS COMETIDOS EN CONTRA DE REPRESENTANTES DE LA AUTORIDAD, PANDILLERISMO, DESOBEDIENCIA O RESISTENCIA DE PARTICULARES Y LESIONES",penal/delitos-cometidos-en-contra-de-representantes-de-la-autoridad-pandillerismo-desobediencia-o-resistencia-de-particulares-y-lesiones,otros,1,1,0
+DESOBEDIENCIA O RESISTENCIA DE PARTICULARES,penal/desobediencia-o-resistencia-de-particulares,otros,3,3,0
+DESOBEDIENCIA O RESISTENCIA DE PARTICULARES Y OTRO,penal/desobediencia-o-resistencia-de-particulares-y-otro,otros,4,4,0
+EVASION DE PRESOS ,penal/evasion-de-presos,otros,3,3,0
+MATERIA DE INHUMACIONES Y EXHUMACIONES,penal/materia-de-inhumaciones-y-exhumaciones,otros,1,1,0
+PANDILLERISMO Y ALLANAMIENTO DE MORADA,penal/pandillerismo-y-allanamiento-de-morada,otros,1,1,0
+PANDILLERISMO Y HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA,penal/pandillerismo-y-homicidio-calificado-en-grado-de-tentativa,otros,1,1,0
+PANDILLERISMO Y OTROS,penal/pandillerismo-y-otros,otros,1,1,0
+POSESION DE COSA MUEBLE ROBADA,penal/posesion-de-cosa-mueble-robada,otros,1,1,0
+ULTRAJES A LA MORAL Y A LAS BUENAS COSTUMBRES ,penal/ultrajes-a-la-moral-y-a-las-buenas-costumbres,otros,3,3,0
+ULTRAJES A LA MORAL Y A LAS BUENAS COSTUMBRES E INCITACION A LA PROSTITUCION,penal/ultrajes-a-la-moral-y-a-las-buenas-costumbres-e-incitacion-a-la-prostitucion,otros,1,1,0
+USURPACION DE FUNCIONES PUBLICAS O DE PROFESION,penal/usurpacion-de-funciones-publicas-o-de-profesion,otros,4,1,3
+USURPACION DE FUNCIONES PUBLICAS O DE PROFESION Y USO INDEBIDO DE UNIFORMES O INSIGNIAS,penal/usurpacion-de-funciones-publicas-o-de-profesion-y-uso-indebido-de-uniformes-o-insignias,otros,5,5,0
+DELITOS EN MATERIA DE SECUESTRO AGRAVADO,penal/delitos-en-materia-de-secuestro-agravado,privacion de la libertad y secuestro,7,7,0
+DELITOS EN MATERIA DE SECUESTRO EN SU MODALIDAD DE SECUESTRO EXPRESS CON LA FINALIDAD DE EXTORSIÓN,penal/delitos-en-materia-de-secuestro-en-su-modalidad-de-secuestro-express-con-la-finalidad-de-extorsion,privacion de la libertad y secuestro,1,1,0
+PLAGIO O SECUESTRO ,penal/plagio-o-secuestro,privacion de la libertad y secuestro,2,2,0
+PRIVACION ILEGAL DE LA LIBERTAD ,penal/privacion-ilegal-de-la-libertad,privacion de la libertad y secuestro,111,11,19
+PRIVACION ILEGAL DE LA LIBERTAD Y OTROS DERECHOS,penal/privacion-ilegal-de-la-libertad-y-otros-derechos,privacion de la libertad y secuestro,1,1,0
+PRIVACION ILEGAL DE LA LIBERTAD Y ROBO CALIFICADO,penal/privacion-ilegal-de-la-libertad-y-robo-calificado,privacion de la libertad y secuestro,1,2,0
+PRIVACION ILEGAL DE LA LIBERTAD Y VIOLACION,penal/privacion-ilegal-de-la-libertad-y-violacion,privacion de la libertad y secuestro,1,1,0
+SECUESTRO,penal/secuestro,privacion de la libertad y secuestro,80,30,0
+SECUESTRO AGRAVADO,penal/secuestro-agravado,privacion de la libertad y secuestro,64,29,1
+SECUESTRO AGRAVADO Y DELINCUENCIA ORGANIZADA,penal/secuestro-agravado-y-delincuencia-organizada,privacion de la libertad y secuestro,1,1,0
+SECUESTRO AGRAVADO Y OTROS,penal/secuestro-agravado-y-otros,privacion de la libertad y secuestro,2,2,0
+SECUESTRO CON EL PROPOSITO DE OBTENER UN RESCATE,penal/secuestro-con-el-proposito-de-obtener-un-rescate,privacion de la libertad y secuestro,5,5,0
+SECUESTRO EN GRADO DE TENTATIVA,penal/secuestro-en-grado-de-tentativa,privacion de la libertad y secuestro,2,2,0
+SECUESTRO EN SU MODALIDAD DE EXIGIR RESCATE,penal/secuestro-en-su-modalidad-de-exigir-rescate,privacion de la libertad y secuestro,5,5,0
+SECUESTRO EXPRESS,penal/secuestro-express,privacion de la libertad y secuestro,1,1,0
+SECUESTRO EXPRESS AGRAVADO,penal/secuestro-express-agravado,privacion de la libertad y secuestro,3,3,0
+SECUESTRO EXPRESS CON LA FINALIDAD DE EXTORSION,penal/secuestro-express-con-la-finalidad-de-extorsion,privacion de la libertad y secuestro,1,1,0
+SECUESTRO Y ASOCIACIÓN DELICTUOSA,penal/secuestro-y-asociacion-delictuosa,privacion de la libertad y secuestro,7,6,1
+SECUESTRO Y DELINCUENCIA ORGANIZADA,penal/secuestro-y-delincuencia-organizada,privacion de la libertad y secuestro,12,8,4
+SECUESTRO Y EXTORSION,penal/secuestro-y-extorsion,privacion de la libertad y secuestro,3,3,0
+SECUESTRO Y OTROS,penal/secuestro-y-otros,privacion de la libertad y secuestro,9,7,2
+SECUESTRO Y TENTATIVA DE HOMICIDIO,penal/secuestro-y-tentativa-de-homicidio,privacion de la libertad y secuestro,1,1,0
+RESPONSABILIDAD MEDICA,penal/responsabilidad-medica,responsabilidad profesional,1,2,0
+RESPONSABILIDAD MEDICA Y LESIONES,penal/responsabilidad-medica-y-lesiones,responsabilidad profesional,4,6,0
+RESPONSABILIDAD MEDICA Y OTRO,penal/responsabilidad-medica-y-otro,responsabilidad profesional,1,1,0
+RESPONSABILIDAD MEDICA Y OTROS,penal/responsabilidad-medica-y-otros,responsabilidad profesional,2,2,0
+RESPONSABILIDAD PROFESIONAL ,penal/responsabilidad-profesional,responsabilidad profesional,1,0,1
+RESPONSABILIDAD PROFESIONAL Y TECNICA,penal/responsabilidad-profesional-y-tecnica,responsabilidad profesional,3,5,0
+ABIGEATO,penal/abigeato,robo,8,2,6
+ABIGEATO CALIFICADO,penal/abigeato-calificado,robo,10,10,0
+ABIGEATO Y ROBO CALIFICADO,penal/abigeato-y-robo-calificado,robo,1,1,0
+ABIGEATO Y ROBO DE ANIMALES,penal/abigeato-y-robo-de-animales,robo,1,1,0
+ASALTO Y ROBO CALIFICADO,penal/asalto-y-robo-calificado,robo,1,1,0
+ROBO,penal/robo,robo,15,5,10
+ROBO AGRAVIADO,penal/robo-agraviado,robo,1,1,0
+ROBO CALIFICADO,penal/robo-calificado,robo,1875,30,0
+ROBO CALIFICADO EN GRADO DE TENTATIVA,penal/robo-calificado-en-grado-de-tentativa,robo,35,14,16
+ROBO CALIFICADO EN GRADO DE TENTATIVA Y OTRO,penal/robo-calificado-en-grado-de-tentativa-y-otro,robo,2,2,0
+ROBO CALIFICADO Y ABIGEATO,penal/robo-calificado-y-abigeato,robo,1,1,0
+ROBO CALIFICADO Y ABUSO DE AUTORIDAD,penal/robo-calificado-y-abuso-de-autoridad,robo,1,1,0
+ROBO CALIFICADO Y ASOCIACION DELICTUOSA,penal/robo-calificado-y-asociacion-delictuosa,robo,2,2,0
+ROBO CALIFICADO Y COHECHO,penal/robo-calificado-y-cohecho,robo,1,1,0
+ROBO CALIFICADO Y CONTRA LA SALUD,penal/robo-calificado-y-contra-la-salud,robo,6,5,1
+ROBO CALIFICADO Y CORRUPCION DE MENORES,penal/robo-calificado-y-corrupcion-de-menores,robo,3,3,0
+ROBO CALIFICADO Y DAÑO EN LAS COSAS A TITULO DOLOSO,penal/robo-calificado-y-dano-en-las-cosas-a-titulo-doloso,robo,1,1,0
+ROBO CALIFICADO Y DELINCUENCIA ORGANIZADA,penal/robo-calificado-y-delincuencia-organizada,robo,16,9,7
+"ROBO CALIFICADO Y FALSIFICACION Y USO INDEBIDO DE SELLOS, MARCAS, LLAVES Y TROQUELES",penal/robo-calificado-y-falsificacion-y-uso-indebido-de-sellos-marcas-llaves-y-troqueles,robo,3,3,0
+ROBO CALIFICADO Y HOMICIDIO CALIFICADO,penal/robo-calificado-y-homicidio-calificado,robo,8,5,3
+ROBO CALIFICADO Y HOMICIDIO CALIFICADO EN GRADO DE TENTATIVA,penal/robo-calificado-y-homicidio-calificado-en-grado-de-tentativa,robo,1,1,0
+ROBO CALIFICADO Y HOMICIDIO EN GRADO DE TENTATIVA,penal/robo-calificado-y-homicidio-en-grado-de-tentativa,robo,1,1,0
+ROBO CALIFICADO Y LESIONES,penal/robo-calificado-y-lesiones,robo,9,9,0
+ROBO CALIFICADO Y LESIONES CALIFICADAS,penal/robo-calificado-y-lesiones-calificadas,robo,2,2,0
+ROBO CALIFICADO Y OTRO,penal/robo-calificado-y-otro,robo,24,15,9
+ROBO CALIFICADO Y OTROS,penal/robo-calificado-y-otros,robo,20,10,10
+ROBO CALIFICADO Y PRIVACION ILEGAL DE LA LIBERTAD,penal/robo-calificado-y-privacion-ilegal-de-la-libertad,robo,2,4,0
+ROBO CALIFICADO Y PRIVACION ILEGAL DE LA LIBERTAD Y OTROS DERECHOS ,penal/robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos,robo,4,4,0
+ROBO CALIFICADO Y ROBO EQUIPARADO,penal/robo-calificado-y-robo-equiparado,robo,1,1,0
+ROBO CALIFICADO Y SECUESTRO EXPRESS AGRAVADO,penal/robo-calificado-y-secuestro-express-agravado,robo,1,1,0
+ROBO CALIFICADO Y TENTATIVA DE ROBO CALIFICADO,penal/robo-calificado-y-tentativa-de-robo-calificado,robo,2,2,0
+ROBO CALIFICADO Y VIOLACION,penal/robo-calificado-y-violacion,robo,2,2,0
+ROBO DE USO,penal/robo-de-uso,robo,1,1,0
+ROBO EN GRADO DE TENTATIVA,penal/robo-en-grado-de-tentativa,robo,4,4,0
+ROBO EQUIPARADO,penal/robo-equiparado,robo,62,30,0
+ROBO EQUIPARADO EN SU  MODALIDAD DE USO,penal/robo-equiparado-en-su-modalidad-de-uso,robo,8,8,0
+ROBO EQUIPARADO EN SU MODALIDAD DE DESMANTELAMIENTO,penal/robo-equiparado-en-su-modalidad-de-desmantelamiento,robo,25,6,19
+ROBO EQUIPARADO EN SU MODALIDAD DE DESMANTELAMIENTO DE UN VEHICULO A SABIENDAS DE SU PROCEDENCIA,penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-un-vehiculo-a-sabiendas-de-su-procedencia,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE DESMANTELAMIENTO DE VEHICULOS A SABIENDAS DE SU ORIGEN ILICITO,penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-vehiculos-a-sabiendas-de-su-origen-ilicito,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE DESMANTELAMIENTO DE VEHICULOS ROBADOS,penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-de-vehiculos-robados,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE DESMANTELAMIENTO Y ROBO CALIFICADO,penal/robo-equiparado-en-su-modalidad-de-desmantelamiento-y-robo-calificado,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE ENAJENAR CON VEHICULOS O VEHICULOS ROBADOS,penal/robo-equiparado-en-su-modalidad-de-enajenar-con-vehiculos-o-vehiculos-robados,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE USO Y OTROS,penal/robo-equiparado-en-su-modalidad-de-uso-y-otros,robo,1,3,0
+ROBO EQUIPARADO EN SU MODALIDAD DE UTILIZACION,penal/robo-equiparado-en-su-modalidad-de-utilizacion,robo,10,30,0
+ROBO EQUIPARADO EN SU MODALIDAD DE UTILIZACION DE UN VEHICULO ROBADO A SABIENDAS DE SU PROCEDENCIA ILICITA,penal/robo-equiparado-en-su-modalidad-de-utilizacion-de-un-vehiculo-robado-a-sabiendas-de-su-procedencia-ilicita,robo,5,5,0
+ROBO EQUIPARADO EN SU MODALIDAD DE UTILIZACION DE VEHÍCULOS ROBADOS A SABIENDAS DE SU ORIGEN ILICITO,penal/robo-equiparado-en-su-modalidad-de-utilizacion-de-vehiculos-robados-a-sabiendas-de-su-origen-ilicito,robo,1,1,0
+ROBO EQUIPARADO EN SU MODALIDAD DE UTILIZAR LOS AUTOMOTORES ROBADOS A SABIENDAS DE SU ORIGEN ILICITO,penal/robo-equiparado-en-su-modalidad-de-utilizar-los-automotores-robados-a-sabiendas-de-su-origen-ilicito,robo,3,3,0
+ROBO EQUIPARADO Y CONTRA LA SALUD,penal/robo-equiparado-y-contra-la-salud,robo,1,0,1
+"ROBO EQUIPARADO Y FALSIFICACION Y USO INDEBIDO DE SELLOS , MARCAS Y TROQUELES",penal/robo-equiparado-y-falsificacion-y-uso-indebido-de-sellos-marcas-y-troqueles,robo,4,4,0
+ROBO EQUIPARADO Y OTRO,penal/robo-equiparado-y-otro,robo,3,3,0
+ROBO EQUIPARADO Y OTROS,penal/robo-equiparado-y-otros,robo,4,4,0
+ROBO SIMPLE,penal/robo-simple,robo,33,14,16
+ROBO SIMPLE EN GRADO DE TENTATIVA,penal/robo-simple-en-grado-de-tentativa,robo,2,2,0
+ROBO Y HOMICIDIO EN GRADO DE TENTATIVA,penal/robo-y-homicidio-en-grado-de-tentativa,robo,2,2,0
+TENTANTIVA DE ROBO CALIFICADO,penal/tentantiva-de-robo-calificado,robo,10,10,0
+TENTATIVA DE ROBO,penal/tentativa-de-robo,robo,2,1,1
+TENTATIVA DE ROBO CALIFICADO,penal/tentativa-de-robo-calificado,robo,61,7,23
+TENTATIVA DE ROBO CALIFICADO Y OTRO,penal/tentativa-de-robo-calificado-y-otro,robo,1,1,0
+ABOGADOS PATRONOS Y LITIGANTES,penal/abogados-patronos-y-litigantes,servidores publicos y administracion de justicia,2,2,0
+ABUSO DE AUTORIDAD,penal/abuso-de-autoridad,servidores publicos y administracion de justicia,31,15,15
+ABUSO DE AUTORIDAD Y DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,penal/abuso-de-autoridad-y-delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,servidores publicos y administracion de justicia,1,2,0
+ABUSO DE AUTORIDAD Y LESIONES CALIFICADAS,penal/abuso-de-autoridad-y-lesiones-calificadas,servidores publicos y administracion de justicia,2,2,0
+ABUSO DE AUTORIDAD Y OTRO,penal/abuso-de-autoridad-y-otro,servidores publicos y administracion de justicia,5,3,2
+ABUSO DE AUTORIDAD Y ROBO CALIFICADO,penal/abuso-de-autoridad-y-robo-calificado,servidores publicos y administracion de justicia,1,1,0
+COHECHO,penal/cohecho,servidores publicos y administracion de justicia,18,13,5
+COHECHO Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/cohecho-y-abuso-sexual-infantil-agravado,servidores publicos y administracion de justicia,2,2,0
+COHECHO Y OTROS,penal/cohecho-y-otros,servidores publicos y administracion de justicia,1,1,0
+DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico,servidores publicos y administracion de justicia,2,4,0
+DELITOS COMETIDOS EN LA ADMINISTRACION DE JUSTICIA Y EN OTROS RAMOS DEL PODER PUBLICO A TITULO DE DOLO,penal/delitos-cometidos-en-la-administracion-de-justicia-y-en-otros-ramos-del-poder-publico-a-titulo-de-dolo,servidores publicos y administracion de justicia,3,3,0
+DESVIO Y APROVECHAMIENTO INDEBIDO DE ATRIBUCIONES Y FACULTADES,penal/desvio-y-aprovechamiento-indebido-de-atribuciones-y-facultades,servidores publicos y administracion de justicia,5,5,0
+EJERCICIO INDEBIDO Y ABANDONO DEL SERVICIO PUBLICO,penal/ejercicio-indebido-y-abandono-del-servicio-publico,servidores publicos y administracion de justicia,1,1,0
+ENCUBRIMIENTO,penal/encubrimiento,servidores publicos y administracion de justicia,3,3,0
+PECULADO,penal/peculado,servidores publicos y administracion de justicia,4,4,0
+ROBO DE INFANTE,penal/robo-de-infante,sustraccion de menores,3,9,0
+ROBO DE INFANTE Y ASOCIACION DELICTUOSA,penal/robo-de-infante-y-asociacion-delictuosa,sustraccion de menores,1,1,0
+SUBSTRACCION DE MENORES ,penal/substraccion-de-menores,sustraccion de menores,2,10,0
+SUSTRACCION DE MENORES,penal/sustraccion-de-menores,sustraccion de menores,5,9,0
+"SUSTRACCION, ROBO Y TRAFICO DE MENORES",penal/sustraccion-robo-y-trafico-de-menores,sustraccion de menores,1,1,0
+SUSTRACCIÓN DE MENORES Y ABANDONO DE FAMILIARES,penal/sustraccion-de-menores-y-abandono-de-familiares,sustraccion de menores,1,3,0
+TENTATIVA DE ROBO DE INFANTE,penal/tentativa-de-robo-de-infante,sustraccion de menores,1,3,0
+TRATA DE PERSONAS,penal/trata-de-personas,trata de personas,2,4,0
+TRATA DE PERSONAS CON FINES DE EXPLOTACION SEXUAL Y OTROS,penal/trata-de-personas-con-fines-de-explotacion-sexual-y-otros,trata de personas,1,3,0
+MALTRATO AL INFANTE,penal/maltrato-al-infante,violencia familiar,1,1,0
+MALTRATO AL INFANTE Y OTROS,penal/maltrato-al-infante-y-otros,violencia familiar,1,1,0
+MALTRATO INFANTIL ,penal/maltrato-infantil,violencia familiar,11,16,0
+MALTRATO INFANTIL Y LESIONES,penal/maltrato-infantil-y-lesiones,violencia familiar,1,1,0
+MALTRATO INFANTIL Y OTRO,penal/maltrato-infantil-y-otro,violencia familiar,1,1,0
+VIOLENCIA FAMILIAR,penal/violencia-familiar,violencia familiar,9,30,0
+VIOLENCIA FAMILIAR EQUIPARADA,penal/violencia-familiar-equiparada,violencia familiar,2,2,0
+VIOLENCIA FAMILIAR Y ABANDONO DE FAMILIARES,penal/violencia-familiar-y-abandono-de-familiares,violencia familiar,1,4,0
+VIOLENCIA FAMILIAR Y AMENAZAS,penal/violencia-familiar-y-amenazas,violencia familiar,1,22,0
+VIOLENCIA FAMILIAR Y LESIONES,penal/violencia-familiar-y-lesiones,violencia familiar,4,30,0
+VIOLENCIA FAMILIAR Y LESIONES DOLOSAS,penal/violencia-familiar-y-lesiones-dolosas,violencia familiar,2,9,0
+VIOLENCIA FAMILIAR Y OTROS,penal/violencia-familiar-y-otros,violencia familiar,3,13,0
+VIOLENCIA FAMILIAR Y VIOLACION EQUIPARADA,penal/violencia-familiar-y-violacion-equiparada,violencia familiar,1,1,0
+"VIOLENCIA FAMILIAR, AMENAZAS Y LESIONES",penal/violencia-familiar-amenazas-y-lesiones,violencia familiar,1,7,0
+VIOLENCIA INTRAFAMILIAR,penal/violencia-intrafamiliar,violencia familiar,83,9,21
+VIOLENCIA INTRAFAMILIAR EQUIPARADA,penal/violencia-intrafamiliar-equiparada,violencia familiar,9,5,4
+VIOLENCIA INTRAFAMILIAR EQUIPARADA Y ABUSO SEXUAL INFANTIL AGRAVADO,penal/violencia-intrafamiliar-equiparada-y-abuso-sexual-infantil-agravado,violencia familiar,2,2,0
+VIOLENCIA INTRAFAMILIAR EQUIPARADA Y LESIONES,penal/violencia-intrafamiliar-equiparada-y-lesiones,violencia familiar,1,1,0
+VIOLENCIA INTRAFAMILIAR EQUIPARADA Y LESIONES DOLOSAS,penal/violencia-intrafamiliar-equiparada-y-lesiones-dolosas,violencia familiar,1,1,0
+VIOLENCIA INTRAFAMILIAR Y ABANDONO DE FAMILIARES,penal/violencia-intrafamiliar-y-abandono-de-familiares,violencia familiar,3,3,0
+VIOLENCIA INTRAFAMILIAR Y ABANDONO DE PERSONAS,penal/violencia-intrafamiliar-y-abandono-de-personas,violencia familiar,1,1,0
+VIOLENCIA INTRAFAMILIAR Y AMENAZAS,penal/violencia-intrafamiliar-y-amenazas,violencia familiar,10,9,1
+VIOLENCIA INTRAFAMILIAR Y DESOBEDIENCIA O RESISTENCIA DE PARTICULARES,penal/violencia-intrafamiliar-y-desobediencia-o-resistencia-de-particulares,violencia familiar,2,2,0
+VIOLENCIA INTRAFAMILIAR Y LESIONES,penal/violencia-intrafamiliar-y-lesiones,violencia familiar,46,9,21
+VIOLENCIA INTRAFAMILIAR Y LESIONES CALIFICADAS,penal/violencia-intrafamiliar-y-lesiones-calificadas,violencia familiar,47,5,25
+VIOLENCIA INTRAFAMILIAR Y LESIONES DOLOSAS,penal/violencia-intrafamiliar-y-lesiones-dolosas,violencia familiar,12,10,2
+VIOLENCIA INTRAFAMILIAR Y LESIONES DOLOSAS CALIFICADAS,penal/violencia-intrafamiliar-y-lesiones-dolosas-calificadas,violencia familiar,1,1,0
+VIOLENCIA INTRAFAMILIAR Y LESIONES SIMPLES ,penal/violencia-intrafamiliar-y-lesiones-simples,violencia familiar,3,3,0
+VIOLENCIA INTRAFAMILIAR Y MALTRATO AL INFANTE,penal/violencia-intrafamiliar-y-maltrato-al-infante,violencia familiar,4,4,0
+VIOLENCIA INTRAFAMILIAR Y OTRO,penal/violencia-intrafamiliar-y-otro,violencia familiar,1,1,0
+VIOLENCIA INTRAFAMILIAR Y OTROS,penal/violencia-intrafamiliar-y-otros,violencia familiar,5,5,0
+"VIOLENCIA INTRAFAMILIAR, AMENAZAS Y LESIONES",penal/violencia-intrafamiliar-amenazas-y-lesiones,violencia familiar,1,1,0
+"VIOLENCIA INTRAFAMILIAR, MALTRATO AL INFANTE Y LESIONES",penal/violencia-intrafamiliar-maltrato-al-infante-y-lesiones,violencia familiar,2,2,0
+"VIOLENCIA INTRAFAMILIAR, MALTRATO AL INFANTE Y LESIONES SIMPLES",penal/violencia-intrafamiliar-maltrato-al-infante-y-lesiones-simples,violencia familiar,1,1,0
