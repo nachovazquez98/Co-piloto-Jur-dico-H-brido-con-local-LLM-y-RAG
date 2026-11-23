@@ -63,7 +63,8 @@ precalculados (`data/indice/`: 186,971 fragmentos × 768, float16, en archivos d
 presentación al jurado con sus notas del orador (`docs/v11.2 Co-piloto Jurídico - Presentación.pdf` y
 `... - Notas del orador.pdf`). Los 1,899 PDF originales descargados a mano (1.3 GB) no van en git: están como
 archivos adjuntos de la versión publicada [`v11.2`](https://github.com/nachovazquez98/Co-piloto-Jur-dico-H-brido-con-local-LLM-y-RAG/releases/tag/v11.2)
-(`sentencias-penales-pdf-parte1.zip` y `-parte2.zip`); se descomprimen en `data/raw/` solo para reconstruir el corpus.
+en 15 ZIP de menos de 90 MB (`sentencias-penales-pdf-01-de-15.zip` … `-15-de-15.zip`, carpetas `nuevas/` y
+`redescarga/`); se descomprimen juntos en `data/raw/` solo para reconstruir el corpus.
 
 ## Instalación
 
@@ -129,7 +130,8 @@ en `evaluacion/resultados/`):
 
 Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 41 s
 (`20261113-112440_fb1f3fe`). Con un resultado ya guardado (`demo --ejemplos`) la app lo muestra en 0.005 s
-(`20261113-120016_fb1f3fe_demo`; con el corpus final, los 16 ejemplos guardados se leen en 0.005–0.008 s, `20261121-054503_c9a03a8_demo`). Clasificación y búsqueda tardan menos de 0.2 s.
+(`20261113-120016_fb1f3fe_demo`; con el corpus final, los 16 ejemplos guardados se leen en 0.005–0.008 s, `20261121-054503_c9a03a8_demo`; con los ejemplos contados
+por la víctima, 0.005–0.008 s, `20261123-025815_f1e742a_demo`). Clasificación y búsqueda tardan menos de 0.2 s.
 
 **Diagnóstico sin anotación** (no son tasas de error del sistema):
 
