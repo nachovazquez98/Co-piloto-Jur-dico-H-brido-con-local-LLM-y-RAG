@@ -2,13 +2,14 @@
 
 # ⚖️ Co-piloto Jurídico
 
-**Búsqueda y análisis de precedentes penales del Supremo Tribunal de Justicia de Jalisco para la defensa en
-apelación, con búsqueda híbrida (embeddings + BM25), un LLM local y una interfaz web.**
+**Búsqueda y análisis de precedentes penales de apelación del Supremo Tribunal de Justicia de Jalisco para tres
+perfiles de usuario —el abogado (defensor o asesor jurídico de la víctima), la persona justiciable y el tribunal de
+alzada—, con búsqueda híbrida (embeddings + BM25), un LLM local y una interfaz web.**
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=yellow)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App_web-ff4b4b?logo=streamlit)
 ![Ollama](https://img.shields.io/badge/Ollama-LLM_local-blueviolet)
-![Version](https://img.shields.io/badge/versión-11.0.0-informational)
+![Version](https://img.shields.io/badge/versión-11.2.0-informational)
 ![License](https://img.shields.io/badge/licencia-MIT-green)
 
 </div>
@@ -17,8 +18,19 @@ apelación, con búsqueda híbrida (embeddings + BM25), un LLM local y una inter
 
 ## Objeto y alcance
 
-**Usuario destinatario:** el abogado defensor, público o particular, que prepara o contesta un recurso de apelación
-ante las Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco (STJ).
+**Problema:** el portal público del Supremo Tribunal de Justicia del Estado de Jalisco (STJ) localiza las sentencias
+por categoría del delito, número de toca o fecha; conocer los hechos, los agravios y cómo los calificó la Sala exige
+leer cada resolución completa. Ese costo de localización y lectura lo enfrentan por igual quienes litigan, quienes
+son parte de un proceso y el propio tribunal.
+
+**Usuarios destinatarios.** El sistema atiende tres perfiles, seleccionables en la interfaz; los tres usan la misma
+búsqueda y las mismas fichas, y cada uno tiene sus propios ejemplos:
+
+| Perfil | Necesidad | Uso del sistema |
+|---|---|---|
+| **Abogado** (defensor o asesor jurídico de la víctima, público o particular) — usuario principal | Interponer o contestar un recurso de apelación ante las Salas Penales | Precedentes en que la Sala calificó agravios semejantes como fundados, infundados o inoperantes |
+| **Persona justiciable** (víctima, ofendido, imputado o familiar, sin formación jurídica) | Conocer el criterio con que el tribunal ha resuelto asuntos semejantes al suyo | Fichas con la parte favorecida y el sentido del fallo; la app remite a la asesoría jurídica para actuar |
+| **Tribunal de alzada** (Sala Penal) | Resolver con un criterio congruente con sus propias resoluciones | Contraste del criterio de las Salas en supuestos semejantes; el sentido de la resolución corresponde exclusivamente a la Sala |
 
 **Objeto:** a partir de la descripción de un caso en lenguaje natural, recuperar las resoluciones penales del propio
 tribunal más afines y elaborar una ficha de cada una (delito, acto impugnado, agravios y su calificación por la Sala,
@@ -31,9 +43,10 @@ jurisprudencia obligatoria.
 ## Uso en 4 pasos
 
 1. Instala y abre la app (ver [Instalación](#instalación)): `streamlit run app/Copiloto.py`.
-2. Escribe el caso (hechos, delito, qué resolución se apela y por qué) o elige un ejemplo.
+2. Elige el **perfil de usuario** y describe el caso (hechos, delito, resolución apelada y agravios) o carga un
+   ejemplo de ese perfil (**Otro ejemplo** elige uno al azar).
 3. Pulsa **Buscar precedentes** y espera a que terminen los 5 pasos.
-4. Lee la síntesis (empieza con qué precedentes fueron favorables o desfavorables para la defensa) y las tarjetas.
+4. Lee la síntesis (empieza con la parte que favoreció cada precedente) y las tarjetas.
    Donde aparezca **verificar** (el sentido del fallo de la ficha no coincide con los resolutivos, o un artículo
    citado no está en la sentencia) o **no verificado por QC_1**, revisa la sentencia original antes de citarla.
    Puedes descargar el informe en Markdown.
@@ -49,7 +62,7 @@ evaluación guardada.
 | 2. Clasificación | consulta → 3 familias de delito más probables | coseno de embeddings + Jaccard de lemas + voto de las sentencias recuperadas |
 | 3. Búsqueda | familias (o los delitos que elige el usuario, uno o varios) → hasta 30 sentencias candidatas | embeddings `multilingual-e5-base` (ChromaDB) + BM25, fusión RRF; filtro por familia con respaldo sin filtro |
 | 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
-| 5. Síntesis | fichas → respuesta a la consulta | lista a favor / en contra de la defensa por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
+| 5. Síntesis | fichas → respuesta a la consulta | parte favorecida por cada precedente, por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
 
 **Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
 de la API antes de que exigiera reCAPTCHA y las que se bajaron después a mano desde el portal (`construir-corpus
@@ -130,8 +143,8 @@ en `evaluacion/resultados/`):
 
 Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 41 s
 (`20261113-112440_fb1f3fe`). Con un resultado ya guardado (`demo --ejemplos`) la app lo muestra en 0.005 s
-(`20261113-120016_fb1f3fe_demo`; con el corpus final, los 16 ejemplos guardados se leen en 0.005–0.008 s, `20261121-054503_c9a03a8_demo`; con los ejemplos contados
-por la víctima, 0.005–0.008 s, `20261123-025815_f1e742a_demo`). Clasificación y búsqueda tardan menos de 0.2 s.
+(`20261113-120016_fb1f3fe_demo`; con el corpus final, DEMO_FINAL). Clasificación y búsqueda tardan menos de
+0.2 s.
 
 **Diagnóstico sin anotación** (no son tasas de error del sistema):
 
@@ -173,7 +186,7 @@ python -m copiloto_juridico.cli construir-corpus --pdfs carpeta/    # añadir PD
 python -m copiloto_juridico.cli limpiar-corpus [--omitidas lista.csv]
 python -m copiloto_juridico.cli indexar                              # regenerar embeddings (GPU recomendada)
 python -m copiloto_juridico.cli redescarga                           # sentencias con páginas omitidas, por prioridad
-python -m copiloto_juridico.cli demo --ejemplos                      # deja guardados los 16 ejemplos para la demo
+python -m copiloto_juridico.cli demo --ejemplos                      # deja guardados los ejemplos de los tres perfiles
 
 # Evaluación (ver evaluacion/README.md)
 python -m copiloto_juridico.evaluacion --help
@@ -217,10 +230,33 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
+- **Perfiles de usuario:** la evaluación mide la búsqueda y las fichas, que son las mismas para los tres perfiles;
+  las consultas de evaluación están redactadas como las plantearía un abogado, así que no hay todavía una medición
+  propia con consultas en lenguaje llano ni con el planteamiento de un toca en estudio.
 - **Evaluación sin expertos:** la referencia es lo que dicen el tribunal (su categoría) y el texto de la sentencia,
   leído por reglas y por jueces LLM; mide si el sistema encuentra precedentes del mismo delito y el mismo problema
   procesal, no si un abogado los consideraría útiles.
 - **Sin OCR:** los PDF escaneados no aportan texto. **Datos testados:** nunca se infieren.
+
+## Próximos pasos
+
+Continuación, mejora y evolución del proyecto, en orden de prioridad:
+
+1. **Precisión del fundamento legal.** PASO_FUNDAMENTO
+2. **Evaluación por perfil de usuario.** Conjuntos de consultas propios de la persona justiciable (lenguaje llano)
+   y del tribunal de alzada (toca en estudio), con la misma referencia automática y una partición de prueba única.
+3. **Tribunal de alzada.** Integrar la búsqueda por hechos y la ficha en el portal del STJ, lo que resolvería el
+   problema de localización en su origen para los tres perfiles; normalizar el catálogo del portal con las 25
+   familias de delito (hoy 546 tipos) y señalar resoluciones de distintas Salas con sentido opuesto en supuestos
+   semejantes.
+4. **Persona justiciable.** Ficha en lenguaje llano con el glosario de la app y canalización a la asesoría jurídica
+   gratuita (defensoría pública o asesoría jurídica de víctimas).
+5. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
+   reCAPTCHA), volver a descargar las sentencias con páginas omitidas y agregar OCR para los PDF escaneados.
+6. **Controles.** Mejorar la precisión de QC_1 (0.322 en prueba) sin perder exhaustividad y fijar el umbral de
+   «sin precedentes del mismo tipo» cuando una señal lo separe mejor que `kem_max`.
+7. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
+   juicio sobre la utilidad de los precedentes.
 
 ## Desarrollo
 

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "copiloto-juridico"
-version = "11.1.0"
-description = "Co-piloto Jurídico: precedentes penales del STJ Jalisco para la defensa en apelación (RAG híbrido, LLM local, Streamlit)"
+version = "11.2.0"
+description = "Co-piloto Jurídico: precedentes penales de apelación del STJ Jalisco para el abogado, la persona justiciable y el tribunal de alzada (RAG híbrido, LLM local, Streamlit)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
