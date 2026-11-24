@@ -463,19 +463,26 @@ def evaluar_fichas(particion: str, log=print):
 # --------------------------------------------------------------------------------------------------------------
 
 
-def experimento_fundamento(n: int, llm, log=print):
-    """¿Mejora la precisión del fundamento legal si el prompt pide solo los artículos que la Sala invoca para fundar
-    su resolución? Muestra estable por hash de `n` sentencias de DESARROLLO con ficha precalculada que cita algún
-    artículo y en que las reglas leen fundamento; se genera la ficha con `PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA` y
-    se compara, por pares, con la ficha precalculada de la misma sentencia (misma referencia, mismo modelo). La
-    partición de prueba no se toca."""
+def experimento_fundamento(n: int, llm, log=print, variante: str = "prompt"):
+    """¿Mejora la precisión del fundamento legal? Muestra estable por hash de `n` sentencias de DESARROLLO con ficha
+    precalculada que cita algún artículo y en que las reglas leen fundamento; se genera de nuevo la ficha y se compara,
+    por pares, con la ficha precalculada de la misma sentencia (misma referencia, mismo modelo). La partición de
+    prueba no se toca. Variantes:
+    - "prompt": el prompt pide solo los artículos que la Sala invoca (`PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA`);
+    - "contexto": mismo prompt de la app, pero la ventana intermedia del texto es la parte considerativa
+      (`pipeline._RE_CONSIDERATIVA`) en lugar de la de los agravios.
+    Controles: agravios por ficha y acuerdo del sentido del fallo con los puntos resolutivos (reglas)."""
     from .. import prompts
     from ..datos.corpus import load_corpus
     from ..fichas import (FichaPenal, articulos_en_sentencia, extraer_articulos, fundamento_de_sentencia,
-                          generar_ficha_json)
+                          generar_ficha_json, sentido_por_reglas)
     from ..fichas_precalculadas import cargar
-    from ..pipeline import recortar_contexto
+    from ..pipeline import _RE_CONSIDERATIVA, recortar_contexto
     from .reporte import Corrida
+
+    if variante not in ("prompt", "contexto"):
+        raise ValueError(f"variante desconocida: {variante}")
+    nombre = {"prompt": "prompt con fundamento de la Sala", "contexto": "contexto con la parte considerativa"}[variante]
 
     def articulos(f) -> set[str]:
         return set().union(set(), *(extraer_articulos(x) for x in f.fundamento_legal))
@@ -492,12 +499,23 @@ def experimento_fundamento(n: int, llm, log=print):
                 candidatas.append((hashlib.sha256(row.doc_id.encode()).hexdigest(), row.doc_id, citados, invocados))
     muestra = sorted(candidatas)[:n]
     filas = []
+    precalculadas = tabla.set_index("doc_id")["ficha"].to_dict()
     for i, (_, doc, antes, invocados) in enumerate(muestra, 1):
-        contexto = recortar_contexto(textos[doc], llm.settings.max_context_chars)
-        ficha, _ = generar_ficha_json(llm.generate, contexto, plantilla=prompts.PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA)
+        if variante == "prompt":
+            contexto = recortar_contexto(textos[doc], llm.settings.max_context_chars)
+            ficha, _ = generar_ficha_json(llm.generate, contexto,
+                                          plantilla=prompts.PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA)
+        else:
+            contexto = recortar_contexto(textos[doc], llm.settings.max_context_chars, patron=_RE_CONSIDERATIVA)
+            ficha, _ = generar_ficha_json(llm.generate, contexto)
         despues = articulos(ficha) if ficha is not None else None
         fuera = antes - invocados
+        previa, reglas = FichaPenal.desde_guardada(precalculadas[doc]), sentido_por_reglas(textos[doc])
         filas.append({"doc_id": doc, "invocados": len(invocados), "citados_antes": len(antes),
+                      "sentido_reglas": reglas, "sentido_antes": previa.sentido_fallo,
+                      "sentido_despues": None if ficha is None else ficha.sentido_fallo,
+                      "agravios_antes": len(previa.agravios),
+                      "agravios_despues": None if ficha is None else len(ficha.agravios),
                       "comunes_antes": len(antes & invocados), "fuera_antes": len(fuera),
                       "fuera_en_sentencia": len(fuera & articulos_en_sentencia(textos[doc])),
                       "citados_despues": None if despues is None else len(despues),
@@ -510,22 +528,22 @@ def experimento_fundamento(n: int, llm, log=print):
     p_despues = (pares["comunes_despues"] / pares["citados_despues"]).tolist()
     r_antes = (validas["comunes_antes"] / validas["invocados"]).tolist()
     r_despues = (validas["comunes_despues"] / validas["invocados"]).tolist()
-    corrida = Corrida("fundamento-prompt", parametros={"n": n, "particion": "desarrollo",
-                                                       "muestra": "primeras n por sha256(doc_id)"})
+    corrida = Corrida(f"fundamento-{variante}", parametros={"n": n, "particion": "desarrollo", "variante": variante,
+                                                            "muestra": "primeras n por sha256(doc_id)"})
     resumen = []
     for medida, a, b in (("precisión", p_antes, p_despues), ("exhaustividad (recall)", r_antes, r_despues)):
         dif = m.bootstrap_diferencia_pareada(b, a)
         resumen.append({"medida": medida, "fichas": dif["n"], "ficha precalculada": round(float(np.mean(a)), 3),
-                        "prompt con fundamento de la Sala": round(float(np.mean(b)), 3),
+                        nombre: round(float(np.mean(b)), 3),
                         "diferencia": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, {dif['ic_sup']:+.3f}]",
                         "significativa": "sí" if dif["significativa"] else "no",
                         "efecto mínimo detectable": round(m.efecto_minimo_detectable(b, a) or float("nan"), 3)})
-    corrida.tabla("Fundamento legal: ficha precalculada frente al prompt con el fundamento de la Sala",
+    corrida.tabla(f"Fundamento legal: ficha precalculada frente al {nombre}",
                   "Mismas sentencias de desarrollo y misma referencia (artículos que la Sala invoca como fundamento, "
                   "leídos por reglas). Diferencia pareada (prompt nuevo − ficha precalculada) con IC 95 % por "
                   "bootstrap; se acepta la mejora solo si el intervalo no incluye el cero.", pd.DataFrame(resumen))
     corrida.tabla("Artículos citados por ficha", "Promedio por ficha válida.", pd.DataFrame([{
-        "fichas generadas": len(d), "JSON válido": len(validas), "sin artículos con el prompt nuevo":
+        "fichas generadas": len(d), "JSON válido": len(validas), "sin artículos con la variante":
             int((validas["citados_despues"] == 0).sum()),
         "citados antes": round(float(validas["citados_antes"].mean()), 2),
         "citados después": round(float(validas["citados_despues"].mean()), 2)}]))
@@ -534,4 +552,20 @@ def experimento_fundamento(n: int, llm, log=print):
                   "no una alucinación.", pd.DataFrame([{
                       "citados fuera del fundamento": int(d["fuera_antes"].sum()),
                       "aparecen en la sentencia": int(d["fuera_en_sentencia"].sum())}]))
+    con_reglas = validas[validas["sentido_reglas"].notna()]
+    acuerdo_antes = (con_reglas["sentido_antes"] == con_reglas["sentido_reglas"]).astype(float).tolist()
+    acuerdo_despues = (con_reglas["sentido_despues"] == con_reglas["sentido_reglas"]).astype(float).tolist()
+    controles = []
+    for medida, a_, b_ in (("sentido igual al de los resolutivos", acuerdo_antes, acuerdo_despues),
+                           ("agravios por ficha", validas["agravios_antes"].astype(float).tolist(),
+                            validas["agravios_despues"].astype(float).tolist())):
+        dif = m.bootstrap_diferencia_pareada(b_, a_)
+        controles.append({"control": medida, "fichas": dif["n"], "ficha precalculada": round(float(np.mean(a_)), 3),
+                          nombre: round(float(np.mean(b_)), 3),
+                          "diferencia": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, {dif['ic_sup']:+.3f}]",
+                          "significativa": "sí" if dif["significativa"] else "no"})
+    corrida.tabla("Controles: lo que la variante no debe empeorar",
+                  "Sentido del fallo frente al leído por reglas en los puntos resolutivos (sentencias donde las reglas "
+                  "lo leen) y número de agravios extraídos. Diferencia pareada con IC 95 % por bootstrap.",
+                  pd.DataFrame(controles))
     return corrida

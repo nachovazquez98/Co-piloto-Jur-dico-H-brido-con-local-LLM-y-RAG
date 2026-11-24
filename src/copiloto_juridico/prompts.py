@@ -266,7 +266,7 @@ PROMPTS_SINTESIS = {"v10": PROMPT_SINTESIS_FINAL, "v11": PROMPT_SINTESIS_FINAL_V
 
 def prompt_sintesis(version: str | None = None) -> str:
     """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v10"; "v11": parte favorecida, sin
-    pronosticar; "v12": v11 con ejemplo de citas y revisión final, en evaluación)."""
+    pronosticar; "v12", la de la app: v11 con ejemplo de citas y revisión final)."""
     from . import config
 
     version = version or config.PROMPT_SINTESIS_VERSION

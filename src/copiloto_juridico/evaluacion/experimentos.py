@@ -875,8 +875,8 @@ def calcular_conceptos(consultas: list[Consulta], llm, path: Path = config.CONCE
 def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
                                log: Callable[[str], None] = print) -> Corrida:
     """¿Cita mejor la síntesis con el prompt v12 (ejemplo de líneas citadas y revisión final)? Para cada consulta
-    validada de la muestra estable por hash se corre la app completa (síntesis v11, la de la app) y, con los MISMOS
-    precedentes, se genera la síntesis v12. Ambas pasan por la verificación determinista de citas de la app;
+    validada de la muestra estable por hash se corre la app completa con la síntesis v11 (la de la app hasta v11.2) y,
+    con los MISMOS precedentes, se genera la síntesis v12. Ambas pasan por la verificación determinista de citas de la app;
     diferencia pareada por consulta con IC 95 % por bootstrap, y conteo de pronósticos (no debe haber ninguno)."""
     from ..pipeline import TITULO_BALANCE, Copiloto, verificar_citas
     from .robustez import _RE_PRONOSTICO
@@ -884,12 +884,16 @@ def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
     corrida = env.corrida
     muestra = sorted((c for c in env.consultas if not c.sin_respuesta),
                      key=lambda c: hashlib.sha256(c.id.encode()).hexdigest())[:max_consultas]
-    filas = []
+    filas, version_app = [], config.PROMPT_SINTESIS_VERSION
     for i, c in enumerate(muestra, 1):
         resultado = None
-        for ev in Copiloto(env.store, env.clasificador, cliente).analizar(c.consulta):
-            if ev.tipo == "resultado":
-                resultado = ev.datos["resultado"]
+        config.PROMPT_SINTESIS_VERSION = "v11"  # línea base fija aunque la app ya use v12
+        try:
+            for ev in Copiloto(env.store, env.clasificador, cliente).analizar(c.consulta):
+                if ev.tipo == "resultado":
+                    resultado = ev.datos["resultado"]
+        finally:
+            config.PROMPT_SINTESIS_VERSION = version_app
         if resultado is None or len(resultado.precedentes) < 2 or not resultado.citas:
             log(f"[{i}/{len(muestra)}] {c.id}: sin síntesis (menos de 2 precedentes)")
             continue
@@ -917,12 +921,12 @@ def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
         v12 = d[d["version"] == "v12"][clave].tolist()
         dif = m.bootstrap_diferencia_pareada(v12, v11)
         resumen.append({"medida (promedio por consulta)": nombre, "consultas": dif["n"],
-                        "v11 (app)": round(float(np.mean(v11)), 3) if v11 else float("nan"),
+                        "v11": round(float(np.mean(v11)), 3) if v11 else float("nan"),
                         "v12": round(float(np.mean(v12)), 3) if v12 else float("nan"),
                         "diferencia (v12 − v11)": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, "
                                                   f"{dif['ic_sup']:+.3f}]",
                         "significativa": "sí" if dif["significativa"] else "no"})
-    corrida.tabla("Citas de la síntesis: prompt v11 (app) frente a v12",
+    corrida.tabla("Citas de la síntesis: prompt v11 frente a v12",
                   "Mismas consultas validadas y mismos precedentes; verificación determinista de la app (cita un "
                   "precedente existente y, si menciona sentido o delito, coincide con la ficha). Diferencia pareada "
                   "por consulta con IC 95 % por bootstrap.", pd.DataFrame(resumen))
@@ -1027,8 +1031,14 @@ def _filas_qc(nombre: str, r: dict, recall_aciertos: int, n_relevantes: int) -> 
 def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fragmento_similar"),
                    log: Callable[[str], None] = print) -> Corrida:
     """QC_1 sobre los pares con referencia (relevante = relevancia ≥ 1). QC_2 es determinista y no se mide aquí:
-    lo que decide (la familia del delito de la ficha) lo mide `fichas-referencia`."""
+    lo que decide (la familia del delito de la ficha) lo mide `fichas-referencia`.
+
+    Variantes del texto que lee QC_1: "inicio" (primeros caracteres), "fragmento_similar" (el de la app) y "ficha"
+    (campos de la ficha precalculada: delito, acto impugnado, agravios...; sin ficha, el fragmento similar). Con dos
+    o más variantes, la primera se compara por pares con las demás en recall y especificidad."""
     from ..embeddings import embed_query
+    from ..fichas import FichaPenal
+    from ..fichas_precalculadas import cargar
     from ..pipeline import parse_veredicto
 
     corrida = env.corrida
@@ -1040,14 +1050,21 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
         corrida.advertir("No hay pares con referencia (`referencias`) para las consultas de esta partición: QC_1 por medir.")
     else:
         embs: dict[str, np.ndarray] = {}
-        filas, detalle = [], []
+        filas, detalle, por_variante, sin_ficha = [], [], {}, 0
         humano = [rel >= 1 for _, _, rel in pares]
+        fichas = {}
+        if "ficha" in variantes:
+            t = cargar()
+            fichas = dict(zip(t.loc[t["json_valido"].astype(bool), "doc_id"], t.loc[t["json_valido"].astype(bool), "ficha"]))
         for variante in variantes:
             log(f"QC_1 ({variante}) sobre {len(pares)} pares...")
             sistema = []
             for i, (cid, doc_id, _) in enumerate(pares, 1):
                 consulta = consultas[cid].consulta
-                if variante == "fragmento_similar":
+                if variante == "ficha" and doc_id in fichas:
+                    fragmento = FichaPenal.desde_guardada(fichas[doc_id]).campos_markdown()[:config.QC1_MAX_CHARS]
+                elif variante in ("fragmento_similar", "ficha"):
+                    sin_ficha += variante == "ficha"
                     q = embs.setdefault(cid, embed_query(consulta))
                     fragmento = env.store.fragmento_mas_similar(doc_id, q)
                 else:
@@ -1058,6 +1075,7 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
                 if i % 25 == 0:
                     log(f"   {i}/{len(pares)}")
             r = resumen_binario(humano, sistema)
+            por_variante[variante] = [v is not False for v in sistema]  # no interpretable = SI, como la app
             filas.append(_filas_qc(f"QC_1 · {variante}", r, r["VP"], r["VP"] + r["FN"]))
             detalle += [{"variante": variante, "consulta": cid, "doc_id": d, "relevancia": rel,
                          "veredicto": "—" if v is None else ("SI" if v else "NO")}
@@ -1065,9 +1083,27 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
         corrida.tabla(
             "QC_1 (relevancia) contra la referencia",
             f"Referencia: {env.fuente_juicios}. Positivo = QC_1 deja pasar el documento. Recall = fracción de documentos relevantes que conserva (lo que "
-            "falta son descartes injustos; es el criterio principal para la defensa). Los veredictos no "
+            "falta son descartes injustos; es el criterio principal, porque un precedente descartado no llega al usuario). Los veredictos no "
             "interpretables cuentan como SI (así se comporta la app) y su tasa se reporta aparte.",
             pd.DataFrame(filas))
+        if len(variantes) > 1:
+            base, comparadas = list(variantes)[0], []
+            for otra in list(variantes)[1:]:
+                for medida, grupo in (("recall (pares relevantes)", True), ("especificidad (pares no relevantes)", False)):
+                    idx = [i for i, h in enumerate(humano) if h == grupo]
+                    a = [float(por_variante[base][i] == grupo) for i in idx]
+                    b = [float(por_variante[otra][i] == grupo) for i in idx]
+                    dif = m.bootstrap_diferencia_pareada(b, a)
+                    comparadas.append({"comparación": f"{otra} − {base}", "medida": medida, "pares": dif["n"],
+                                       base: round(float(np.mean(a)), 3), otra: round(float(np.mean(b)), 3),
+                                       "diferencia": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, {dif['ic_sup']:+.3f}]",
+                                       "significativa": "sí" if dif["significativa"] else "no"})
+            corrida.tabla("Comparación por pares de las variantes",
+                          "Mismos pares (consulta, sentencia). Diferencia pareada con IC 95 % por bootstrap; una "
+                          "variante solo mejora si sube la especificidad sin bajar el recall de forma significativa."
+                          + (f" {sin_ficha} pares sin ficha precalculada usan el fragmento similar."
+                             if "ficha" in variantes else ""),
+                          pd.DataFrame(comparadas))
         corrida.tabla("Veredictos de QC_1 por par", "Lo usa el comando `errores` (descartes de pares relevantes).",
                       pd.DataFrame(detalle), diagnostico=True)
     return corrida

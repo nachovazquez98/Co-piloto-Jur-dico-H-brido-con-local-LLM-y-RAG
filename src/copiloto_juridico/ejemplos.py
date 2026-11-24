@@ -24,7 +24,7 @@ class Ejemplo:
     texto: str
     etapa: str | None = None          # acto impugnado o etapa del caso
     tipo_corpus: str | None = ""      # "" = no verificado (v10); None = sin tipo en el corpus
-    perfil: str = "abogado"           # quién consulta: una de las claves de PERFILES
+    perfil: str = "abogado"           # perfil de usuario: una de las claves de PERFILES
 
     @property
     def sin_tipo_en_corpus(self) -> bool:

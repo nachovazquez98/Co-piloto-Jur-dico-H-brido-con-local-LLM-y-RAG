@@ -189,7 +189,10 @@ PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
 # Síntesis (paso 5). En una consulta real, la v10 leyó al revés un precedente que confirmó la vinculación pese a
 # impugnarse el reconocimiento por fotografía y concluyó que "es probable que la apelación tenga éxito". v11: dice
 # quién apeló y qué resolvió la Sala, separa precedentes a favor y en contra del argumento, y no predice resultados.
-PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v11")
+# v12 (v11.2): v11 más un ejemplo de líneas bien citadas y una revisión final de que cada línea termine en [Pn]. En
+# 20 consultas de desarrollo, por pares, las afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086
+# [+0.021, +0.161]) y las sin cita de 0.144 a 0.066, sin ningún pronóstico (`20261123-201729_e566e3d_sintesis-citas`).
+PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v12")
 # v11.1: la síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
 # fallo o el delito mencionados coincidan con la ficha citada; si no, la frase se marca "verificar".
 VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)

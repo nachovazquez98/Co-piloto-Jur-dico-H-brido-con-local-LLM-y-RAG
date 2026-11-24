@@ -322,22 +322,27 @@ def es_fallo(texto: str | None) -> bool:
 
 
 _RE_AGRAVIOS = re.compile(r"agravi|infundad|inoperante|fundad")
+# Parte considerativa: donde la Sala, con su propia voz, cita las normas en que funda la decisión. No usa las
+# fórmulas de fundamentación de la referencia ("con fundamento en"...), para no medir la referencia contra sí misma.
+_RE_CONSIDERATIVA = re.compile(r"art[ií]culos?\b|\bart\.|esta\s+(?:sala|alzada)|este\s+(?:tribunal|[oó]rgano)",
+                               re.IGNORECASE)
 _OMITIDO = "\n\n[... texto omitido por longitud ...]\n\n"
 
 
-def recortar_contexto(texto: str, max_chars: int) -> str:
+def recortar_contexto(texto: str, max_chars: int, patron: re.Pattern = _RE_AGRAVIOS) -> str:
     """Texto de la sentencia que cabe en la ventana del LLM. No se resume: se eligen partes.
 
     Si no cabe: el inicio (25 %: tribunal, toca, antecedentes), el final (25 %: resolutivos) y, en medio, la
     ventana del texto intermedio con más menciones a los agravios y su calificación ("agravio", "fundado",
     "infundado", "inoperante"), que es lo que más le sirve a la defensa y suele estar en los considerandos. Si el
-    texto intermedio no habla de agravios, se usa 55 % inicio / 45 % final como en v10."""
+    texto intermedio no habla de agravios, se usa 55 % inicio / 45 % final como en v10. `patron` cambia lo que se
+    cuenta en la ventana intermedia (`_RE_CONSIDERATIVA`: experimento `fundamento-contexto`)."""
     if len(texto) <= max_chars:
         return texto
     cabeza, cola = int(max_chars * 0.25), int(max_chars * 0.25)
     medio = max_chars - cabeza - cola - 2 * len(_OMITIDO)
     ini, fin = cabeza, len(texto) - cola
-    posiciones = [m.start() for m in _RE_AGRAVIOS.finditer(texto, ini, fin)]
+    posiciones = [m.start() for m in patron.finditer(texto, ini, fin)]
     if not posiciones or medio <= 0:
         cabeza = int(max_chars * 0.55)
         return texto[:cabeza] + _OMITIDO + texto[-(max_chars - cabeza):]
@@ -795,7 +800,7 @@ class Copiloto:
             yield log(f"   -> Citas: {citas['con_cita_valida']}/{citas['afirmaciones']} afirmaciones con cita válida"
                       f"{marcadas}.", "sintesis")
         balance = balance_precedentes(precedentes)
-        if balance and config.PROMPT_SINTESIS_VERSION == "v11":
+        if balance and config.PROMPT_SINTESIS_VERSION != "v10":  # v11 y v12 parten de la lista por reglas
             sintesis = balance + "\n\n" + sintesis.strip()
         yield Evento("paso_fin", "sintesis")
 

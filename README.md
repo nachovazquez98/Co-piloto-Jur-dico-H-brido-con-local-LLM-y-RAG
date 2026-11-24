@@ -232,9 +232,13 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
-- **Perfiles de usuario:** la evaluación mide la búsqueda y las fichas, que son las mismas para los dos perfiles;
-  las consultas de evaluación están redactadas como las plantearía un abogado, así que el planteamiento de un toca en
-  estudio (tribunal de alzada) no tiene todavía una medición propia.
+- **Perfiles de usuario:** la búsqueda y las fichas son las mismas para los dos perfiles, y la evaluación final usa
+  consultas redactadas como las plantearía un abogado. Con las mismas 39 consultas de desarrollo reescritas por el LLM
+  como toca en estudio, la familia correcta se encuentra igual (Hit@3 0.667 → 0.718; +0.051 [−0.077, +0.205], no
+  significativo), pero los cinco primeros precedentes son menos pertinentes (nDCG@5 0.266 → 0.145; −0.121
+  [−0.205, −0.042], significativo; `20261123-202205_e566e3d-sucio_perfil-tribunal`). Parte de la diferencia puede venir
+  de la reescritura, que a veces altera o generaliza la consulta; por eso la app pide al tribunal hechos, acto
+  impugnado, apelante y agravios concretos.
 - **Evaluación sin expertos:** la referencia es lo que dicen el tribunal (su categoría) y el texto de la sentencia,
   leído por reglas y por jueces LLM; mide si el sistema encuentra precedentes del mismo delito y el mismo problema
   procesal, no si un abogado los consideraría útiles.
@@ -251,8 +255,9 @@ Continuación, mejora y evolución del proyecto, en orden de prioridad:
    la Sala, 126 sí aparecen en la sentencia: el error es de selección (agravios, primera instancia), no de invención.
    El siguiente paso es dar al modelo la parte considerativa donde la Sala funda su decisión, no solo cambiar la
    instrucción.
-2. **Evaluación del perfil del tribunal de alzada.** Un conjunto de consultas redactadas como toca en estudio, con la
-   misma referencia automática y una partición de prueba única.
+2. **Evaluación del perfil del tribunal de alzada.** La medición en desarrollo (ver Limitaciones) usa consultas
+   reescritas por el LLM; el siguiente paso es un conjunto redactado por personal de una Sala, con la misma
+   referencia automática y una partición de prueba única.
 3. **Tribunal de alzada.** Integrar la búsqueda por hechos y la ficha en el portal del STJ, lo que resolvería el
    problema de localización en su origen; normalizar el catálogo del portal con las 25
    familias de delito (hoy 546 tipos) y señalar resoluciones de distintas Salas con sentido opuesto en supuestos

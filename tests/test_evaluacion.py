@@ -421,3 +421,6 @@ def test_prompt_sintesis_v12_solo_agrega_reglas_de_cita():
     assert "{text_consulta}" in v12 and "{informes_precedentes}" in v12
     with pytest.raises(ValueError):
         prompts.prompt_sintesis("v99")
+    from copiloto_juridico import config
+
+    assert config.PROMPT_SINTESIS_VERSION == "v12" and "NO predigas el resultado" in v12  # la de la app

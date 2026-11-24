@@ -26,6 +26,7 @@ Referencia automática, sin anotadores humanos (v11.2):
     referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
     fichas-referencia --particion P  Fichas precalculadas contra la referencia (sin LLM)
     fundamento-prompt --n N          Prompt de la ficha con el fundamento de la Sala, en desarrollo (con LLM)
+    fundamento-contexto --n N        Ficha con la parte considerativa en la ventana del texto (con LLM)
     esfuerzo --particion P           Esfuerzo simulado: portal, búsqueda por palabras y app
 """
 
@@ -277,7 +278,8 @@ def cmd_qc(args) -> None:
     from .experimentos import experimento_qc
 
     env = _entorno(args, "qc", args.particion)
-    variantes = ["inicio", "fragmento_similar"] if args.variante == "ambas" else [args.variante]
+    variantes = {"ambas": ["inicio", "fragmento_similar"], "ficha-vs-fragmento": ["fragmento_similar", "ficha"]}.get(
+        args.variante, [args.variante])
     _guardar(experimento_qc(env, _llm(), variantes, log=_log))
 
 
@@ -428,7 +430,7 @@ def cmd_perfil_tribunal(args) -> None:
 def cmd_fundamento_prompt(args) -> None:
     from .referencias import experimento_fundamento
 
-    _guardar(experimento_fundamento(args.n, _llm(), log=_log))
+    _guardar(experimento_fundamento(args.n, _llm(), log=_log, variante=args.variante))
 
 
 def cmd_errores(args) -> None:
@@ -484,7 +486,9 @@ def main(argv=None) -> None:
         s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
         s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
         if nombre == "qc":
-            s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ambas"], default="ambas")
+            s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ficha", "ambas", "ficha-vs-fragmento"],
+                           default="ambas", help="ambas = inicio y fragmento_similar; ficha-vs-fragmento = "
+                                                 "fragmento_similar (la app) frente a la ficha precalculada")
         if nombre == "latencia":
             s.add_argument("--max", type=int, default=10, help="Número de consultas a ejecutar")
             s.add_argument("--ejemplos", action="store_true", help="Usa los ejemplos penales de la app")
@@ -559,7 +563,12 @@ def main(argv=None) -> None:
 
     s = sub.add_parser("fundamento-prompt", help="Prompt de la ficha con el fundamento de la Sala (desarrollo, con LLM)")
     s.add_argument("--n", type=int, default=120, help="Sentencias de desarrollo de la muestra estable por hash")
-    s.set_defaults(func=cmd_fundamento_prompt)
+    s.set_defaults(func=cmd_fundamento_prompt, variante="prompt")
+
+    s = sub.add_parser("fundamento-contexto",
+                       help="Ficha con la parte considerativa en la ventana del texto (desarrollo, con LLM)")
+    s.add_argument("--n", type=int, default=120, help="Sentencias de desarrollo de la muestra estable por hash")
+    s.set_defaults(func=cmd_fundamento_prompt, variante="contexto")
 
     args = p.parse_args(argv)
     args.func(args)
