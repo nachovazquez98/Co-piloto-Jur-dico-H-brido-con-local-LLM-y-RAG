@@ -133,6 +133,7 @@ def test_qc1_lee_la_ficha_precalculada(monkeypatch):
     ficha = FichaPenal.desde_json(json.dumps(FICHA))
     monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", True)
     monkeypatch.setattr(config, "QC1_CONTEXTO", "ficha")
+    monkeypatch.setattr(config, "QC1_ACTIVO", True)
     monkeypatch.setattr(fp, "ficha_guardada", lambda d, t, s: ficha)
     llm_ = LLMFalso()
     _correr(StoreFalso([_cand(f"d{i}") for i in range(3)], []), ClasificadorFalso(), llm_, num_precedentes=1)

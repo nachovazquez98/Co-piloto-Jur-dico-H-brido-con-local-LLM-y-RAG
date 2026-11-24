@@ -70,7 +70,9 @@ def sidebar_configuracion() -> tuple[config.LLMSettings, dict]:
     with st.sidebar.expander("Configuración", expanded=False):
         opciones = {
             "num_precedentes": st.slider("Precedentes a analizar", 1, 5, config.RAG_NUM_RESULTS_DESIRED),
-            "qc_relevancia": st.toggle("QC_1: verificar que el documento sirva como precedente", value=True),
+            "qc_relevancia": st.toggle("QC_1: verificar con el modelo que el documento sirva como precedente "
+                                       "(más lento; no cambió los precedentes mostrados en la evaluación)",
+                                       value=config.QC1_ACTIVO),
             "qc_post_reporte": st.toggle("QC_2: verificar la ficha", value=True),
         }
         claves = list(PROVIDERS)

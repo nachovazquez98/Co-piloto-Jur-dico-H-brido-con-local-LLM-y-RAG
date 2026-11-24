@@ -73,6 +73,7 @@ class LLMFalso:
 def _sin_embeddings(monkeypatch):
     monkeypatch.setattr(pipeline, "embed_query", lambda t: np.zeros(4, dtype=np.float32))
     monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", False)  # las pruebas no dependen de data/fichas
+    monkeypatch.setattr(config, "QC1_ACTIVO", True)  # estas pruebas ejercitan QC_1 (apagado por defecto)
 
 
 def _correr(store, clasif, llm_, **op):

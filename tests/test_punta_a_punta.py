@@ -22,4 +22,4 @@ def test_pipeline_completo_con_llm_simulado(tmp_path):
     assert out["sintesis"].startswith("### Resultado de cada precedente")
     assert out["citas"] == {"afirmaciones": 3, "con_cita_valida": 2, "sin_cita": 0, "marcadas": 1}
     assert "_(verificar: la ficha citada dice CONFIRMA)_" in out["sintesis"]
-    assert out["llamadas"] == ["conceptos"] + ["qc1", "ficha"] * 3 + ["sintesis"]
+    assert out["llamadas"] == ["conceptos"] + ["ficha"] * 3 + ["sintesis"]  # QC_1 apagado por defecto

@@ -70,7 +70,7 @@ class Evento:
 class Opciones:
     num_precedentes: int = config.RAG_NUM_RESULTS_DESIRED
     max_candidatos: int = 15
-    qc_relevancia: bool = True
+    qc_relevancia: bool = field(default_factory=lambda: config.QC1_ACTIVO)  # QC_1 (ver config.QC1_ACTIVO)
     qc_post_reporte: bool = True
     # familias de delito que elige el usuario (una o varias); vacío = las elige el clasificador
     familias: tuple[str, ...] = ()

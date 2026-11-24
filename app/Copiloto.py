@@ -41,11 +41,13 @@ st.markdown("Recuperación y análisis de precedentes de las Salas Penales del S
 # --- Consulta ---
 ESCRIBIR = "Escribir mi propia consulta"
 # Por perfil de usuario: contenido esperado de la descripción y advertencia sobre el alcance de los resultados.
+NOMBRAR_ACTO = ("Nombre la resolución que se apela (vinculación a proceso, prisión preventiva, sentencia...): con "
+                "ella, la búsqueda ordena primero los precedentes del mismo delito y la misma resolución impugnada.")
 GUIA = {
-    "abogado": ("Hechos, delito, resolución que se apela y motivos de inconformidad...", None),
+    "abogado": ("Hechos, delito, resolución que se apela y motivos de inconformidad...", NOMBRAR_ACTO),
     "tribunal": ("Toca en estudio: hechos, acto impugnado, apelante y agravios...",
-                 "Los resultados permiten contrastar el criterio de las Salas en supuestos semejantes; el sentido de "
-                 "la resolución corresponde exclusivamente a la Sala."),
+                 NOMBRAR_ACTO + " Los resultados permiten contrastar el criterio de las Salas en supuestos semejantes; "
+                 "el sentido de la resolución corresponde exclusivamente a la Sala."),
 }
 
 

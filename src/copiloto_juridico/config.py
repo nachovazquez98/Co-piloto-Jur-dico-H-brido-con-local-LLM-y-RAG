@@ -151,6 +151,12 @@ ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
 # lugar del fragmento sube el recall de 0.725 a 0.844 (+0.120 [+0.036, +0.204]) sin cambio significativo en la
 # especificidad (0.410 → 0.396); precisión 0.294 → 0.321 (`20261123-230824_5fc9b67_qc`).
 QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "ficha")  # "inicio" | "fragmento_similar" | "ficha"
+# QC_1 está apagado por defecto (la barra lateral lo enciende): en 39 consultas de desarrollo, los 3 precedentes que
+# ve el usuario son igual de pertinentes con y sin QC_1 (P@3 0.410 en ambos casos, diferencia +0.000 [−0.034, +0.034];
+# nDCG@3 −0.007, no significativa; igual si la consulta nombra el acto impugnado o no), porque el orden por familia y
+# acto impugnado ya pone primero los pertinentes, y QC_1 costaba 3 de las 5 llamadas al modelo por consulta
+# (`20261124-014247_0f2894a_precedentes`).
+QC1_ACTIVO = _env("COPILOTO_QC1", False)
 # QC_1 razona en dos frases (delito y problema de la consulta y del documento) antes del veredicto, con el modelo de la
 # app. Probadas en los mismos 660 pares (`20261123-234717_e28a600_qc`) y descartadas: pedir solo el veredicto (0.59 s por
 # llamada, pero responde SI en 649 de 660 pares: especificidad 0.022, deja de filtrar) y qwen2.5:7b (recall 0.844 →
