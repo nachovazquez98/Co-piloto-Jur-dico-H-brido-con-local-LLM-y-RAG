@@ -219,3 +219,28 @@ def test_bm25_guardado_da_los_mismos_puntajes_y_se_rehace_si_cambia_el_corpus(tm
     assert np.allclose(leido.scores(consulta), nuevo.scores(consulta))
     BM25.cargado(textos + ["fraude especifico con documento falso"], directorio=tmp_path)
     assert len(list(tmp_path.glob("bm25-*.pkl"))) == 1  # el anterior se reemplaza
+
+
+def test_ocr_solo_en_paginas_sin_texto(tmp_path, monkeypatch):
+    """Una página sin capa de texto (escaneada) se lee por OCR si está disponible; si no, queda vacía."""
+    from pypdf import PdfWriter
+
+    from copiloto_juridico import config
+    from copiloto_juridico.datos import procesamiento as proc
+
+    pdf = tmp_path / "2025-01-01-000000_penal_robo.pdf"
+    w = PdfWriter()
+    w.add_blank_page(width=612, height=792)
+    with pdf.open("wb") as f:
+        w.write(f)
+    llamadas = []
+    monkeypatch.setattr(proc, "ocr_disponible", lambda: True)
+    monkeypatch.setattr(proc, "ocr_pagina", lambda ruta, n: llamadas.append(n) or "TEXTO LEÍDO POR OCR")
+    assert "TEXTO LEÍDO POR OCR" in proc.extract_text_from_pdf(pdf) and llamadas == [1]
+    monkeypatch.setattr(proc, "ocr_disponible", lambda: False)
+    assert "OCR" not in proc.extract_text_from_pdf(pdf)
+    monkeypatch.undo()
+    monkeypatch.setattr(config, "PDF_OCR", "false")
+    proc.ocr_disponible.cache_clear()
+    assert proc.ocr_disponible() is False
+    proc.ocr_disponible.cache_clear()

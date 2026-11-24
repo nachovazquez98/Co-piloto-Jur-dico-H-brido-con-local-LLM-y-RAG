@@ -96,6 +96,12 @@ PDF_TARGET_TOTAL_PAGES_SAMPLE = 40
 PDF_FIXED_START_PAGES = 10
 PDF_FIXED_END_PAGES = 15
 MAX_WORKERS_FASE_1 = None
+# v11.2: OCR (Tesseract, español) de las páginas sin capa de texto, como en los PDF escaneados. "auto": se usa si
+# `pdftoppm`, `tesseract` y su modelo `spa` están instalados (TESSDATA_PREFIX si el modelo está en una carpeta de
+# usuario); "false": nunca. Una página con menos de PDF_OCR_MIN_CARACTERES caracteres extraídos se trata como imagen.
+PDF_OCR = _env("COPILOTO_PDF_OCR", "auto")
+PDF_OCR_MIN_CARACTERES = 30
+PDF_OCR_DPI = 300
 
 # --- RAG y clasificación (Fase 3) ---
 RAG_NUM_RESULTS_DESIRED = _env("COPILOTO_NUM_PRECEDENTES", 3)

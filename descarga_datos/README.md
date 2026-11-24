@@ -63,7 +63,7 @@ python -m copiloto_juridico.cli construir-corpus --pdfs data/raw/nuevas
 python -m copiloto_juridico.cli indexar
 ```
 
-`construir-corpus` lee el PDF completo, recorta y limpia el texto, rechaza el que no corresponde a la misma resolución
+`construir-corpus` lee el PDF completo (las páginas escaneadas, por OCR si Tesseract está instalado), recorta y limpia el texto, rechaza el que no corresponde a la misma resolución
 y suprime repetidas; `indexar` actualiza el índice. El método vigente del proyecto (familias de delito, ficha,
 evaluación) es específico de la materia penal: las sentencias de otras materias pueden descargarse con este script,
 pero la aplicación solo busca en las penales (`COPILOTO_MATERIAS`).

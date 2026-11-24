@@ -1,4 +1,5 @@
-"""Fase 1: extracción y limpieza del texto de los PDFs (migrado del notebook).
+"""Fase 1: extracción y limpieza del texto de los PDFs (migrado del notebook). Las páginas sin capa de texto
+(escaneadas) se leen por OCR si Tesseract está instalado (`config.PDF_OCR`).
 
 Las sentencias largas se muestrean (inicio + medio + final) porque no caben completas en el
 contexto del LLM ni del modelo de embeddings.
@@ -6,8 +7,12 @@ contexto del LLM ni del modelo de embeddings.
 
 from __future__ import annotations
 
+import functools
 import logging
 import re
+import shutil
+import subprocess
+import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Callable
@@ -69,6 +74,41 @@ def pages_to_read(total_pages: int) -> list[int]:
     return sorted(indices)
 
 
+@functools.lru_cache(maxsize=1)
+def ocr_disponible() -> bool:
+    """OCR utilizable: `config.PDF_OCR` no es "false" y están `pdftoppm`, `tesseract` y el modelo de español."""
+    if str(config.PDF_OCR).lower() in {"false", "0", "no"} or not (shutil.which("pdftoppm") and shutil.which("tesseract")):
+        return False
+    try:
+        idiomas = subprocess.run(["tesseract", "--list-langs"], capture_output=True, text=True, timeout=30).stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return "spa" in idiomas.split()
+
+
+def ocr_pagina(pdf_path: Path, numero: int) -> str:
+    """Texto de la página `numero` (desde 1) por OCR: pdftoppm la convierte en imagen y Tesseract la lee en español.
+    Cadena vacía si falla."""
+    with tempfile.TemporaryDirectory() as tmp:
+        imagen = Path(tmp) / "pagina"
+        try:
+            subprocess.run(["pdftoppm", "-r", str(config.PDF_OCR_DPI), "-gray", "-png", "-singlefile", "-f", str(numero),
+                            "-l", str(numero), str(pdf_path), str(imagen)], check=True, capture_output=True, timeout=120)
+            return subprocess.run(["tesseract", f"{imagen}.png", "stdout", "-l", "spa"], check=True,
+                                  capture_output=True, text=True, timeout=300).stdout
+        except (OSError, subprocess.SubprocessError) as e:
+            logger.warning("OCR fallido en pág %s de %s: %s", numero, pdf_path.name, e)
+            return ""
+
+
+def _texto_pagina(reader: PdfReader, pdf_path: Path, index: int) -> str:
+    """Capa de texto de la página; si no la tiene (página escaneada) y hay OCR, el texto por OCR."""
+    texto = reader.pages[index].extract_text() or ""
+    if len(texto.strip()) < config.PDF_OCR_MIN_CARACTERES and ocr_disponible():
+        texto = ocr_pagina(pdf_path, index + 1) or texto
+    return texto
+
+
 def extract_text_from_pdf(pdf_path: Path) -> str:
     try:
         reader = PdfReader(str(pdf_path))
@@ -80,7 +120,7 @@ def extract_text_from_pdf(pdf_path: Path) -> str:
             if last != -1 and index > last + 1:
                 textos.append(f"\n\n [... {index - last - 1} pág(s) omitida(s) ...] \n\n")
             try:
-                textos.append(f"\n--- PÁG {index + 1}/{total} ---\n{reader.pages[index].extract_text() or ''}")
+                textos.append(f"\n--- PÁG {index + 1}/{total} ---\n{_texto_pagina(reader, pdf_path, index)}")
             except Exception as e:  # una página dañada no invalida todo el PDF
                 logger.warning("Error leyendo pág %s de %s: %s", index + 1, pdf_path.name, e)
             last = index

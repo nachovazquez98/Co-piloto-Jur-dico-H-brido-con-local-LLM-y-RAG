@@ -93,6 +93,10 @@ ollama pull llama3.1:8b
 streamlit run app/Copiloto.py
 ```
 
+Opcional, solo para construir el corpus con PDF escaneados: `tesseract` y `pdftoppm` (poppler) con el modelo de
+español `spa` (por ejemplo `tesseract-langpack-spa` o `tesseract-ocr-spa` en Linux, o `spa.traineddata` en la carpeta que
+indique `TESSDATA_PREFIX`). Sin ellos, esas páginas se omiten (`COPILOTO_PDF_OCR=false` lo desactiva).
+
 En el primer arranque se descarga el modelo de embeddings (~1 GB), se construye la base ChromaDB local a partir del
 índice incluido (unos minutos) y se guarda el índice BM25 en `data/cache/`. Después la app abre en unos 8 s (medido con
 el corpus final: 22.5 s si tuviera que reconstruir BM25 en cada arranque); las consultas de los ejemplos ya
@@ -242,7 +246,11 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 - **Evaluación sin expertos:** la referencia es lo que dicen el tribunal (su categoría) y el texto de la sentencia,
   leído por reglas y por jueces LLM; mide si el sistema encuentra precedentes del mismo delito y el mismo problema
   procesal, no si un abogado los consideraría útiles.
-- **Sin OCR:** los PDF escaneados no aportan texto. **Datos testados:** nunca se infieren.
+- **Documentos escaneados:** `construir-corpus` lee por OCR (Tesseract, español) las páginas sin capa de texto si
+  Tesseract está instalado. En los 1,899 PDF del proyecto solo uno está escaneado (94 páginas; el OCR lo lee en 392 s
+  y las reglas encuentran su sentido y su fundamento) y otras 12 páginas sueltas no tienen texto. Ese PDF no se
+  incorporó: no cambia el corpus congelado de la evaluación y su versión escaneada no tiene suprimidos los datos
+  personales. **Datos testados:** nunca se infieren.
 
 ## Próximos pasos
 
@@ -263,7 +271,8 @@ Continuación, mejora y evolución del proyecto, en orden de prioridad:
    familias de delito (hoy 546 tipos) y señalar resoluciones de distintas Salas con sentido opuesto en supuestos
    semejantes.
 4. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
-   reCAPTCHA), volver a descargar las sentencias con páginas omitidas y agregar OCR para los PDF escaneados.
+   reCAPTCHA) y volver a descargar las sentencias con páginas omitidas; los PDF escaneados ya se leen por OCR al
+   construir el corpus, pero antes de incorporarlos hay que comprobar que tengan suprimidos los datos personales.
 5. **Controles.** Mejorar la precisión de QC_1 (0.322 en prueba) sin perder exhaustividad y fijar el umbral de
    «sin precedentes del mismo tipo» cuando una señal lo separe mejor que `kem_max`.
 6. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
