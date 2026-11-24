@@ -63,6 +63,25 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 - `indexar --recortar`: reduce el índice al corpus sin recalcular embeddings.
 - `evaluacion/errores/juez_familia.md` y `evaluacion/errores/sugerencia_delito.md`.
 
+### Experimentos en desarrollo, después del congelado
+Cada uno en la partición de desarrollo, por pares y con IC 95 % por bootstrap; la partición de prueba no se volvió a
+medir.
+- **Síntesis v12, adoptada:** v11 más un ejemplo de líneas bien citadas y una revisión final. En 20 consultas, las
+  afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086 [+0.021, +0.161]) y las sin cita de 0.144 a 0.066, sin
+  ningún pronóstico (`20261123-201729_e566e3d_sintesis-citas`). La lista por reglas de cada precedente sigue
+  encabezando la síntesis.
+- **Fundamento legal, dos variantes descartadas:** pedir solo los artículos que invoca la Sala (precisión +0.010
+  [−0.040, +0.060], exhaustividad −0.023, significativa; `20261123-174502_b8fdd94_fundamento-prompt`) y darle al
+  modelo la parte considerativa (precisión −0.048 [−0.096, +0.006], exhaustividad −0.030, significativa;
+  `20261123-212426_5fc9b67_fundamento-contexto`), ambas en 120 sentencias. 126 de 127 artículos citados fuera del
+  fundamento sí están en la sentencia: el error es de selección, no de invención.
+- **Perfil del tribunal de alzada:** las 39 consultas reescritas como toca en estudio encuentran la familia igual
+  (Hit@3 +0.051 [−0.077, +0.205]) pero con precedentes menos pertinentes (nDCG@5 0.266 → 0.145, significativo), en
+  parte por la reescritura automática (`20261123-202205_e566e3d-sucio_perfil-tribunal`).
+- QC_1_PENDIENTE
+- **OCR:** `construir-corpus` lee por OCR (Tesseract, español) las páginas sin capa de texto, si está instalado. Solo
+  1 de 1,899 PDF está escaneado; no se incorporó porque su versión escaneada no suprime los datos personales.
+
 ### Corregido
 - Sentido del fallo por reglas: también "lo procedente es confirmar/revocar…" y el verbo sin "se" (cobertura 557 →
   608 de 1,412, sin cambiar ningún valor ya leído; `evaluacion/errores/sentido_fallo.md`).

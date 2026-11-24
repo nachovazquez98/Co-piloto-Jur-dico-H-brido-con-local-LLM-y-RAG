@@ -424,3 +424,15 @@ def test_prompt_sintesis_v12_solo_agrega_reglas_de_cita():
     from copiloto_juridico import config
 
     assert config.PROMPT_SINTESIS_VERSION == "v12" and "NO predigas el resultado" in v12  # la de la app
+
+
+def test_prompt_qc1_v12_mismo_criterio_solo_veredicto():
+    from copiloto_juridico import prompts
+    from copiloto_juridico.pipeline import parse_veredicto
+
+    v11, v12 = prompts.prompt_qc1("v11"), prompts.prompt_qc1("v12")
+    assert v12.split("**Consulta del Usuario:**")[0] == v11.split("**Consulta del Usuario:**")[0]
+    assert "1. Delito y problema" not in v12 and "VEREDICTO: SI o VEREDICTO: NO" in v12
+    assert parse_veredicto("VEREDICTO: NO") is False and parse_veredicto("VEREDICTO: SI") is True
+    with pytest.raises(ValueError):
+        prompts.prompt_qc1("v99")

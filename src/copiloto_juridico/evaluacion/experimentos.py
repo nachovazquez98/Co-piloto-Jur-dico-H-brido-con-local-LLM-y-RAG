@@ -1034,8 +1034,15 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
     lo que decide (la familia del delito de la ficha) lo mide `fichas-referencia`.
 
     Variantes del texto que lee QC_1: "inicio" (primeros caracteres), "fragmento_similar" (el de la app) y "ficha"
-    (campos de la ficha precalculada: delito, acto impugnado, agravios...; sin ficha, el fragmento similar). Con dos
-    o más variantes, la primera se compara por pares con las demás en recall y especificidad."""
+    (campos de la ficha precalculada: delito, acto impugnado, agravios...; sin ficha, el fragmento similar). Con
+    sufijo ":vNN" la variante usa esa versión del prompt (p. ej. "ficha:v12"); sin sufijo, la de la app. Con
+    "@modelo", otro modelo de Ollama (p. ej. "fragmento_similar@qwen2.5:7b"). Con dos o más variantes, la primera se
+    compara por pares con las demás en recall y especificidad. Tiempo: mediana por llamada sin caché y primera
+    llamada (incluye la carga del modelo cuando la variante anterior usó otro)."""
+    import dataclasses
+    import statistics
+
+    from ..llm import get_client
     from ..embeddings import embed_query
     from ..fichas import FichaPenal
     from ..fichas_precalculadas import cargar
@@ -1053,30 +1060,42 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
         filas, detalle, por_variante, sin_ficha = [], [], {}, 0
         humano = [rel >= 1 for _, _, rel in pares]
         fichas = {}
-        if "ficha" in variantes:
+        if any(v.split(":")[0] == "ficha" for v in variantes):
             t = cargar()
             fichas = dict(zip(t.loc[t["json_valido"].astype(bool), "doc_id"], t.loc[t["json_valido"].astype(bool), "ficha"]))
+        tiempos, clientes = {}, {}
         for variante in variantes:
             log(f"QC_1 ({variante}) sobre {len(pares)} pares...")
-            sistema = []
+            spec, _, modelo = variante.partition("@")
+            contexto, _, version = spec.partition(":")
+            plantilla = prompts.prompt_qc1(version or None)  # sin sufijo, el mismo prompt que la app
+            cliente = llm if not modelo else clientes.setdefault(modelo, LLMConCache(get_client(
+                dataclasses.replace(llm.settings, model=modelo))))
+            sistema, tiempos[variante] = [], []
             for i, (cid, doc_id, _) in enumerate(pares, 1):
                 consulta = consultas[cid].consulta
-                if variante == "ficha" and doc_id in fichas:
+                if contexto == "ficha" and doc_id in fichas:
                     fragmento = FichaPenal.desde_guardada(fichas[doc_id]).campos_markdown()[:config.QC1_MAX_CHARS]
-                elif variante in ("fragmento_similar", "ficha"):
-                    sin_ficha += variante == "ficha"
+                elif contexto in ("fragmento_similar", "ficha"):
+                    sin_ficha += contexto == "ficha"
                     q = embs.setdefault(cid, embed_query(consulta))
                     fragmento = env.store.fragmento_mas_similar(doc_id, q)
                 else:
                     fragmento = env.store.corpus.loc[doc_id, "texto"][:2500]
-                resp = llm.generate(prompts.prompt_qc1().format(  # el mismo prompt que la app
-                    texto_consulta=consulta, fragmento_documento=fragmento))
+                aciertos, t0 = getattr(cliente, "aciertos", 0), time.perf_counter()
+                resp = cliente.generate(plantilla.format(texto_consulta=consulta, fragmento_documento=fragmento))
+                if getattr(cliente, "aciertos", 0) == aciertos:  # llamada real, no de la caché
+                    tiempos[variante].append(time.perf_counter() - t0)
                 sistema.append(parse_veredicto(resp))
                 if i % 25 == 0:
                     log(f"   {i}/{len(pares)}")
             r = resumen_binario(humano, sistema)
             por_variante[variante] = [v is not False for v in sistema]  # no interpretable = SI, como la app
-            filas.append(_filas_qc(f"QC_1 · {variante}", r, r["VP"], r["VP"] + r["FN"]))
+            t = tiempos[variante]
+            filas.append({**_filas_qc(f"QC_1 · {variante}", r, r["VP"], r["VP"] + r["FN"]),
+                          "llamadas sin caché": len(t),
+                          "s por llamada (mediana)": round(statistics.median(t[1:] or t), 2) if t else float("nan"),
+                          "primera llamada (s)": round(t[0], 2) if t else float("nan")})
             detalle += [{"variante": variante, "consulta": cid, "doc_id": d, "relevancia": rel,
                          "veredicto": "—" if v is None else ("SI" if v else "NO")}
                         for (cid, d, rel), v in zip(pares, sistema)]
@@ -1101,8 +1120,8 @@ def experimento_qc(env: Entorno, llm, variantes: Iterable[str] = ("inicio", "fra
             corrida.tabla("Comparación por pares de las variantes",
                           "Mismos pares (consulta, sentencia). Diferencia pareada con IC 95 % por bootstrap; una "
                           "variante solo mejora si sube la especificidad sin bajar el recall de forma significativa."
-                          + (f" {sin_ficha} pares sin ficha precalculada usan el fragmento similar."
-                             if "ficha" in variantes else ""),
+                          + (f" {sin_ficha} lecturas sin ficha precalculada usan el fragmento similar."
+                             if fichas else ""),
                           pd.DataFrame(comparadas))
         corrida.tabla("Veredictos de QC_1 por par", "Lo usa el comando `errores` (descartes de pares relevantes).",
                       pd.DataFrame(detalle), diagnostico=True)

@@ -279,7 +279,10 @@ def cmd_qc(args) -> None:
 
     env = _entorno(args, "qc", args.particion)
     variantes = {"ambas": ["inicio", "fragmento_similar"], "ficha-vs-fragmento": ["fragmento_similar", "ficha"]}.get(
-        args.variante, [args.variante])
+        args.variante, [v.strip() for v in args.variante.split(",") if v.strip()])
+    for v in variantes:
+        if v.partition("@")[0].partition(":")[0] not in ("inicio", "fragmento_similar", "ficha"):
+            sys.exit(f"❌ Variante de QC_1 desconocida: {v}")
     _guardar(experimento_qc(env, _llm(), variantes, log=_log))
 
 
@@ -486,9 +489,10 @@ def main(argv=None) -> None:
         s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
         s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
         if nombre == "qc":
-            s.add_argument("--variante", choices=["inicio", "fragmento_similar", "ficha", "ambas", "ficha-vs-fragmento"],
-                           default="ambas", help="ambas = inicio y fragmento_similar; ficha-vs-fragmento = "
-                                                 "fragmento_similar (la app) frente a la ficha precalculada")
+            s.add_argument("--variante", default="ambas",
+                           help="ambas = inicio y fragmento_similar; ficha-vs-fragmento = fragmento_similar (la app) "
+                                "frente a la ficha precalculada; o una lista separada por comas de contexto[:versión]"
+                                "[@modelo], p. ej. fragmento_similar,fragmento_similar:v12,fragmento_similar@qwen2.5:7b")
         if nombre == "latencia":
             s.add_argument("--max", type=int, default=10, help="Número de consultas a ejecutar")
             s.add_argument("--ejemplos", action="store_true", help="Usa los ejemplos penales de la app")

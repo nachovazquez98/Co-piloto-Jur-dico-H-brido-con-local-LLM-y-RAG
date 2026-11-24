@@ -85,14 +85,29 @@ VEREDICTO: SI o NO
 """
 
 
+# v12 (v11.2, experimento de velocidad): el mismo criterio que v11, pero sin las dos frases de razonamiento previas
+# al veredicto, que son la mayor parte de lo que genera el modelo en cada llamada.
+_FORMATO_QC1_V11 = """Responde exactamente con este formato:
+1. Delito y problema de la consulta: <una frase>
+2. Delito y problema del documento: <una frase>
+VEREDICTO: SI o NO
+"""
+assert _FORMATO_QC1_V11 in PROMPT_VERIFICACION_RELEVANCIA_V11
+PROMPT_VERIFICACION_RELEVANCIA_V12 = PROMPT_VERIFICACION_RELEVANCIA_V11.replace(
+    _FORMATO_QC1_V11, "Responde ÚNICAMENTE con una línea: VEREDICTO: SI o VEREDICTO: NO\n")
+PROMPTS_QC1 = {"v10": PROMPT_VERIFICACION_RELEVANCIA, "v11": PROMPT_VERIFICACION_RELEVANCIA_V11,
+               "v12": PROMPT_VERIFICACION_RELEVANCIA_V12}
+
+
 def prompt_qc1(version: str | None = None) -> str:
-    """Prompt de QC_1 según `config.PROMPT_QC1_VERSION` ("v10": mismo tema Y contexto; "v11": criterio de defensa)."""
+    """Prompt de QC_1 según `config.PROMPT_QC1_VERSION` ("v10": mismo tema Y contexto; "v11": criterio de defensa;
+    "v12": criterio de v11, solo el veredicto)."""
     from . import config
 
     version = version or config.PROMPT_QC1_VERSION
-    if version not in ("v10", "v11"):
+    if version not in PROMPTS_QC1:
         raise ValueError(f"Versión de QC_1 desconocida: {version}")
-    return PROMPT_VERIFICACION_RELEVANCIA if version == "v10" else PROMPT_VERIFICACION_RELEVANCIA_V11
+    return PROMPTS_QC1[version]
 
 
 PROMPT_VERIFICACION_POST_REPORTE = """
