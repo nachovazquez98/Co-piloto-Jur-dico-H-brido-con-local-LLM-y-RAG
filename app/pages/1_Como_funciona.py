@@ -83,15 +83,15 @@ for termino, definicion in GLOSARIO.items():
 st.header("Evaluación")
 st.markdown("No se contó con abogados para anotar resultados, por lo que la referencia de la evaluación se construyó "
             "de forma automática e independiente del sistema: el delito, a partir de la categoría que asignó el "
-            "propio STJ en su portal; el acto impugnado, el apelante y el sentido del fallo, por mayoría entre reglas "
-            "aplicadas al texto y un modelo evaluador de otra familia (`gemma2:9b`), admitido solo tras acreditar "
-            "al menos 0.80 de exactitud contra la categoría del STJ. Las métricas finales se miden una sola vez, con "
-            "el código y los datos congelados. A continuación, la última corrida guardada de cada experimento "
+            "propio STJ en su portal; el acto impugnado, el apelante y el sentido del fallo, por reglas aplicadas al "
+            "texto. Un modelo evaluador de otra familia (`gemma2:9b`) solo se admitía con al menos 0.80 de exactitud "
+            "contra la categoría del STJ; obtuvo 0.742 y no se usa. Las métricas finales se miden una sola vez, en la "
+            "partición de prueba, con el código y los datos congelados. A continuación, esa evaluación final "
             "(`evaluacion/resultados/`); lo no medido aparece como **por medir**.")
 for comando, titulo in (("recuperacion", "Clasificación y recuperación"), ("qc", "Controles de calidad"),
                         ("fichas-referencia", "Calidad de la ficha"), ("esfuerzo", "Esfuerzo para encontrar precedentes"),
                         ("latencia", "Tiempo por consulta")):
-    datos = ultimo_resultado(comando)
+    datos = ultimo_resultado(comando, particion=None if comando == "latencia" else "prueba")
     st.subheader(titulo)
     if datos is None:
         st.markdown(f"Por medir (`python -m copiloto_juridico.evaluacion {comando}`).")

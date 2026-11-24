@@ -1,5 +1,6 @@
 """La interfaz se ejecuta sin errores (Streamlit en modo prueba, sin GPU ni Ollama)."""
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -16,7 +17,7 @@ def test_solo_dos_paginas():
 def test_como_funciona_sin_resultados_dice_por_medir(tmp_path, monkeypatch):
     import copiloto_juridico.evaluacion.reporte as rep
 
-    monkeypatch.setattr(rep.ultimo_resultado, "__defaults__", (None, tmp_path))
+    monkeypatch.setattr(rep.ultimo_resultado, "__defaults__", (None, tmp_path, None))
     at = st_testing.AppTest.from_file(str(APP / "pages" / "1_Como_funciona.py"), default_timeout=60).run()
     assert not at.exception
     textos = " ".join(m.value for m in at.markdown)
@@ -26,14 +27,20 @@ def test_como_funciona_sin_resultados_dice_por_medir(tmp_path, monkeypatch):
 def test_como_funciona_oculta_diagnosticos(tmp_path, monkeypatch):
     import copiloto_juridico.evaluacion.reporte as rep
 
-    cor = rep.Corrida("recuperacion", borrador=True)
+    cor = rep.Corrida("recuperacion", parametros={"particion": "prueba"}, borrador=True)
     cor.tabla("Clasificación de la consulta", "d", pd.DataFrame([{"variante": "x", "Hit@3 tipo": 0.5}]))
     cor.tabla("Diagnóstico", "d", pd.DataFrame([{"x": 1}]), diagnostico=True)
     cor.guardar(tmp_path)
-    monkeypatch.setattr(rep.ultimo_resultado, "__defaults__", (None, tmp_path))
+    monkeypatch.setattr(rep.ultimo_resultado, "__defaults__", (None, tmp_path, None))
     at = st_testing.AppTest.from_file(str(APP / "pages" / "1_Como_funciona.py"), default_timeout=60).run()
     assert not at.exception and len(at.dataframe) == 1
     assert any("BORRADOR" in c.value for c in at.caption)
+    # Un experimento de desarrollo más reciente no reemplaza a la evaluación final
+    (tmp_path / "99991231-235959_x_recuperacion.json").write_text(json.dumps({
+        "comando": "recuperacion", "fecha": "9999-12-31", "commit": "x", "parametros": {"particion": "desarrollo"},
+        "tablas": {}}), encoding="utf-8")
+    at = st_testing.AppTest.from_file(str(APP / "pages" / "1_Como_funciona.py"), default_timeout=60).run()
+    assert not at.exception and len(at.dataframe) == 1
 
 
 def _modelo_en_cache() -> bool:

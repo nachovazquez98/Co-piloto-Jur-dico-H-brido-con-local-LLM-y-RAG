@@ -159,12 +159,14 @@ def tabla_markdown(df: pd.DataFrame) -> str:
     return "\n".join([cab, sep, *filas])
 
 
-def ultimo_resultado(comando: str | None = None, directorio: Path = config.RESULTADOS_DIR) -> dict | None:
-    """El JSON más reciente (de un comando, o de cualquiera)."""
+def ultimo_resultado(comando: str | None = None, directorio: Path = config.RESULTADOS_DIR,
+                     particion: str | None = None) -> dict | None:
+    """El JSON más reciente (de un comando, o de cualquiera); con `particion`, el más reciente de esa partición
+    (la página "Cómo funciona" muestra la evaluación final, en prueba, no los experimentos de desarrollo)."""
     patron = f"*_{comando}.json" if comando else "*.json"
-    archivos = sorted(directorio.glob(patron)) if directorio.exists() else []
-    if not archivos:
-        return None
-    datos = json.loads(archivos[-1].read_text(encoding="utf-8"))
-    datos["_archivo"] = archivos[-1].name
-    return datos
+    for archivo in sorted(directorio.glob(patron), reverse=True) if directorio.exists() else []:
+        datos = json.loads(archivo.read_text(encoding="utf-8"))
+        if particion is None or (datos.get("parametros") or {}).get("particion") == particion:
+            datos["_archivo"] = archivo.name
+            return datos
+    return None

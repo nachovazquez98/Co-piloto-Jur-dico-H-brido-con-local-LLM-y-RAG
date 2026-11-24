@@ -158,7 +158,11 @@ ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
 # misma familia o mismo problema procesal. Sin anotaciones (`qc-diagnostico`, corrida 20261112-184123_2c7be47): en
 # los 5 primeros candidatos de los 16 ejemplos penales, v10 descarta 55 % y v11 + fragmento 14 %, ninguna consulta
 # se queda sin candidatos. Si esos descartes son correctos lo mide `qc` contra juicios humanos.
-QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "fragmento_similar")  # "inicio" | "fragmento_similar"
+# v11.2: QC_1 lee la ficha precalculada de la sentencia (delito, acto impugnado, agravios, sentido) en lugar del
+# fragmento; sin ficha vigente, el fragmento. En 660 pares de desarrollo, por pares, el recall pasa de 0.725 a 0.844
+# (+0.120 [+0.036, +0.204]) sin cambio significativo en la especificidad (0.410 → 0.396); precisión 0.294 → 0.321
+# (`20261123-230824_5fc9b67_qc`).
+QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "ficha")  # "inicio" | "fragmento_similar" | "ficha"
 PROMPT_QC1_VERSION = _env("COPILOTO_PROMPT_QC1", "v11")
 QC1_MAX_CHARS = 2500
 # Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).

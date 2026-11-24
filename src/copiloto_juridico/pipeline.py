@@ -633,8 +633,15 @@ class Copiloto:
         return set(cargar_familias(tipos).values())
 
     def _contexto_qc1(self, cand: Candidato, q_emb) -> str:
-        """Texto de la sentencia que lee QC_1, según `config.QC1_CONTEXTO`."""
-        if config.QC1_CONTEXTO == "fragmento_similar":
+        """Texto de la sentencia que lee QC_1, según `config.QC1_CONTEXTO`: "ficha" (campos de la ficha precalculada
+        vigente; sin ella, el fragmento similar), "fragmento_similar" o "inicio"."""
+        if config.QC1_CONTEXTO == "ficha" and config.FICHAS_PRECALCULADAS:
+            from .fichas_precalculadas import ficha_guardada
+
+            guardada = ficha_guardada(cand.doc_id, cand.texto, self.llm.settings)
+            if guardada is not None:
+                return guardada.campos_markdown()[:config.QC1_MAX_CHARS]
+        if config.QC1_CONTEXTO in ("fragmento_similar", "ficha"):
             return self.store.fragmento_mas_similar(cand.doc_id, q_emb, config.QC1_MAX_CHARS)
         return cand.texto[:config.QC1_MAX_CHARS]
 

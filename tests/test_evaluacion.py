@@ -255,6 +255,8 @@ def test_reporte_guarda_json_y_md(tmp_path):
     assert "configuracion" in datos and "corpus_fingerprint" in datos
     assert "BORRADOR" in pm.read_text()
     assert ultimo_resultado("prueba", tmp_path)["_archivo"] == pj.name
+    assert ultimo_resultado("prueba", tmp_path, particion="desarrollo")["_archivo"] == pj.name
+    assert ultimo_resultado("prueba", tmp_path, particion="prueba") is None  # solo la evaluación final
 
 
 # Fragmentos reales de resolutivos del corpus (texto tal como lo deja la extracción del PDF).

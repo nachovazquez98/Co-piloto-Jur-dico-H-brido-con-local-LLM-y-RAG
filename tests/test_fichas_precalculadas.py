@@ -124,3 +124,21 @@ def test_ficha_del_modelo_de_respaldo_se_acepta(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "FICHAS_MODELO_RESPALDO", "respaldo")
     assert fp.ficha_guardada("a", TEXTO, principal, path).sentido_fallo == "CONFIRMA"
     assert fp.fila_guardada("a", path)["modelo"] == "respaldo"
+
+
+def test_qc1_lee_la_ficha_precalculada(monkeypatch):
+    """v11.2: QC_1 lee los campos de la ficha precalculada; sin ficha vigente, el fragmento."""
+    from test_pipeline_v11 import ClasificadorFalso, LLMFalso, StoreFalso, _cand, _correr
+
+    ficha = FichaPenal.desde_json(json.dumps(FICHA))
+    monkeypatch.setattr(config, "FICHAS_PRECALCULADAS", True)
+    monkeypatch.setattr(config, "QC1_CONTEXTO", "ficha")
+    monkeypatch.setattr(fp, "ficha_guardada", lambda d, t, s: ficha)
+    llm_ = LLMFalso()
+    _correr(StoreFalso([_cand(f"d{i}") for i in range(3)], []), ClasificadorFalso(), llm_, num_precedentes=1)
+    qc1 = next(p for p in llm_.prompts if "Verificación de Relevancia" in p)
+    assert "Auto de vinculación a proceso" in qc1 and "Robo calificado" in qc1
+    monkeypatch.setattr(fp, "ficha_guardada", lambda d, t, s: None)
+    llm_ = LLMFalso()
+    _correr(StoreFalso([_cand(f"d{i}") for i in range(3)], []), ClasificadorFalso(), llm_, num_precedentes=1)
+    assert "Auto de vinculación" not in next(p for p in llm_.prompts if "Verificación de Relevancia" in p)

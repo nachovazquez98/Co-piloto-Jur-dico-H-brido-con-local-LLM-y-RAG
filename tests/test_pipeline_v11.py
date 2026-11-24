@@ -124,7 +124,7 @@ def test_ficha_json_reintenta_y_cae_a_dos_llamadas():
 
 
 def test_qc1_contexto_configurable(monkeypatch):
-    assert config.QC1_CONTEXTO == "fragmento_similar"  # por defecto en v11
+    assert config.QC1_CONTEXTO == "ficha"  # por defecto en v11.2 (sin ficha precalculada, el fragmento)
     monkeypatch.setattr(config, "QC1_CONTEXTO", "inicio")
     store = StoreFalso([_cand(f"d{i}") for i in range(4)], [])
     llm_ = LLMFalso()
