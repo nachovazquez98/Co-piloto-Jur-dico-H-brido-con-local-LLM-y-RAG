@@ -18,6 +18,7 @@ Con LLM:
     robustez                         Consultas difíciles con la app completa (diagnóstico)
     perfil-tribunal --particion P    Las consultas planteadas como toca en estudio frente a la redacción del abogado
     sintesis-citas --particion P     Citas de la síntesis frente a la línea base v11, mismos precedentes
+    precedentes --particion P        Los precedentes que ve el usuario: orden por facetas, QC_1 y regla de familia
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
 Referencia automática, sin anotadores humanos:
@@ -423,6 +424,13 @@ def cmd_sintesis_citas(args) -> None:
     _guardar(experimento_sintesis_citas(env, _llm(con_cache=False), args.max, args.versiones.split(","), log=_log))
 
 
+def cmd_precedentes(args) -> None:
+    from .experimentos import experimento_precedentes
+
+    env = _entorno(args, "precedentes", args.particion)
+    _guardar(experimento_precedentes(env, _llm(), log=_log))
+
+
 def cmd_perfil_tribunal(args) -> None:
     from .experimentos import experimento_perfil_tribunal
 
@@ -560,6 +568,12 @@ def main(argv=None) -> None:
     s.add_argument("--max", type=int, default=20, help="Consultas de la muestra estable por hash")
     s.add_argument("--versiones", default="v12,v13", help="Versiones de la síntesis que se comparan con v11")
     s.set_defaults(func=cmd_sintesis_citas)
+
+    s = sub.add_parser("precedentes", help="Los precedentes que ve el usuario: facetas, QC_1 y regla de familia (LLM)")
+    s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")
+    s.add_argument("--consultas", default=str(config.CONSULTAS_PATH))
+    s.add_argument("--forzar", metavar="MOTIVO", help="Repite una corrida de prueba ya hecha (queda en el reporte)")
+    s.set_defaults(func=cmd_precedentes)
 
     s = sub.add_parser("perfil-tribunal", help="Consultas como toca en estudio frente a la redacción del abogado (LLM)")
     s.add_argument("--particion", choices=["desarrollo", "prueba", "todas"], default="desarrollo")

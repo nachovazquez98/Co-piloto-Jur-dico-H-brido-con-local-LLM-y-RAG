@@ -955,6 +955,122 @@ def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20, v
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Los precedentes que ve el usuario
+# --------------------------------------------------------------------------------------------------------------
+
+
+def experimento_precedentes(env: Entorno, llm, log: Callable[[str], None] = print) -> Corrida:
+    """¿Qué tan pertinentes son los precedentes que la app muestra? Para cada consulta validada con juicios se
+    comparan, contra la referencia:
+    - la búsqueda con filtro top-3 sin el orden por facetas (lo que mide `recuperacion`);
+    - la lista real de la app (`pipeline.buscar_candidatos`, con el orden por familia y acto impugnado);
+    - los 3 precedentes mostrados: los 3 primeros de esa lista sin QC_1, con QC_1 (la app) y con QC_1 más la regla
+      de familia (solo candidatos de las familias de las 3 categorías del clasificador, que la app ya conoce).
+    QC_1 se evalúa como en la app (ficha precalculada; sin ficha, el fragmento), hasta `Opciones.max_candidatos`.
+    Los no juzgados cuentan 0; como los pares a juzgar no cubren por igual todas las listas, se reporta además la
+    versión condensada (sin los no juzgados, Sakai 2007), que no favorece a la lista mejor juzgada. Diferencias
+    pareadas con IC 95 % por bootstrap."""
+    from ..embeddings import embed_query  # noqa: F401  (las consultas ya traen su embedding)
+    from ..fichas_precalculadas import ficha_guardada
+    from ..pipeline import Opciones, buscar_candidatos, familias_de_categoria, parse_veredicto
+    from .familias import cargar_familias
+
+    corrida = env.corrida
+    preparadas = [p for p in preparar(env) if not p.consulta.sin_respuesta and p.consulta.id in env.juicios]
+    textos = env.store.corpus.set_index("id")["texto"].to_dict()
+    tipos = env.store.corpus.set_index("id")["tipo"].to_dict()
+    fam_tipo = cargar_familias(sorted(set(tipos.values())))
+    max_cand = Opciones().max_candidatos
+    variantes = ["filtro sin facetas", "app (filtro + facetas)", "mostrados sin QC_1", "mostrados con QC_1 (app)",
+                 "mostrados con QC_1 + regla de familia"]
+    filas, llamadas = [], 0
+    for i, p in enumerate(preparadas, 1):
+        c, juicios = p.consulta, env.juicios[p.consulta.id]
+        amplios, _, rk = _clasificacion(env, p)
+        lista_sin = _lista_pipeline(env, p, rk, amplios, config.NUM_CATEGORIAS_FILTRO, None)
+        b = buscar_candidatos(env.store, env.clasificador, c.consulta, p.conceptos, p.q, config.RAG_NUM_RESULTS_DESIRED)
+        lista_app = [cand.doc_id for cand, _ in b.candidatos]
+        familias = set().union(*(familias_de_categoria(env.clasificador, cat) for cat in b.categorias))
+        veredictos: dict[str, bool] = {}
+
+        def qc1(doc: str) -> bool:
+            nonlocal llamadas
+            if doc not in veredictos:
+                guardada = ficha_guardada(doc, textos[doc], llm.settings) if config.FICHAS_PRECALCULADAS else None
+                contexto = (guardada.campos_markdown()[:config.QC1_MAX_CHARS] if guardada is not None
+                            else env.store.fragmento_mas_similar(doc, p.q, config.QC1_MAX_CHARS))
+                llamadas += 1
+                v = parse_veredicto(llm.generate(prompts.prompt_qc1().format(texto_consulta=c.consulta,
+                                                                            fragmento_documento=contexto)))
+                veredictos[doc] = v is not False  # no interpretable = SI, como la app
+            return veredictos[doc]
+
+        def mostrados(condicion) -> list[str]:
+            out = []
+            for doc in lista_app[:max_cand]:
+                if len(out) == config.RAG_NUM_RESULTS_DESIRED:
+                    break
+                if condicion(doc):
+                    out.append(doc)
+            return out
+
+        listas = {
+            "filtro sin facetas": lista_sin,
+            "app (filtro + facetas)": lista_app,
+            "mostrados sin QC_1": lista_app[:config.RAG_NUM_RESULTS_DESIRED],
+            "mostrados con QC_1 (app)": mostrados(qc1),
+            "mostrados con QC_1 + regla de familia": mostrados(
+                lambda d: fam_tipo.get(tipos.get(d)) in familias and qc1(d)),
+        }
+        for nombre, ids in listas.items():
+            r3, r5 = metricas_graduadas(ids, juicios, k=3), metricas_graduadas(ids, juicios, k=5)
+            cond = [d for d in ids if d in juicios]  # condensada: solo los juzgados
+            c3, c5 = metricas_graduadas(cond, juicios, k=3), metricas_graduadas(cond, juicios, k=5)
+            filas.append({"id": c.id, "variante": nombre, "ndcg3": r3["ndcg5"], "p3": r3["p5"], "cob3": r3["cobertura"],
+                          "ndcg5": r5["ndcg5"], "p5": r5["p5"], "n_mostrados": min(len(ids), 3),
+                          "ndcg3c": c3["ndcg5"], "p3c": c3["p5"], "ndcg5c": c5["ndcg5"]})
+        if i % 5 == 0:
+            log(f"[{i}/{len(preparadas)}] llamadas a QC_1 sin caché o con caché: {llamadas}")
+    d = pd.DataFrame(filas)
+    resumen = []
+    for v in variantes:
+        x = d[d["variante"] == v]
+        resumen.append({"variante": v, "consultas": len(x), "P@3": round(x["p3"].mean(), 3),
+                        "nDCG@3": round(x["ndcg3"].mean(), 3), "nDCG@5": round(x["ndcg5"].mean(), 3)
+                        if not v.startswith("mostrados") else float("nan"),
+                        "P@3 condensada": round(x["p3c"].mean(), 3), "nDCG@3 condensada": round(x["ndcg3c"].mean(), 3),
+                        "cobertura de juicios @3": round(x["cob3"].mean(), 3),
+                        "consultas con menos de 3 mostrados": int((x["n_mostrados"] < 3).sum())})
+    corrida.tabla("Precedentes que ve el usuario",
+                  f"Referencia: {env.fuente_juicios}. P@3 = fracción de los 3 primeros con relevancia ≥ 1; nDCG@k con "
+                  "las relevancias graduadas (2 = mismo delito y mismo problema procesal). Los no juzgados cuentan "
+                  "0 (la cobertura dice cuántos estaban juzgados).", pd.DataFrame(resumen))
+    comparaciones = []
+    for a, bb, metr in (("app (filtro + facetas)", "filtro sin facetas", "ndcg5"),
+                        ("app (filtro + facetas)", "filtro sin facetas", "ndcg5c"),
+                        ("app (filtro + facetas)", "filtro sin facetas", "p3"),
+                        ("app (filtro + facetas)", "filtro sin facetas", "p3c"),
+                        ("mostrados con QC_1 (app)", "mostrados sin QC_1", "p3"),
+                        ("mostrados con QC_1 (app)", "mostrados sin QC_1", "ndcg3"),
+                        ("mostrados con QC_1 (app)", "mostrados sin QC_1", "p3c"),
+                        ("mostrados con QC_1 + regla de familia", "mostrados con QC_1 (app)", "p3"),
+                        ("mostrados con QC_1 + regla de familia", "mostrados con QC_1 (app)", "ndcg3"),
+                        ("mostrados con QC_1 + regla de familia", "mostrados con QC_1 (app)", "p3c")):
+        xa = d[d["variante"] == a].set_index("id")[metr]; xb = d[d["variante"] == bb].set_index("id")[metr]
+        dif = m.bootstrap_diferencia_pareada(xa.tolist(), xb.loc[xa.index].tolist())
+        etiqueta = {"ndcg5": "nDCG@5", "ndcg5c": "nDCG@5 condensada", "p3": "P@3", "p3c": "P@3 condensada",
+                    "ndcg3": "nDCG@3"}[metr]
+        comparaciones.append({"A": a, "B": bb, "métrica": etiqueta,
+                              "consultas": dif["n"],
+                              "diferencia (A − B)": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, {dif['ic_sup']:+.3f}]",
+                              "significativa": "sí" if dif["significativa"] else "no"})
+    corrida.tabla("Comparaciones pareadas", "Mismas consultas; IC 95 % por bootstrap pareado.",
+                  pd.DataFrame(comparaciones))
+    corrida.parametros.update(max_candidatos=max_cand, llamadas_qc1=llamadas)
+    return corrida
+
+
+# --------------------------------------------------------------------------------------------------------------
 # Perfil del tribunal de alzada
 # --------------------------------------------------------------------------------------------------------------
 
