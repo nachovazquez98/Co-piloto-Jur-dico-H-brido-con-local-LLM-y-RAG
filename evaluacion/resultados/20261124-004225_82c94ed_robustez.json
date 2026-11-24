@@ -1,7 +1,7 @@
 {
   "comando": "robustez",
-  "fecha": "2026-11-23T23:56:04",
-  "commit": "835231c",
+  "fecha": "2026-11-24T00:42:25",
+  "commit": "82c94ed",
   "sucio": false,
   "semilla": 42,
   "parametros": {
@@ -101,7 +101,7 @@
     "PROMPT_CONCEPTOS_VERSION": "v11",
     "PROMPT_PENAL_VERSION": "v11",
     "PROMPT_QC1_VERSION": "v11",
-    "PROMPT_SINTESIS_VERSION": "v12",
+    "PROMPT_SINTESIS_VERSION": "v11",
     "QC1_CONTEXTO": "ficha",
     "QC1_MAX_CHARS": 2500,
     "QC2_MODO": "determinista",
@@ -162,7 +162,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 34.7
+          "segundos": 25.5
         },
         {
           "id": "R02",
@@ -176,7 +176,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 33.2
+          "segundos": 43.1
         },
         {
           "id": "R03",
@@ -190,7 +190,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 40.7
+          "segundos": 36.7
         },
         {
           "id": "R04",
@@ -204,7 +204,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 58.2
+          "segundos": 57.1
         },
         {
           "id": "R05",
@@ -218,7 +218,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 90.9
+          "segundos": 85.6
         },
         {
           "id": "R06",
@@ -232,7 +232,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 70.0
+          "segundos": 73.1
         },
         {
           "id": "R07",
@@ -246,7 +246,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 24.2
+          "segundos": 26.5
         },
         {
           "id": "R08",
@@ -260,7 +260,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 41.0
+          "segundos": 38.4
         }
       ]
     },

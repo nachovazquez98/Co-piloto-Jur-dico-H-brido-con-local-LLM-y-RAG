@@ -1,7 +1,7 @@
 {
   "comando": "demo",
-  "fecha": "2026-11-24T00:08:15",
-  "commit": "835231c",
+  "fecha": "2026-11-24T00:54:12",
+  "commit": "82c94ed",
   "sucio": false,
   "semilla": 42,
   "parametros": {
@@ -100,7 +100,7 @@
     "PROMPT_CONCEPTOS_VERSION": "v11",
     "PROMPT_PENAL_VERSION": "v11",
     "PROMPT_QC1_VERSION": "v11",
-    "PROMPT_SINTESIS_VERSION": "v12",
+    "PROMPT_SINTESIS_VERSION": "v11",
     "QC1_CONTEXTO": "ficha",
     "QC1_MAX_CHARS": 2500,
     "QC2_MODO": "determinista",
@@ -142,122 +142,122 @@
       "filas": [
         {
           "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
-          "sin caché (s)": 28.3,
+          "sin caché (s)": 32.1,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Robo equiparado · Sentencia de juicio oral",
-          "sin caché (s)": 29.4,
+          "sin caché (s)": 26.3,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
-          "sin caché (s)": 30.8,
+          "sin caché (s)": 28.6,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Homicidio calificado en grado de tentativa · Sentencia de juicio oral",
-          "sin caché (s)": 33.4,
-          "con caché (s)": 0.009,
+          "sin caché (s)": 32.9,
+          "con caché (s)": 0.007,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Violencia familiar · Sentencia de juicio oral",
-          "sin caché (s)": 54.4,
+          "sin caché (s)": 52.2,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
-          "sin caché (s)": 30.0,
+          "sin caché (s)": 27.1,
           "con caché (s)": 0.007,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Violación · Vinculación a proceso",
-          "sin caché (s)": 36.0,
-          "con caché (s)": 0.009,
+          "sin caché (s)": 33.5,
+          "con caché (s)": 0.007,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
-          "sin caché (s)": 32.8,
+          "sin caché (s)": 31.5,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Despojo de inmuebles · Vinculación a proceso",
-          "sin caché (s)": 36.9,
-          "con caché (s)": 0.007,
-          "guardado": "sí"
-        },
-        {
-          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
-          "sin caché (s)": 32.0,
-          "con caché (s)": 0.015,
-          "guardado": "sí"
-        },
-        {
-          "ejemplo": "Penal · Amenazas · Sentencia de juicio oral",
-          "sin caché (s)": 31.9,
-          "con caché (s)": 0.005,
-          "guardado": "sí"
-        },
-        {
-          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
-          "sin caché (s)": 29.9,
+          "sin caché (s)": 37.8,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
+          "ejemplo": "Penal · Homicidio culposo (tránsito) · Sentencia de juicio oral",
+          "sin caché (s)": 31.2,
+          "con caché (s)": 0.007,
+          "guardado": "sí"
+        },
+        {
+          "ejemplo": "Penal · Amenazas · Sentencia de juicio oral",
+          "sin caché (s)": 27.7,
+          "con caché (s)": 0.007,
+          "guardado": "sí"
+        },
+        {
+          "ejemplo": "Penal · Abandono de familiares · Sentencia de juicio oral",
+          "sin caché (s)": 31.9,
+          "con caché (s)": 0.007,
+          "guardado": "sí"
+        },
+        {
           "ejemplo": "Penal · Secuestro agravado · Sentencia de juicio oral",
-          "sin caché (s)": 94.3,
+          "sin caché (s)": 95.2,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Lesiones calificadas · Sentencia de juicio oral",
-          "sin caché (s)": 24.4,
-          "con caché (s)": 0.005,
+          "sin caché (s)": 24.9,
+          "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Justicia para adolescentes · Medida de internamiento (sin tipo en el corpus)",
-          "sin caché (s)": 34.9,
-          "con caché (s)": 0.005,
+          "sin caché (s)": 36.8,
+          "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Ejecución de sentencia · Libertad condicionada (sin tipo en el corpus)",
-          "sin caché (s)": 32.7,
-          "con caché (s)": 0.007,
+          "sin caché (s)": 31.6,
+          "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Robo calificado · Vinculación a proceso",
-          "sin caché (s)": 29.9,
+          "sin caché (s)": 25.9,
           "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Homicidio calificado · Prisión preventiva",
-          "sin caché (s)": 30.9,
+          "sin caché (s)": 26.2,
           "con caché (s)": 0.005,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Abuso sexual infantil · Sentencia de juicio oral",
-          "sin caché (s)": 27.6,
-          "con caché (s)": 0.007,
+          "sin caché (s)": 28.0,
+          "con caché (s)": 0.006,
           "guardado": "sí"
         },
         {
           "ejemplo": "Penal · Fraude · No vinculación (apela el MP)",
-          "sin caché (s)": 39.6,
-          "con caché (s)": 0.006,
+          "sin caché (s)": 35.7,
+          "con caché (s)": 0.007,
           "guardado": "sí"
         }
       ]
@@ -273,13 +273,13 @@
       "filas": [
         {
           "modo": "sin caché",
-          "p50": 31.95,
-          "p95": 56.395000000000024
+          "p50": 31.55,
+          "p95": 54.35000000000004
         },
         {
           "modo": "con caché",
           "p50": 0.006,
-          "p95": 0.009300000000000003
+          "p95": 0.007
         }
       ]
     }
