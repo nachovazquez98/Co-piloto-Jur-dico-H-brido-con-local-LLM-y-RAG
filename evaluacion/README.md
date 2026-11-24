@@ -4,7 +4,7 @@ Todos los comandos: `python -m copiloto_juridico.evaluacion <comando>` desde la 
 queda en `evaluacion/resultados/` (JSON y Markdown) con fecha, commit, configuración, semillas, digest del modelo y
 huella del corpus. Las decisiones de diseño citan en `config.py` la corrida que las respalda.
 
-## Referencia automática, sin anotadores humanos (v11.2)
+## Referencia automática, sin anotadores humanos
 
 No hay abogados disponibles para anotar, así que la referencia se construye sin intervención humana:
 

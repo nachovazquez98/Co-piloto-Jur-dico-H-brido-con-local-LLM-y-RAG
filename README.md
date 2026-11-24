@@ -140,35 +140,24 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 | Ficha: darle al modelo la parte considerativa (120 sentencias) | precisión −0.048 [−0.096, +0.006]; exhaustividad −0.030, significativa | descartado | `20261123-212426_5fc9b67_fundamento-contexto` |
 | Consultas planteadas como toca en estudio (39 consultas) | Hit@3 de familia igual (+0.051 [−0.077, +0.205]); nDCG@5 0.266 → 0.145, significativo | medición del perfil | `20261123-202205_e566e3d-sucio_perfil-tribunal` |
 
-Orden de la evaluación final: corpus definitivo → fichas → juez y `referencias` → `congelar` → corridas con
-`--particion prueba`, una sola vez. Lo que sigue en esta sección es **diagnóstico** de versiones anteriores.
+Orden de la evaluación final: corpus definitivo → fichas → `referencias` → `congelar` → corridas con
+`--particion prueba`, una sola vez.
 
-**Referencia histórica (v10):** en 15 de 18 consultas de ejemplo el filtro incluyó la categoría correcta:
-Hit@3 = 0.83, IC 95 % [0.61, 0.94], n = 18. Son consultas de cinco materias (no un conjunto penal) y los pesos se
-ajustaron mirando esas mismas consultas, así que es una estimación optimista y no independiente del ajuste.
+**Por qué una consulta tarda ~31 s** (`latencia --ejemplos`, 10 ejemplos penales de la app, RTX 4060 Laptop 8 GB,
+`llama3.1:8b`):
 
-**Latencia medida** (`latencia --ejemplos`, ejemplos penales de la app, RTX 4060 Laptop 8 GB, `llama3.1:8b`; corridas
-en `evaluacion/resultados/`):
-
-| Versión | Corrida | Total p50 | Total p95 | Llamadas al LLM p50 (p95) |
+| Diseño | Corrida | Total p50 | Total p95 | Llamadas al LLM p50 (p95) |
 |---|---|---|---|---|
-| v10: ficha en dos llamadas + QC_2 con el LLM | `20261112-175942_c78b576` | 321 s | 847 s | 17 (45) |
-| v11.0: ficha en una llamada JSON + QC_2 determinista | `20261112-173610_0a20152` | 138 s | 168 s | 8 (9) |
-| v11.1, fichas generadas en el momento | `20261113-111047_fb1f3fe` | 121 s | 140 s | 8 (9) |
-| v11.1, fichas precalculadas (la app por defecto) | `20261113-111602_fb1f3fe` | 30 s | 34 s | 5 (6) |
-| v11.2, solo penal, fichas precalculadas | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
+| Línea base: ficha en dos llamadas + QC_2 con el LLM | `20261112-175942_c78b576` | 321 s | 847 s | 17 (45) |
+| Ficha en una llamada JSON + QC_2 determinista | `20261112-173610_0a20152` | 138 s | 168 s | 8 (9) |
+| Además, fichas precalculadas (la app), corpus final | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
 
-Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 41 s
-(`20261113-112440_fb1f3fe`). Con un resultado ya guardado (`demo --ejemplos`) la app lo muestra en 0.005 s
-(`20261113-120016_fb1f3fe_demo`; con el corpus final, DEMO_FINAL). Clasificación y búsqueda tardan menos de
-0.2 s.
+Con fichas precalculadas, lo que queda es QC_1 (unas 3 llamadas) y la síntesis; clasificación y búsqueda tardan
+menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra al instante (DEMO_FINAL).
 
-**Diagnóstico sin anotación** (no son tasas de error del sistema):
+**Diagnósticos complementarios** (sin referencia; no son tasas de error del sistema):
 
-- Fichas precalculadas, 1,412 sentencias penales (`20261113-105003_fb1f3fe_fichas-diagnostico`): JSON inválido tras
-  un reintento en 66; donde las reglas leen el sentido del fallo (538), el LLM coincide en 349; 429 de 5,096
-  artículos citados no aparecen en el texto. La app marca esos casos con **verificar**.
-- Errores por tipo con los 16 ejemplos (`evaluacion/errores/`, `errores --corrida`): en la regresión
+- Errores por tipo con los ejemplos (`evaluacion/errores/`, `errores --corrida`): en la regresión
   `20261113-114442_fb1f3fe`, cobertura 2, orden 4, ficha 5; en `qc-diagnostico` `20261113-114412_fb1f3fe`, QC_1
   descartó un candidato de la familia correcta en 6 ejemplos. Casos para la presentación en
   [`evaluacion/errores/casos_presentacion.md`](evaluacion/errores/casos_presentacion.md).
@@ -179,19 +168,18 @@ Las cuatro con 10 ejemplos; con los 16 ejemplos y fichas precalculadas, 31 s / 4
   | `llama3.1:8b` (el de la app) | 125 s / 167 s | 19/20 | 4/6 | 11/96 | 7,311 MiB |
   | `qwen2.5:7b` | 83 s / 121 s | 20/20 | 5/6 | 7/106 | 7,049 MiB |
 
-  Con 20 fichas no alcanza para cambiar de modelo; `qwen2.5:7b` se usa como modelo de respaldo de las fichas precalculadas.
-- Consultas difíciles (`20261113-115133_fb1f3fe_robustez`): las 8 terminaron, ninguna síntesis pronosticó el
-  resultado (tampoco con instrucciones inyectadas en la consulta) y los datos personales de prueba no quedaron en
-  ningún archivo; pero las consultas civil, familiar y fuera de tema **no** recibieron el aviso de "no hay
-  precedentes del mismo tipo". En v11.2 se agregó el aviso de otra materia, que aparece en las 3
-  (`20261121-053544_4b1529e_robustez`).
+  Con 20 fichas no alcanza para cambiar de modelo; `qwen2.5:7b` se usa como modelo de respaldo de las fichas
+  precalculadas; no como QC_1, donde pierde la mitad de los precedentes relevantes (tabla anterior).
+- Consultas difíciles (ROBUSTEZ_FINAL): las 8 terminan, ninguna síntesis pronostica el resultado (tampoco con
+  instrucciones inyectadas en la consulta), las 3 de otra materia reciben el aviso y los datos personales de prueba
+  no quedan en ningún archivo.
 
-**Evaluación automática (v11.2).** El delito sale de la categoría que asignó el STJ en su portal; el acto
-impugnado, el apelante y el sentido del fallo, de las reglas sobre el texto: el juez `gemma2:9b` acertó la familia del
-STJ en 0.742 de 725 sentencias del corpus final, por debajo del mínimo de 0.80 fijado antes de correrlo, y no se usa
+**Referencia automática.** El delito sale de la categoría que asignó el STJ en su portal; el acto impugnado, el
+apelante y el sentido del fallo, de las reglas sobre el texto. El juez `gemma2:9b` acertó la familia del STJ en 0.742
+de 725 sentencias del corpus final, por debajo del mínimo de 0.80 fijado antes de correrlo, y no se usa
 (`20261121-031724_723fe6b_referencias`, análisis en `evaluacion/errores/juez_familia.md`); `mistral:7b` tampoco
-alcanzó el mínimo (`20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las sentencias, 50 % de
-las consultas con todos sus pares).
+alcanzó el mínimo (`20261117-065346_a60ca4f_referencias`). El juez trabaja sobre una muestra estable (30 % de las
+sentencias, 50 % de las consultas con todos sus pares).
 
 ## Línea de comandos
 
@@ -216,8 +204,8 @@ resuelve ni lo evita). Los PDF se incorporan con `construir-corpus --pdfs`.
 
 ## Configuración
 
-Los valores por defecto son los del alcance penal. Las opciones de la versión 10 siguen disponibles por variable de
-entorno solo para comparar en la evaluación (ver `.env.example` y los comentarios de `config.py`, donde cada decisión
+Los valores por defecto son los del alcance penal. La línea base con que la evaluación compara cada decisión está
+disponible por variable de entorno (ver `.env.example` y los comentarios de `config.py`, donde cada decisión
 cita la corrida que la respalda).
 
 **Modelo de lenguaje:** `llama3.1:8b`, el evaluado. Cabe íntegro en 8 GB de GPU con la ventana de 8,192 tokens cuando
@@ -239,7 +227,7 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
 
 - **Cobertura:** muchos tipos penales tienen una o ninguna sentencia; cuando ningún precedente sale de las familias
   detectadas, la app lo dice.
-- **Consultas fuera de materia:** el corpus es penal. Desde v11.2 la app avisa si la consulta no menciona ningún
+- **Consultas fuera de materia:** el corpus es penal. La app avisa si la consulta no menciona ningún
   delito ni término del proceso penal (lista de palabras, no un modelo: una consulta penal redactada sin ninguna de
   ellas también recibiría el aviso). La señal de coincidencia (`kem_max`) separa mal las consultas sin respuesta en
   desarrollo (40 % de falsas alarmas, `20261113-130208_fb1f3fe_recuperacion`), así que ese umbral sigue sin fijar.
