@@ -135,7 +135,7 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 |---|---|---|---|
 | Síntesis con un ejemplo de líneas citadas y revisión final de las citas (19 consultas) | con un ejemplo de contenido jurídico, cita válida −0.024 [−0.144, +0.078], lo copia en 9 de 19 síntesis y pronostica en una (una primera medición, con otros precedentes, daba +0.086); con un ejemplo solo de formato, +0.024 [−0.069, +0.121], sin copias | descartado: la app sigue con la síntesis anterior | `20261124-003427_905c255_sintesis-citas` |
 | Precedentes que ve el usuario (39 consultas): la lista real de la app, con el orden por familia y acto impugnado, frente a la que medía `recuperacion` | P@3 0.248 → **0.410** (+0.162 [+0.077, +0.248]); condensada, sin los no juzgados, +0.128 [+0.043, +0.222]; nDCG@5 0.270 → 0.442 | medición: la calidad real es mayor que la reportada | `20261124-014247_0f2894a_precedentes` |
-| QC_1 sobre los precedentes mostrados (39 consultas) | P@3 0.410 con y sin QC_1 (+0.000 [−0.034, +0.034]); nDCG@3 −0.007, no significativo; igual si la consulta nombra el acto o no. Costaba 3 de las 5 llamadas al modelo | QC_1 apagado por defecto (opcional en Configuración) | `20261124-014247_0f2894a_precedentes` |
+| QC_1 sobre los precedentes mostrados (39 consultas) | P@3 0.410 con y sin QC_1 (+0.000 [−0.034, +0.034]); nDCG@3 −0.007, no significativo; igual si la consulta nombra el acto o no. Sin QC_1, la consulta pasa de 30.8 s a 17.1 s (p50) y de 5 a 2 llamadas al modelo (`20261124-020004_2e50981_latencia`) | QC_1 apagado por defecto (opcional en Configuración) | `20261124-014247_0f2894a_precedentes` |
 | QC_1 lee la ficha precalculada en lugar del fragmento (660 pares) | recall 0.725 → **0.844** (+0.120 [+0.036, +0.204]); especificidad 0.410 → 0.396 (no significativo); precisión 0.294 → 0.321 | adoptado | `20261123-230824_5fc9b67_qc` |
 | QC_1 con `qwen2.5:7b` (660 pares) | recall 0.844 → 0.425 (−0.419, significativo); 1.9 s por llamada, pero cada cambio de modelo en 8 GB cuesta 5-8 s | descartado | `20261123-234717_e28a600_qc` |
 | QC_1 solo con el veredicto, sin razonar (660 pares) | 0.59 s por llamada, pero responde SI en 649 de 660 pares (especificidad 0.022): deja de filtrar | descartado | `20261123-234717_e28a600_qc` |
@@ -146,17 +146,20 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 Orden de la evaluación final: corpus definitivo → fichas → `referencias` → `congelar` → corridas con
 `--particion prueba`, una sola vez.
 
-**Por qué una consulta tarda ~31 s** (`latencia --ejemplos`, 10 ejemplos penales de la app, RTX 4060 Laptop 8 GB,
+**Por qué una consulta tarda ~17 s** (`latencia --ejemplos`, 10 ejemplos penales de la app, RTX 4060 Laptop 8 GB,
 `llama3.1:8b`):
 
 | Diseño | Corrida | Total p50 | Total p95 | Llamadas al LLM p50 (p95) |
 |---|---|---|---|---|
 | Línea base: ficha en dos llamadas + QC_2 con el LLM | `20261112-175942_c78b576` | 321 s | 847 s | 17 (45) |
 | Ficha en una llamada JSON + QC_2 determinista | `20261112-173610_0a20152` | 138 s | 168 s | 8 (9) |
-| Además, fichas precalculadas (la app), corpus final | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
+| Además, fichas precalculadas, corpus final | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
+| Además, QC_1 apagado (la app) | `20261124-020004_2e50981` | **17 s** | **35 s** | 2 (2.6) |
 
-Con fichas precalculadas, lo que queda es QC_1 (unas 3 llamadas) y la síntesis; clasificación y búsqueda tardan
-menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra en 0.006 s de mediana (`20261124-005412_82c94ed_demo`, 20 ejemplos de los dos perfiles).
+Sin QC_1 queda la síntesis (15 s de mediana) y, si falta la ficha precalculada de un candidato, su generación;
+clasificación y búsqueda tardan menos de 0.2 s. En los 20 ejemplos de la demo, apagar QC_1 bajó la mediana de 31.6 s
+a 18.2 s (−11.8 s [−14.2, −9.4], 19 de 20 más rápidos; `20261124-005412_82c94ed_demo` frente a
+`20261124-020755_2e50981_demo`), y un resultado ya guardado (`demo --ejemplos`) se muestra en 0.007 s.
 
 **Diagnósticos complementarios** (sin referencia; no son tasas de error del sistema):
 
@@ -241,7 +244,7 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
   agravios y los resolutivos. No se resume.
 - **Sentido del fallo:** el campo de la ficha acierta en 0.722 de los casos; por eso la tarjeta muestra el sentido
   leído de los puntos resolutivos cuando las reglas lo encuentran (1,966 de 2,495 sentencias,
-  `20261120-014423_c27877e_metadatos-cobertura`; 54 de los 60 precedentes de la demo) y marca **sin verificar** el
+  `20261120-014423_c27877e_metadatos-cobertura`; 53 de los 60 precedentes de la demo) y marca **sin verificar** el
   resto. Donde no lo encuentran suele tratarse de resoluciones sin sentido de apelación (excusas, competencia) o de
   textos con páginas omitidas.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
