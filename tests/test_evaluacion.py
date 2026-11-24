@@ -426,6 +426,8 @@ def test_prompt_sintesis_v12_solo_agrega_reglas_de_cita():
     from copiloto_juridico import config
 
     assert config.PROMPT_SINTESIS_VERSION == "v12" and "NO predigas el resultado" in v12  # la de la app
+    v13 = prompts.prompt_sintesis("v13")
+    assert "toda línea que no sea un título termina" in v13 and "dictamen pericial" not in v13
 
 
 def test_prompt_qc1_v12_mismo_criterio_solo_veredicto():

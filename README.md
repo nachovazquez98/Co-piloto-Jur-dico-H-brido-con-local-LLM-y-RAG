@@ -153,7 +153,7 @@ Orden de la evaluación final: corpus definitivo → fichas → `referencias` �
 | Además, fichas precalculadas (la app), corpus final | `20261121-052935_4b1529e` | 31 s | 53 s | 5 (6) |
 
 Con fichas precalculadas, lo que queda es QC_1 (unas 3 llamadas) y la síntesis; clasificación y búsqueda tardan
-menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra al instante (DEMO_FINAL).
+menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra en 0.006 s de mediana (`20261124-000815_835231c_demo`, 20 ejemplos de los dos perfiles).
 
 **Diagnósticos complementarios** (sin referencia; no son tasas de error del sistema):
 
@@ -170,7 +170,7 @@ menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra al insta
 
   Con 20 fichas no alcanza para cambiar de modelo; `qwen2.5:7b` se usa como modelo de respaldo de las fichas
   precalculadas; no como QC_1, donde pierde la mitad de los precedentes relevantes (tabla anterior).
-- Consultas difíciles (ROBUSTEZ_FINAL): las 8 terminan, ninguna síntesis pronostica el resultado (tampoco con
+- Consultas difíciles, con la versión final (`20261123-235604_835231c_robustez`): las 8 terminan, ninguna síntesis pronostica el resultado (tampoco con
   instrucciones inyectadas en la consulta), las 3 de otra materia reciben el aviso y los datos personales de prueba
   no quedan en ningún archivo.
 

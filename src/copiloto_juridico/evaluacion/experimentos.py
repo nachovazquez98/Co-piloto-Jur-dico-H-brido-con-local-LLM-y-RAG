@@ -872,22 +872,30 @@ def calcular_conceptos(consultas: list[Consulta], llm, path: Path = config.CONCE
 # --------------------------------------------------------------------------------------------------------------
 
 
-def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
+def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20, versiones: Iterable[str] = ("v12", "v13"),
                                log: Callable[[str], None] = print) -> Corrida:
-    """¿Cita mejor la síntesis con el prompt v12 (ejemplo de líneas citadas y revisión final)? Para cada consulta
-    validada de la muestra estable por hash se corre la app completa con la síntesis v11 (línea base) y,
-    con los MISMOS precedentes, se genera la síntesis v12. Ambas pasan por la verificación determinista de citas de la app;
-    diferencia pareada por consulta con IC 95 % por bootstrap, y conteo de pronósticos (no debe haber ninguno)."""
+    """¿Cita mejor la síntesis con un ejemplo de líneas citadas y una revisión final? Para cada consulta validada de
+    la muestra estable por hash se corre la app completa con la síntesis v11 (línea base) y, con los MISMOS
+    precedentes, se genera la síntesis de cada versión de `versiones`. Todas pasan por la verificación determinista de
+    citas de la app; diferencia pareada por consulta con IC 95 % por bootstrap. Además se cuentan las síntesis que
+    pronostican el resultado y las que copian el ejemplo del prompt (frases del ejemplo que no están en la consulta
+    ni en las fichas): ninguna de las dos debe aparecer."""
     from ..pipeline import TITULO_BALANCE, Copiloto, verificar_citas
     from .robustez import _RE_PRONOSTICO
 
+    versiones = list(versiones)
     corrida = env.corrida
     muestra = sorted((c for c in env.consultas if not c.sin_respuesta),
                      key=lambda c: hashlib.sha256(c.id.encode()).hexdigest())[:max_consultas]
+
+    def copia(version: str, texto: str, fuente: str) -> bool:
+        t, f = texto.lower(), fuente.lower()
+        return any(fr in t and fr not in f for fr in prompts.FRASES_EJEMPLO_SINTESIS.get(version, ()))
+
     filas, version_app = [], config.PROMPT_SINTESIS_VERSION
     for i, c in enumerate(muestra, 1):
         resultado = None
-        config.PROMPT_SINTESIS_VERSION = "v11"  # línea base fija aunque la app ya use v12
+        config.PROMPT_SINTESIS_VERSION = "v11"  # línea base fija, sea cual sea la de la app
         try:
             for ev in Copiloto(env.store, env.clasificador, cliente).analizar(c.consulta):
                 if ev.tipo == "resultado":
@@ -899,42 +907,50 @@ def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
             continue
         informes = "\n\n---\n\n".join(f"Precedente {p.numero} ({p.candidato.doc_id}):\n{p.informe}"
                                       for p in resultado.precedentes)
-        texto_v12 = cliente.generate(prompts.prompt_sintesis("v12").format(text_consulta=c.consulta,
-                                                                          informes_precedentes=informes))
-        _, citas_v12 = verificar_citas(texto_v12, resultado.precedentes)
         sintesis_v11 = resultado.sintesis
         if sintesis_v11.startswith(TITULO_BALANCE):  # la lista por reglas no es texto del LLM
             sintesis_v11 = sintesis_v11.split("\n\n", 1)[-1]
-        for version, citas, texto in (("v11", resultado.citas, sintesis_v11), ("v12", citas_v12, texto_v12)):
+        textos = [("v11", resultado.citas, sintesis_v11)]
+        for v in versiones:
+            texto = cliente.generate(prompts.prompt_sintesis(v).format(text_consulta=c.consulta,
+                                                                       informes_precedentes=informes))
+            textos.append((v, verificar_citas(texto, resultado.precedentes)[1], texto))
+        for version, citas, texto in textos:
             n = max(citas["afirmaciones"], 1)
             filas.append({"id": c.id, "version": version, "afirmaciones": citas["afirmaciones"],
                           "con_cita_valida": citas["con_cita_valida"] / n, "sin_cita": citas["sin_cita"] / n,
-                          "marcadas": citas["marcadas"] / n, "pronostico": bool(_RE_PRONOSTICO.search(texto))})
-        log(f"[{i}/{len(muestra)}] {c.id}: con cita válida v11 {filas[-2]['con_cita_valida']:.0%} · "
-            f"v12 {filas[-1]['con_cita_valida']:.0%}")
+                          "marcadas": citas["marcadas"] / n, "pronostico": bool(_RE_PRONOSTICO.search(texto)),
+                          "copia_ejemplo": copia(version, texto, c.consulta + informes)})
+        log(f"[{i}/{len(muestra)}] {c.id}: con cita válida "
+            + " · ".join(f"{f['version']} {f['con_cita_valida']:.0%}" for f in filas[-len(textos):]))
     d = pd.DataFrame(filas, columns=["id", "version", "afirmaciones", "con_cita_valida", "sin_cita", "marcadas",
-                                     "pronostico"])
+                                     "pronostico", "copia_ejemplo"])
     resumen = []
-    for clave, nombre in (("con_cita_valida", "afirmaciones con cita válida"), ("sin_cita", "afirmaciones sin cita"),
-                          ("marcadas", "afirmaciones marcadas «verificar»")):
-        v11 = d[d["version"] == "v11"][clave].tolist()
-        v12 = d[d["version"] == "v12"][clave].tolist()
-        dif = m.bootstrap_diferencia_pareada(v12, v11)
-        resumen.append({"medida (promedio por consulta)": nombre, "consultas": dif["n"],
-                        "v11": round(float(np.mean(v11)), 3) if v11 else float("nan"),
-                        "v12": round(float(np.mean(v12)), 3) if v12 else float("nan"),
-                        "diferencia (v12 − v11)": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, "
-                                                  f"{dif['ic_sup']:+.3f}]",
-                        "significativa": "sí" if dif["significativa"] else "no"})
-    corrida.tabla("Citas de la síntesis: prompt v11 frente a v12",
+    for v in versiones:
+        for clave, nombre in (("con_cita_valida", "afirmaciones con cita válida"), ("sin_cita", "afirmaciones sin cita"),
+                              ("marcadas", "afirmaciones marcadas «verificar»")):
+            base = d[d["version"] == "v11"][clave].tolist()
+            otra = d[d["version"] == v][clave].tolist()
+            dif = m.bootstrap_diferencia_pareada(otra, base)
+            resumen.append({"versión": v, "medida (promedio por consulta)": nombre, "consultas": dif["n"],
+                            "v11": round(float(np.mean(base)), 3) if base else float("nan"),
+                            "versión probada": round(float(np.mean(otra)), 3) if otra else float("nan"),
+                            "diferencia (versión − v11)": f"{dif['diferencia']:+.3f} [{dif['ic_inf']:+.3f}, "
+                                                          f"{dif['ic_sup']:+.3f}]",
+                            "significativa": "sí" if dif["significativa"] else "no"})
+    corrida.tabla("Citas de la síntesis frente a la línea base v11",
                   "Mismas consultas validadas y mismos precedentes; verificación determinista de la app (cita un "
                   "precedente existente y, si menciona sentido o delito, coincide con la ficha). Diferencia pareada "
                   "por consulta con IC 95 % por bootstrap.", pd.DataFrame(resumen))
-    corrida.tabla("Pronósticos y volumen", "La síntesis no debe pronosticar el resultado del caso.", pd.DataFrame([
-        {"versión": v, "consultas": int((d["version"] == v).sum()),
-         "afirmaciones": int(d[d["version"] == v]["afirmaciones"].sum()),
-         "síntesis con pronóstico": int(d[d["version"] == v]["pronostico"].sum())} for v in ("v11", "v12")]))
-    corrida.parametros.update(max_consultas=max_consultas, muestra="primeras por sha256(id)")
+    corrida.tabla("Pronósticos, copias del ejemplo y volumen",
+                  "La síntesis no debe pronosticar el resultado del caso ni copiar el ejemplo del prompt (frases del "
+                  "ejemplo que no están en la consulta ni en las fichas).", pd.DataFrame([
+                      {"versión": v, "consultas": int((d["version"] == v).sum()),
+                       "afirmaciones": int(d[d["version"] == v]["afirmaciones"].sum()),
+                       "síntesis con pronóstico": int(d[d["version"] == v]["pronostico"].sum()),
+                       "síntesis que copian el ejemplo": int(d[d["version"] == v]["copia_ejemplo"].sum())}
+                      for v in ["v11", *versiones]]))
+    corrida.parametros.update(max_consultas=max_consultas, versiones=versiones, muestra="primeras por sha256(id)")
     return corrida
 
 

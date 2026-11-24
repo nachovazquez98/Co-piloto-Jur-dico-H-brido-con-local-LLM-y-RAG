@@ -276,7 +276,19 @@ _EJEMPLO_CITAS_V12 = ("\nEjemplo de líneas bien citadas (el contenido es ilustr
                       "[P2].\n")
 assert _REGLA_NO_PREDECIR in PROMPT_SINTESIS_FINAL_V11
 PROMPT_SINTESIS_FINAL_V12 = PROMPT_SINTESIS_FINAL_V11.replace(_REGLA_NO_PREDECIR, _REGLAS_CITA_V12) + _EJEMPLO_CITAS_V12
-PROMPTS_SINTESIS = {"v10": PROMPT_SINTESIS_FINAL, "v11": PROMPT_SINTESIS_FINAL_V11, "v12": PROMPT_SINTESIS_FINAL_V12}
+# v13: las mismas reglas de cita, con un ejemplo que solo muestra el formato. El ejemplo de v12 tenía contenido
+# jurídico y el modelo lo copiaba: «dictamen pericial» aparece en 10 de las 20 síntesis de la demo sin que la
+# consulta lo mencione (`sintesis-citas` mide estas copias).
+_EJEMPLO_CITAS_V13 = ("\nFormato de las líneas (sustituye lo que está entre < > por el contenido de las fichas; no "
+                      "escribas los signos < >):\n- <qué resolvió la Sala sobre un agravio y por qué> [P1].\n"
+                      "- <qué conviene leer de una sentencia y para qué> [P2].\n")
+PROMPT_SINTESIS_FINAL_V13 = PROMPT_SINTESIS_FINAL_V11.replace(_REGLA_NO_PREDECIR, _REGLAS_CITA_V12) + _EJEMPLO_CITAS_V13
+PROMPTS_SINTESIS = {"v10": PROMPT_SINTESIS_FINAL, "v11": PROMPT_SINTESIS_FINAL_V11, "v12": PROMPT_SINTESIS_FINAL_V12,
+                    "v13": PROMPT_SINTESIS_FINAL_V13}
+# Frases propias del ejemplo de cada versión: si aparecen en la síntesis sin estar en la consulta ni en las fichas,
+# el modelo copió el ejemplo.
+FRASES_EJEMPLO_SINTESIS = {"v12": ("dictamen pericial", "con defensor presente"),
+                           "v13": ("<", "sobre un agravio y por qué", "qué conviene leer de una sentencia")}
 
 
 def prompt_sintesis(version: str | None = None) -> str:
