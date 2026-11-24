@@ -31,7 +31,7 @@ def cmd_construir_corpus(args) -> None:
     from .datos.procesamiento import process_pdf_folder
 
     # Orden de las fuentes: PDFs > corpus actual > ChromaDB. El PDF procesado ahora reemplaza al texto guardado de la
-    # misma sentencia (v11.2: así entra la extracción corregida); los PDF con el texto de otra sentencia ya se quitaron.
+    # misma sentencia (así entra la extracción corregida); los PDF con el texto de otra sentencia ya se quitaron.
     fuentes, viejas, actual, rechazadas = [], [], pd.DataFrame(columns=["id"]), []
     if not args.reiniciar:
         actual = load_corpus()
@@ -64,7 +64,7 @@ def cmd_construir_corpus(args) -> None:
     # muestreada); entre iguales, la primera fuente (PDFs > corpus actual > chroma).
     todo = unir_fuentes(fuentes)
     todo = todo[todo["texto"].str.len() >= 500]
-    # v11.2: el corpus contiene solo las materias del alcance (penal); las demás ya no se guardan ni se indexan.
+    # El corpus contiene solo las materias del alcance (penal); las demás ya no se guardan ni se indexan.
     fuera = ~todo["materia"].isin(config.MATERIAS_ACTIVAS)
     if fuera.any():
         _log(f"Fuera del alcance ({', '.join(config.MATERIAS_ACTIVAS)}): {int(fuera.sum())} sentencias de "
@@ -148,7 +148,7 @@ def cmd_estado(args) -> None:
 
 
 def cmd_limpiar_corpus(args) -> None:
-    """Aplica la limpieza v11 al corpus guardado (sin necesidad de los PDFs) y lo vuelve a guardar."""
+    """Aplica la limpieza al corpus guardado (sin necesidad de los PDFs) y lo vuelve a guardar."""
     from .datos.corpus import load_corpus, save_corpus
     from .datos.procesamiento import limpiar_texto
 
@@ -315,7 +315,7 @@ def main(argv=None) -> None:
     es.add_argument("--salida", help="CSV con el balance por tipo")
     es.set_defaults(func=cmd_estado)
 
-    lc = sub.add_parser("limpiar-corpus", help="Limpieza v11 del texto guardado (anexo testado, etiquetas, encabezados)")
+    lc = sub.add_parser("limpiar-corpus", help="Limpieza del texto guardado (anexo testado, etiquetas, encabezados)")
     lc.add_argument("--omitidas", help="CSV con las sentencias que tienen páginas omitidas")
     lc.set_defaults(func=cmd_limpiar_corpus)
 

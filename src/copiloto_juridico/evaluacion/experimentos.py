@@ -316,7 +316,7 @@ class Entorno:
     preparadas: list[Preparada] = field(default_factory=list)
     facetas: dict[str, dict[str, dict[str, bool]]] = field(default_factory=dict)  # mismo delito / problema procesal
     tiempos_reranker: list[float] = field(default_factory=list)
-    fuente_juicios: str = "juicio humano"   # o la referencia automática (v11.2)
+    fuente_juicios: str = "juicio humano"   # o la referencia automática
 
     @property
     def doc_tipo(self) -> dict[str, str]:
@@ -382,7 +382,7 @@ def cargar_entorno(comando: str, particion: str | None, ruta_consultas: Path = c
     consultas = [c for c in todas if c.consulta.strip() and (particion in (None, "todas") or c.particion == particion)]
     validadas = leer_validadas()
     if validadas is not None:
-        # v11.2: sin revisión humana, solo cuentan las consultas que pasaron la validación automática (`referencias`)
+        # sin revisión humana, solo cuentan las consultas que pasaron la validación automática (`referencias`)
         descartadas = [c.id for c in consultas if not validadas.get(c.id, False)]
         consultas = [c for c in consultas if validadas.get(c.id, False)]
         for c in consultas:
@@ -868,14 +868,14 @@ def calcular_conceptos(consultas: list[Consulta], llm, path: Path = config.CONCE
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Citas de la síntesis: prompt v11 frente a v12 (v11.2)
+# Citas de la síntesis: prompt v11 frente a v12
 # --------------------------------------------------------------------------------------------------------------
 
 
 def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
                                log: Callable[[str], None] = print) -> Corrida:
     """¿Cita mejor la síntesis con el prompt v12 (ejemplo de líneas citadas y revisión final)? Para cada consulta
-    validada de la muestra estable por hash se corre la app completa con la síntesis v11 (la de la app hasta v11.2) y,
+    validada de la muestra estable por hash se corre la app completa con la síntesis v11 (línea base) y,
     con los MISMOS precedentes, se genera la síntesis v12. Ambas pasan por la verificación determinista de citas de la app;
     diferencia pareada por consulta con IC 95 % por bootstrap, y conteo de pronósticos (no debe haber ninguno)."""
     from ..pipeline import TITULO_BALANCE, Copiloto, verificar_citas
@@ -939,7 +939,7 @@ def experimento_sintesis_citas(env: Entorno, cliente, max_consultas: int = 20,
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Perfil del tribunal de alzada (v11.2)
+# Perfil del tribunal de alzada
 # --------------------------------------------------------------------------------------------------------------
 
 

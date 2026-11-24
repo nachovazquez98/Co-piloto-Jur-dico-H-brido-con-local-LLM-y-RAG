@@ -54,7 +54,7 @@ _RE_SENTIDO = re.compile(r"\b(confirm\w*|modific\w*|revoc\w*|repon\w*|reposicion
 def normalizar_sentido(texto: str | None) -> str | None:
     """Sentido del fallo en valores cerrados: CONFIRMA / MODIFICA / REVOCA / REPONE / OTRO.
 
-    Si el texto ya trae un valor cerrado (prompt v11) se usa; si es texto libre (prompt v10, "Se MODIFICA la
+    Si el texto ya trae un valor cerrado (prompt de la app) se usa; si es texto libre (línea base, "Se MODIFICA la
     sentencia...") se toma el primer verbo de decisión que aparece. None si no hay dato.
     """
     if not texto or DATO_NO_DISPONIBLE.lower() in texto.lower():
@@ -95,7 +95,7 @@ def extraer_articulos(texto: str) -> set[str]:
     return out
 
 
-# v11.2 (evaluacion/errores/articulos_no_encontrados.md): en la sentencia, los artículos se citan en listas largas
+# (evaluacion/errores/articulos_no_encontrados.md): en la sentencia, los artículos se citan en listas largas
 # ("artículos 20 fracción i, 133 fracción iii, 461, 467 fracción vii, 475"), con otras palabras ("arábigos",
 # "diversos", "en relación al 219") y con palabras partidas por el PDF ("art ículo s"). Del lado de la sentencia se
 # toman los números que siguen a esas palabras (hasta un punto y coma o punto, como máximo `_VENTANA` caracteres) y
@@ -145,7 +145,7 @@ def datos_penales(extraccion: str) -> dict[str, str | None]:
 
 # Se buscan sobre el texto "compacto" (sin espacios ni acentos) porque la extracción del PDF parte palabras
 # ("segund o", "co ntrol"). El orden importa solo para nombrar el valor; se elige el primer verbo que aparece.
-# v11.2 (muestra de desacuerdos y de sentencias sin sentido, evaluacion/errores/sentido_fallo.md): también "lo
+# (muestra de desacuerdos y de sentencias sin sentido, evaluacion/errores/sentido_fallo.md): también "lo
 # procedente es confirmar". El verbo sin "se" ("este órgano colegiado revoca la resolución") solo cuenta si no hay
 # ninguno de los anteriores: en la sección también se narra ("el colegiado confirma el amparo").
 _VERBOS_SENTIDO = [
@@ -191,7 +191,7 @@ def sentido_por_reglas(texto_sentencia: str, fraccion_final: float = 0.5, seccio
     return None
 
 
-# v11.2: referencia del fundamento legal sin anotadores. Los artículos que la Sala invoca como fundamento de su
+# referencia del fundamento legal sin anotadores. Los artículos que la Sala invoca como fundamento de su
 # decisión: los que siguen a una fórmula de fundamentación ("con fundamento en", "de conformidad con", "con apoyo en",
 # "en términos de", "con base en") hasta el primer punto (como máximo `_VENTANA_FUNDAMENTO` caracteres), y los de los
 # puntos resolutivos. Lectura por reglas: no distingue el ordenamiento (ver `extraer_articulos`).

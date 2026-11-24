@@ -61,7 +61,7 @@ def key_entity_match(category_tokens: set, entity_tokens: set, high_importance_t
     KEM = |R ∩ C| / |R|, con R = términos importantes presentes en la consulta y C = lemas de la categoría.
     A diferencia de Jaccard no castiga que la categoría tenga palabras extra: mide cobertura de la consulta.
     Con R = conceptos de la consulta, KEM queda casi idéntico a Jaccard (mismos conjuntos, distinto denominador):
-    por eso su peso es 0 en v11. Se sigue calculando porque la penalización por longitud lo usa.
+    por eso su peso es 0. Se sigue calculando porque la penalización por longitud lo usa.
     """
     relevantes = high_importance_tokens & entity_tokens
     return len(relevantes & category_tokens) / len(relevantes) if relevantes else 0.0
@@ -198,7 +198,7 @@ class ClasificadorHibrido:
         - penal_tokens: 0.70 si la categoría contiene una palabra de `config.IRRELEVANT_TOKENS`, si no 1.
         """
         entity_tokens = lemmatized_tokens(entidades) if entidades else lemmatized_tokens(consulta)
-        high_importance = entity_tokens  # KEM = |A∩B|/|A| con A = conceptos (peso 0 en v11, ver config)
+        high_importance = entity_tokens  # KEM = |A∩B|/|A| con A = conceptos (peso 0, ver config)
 
         cos = self.embeddings @ query_embedding
         votos: dict[str, float] = {}

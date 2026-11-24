@@ -57,7 +57,7 @@ def _problemas(c: Consulta, texto: str, prohibidas: list[str]) -> str:
 def redactar_borradores(plantilla: list[Consulta], textos: pd.Series, llm, n: int | None = None,
                         intentos: int = 3, estricto: bool = False, log: Callable[[str], None] = print) -> list[Consulta]:
     """Borrador de consulta para las primeras `n` entradas de la plantilla (todas si n es None). `estricto`
-    (v11.1): prompt con las palabras del tipo prohibidas y sin números, también verificado."""
+   : prompt con las palabras del tipo prohibidas y sin números, también verificado."""
     salida = []
     for c in plantilla[:n]:
         c.borrador, c.revisado = True, False

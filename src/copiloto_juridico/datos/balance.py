@@ -59,7 +59,7 @@ def select_balanced(corpus: pd.DataFrame, max_por_tipo: int = config.MAX_SENTENC
                     conservar: set[str] | None = None) -> pd.DataFrame:
     """Aplica el tope por tipo eligiendo sentencias repartidas uniformemente en el tiempo.
 
-    `conservar` (v11.2): ids que ya estaban en el corpus; se quedan primero y las nuevas solo llenan el cupo que
+    `conservar`: ids que ya estaban en el corpus; se quedan primero y las nuevas solo llenan el cupo que
     falte. Sin esto, agregar sentencias a un tipo lleno cambiaba la selección y sacaba sentencias que ya tenían
     consultas, fichas y juicios."""
     conservar = conservar or set()

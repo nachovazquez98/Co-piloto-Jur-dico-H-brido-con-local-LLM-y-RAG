@@ -150,7 +150,7 @@ class SentenciasStore:
 
     def materias_filtro(self, materias: list[str] | None = None) -> list[str] | None:
         """Materias a las que se restringe la búsqueda (config.MATERIAS_ACTIVAS), o None si son todas las del
-        corpus (así el comportamiento por defecto es idéntico al de v10)."""
+        corpus (así el comportamiento por defecto no cambia)."""
         materias = list(config.MATERIAS_ACTIVAS if materias is None else materias)
         existentes = set(np.unique(self.doc_materias))
         desconocidas = set(materias) - existentes
@@ -192,7 +192,7 @@ class SentenciasStore:
         if not len(filas):
             return texto[:largo]
         mejor = int(np.argmax(self.emb[filas].astype(np.float32) @ q))
-        # La misma política de fragmentación con que se construyó el índice (índices de v10 no la guardan: 12).
+        # La misma política de fragmentación con que se construyó el índice (los índices anteriores no la guardan: 12).
         chunks = chunks_de(texto, self.corpus.loc[doc_id, "materia"],
                            self.manifest.get("max_chunks_penal", self.manifest.get("max_chunks_per_doc", 12)),
                            self.manifest.get("max_chunks_per_doc", 12))

@@ -1,4 +1,4 @@
-"""Comparación de modelos locales de Ollama (v11.1): `python -m copiloto_juridico.evaluacion modelos`.
+"""Comparación de modelos locales de Ollama: `python -m copiloto_juridico.evaluacion modelos`.
 
 Solo con los modelos de `config.MODELOS_COMPARACION` que ya están instalados en Ollama: los que faltan se omiten
 con un aviso y **no se descargan**. Cada modelo corre con la misma semilla, temperatura 0 y los mismos insumos:

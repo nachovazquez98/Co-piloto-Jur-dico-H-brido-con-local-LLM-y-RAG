@@ -39,7 +39,7 @@ INDICE_DIR = DATA_DIR / "indice"          # Embeddings precalculados (versionado
 RAW_PDF_DIR = Path(_env("COPILOTO_PDF_DIR", str(DATA_DIR / "raw" / "pdfs")))  # PDFs descargados (no versionados)
 CHROMA_DIR = Path(_env("COPILOTO_CHROMA_DIR", str(DATA_DIR / "chroma")))       # DB vectorial local (se reconstruye)
 
-# --- Evaluación (v11) ---
+# --- Evaluación ---
 EVAL_DIR = Path(_env("COPILOTO_EVAL_DIR", str(ROOT_DIR / "evaluacion")))
 FAMILIAS_CSV = EVAL_DIR / "familias_penal.csv"            # Tipo -> familia de delito
 CONSULTAS_PATH = EVAL_DIR / "consultas_penal.jsonl"         # Consultas redactadas a partir de sentencias
@@ -49,24 +49,16 @@ EVAL_SEED = _env("COPILOTO_EVAL_SEED", 42)
 EVAL_BOOTSTRAP = 1000
 # Modelos de Ollama que compara `evaluacion modelos` (solo los ya instalados; los demás se omiten, no se descargan).
 MODELOS_COMPARACION = ["llama3.1:8b", "qwen2.5:7b", "gemma2:9b", "mistral:7b"]
-# Evaluación automática (v11.2): no hay abogados disponibles, así que la referencia la dan la categoría del STJ, el
-# texto de la sentencia (reglas) y dos jueces LLM distintos del modelo de la app (`evaluacion jueces`). Corren uno a
-# la vez (8 GB de VRAM). Un juez se usa solo si acierta la familia del delito de la categoría del STJ al menos en
-# JUEZ_EXACTITUD_MINIMA de las sentencias: criterio fijado ANTES de correrlos, no ajustado a los resultados.
-# Dos familias de modelos distintas a la de la app (Meta), que caben enteros en 8 GB. En una prueba piloto sobre 60
-# sentencias, qwen2.5:7b no alcanzó el mínimo y se descartó. qwen2.5:14b sí lo alcanzaba, pero no cabe en la GPU
-# (~11 GB entre GPU y RAM) y la laptop no lo sostiene en tandas largas: se sustituyó por mistral:7b (piloto: 48/60 =
-# 0.80), por recursos y antes de construir la referencia. En la validación completa, mistral:7b no alcanzó el mínimo
-# (0.795 en las 1,412 sentencias, corrida 20261117-065346_a60ca4f_referencias) y quedó fuera; la referencia es la
-# mayoría entre las reglas y gemma2:9b.
-# v11.2, corpus final: gemma2:9b acertó la familia del STJ en 0.739 de las 725 sentencias de la muestra
-# (20261121-003449_5311dc1_referencias) y, con el criterio fijado de antemano, no se usa: la referencia de acto
-# impugnado, apelante y sentido queda con las reglas. Sus errores: daños y homicidio a título de culpa leídos por el bien
-# afectado pese a la instrucción del prompt, violación en contexto familiar leída como violencia familiar y la familia
-# residual "otros" (evaluacion/errores/juez_familia.md).
+# Evaluación automática: no hay abogados disponibles, así que la referencia la dan la categoría del STJ y el texto de
+# la sentencia leído por reglas. Un juez LLM de otra familia que la de la app (`evaluacion jueces`, uno a la vez por
+# los 8 GB de VRAM) se usa solo si acierta la familia del delito de la categoría del STJ al menos en
+# JUEZ_EXACTITUD_MINIMA de las sentencias, criterio fijado antes de correrlo. Ninguno lo alcanzó: gemma2:9b 0.742
+# [0.709, 0.773] en 725 sentencias del corpus final (`20261121-031724_723fe6b_referencias`; errores en
+# evaluacion/errores/juez_familia.md), mistral:7b 0.795 en 1,412 (`20261117-065346_a60ca4f_referencias`) y
+# qwen2.5:7b en el piloto de 60; qwen2.5:14b no cabe en la GPU. Por eso acto, apelante y sentido se leen por reglas.
 MODELOS_JUECES = ["gemma2:9b"]
 JUEZ_EXACTITUD_MINIMA = 0.80
-# Muestra al azar de los jueces (v11.2): juzgar todo con dos modelos tomaba ~7 h por juez. Cada elemento entra a la
+# Muestra al azar de los jueces: juzgar todo tomaba ~7 h por juez. Cada elemento entra a la
 # muestra por el hash de su id con la semilla (no por orden), así que al crecer el corpus los que ya estaban no
 # cambian. Sentencias 0.30 (~420 de 1,412): IC95 de ±4 puntos para la exactitud de cada juez. Consultas 0.50: entran
 # con todos sus pares, para que las métricas por consulta (nDCG) tengan todos sus juicios. `--completa` usa todo.
@@ -77,7 +69,7 @@ JUECES_DIR = EVAL_DIR / "jueces"
 COLLECTION_NAME = "sentencias_judiciales"
 
 # --- Embeddings ---
-# Modelo multilingüe (el corpus está en español). all-mpnet-base-v2 era un modelo entrenado en inglés.
+# Modelo multilingüe: el corpus está en español.
 EMBEDDING_MODEL_NAME = _env("COPILOTO_EMBEDDING_MODEL", "intfloat/multilingual-e5-base")
 EMBEDDING_BATCH_SIZE = _env("COPILOTO_EMBEDDING_BATCH_SIZE", 64)
 CHUNK_SIZE_CHARS = 1500       # ~400 tokens: cabe en la ventana de 512 tokens del modelo
@@ -89,14 +81,14 @@ MAX_CHUNKS_PENAL = 0          # Sentencias penales: todos los fragmentos (0 = si
 MAX_SENTENCIAS_POR_TIPO = _env("COPILOTO_MAX_POR_TIPO", 30)
 
 # --- Procesamiento de PDFs (Fase 1) ---
-# v11: los PDF se leen completos (0 = sin límite). Antes, los de más de 50 páginas se muestreaban a 40 y se perdía
-# contexto: el 57 % de las sentencias penales del corpus actual tiene páginas omitidas.
+# Los PDF se leen completos (0 = sin límite); muestrearlos a 40 páginas dejaba páginas omitidas en el 57 % de las
+# sentencias penales.
 PDF_MAX_PAGES_FULL_READ = _env("COPILOTO_PDF_MAX_PAGINAS", 0)
 PDF_TARGET_TOTAL_PAGES_SAMPLE = 40
 PDF_FIXED_START_PAGES = 10
 PDF_FIXED_END_PAGES = 15
 MAX_WORKERS_FASE_1 = None
-# v11.2: OCR (Tesseract, español) de las páginas sin capa de texto, como en los PDF escaneados. "auto": se usa si
+# OCR (Tesseract, español) de las páginas sin capa de texto, como en los PDF escaneados. "auto": se usa si
 # `pdftoppm`, `tesseract` y su modelo `spa` están instalados (TESSDATA_PREFIX si el modelo está en una carpeta de
 # usuario); "false": nunca. Una página con menos de PDF_OCR_MIN_CARACTERES caracteres extraídos se trata como imagen.
 PDF_OCR = _env("COPILOTO_PDF_OCR", "auto")
@@ -111,12 +103,11 @@ RRF_K = _env("COPILOTO_RRF_K", 60)  # Constante k de Reciprocal Rank Fusion (val
 TOP_N_CANDIDATES_INITIAL = 20
 TOP_N_CANDIDATES_FINAL = 10
 
-# Pesos del score híbrido de categorías (suman 1; solo importa el orden dentro de una consulta).
-# v11: KEM sale del score (peso 0) y su peso pasa a Jaccard. Con los conceptos de la consulta como "términos
-# importantes", KEM = |A∩B|/|A| y Jaccard = |A∩B|/|A∪B| usan los mismos conjuntos (correlación 0.995 en la
-# ablación). La alternativa, KEM sobre un vocabulario jurídico sin Jaccard, perdió un caso en la regresión de las
-# 18 consultas v10 (13/14 frente a 14/14): evaluacion/resultados/20261112-033711_*_regresion.md.
-# Pesos de v10: coseno 0.20, Jaccard 0.20, KEM 0.20, concisión 0.05, voto 0.35.
+# Pesos del score híbrido de categorías (suman 1; solo importa el orden dentro de una consulta). KEM tiene peso 0:
+# con los conceptos de la consulta como "términos importantes", KEM = |A∩B|/|A| y Jaccard = |A∩B|/|A∪B| usan los
+# mismos conjuntos (correlación 0.995 en la ablación), así que su peso pasa a Jaccard. KEM sobre un vocabulario
+# jurídico sin Jaccard perdió un caso en la regresión (13/14 frente a 14/14; 20261112-033711_*_regresion). La línea
+# base que compara la evaluación: coseno 0.20, Jaccard 0.20, KEM 0.20, concisión 0.05, voto 0.35.
 COSINE_WEIGHT = 0.20
 JACCARD_WEIGHT = 0.40
 KEM_WEIGHT = 0.00
@@ -140,8 +131,8 @@ def _env_lista(name: str, default: list[str]) -> list[str]:
     return [v.strip() for v in value.split(",") if v.strip()] if value else list(default)
 
 
-# --- v11: el alcance es la defensa penal en apelación. Las opciones de v10 quedan por variable de entorno solo
-# para comparar en la evaluación. Desde v11.2 el corpus contiene solo la materia penal. ---
+# --- Alcance: materia penal en apelación. Las alternativas que la evaluación usa como línea base quedan por variable
+# de entorno. ---
 # Penalización ×0.70 a categorías con palabras de IRRELEVANT_TOKENS ("violacion", "falsedad"...): castigaba delitos
 # reales (penal/violacion tiene 30 sentencias) sin evidencia a favor. Desactivada; en la regresión solo ayudaba a un
 # ejemplo por accidente, y ese caso se resuelve con ENRIQUECER_FAMILIAS
@@ -150,25 +141,26 @@ USAR_LISTA_TOKENS_PENALIZADOS = _env("COPILOTO_USAR_LISTA_TOKENS_PENALIZADOS", F
 MATERIAS_ACTIVAS = _env_lista("COPILOTO_MATERIAS", ["penal"])
 NIVEL_CLASIFICACION = _env("COPILOTO_NIVEL_CLASIFICACION", "familia")  # "tipo" | "familia" (solo penal se agrupa)
 # El embedding de una familia incluye los nombres de sus tipos más generales ("contra la salud: narcomenudeo..."),
-# sin "y otro(s)" ni nombres compuestos. Con esa limpieza, la familia correcta queda primera en 13 de 14 ejemplos
-# penales (antes 12): regresiones 20261112-180034_139bfe6 (antes) y 20261112-180217_99bb183 (después).
+# sin "y otro(s)" ni nombres compuestos: la familia correcta queda primera en 13 de 14 ejemplos penales, frente a 12
+# sin ella (regresiones 20261112-180034_139bfe6 y 20261112-180217_99bb183).
 ENRIQUECER_FAMILIAS = _env("COPILOTO_ENRIQUECER_FAMILIAS", True)
-# QC_1. En una consulta real de defensa, la versión v10 (inicio del documento + "mismo tema Y contexto") descartó
-# 14 de 15 candidatos. v11: lee la ventana alrededor del fragmento más parecido a la consulta y acepta mismo delito,
-# misma familia o mismo problema procesal. Sin anotaciones (`qc-diagnostico`, corrida 20261112-184123_2c7be47): en
-# los 5 primeros candidatos de los 16 ejemplos penales, v10 descarta 55 % y v11 + fragmento 14 %, ninguna consulta
-# se queda sin candidatos. Si esos descartes son correctos lo mide `qc` contra juicios humanos.
-# v11.2: QC_1 lee la ficha precalculada de la sentencia (delito, acto impugnado, agravios, sentido) en lugar del
-# fragmento; sin ficha vigente, el fragmento. En 660 pares de desarrollo, por pares, el recall pasa de 0.725 a 0.844
-# (+0.120 [+0.036, +0.204]) sin cambio significativo en la especificidad (0.410 → 0.396); precisión 0.294 → 0.321
-# (`20261123-230824_5fc9b67_qc`).
+# QC_1 acepta mismo delito, misma familia o mismo problema procesal; exigir "mismo tema Y contexto" con el inicio del
+# documento descartaba el 55 % de los 5 primeros candidatos de los ejemplos, frente al 14 % (`qc-diagnostico`,
+# 20261112-184123_2c7be47). Lee la ficha precalculada de la sentencia (delito, acto impugnado, agravios, sentido); sin
+# ficha vigente, el fragmento más parecido a la consulta. En 660 pares de desarrollo, por pares, leer la ficha en
+# lugar del fragmento sube el recall de 0.725 a 0.844 (+0.120 [+0.036, +0.204]) sin cambio significativo en la
+# especificidad (0.410 → 0.396); precisión 0.294 → 0.321 (`20261123-230824_5fc9b67_qc`).
 QC1_CONTEXTO = _env("COPILOTO_QC1_CONTEXTO", "ficha")  # "inicio" | "fragmento_similar" | "ficha"
+# QC_1 razona en dos frases (delito y problema de la consulta y del documento) antes del veredicto, con el modelo de la
+# app. Probadas en los mismos 660 pares (`20261123-234717_e28a600_qc`) y descartadas: pedir solo el veredicto (0.59 s por
+# llamada, pero responde SI en 649 de 660 pares: especificidad 0.022, deja de filtrar) y qwen2.5:7b (recall 0.844 →
+# 0.425; además no cabe junto a llama3.1:8b en 8 GB y cada cambio de modelo cuesta unos 5-8 s de carga).
 PROMPT_QC1_VERSION = _env("COPILOTO_PROMPT_QC1", "v11")
 QC1_MAX_CHARS = 2500
-# Conceptos clave (paso 1): "v10" o "v11" (pide primero el delito y después el problema procesal).
+# Conceptos clave (paso 1): el prompt pide primero el delito con su modalidad y después el problema procesal.
 PROMPT_CONCEPTOS_VERSION = _env("COPILOTO_PROMPT_CONCEPTOS", "v11")
-# Ficha penal: "json" (v11: una llamada que devuelve la ficha estructurada; el informe se arma con código) o
-# "dos_llamadas" (extracción + informe, como v10). Con "json" se ahorra una llamada por candidato.
+# Ficha penal: "json" (una llamada que devuelve la ficha estructurada; el informe se arma con código) o
+# "dos_llamadas" (extracción + informe; línea base y respaldo si el JSON no es válido).
 FICHA_MODO = _env("COPILOTO_FICHA_MODO", "json")
 # Orden final de los candidatos: "rrf" (el de la búsqueda) o "familia_acto": si la consulta nombra un acto impugnado
 # (vinculación, prisión preventiva, sentencia...), primero los de la misma familia de delito y el mismo acto, leídos
@@ -185,34 +177,33 @@ RERANKER_DISPOSITIVO = _env("COPILOTO_RERANKER_DISPOSITIVO", "auto")  # "auto" |
 # texto y la versión (prompt + modelo); si no, la genera en la consulta. Activado por defecto solo si existe el archivo.
 FICHAS_PRECALCULADAS_PATH = DATA_DIR / "fichas" / "fichas-penal.parquet"
 FICHAS_PRECALCULADAS = _env("COPILOTO_FICHAS_PRECALCULADAS", FICHAS_PRECALCULADAS_PATH.exists())
-# Modelo de respaldo de las fichas precalculadas (v11.2): `fichas-batch --respaldo` genera con él, por lotes y sin otro
+# Modelo de respaldo de las fichas precalculadas: `fichas-batch --respaldo` genera con él, por lotes y sin otro
 # modelo cargado, las fichas de las sentencias que no tienen una válida del modelo principal, fuera de la muestra de
 # la referencia (la evaluación mide solo las del modelo principal). La app usa primero la del modelo principal y, si
 # no hay, la de respaldo, en lugar de generarla durante la consulta. qwen2.5:7b: cabe en 8 GB y en `modelos`
 # (20261113-125326_fb1f3fe) tardó 18 s por ficha frente a 29 s, con JSON válido 20/20. Vacío = sin respaldo.
 FICHAS_MODELO_RESPALDO = _env("COPILOTO_FICHAS_MODELO_RESPALDO", "qwen2.5:7b") or None
 # QC_2: "determinista" (sin LLM: el delito de la ficha debe ser de una familia clasificada o de la etiqueta de la
-# sentencia; además se marcan sentido del fallo y artículos no encontrados) o "llm" (verificador LLM de v10).
+# sentencia; además se marcan sentido del fallo y artículos no encontrados) o "llm" (verificador LLM, línea base).
 QC2_MODO = _env("COPILOTO_QC2_MODO", "determinista")
-# Prompts penales: "v10" o "v11" (añade acto impugnado, agravios, su calificación y sentido del fallo cerrado).
+# Prompt penal: pide acto impugnado, agravios, su calificación y el sentido del fallo como valor cerrado.
 PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
-# Síntesis (paso 5). En una consulta real, la v10 leyó al revés un precedente que confirmó la vinculación pese a
-# impugnarse el reconocimiento por fotografía y concluyó que "es probable que la apelación tenga éxito". v11: dice
-# quién apeló y qué resolvió la Sala, separa precedentes a favor y en contra del argumento, y no predice resultados.
-# v12 (v11.2): v11 más un ejemplo de líneas bien citadas y una revisión final de que cada línea termine en [Pn]. En
-# 20 consultas de desarrollo, por pares, las afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086
+# Síntesis (paso 5): parte de la lista por reglas de quién apeló, qué resolvió la Sala y a qué parte favoreció; no
+# pronostica el resultado (una síntesis sin esas reglas leyó al revés un precedente y concluyó que "es probable que la
+# apelación tenga éxito"). Incluye un ejemplo de líneas bien citadas y una revisión final de que cada línea termine
+# en [Pn]: en 20 consultas de desarrollo, por pares, las afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086
 # [+0.021, +0.161]) y las sin cita de 0.144 a 0.066, sin ningún pronóstico (`20261123-201729_e566e3d_sintesis-citas`).
 PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v12")
-# v11.1: la síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
+# La síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
 # fallo o el delito mencionados coincidan con la ficha citada; si no, la frase se marca "verificar".
 VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)
 # Resultados guardados para la demo (cache_resultados.py): la app muestra al instante una consulta ya analizada con
 # la misma configuración. Guarda la consulta en data/cache/resultados (local). La evaluación nunca la usa.
 CACHE_RESULTADOS = _env("COPILOTO_CACHE_RESULTADOS", True)
-# Aviso "parece de otra materia" (v11.2): el corpus es penal y, en `robustez` (20261113-115133_fb1f3fe), las consultas
-# civil, familiar y fuera de tema recibieron precedentes penales sin aviso. Se avisa si la consulta no menciona ningún
-# delito ni término del proceso penal (lista en pipeline._RE_PENAL). tests/test_robustez.py comprueba que avisa en las
-# 3 de otra materia y en ninguno de los 16 ejemplos penales; la corrida `robustez` de v11.2 lo deja registrado.
+# Aviso "parece de otra materia": el corpus es penal. Se avisa si la consulta no menciona ningún delito ni término del
+# proceso penal (lista en pipeline._RE_PENAL); sin él, las consultas civil, familiar y fuera de tema recibían
+# precedentes penales sin aviso (`robustez`, 20261113-115133_fb1f3fe). tests/test_robustez.py comprueba que avisa en
+# las 3 de otra materia y en ninguno de los ejemplos penales.
 AVISO_OTRA_MATERIA = _env("COPILOTO_AVISO_OTRA_MATERIA", True)
 # Aviso "no hay precedentes del mismo tipo": siempre que ningún precedente venga del filtro; además, si se fija
 # un umbral (medido con `evaluacion recuperacion`), cuando la señal de coincidencia de la mejor categoría
@@ -234,7 +225,7 @@ class LLMSettings:
     provider: str = _env("COPILOTO_LLM_PROVIDER", "ollama")  # "ollama" | "openai"
     # En `modelos` (20261113-125326_fb1f3fe: 10 consultas, 20 fichas, sin referencia) qwen2.5:7b fue más rápido
     # (83 s frente a 125 s por consulta; 18 s frente a 29 s por ficha) y mejor en los diagnósticos (JSON 20/20 frente
-    # a 19/20; "dato no disponible" 3.5 % frente a 8.9 %). Se mantiene llama3.1:8b en v11.2 porque cambiarlo invalida
+    # a 19/20; "dato no disponible" 3.5 % frente a 8.9 %). Se mantiene llama3.1:8b porque cambiarlo invalida
     # las 2,495 fichas precalculadas (~12.7 h) y obliga a repetir la evaluación; es el siguiente cambio recomendado,
     # medido antes con `fichas-referencia` contra la referencia.
     model: str = _env("COPILOTO_LLM_MODEL", "llama3.1:8b")

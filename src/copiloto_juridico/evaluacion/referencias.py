@@ -1,4 +1,4 @@
-"""Referencias de la evaluación automática (v11.2): lo que haría el anotador humano, sin anotador humano.
+"""Referencias de la evaluación automática: lo que haría el anotador humano, sin anotador humano.
 
 - **Delito:** la categoría que el STJ asignó a la sentencia en su portal (externa al sistema) → familia.
 - **Acto impugnado, apelante y sentido del fallo:** tres lectores independientes de la sentencia (las reglas de
@@ -459,7 +459,7 @@ def evaluar_fichas(particion: str, log=print):
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Experimento: prompt de la ficha con el fundamento legal de la Sala (v11.2)
+# Experimento: prompt de la ficha con el fundamento legal de la Sala
 # --------------------------------------------------------------------------------------------------------------
 
 

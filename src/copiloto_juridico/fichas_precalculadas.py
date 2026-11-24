@@ -1,4 +1,4 @@
-"""Fichas penales precalculadas (v11.1): la ficha JSON de cada sentencia penal se genera una sola vez.
+"""Fichas penales precalculadas: la ficha JSON de cada sentencia penal se genera una sola vez.
 
 Generar fichas durante la consulta era casi todo el tiempo de respuesta. `python -m copiloto_juridico.evaluacion
 fichas-batch` las genera para todo el corpus penal y las guarda en `data/fichas/fichas-penal.parquet`, con las
@@ -85,7 +85,7 @@ def generar_todas(corpus: pd.DataFrame, llm, path: Path = config.FICHAS_PRECALCU
 
     version, digest = version_ficha(llm.settings), digest_modelo(llm.settings)
     tabla = cargar(path)
-    # Las fichas que quedaron inválidas se vuelven a intentar (v11.2: hay un tercer intento que antes no existía)
+    # Las fichas que quedaron inválidas se vuelven a intentar (con el tercer intento)
     vigentes = {(d, h) for d, h, v, ok in zip(tabla["doc_id"], tabla["huella_texto"], tabla["version"],
                                              tabla["json_valido"]) if v == version and bool(ok)}
     penal = corpus[corpus["materia"] == "penal"]

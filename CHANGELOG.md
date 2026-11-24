@@ -78,7 +78,11 @@ medir.
 - **Perfil del tribunal de alzada:** las 39 consultas reescritas como toca en estudio encuentran la familia igual
   (Hit@3 +0.051 [−0.077, +0.205]) pero con precedentes menos pertinentes (nDCG@5 0.266 → 0.145, significativo), en
   parte por la reescritura automática (`20261123-202205_e566e3d-sucio_perfil-tribunal`).
-- QC_1_PENDIENTE
+- **QC_1 lee la ficha precalculada, adoptado:** en 660 pares, recall 0.725 → 0.844 (+0.120 [+0.036, +0.204]) sin
+  cambio significativo de la especificidad (`20261123-230824_5fc9b67_qc`). Para acelerarlo se probaron, y se
+  descartaron, `qwen2.5:7b` (recall 0.425; cambiar de modelo en 8 GB cuesta 5-8 s) y un prompt solo con el veredicto
+  (responde SI en 649 de 660 pares) (`20261123-234717_e28a600_qc`).
+- La página «Cómo funciona» muestra las corridas de la partición de prueba, no los experimentos de desarrollo.
 - **OCR:** `construir-corpus` lee por OCR (Tesseract, español) las páginas sin capa de texto, si está instalado. Solo
   1 de 1,899 PDF está escaneado; no se incorporó porque su versión escaneada no suprime los datos personales.
 

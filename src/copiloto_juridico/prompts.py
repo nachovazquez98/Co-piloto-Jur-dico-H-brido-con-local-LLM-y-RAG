@@ -1,8 +1,8 @@
-"""Prompts del Co-piloto Jurídico (migrados del notebook v9.8).
+"""Prompts del Co-piloto Jurídico.
 
-Cambios respecto al notebook:
-- Los verificadores (QC_1 y QC_2) terminan con una línea `VEREDICTO: SI|NO` que se parsea de forma estricta.
-- Los informes piden Markdown explícitamente, porque la app los muestra tal cual.
+La versión que usa la app de cada paso se elige en `config` (PROMPT_*_VERSION) junto con la corrida que la respalda;
+las otras versiones son la línea base con que la evaluación la compara. Los verificadores (QC_1 y QC_2) terminan con
+una línea `VEREDICTO: SI|NO` que se parsea de forma estricta; los informes piden Markdown porque la app los muestra.
 """
 
 PROMPT_EXTRACCION_ENTIDADES = """
@@ -12,9 +12,9 @@ Consulta del Usuario: "{texto_consulta}"
 Conceptos Clave:
 """
 
-# v11: una consulta de defensa suele centrarse en el problema procesal ("vinculación a proceso", "reconocimiento
-# ilegal") y el LLM extrae solo esos conceptos; entonces Jaccard y KEM valen 0 para todas las categorías (que son
-# delitos). Esta variante pide primero el delito. Se activa con COPILOTO_PROMPT_CONCEPTOS=v11.
+# Conceptos clave de la app: pide primero el delito. Una consulta suele centrarse en el problema procesal
+# ("vinculación a proceso", "reconocimiento ilegal") y, sin esta regla (línea base), el LLM extrae solo esos conceptos:
+# entonces Jaccard y KEM valen 0 para todas las categorías, que son delitos.
 PROMPT_EXTRACCION_ENTIDADES_V11 = """
 Tu única tarea es analizar la Consulta del Usuario y extraer de 1 a 3 conceptos jurídicos clave que sirvan como etiquetas de búsqueda.
 El PRIMER concepto debe ser SIEMPRE el nombre del delito, con su modalidad si se menciona o se deduce (ej: 'robo calificado', 'homicidio a título de culpa', 'violencia familiar'). Si la consulta no nombra el delito, dedúcelo de los hechos descritos (ej: "le quitaron la cartera amenazándolo con una navaja" -> 'robo calificado'). Los demás, si los hay, son el problema procesal (ej: 'vinculación a proceso', 'prisión preventiva', 'detención ilegal').
@@ -56,7 +56,7 @@ Responde exactamente con este formato:
 VEREDICTO: SI o NO
 """
 
-# v11: el criterio es el que usa un defensor para decidir si una sentencia le sirve como precedente.
+# QC_1 de la app: el criterio con que un abogado decide si una sentencia le sirve como precedente.
 PROMPT_VERIFICACION_RELEVANCIA_V11 = """
 Eres un Asistente de Verificación de Relevancia para un defensor penal. Decide si el Documento Recuperado puede
 servirle como precedente para la Consulta.
@@ -85,8 +85,8 @@ VEREDICTO: SI o NO
 """
 
 
-# v12 (v11.2, experimento de velocidad): el mismo criterio que v11, pero sin las dos frases de razonamiento previas
-# al veredicto, que son la mayor parte de lo que genera el modelo en cada llamada.
+# Solo para el experimento de velocidad de `qc` (no es el de la app): el mismo criterio sin las dos frases de
+# razonamiento previas al veredicto. Descartado: el modelo responde SI en 649 de 660 pares (`20261123-234717_e28a600_qc`).
 _FORMATO_QC1_V11 = """Responde exactamente con este formato:
 1. Delito y problema de la consulta: <una frase>
 2. Delito y problema del documento: <una frase>
@@ -100,8 +100,8 @@ PROMPTS_QC1 = {"v10": PROMPT_VERIFICACION_RELEVANCIA, "v11": PROMPT_VERIFICACION
 
 
 def prompt_qc1(version: str | None = None) -> str:
-    """Prompt de QC_1 según `config.PROMPT_QC1_VERSION` ("v10": mismo tema Y contexto; "v11": criterio de defensa;
-    "v12": criterio de v11, solo el veredicto)."""
+    """Prompt de QC_1 según `config.PROMPT_QC1_VERSION` ("v11", el de la app; "v10", línea base: mismo tema Y
+    contexto; "v12", experimento: solo el veredicto)."""
     from . import config
 
     version = version or config.PROMPT_QC1_VERSION
@@ -262,9 +262,9 @@ Formato de salida (Markdown):
 """
 
 
-# v11.2 (experimento `sintesis-citas`): la misma síntesis con un ejemplo de líneas bien citadas y una revisión final
-# de las citas. En la latencia de prueba, 16.9 % de las afirmaciones de la síntesis no citaba ningún precedente
-# (20261121-052935_4b1529e_latencia).
+# Síntesis de la app: la anterior más un ejemplo de líneas bien citadas y una revisión final de las citas. Con la
+# anterior, 16.9 % de las afirmaciones no citaba ningún precedente (20261121-052935_4b1529e_latencia); con esta, las
+# afirmaciones con cita válida pasan de 0.743 a 0.829 (`20261123-201729_e566e3d_sintesis-citas`).
 _REGLA_NO_PREDECIR = ('- NO predigas el resultado del caso consultado ni digas que una apelación "tendrá éxito". Di '
                       'qué argumentos acogió\n  o rechazó la Sala y por qué.')
 _REGLAS_CITA_V12 = (_REGLA_NO_PREDECIR + "\n- Una frase general sobre varios precedentes cita todos los que la "
@@ -280,8 +280,8 @@ PROMPTS_SINTESIS = {"v10": PROMPT_SINTESIS_FINAL, "v11": PROMPT_SINTESIS_FINAL_V
 
 
 def prompt_sintesis(version: str | None = None) -> str:
-    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v10"; "v11": parte favorecida, sin
-    pronosticar; "v12", la de la app: v11 con ejemplo de citas y revisión final)."""
+    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v12", la de la app; "v11" y "v10", líneas
+    base de la evaluación)."""
     from . import config
 
     version = version or config.PROMPT_SINTESIS_VERSION
@@ -292,7 +292,7 @@ def prompt_sintesis(version: str | None = None) -> str:
 
 
 
-# --- v11: ficha penal orientada a la defensa en apelación (config.PROMPT_PENAL_VERSION = "v11") ---
+# --- Ficha penal de la app: acto impugnado, agravios y su calificación, sentido del fallo como valor cerrado ---
 PROMPT_EXTRACCION_PENAL_V11 = """
 Eres un Analista Legal Penal que apoya a la DEFENSA en segunda instancia. Extrae de la SENTENCIA PENAL (resolución de
 un recurso de apelación de una Sala Penal) la información que un defensor necesita para usarla como precedente.
@@ -358,8 +358,8 @@ profesional, **detallado y analítico**, útil para un defensor que prepara o co
 **Razonamiento del Tribunal:** [Con base en 'Fundamento Legal' y 'Pruebas Decisivas', **explica** por qué la Sala resolvió así y qué argumentos de la defensa prosperaron o no.]
 """
 
-# v11, una sola llamada: la ficha penal completa como JSON (config.FICHA_MODO = "json"). El informe en Markdown se
-# arma con código a partir del JSON, sin segunda llamada al LLM.
+# Ficha de la app en una sola llamada: la ficha penal completa como JSON (config.FICHA_MODO = "json"). El informe en
+# Markdown se arma con código a partir del JSON, sin segunda llamada al LLM.
 PROMPT_FICHA_PENAL_JSON = """
 Eres un Analista Legal Penal que apoya a la DEFENSA en segunda instancia. Lee la SENTENCIA PENAL (resolución de un
 recurso de apelación de una Sala Penal) y devuelve su ficha como UN objeto JSON con exactamente estas claves:
@@ -390,7 +390,7 @@ Sentencia:
 {contexto}
 """
 
-# v11.2, solo para el experimento `fundamento-prompt` (no es la ficha de la app): la misma ficha con el fundamento
+# Solo para el experimento `fundamento-prompt` (no es la ficha de la app): la misma ficha con el fundamento
 # legal restringido a lo que invoca la Sala para fundar SU resolución. Los artículos que la ficha precalculada cita
 # fuera de ese fundamento casi siempre aparecen en la sentencia (agravios, primera instancia): no son alucinaciones
 # sino artículos de otra parte del texto (126 de 127). No se adoptó: precisión +0.010 [−0.040, +0.060] y
@@ -406,7 +406,7 @@ assert _FUNDAMENTO_ACTUAL in PROMPT_FICHA_PENAL_JSON and _REGLA_FINAL in PROMPT_
 PROMPT_FICHA_PENAL_JSON_FUNDAMENTO_SALA = PROMPT_FICHA_PENAL_JSON.replace(_FUNDAMENTO_ACTUAL, _FUNDAMENTO_SALA).replace(
     _REGLA_FINAL, _REGLA_FUNDAMENTO)
 
-# v11.2: tercer intento de la ficha JSON. 62 de las 66 fichas inválidas de llama3.1:8b solo carecían de 'delitos'
+# Tercer intento de la ficha JSON. 62 de las 66 fichas inválidas de llama3.1:8b solo carecían de 'delitos'
 # (o 'resumen'), aun después del reintento (fichas-diagnostico 20261116-213316_1fc6dd4). Se piden únicamente esos
 # campos y se unen a la respuesta anterior; no cambia la versión de la ficha (el prompt principal es el mismo).
 PROMPT_FICHA_FALTANTES = """
@@ -475,7 +475,7 @@ Extracto de la sentencia:
 Consulta:
 """
 
-# v11.1: para regenerar los borradores que el verificador marcó (copiaban frases, nombraban el delito o traían cifras).
+# Para regenerar los borradores que el verificador marcó (copiaban frases, nombraban el delito o traían cifras).
 PROMPT_BORRADOR_CONSULTA_ESTRICTO = """
 Eres un defensor penal en Jalisco. A partir del extracto de una sentencia de segunda instancia, escribe la consulta
 que harías a un buscador de precedentes sobre TU caso, ANTES de conocer esa sentencia: en 2 a 4 frases, en primera
@@ -507,7 +507,7 @@ Consulta:
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Jueces LLM de la evaluación automática (v11.2). Los usa un modelo DISTINTO del que genera las fichas; los criterios
+# Jueces LLM de la evaluación automática. Los usa un modelo DISTINTO del que genera las fichas; los criterios
 # son los de la guía de anotación (evaluacion/README.md). Responden solo JSON con valores cerrados.
 # --------------------------------------------------------------------------------------------------------------
 

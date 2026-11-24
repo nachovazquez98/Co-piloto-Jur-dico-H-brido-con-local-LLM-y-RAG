@@ -28,7 +28,7 @@ _PREFIJOS_TENTATIVA = re.compile(r"^(tentativa|tentantiva|continuado)-de-")
 # Reglas ordenadas: (familia, expresión aplicada al inicio del slug, nota para el revisor o "").
 # El orden importa: "violacion-de-deposito" debe evaluarse antes que "violacion", y "robo-de-infante" antes que "robo".
 REGLAS: list[tuple[str, str, str]] = [
-    # v11.2: asuntos sin delito (recursos e incidencias del procedimiento); antes caían en "otros".
+    # asuntos sin delito (recursos e incidencias del procedimiento); antes caían en "otros".
     ("cuestiones-procesales", r"queja|conflicto-de-competencia|excusa",
      "No es un delito: recurso o incidencia del procedimiento."),
     ("sustraccion-de-menores", r"robo-de-infante|substraccion-de-menores|sustraccion-de-menores|sustraccion-robo",
@@ -175,7 +175,7 @@ def cargar_familias(tipos: list[str], path: Path = config.FAMILIAS_CSV) -> dict[
 
 
 def coherencia(doc_ids, emb, doc_tipo: dict[str, str], familias: dict[str, str], min_docs: int = 3):
-    """Comprobación sin LLM de la agrupación (v11.2): para cada tipo con al menos
+    """Comprobación sin LLM de la agrupación: para cada tipo con al menos
     `min_docs` sentencias, a qué familia se parece más su centroide de embeddings (el promedio de los fragmentos de
     sus sentencias, centrado). La familia de comparación se calcula SIN ese tipo. Un tipo más cercano a otra familia que a la
     suya es un posible error de agrupación (o un tipo con varios delitos): diagnóstico, no una decisión."""

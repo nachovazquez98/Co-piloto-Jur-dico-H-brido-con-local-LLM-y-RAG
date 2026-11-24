@@ -1,4 +1,4 @@
-"""Re-ranking opcional con un cross-encoder (v11.1, experimento; apagado por defecto: config.RERANKER = None).
+"""Re-ranking opcional con un cross-encoder (experimento; apagado por defecto: config.RERANKER = None).
 
 El cross-encoder lee la consulta junto con el fragmento más parecido de cada candidato y les da un puntaje de
 relevancia; reordena solo los candidatos de la búsqueda (hasta 30). Se activa por defecto únicamente si, con los

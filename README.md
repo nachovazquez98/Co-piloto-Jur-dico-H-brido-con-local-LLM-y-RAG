@@ -61,7 +61,7 @@ evaluación guardada.
 | 1. Conceptos clave | consulta → delito + problema procesal | LLM (Ollama, `llama3.1:8b`) |
 | 2. Clasificación | consulta → 3 familias de delito más probables | coseno de embeddings + Jaccard de lemas + voto de las sentencias recuperadas |
 | 3. Búsqueda | familias (o los delitos que elige el usuario, uno o varios) → hasta 30 sentencias candidatas | embeddings `multilingual-e5-base` (ChromaDB) + BM25, fusión RRF; filtro por familia con respaldo sin filtro |
-| 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
+| 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?, leyendo la ficha precalculada), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
 | 5. Síntesis | fichas → respuesta a la consulta | parte favorecida por cada precedente, por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
 
 **Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
@@ -126,6 +126,19 @@ Resultados de la evaluación final: partición de prueba, una sola corrida por c
 
 Análisis de los fallos por tipo en `evaluacion/errores/` (`errores --corrida`). Guía para leer cada métrica en
 [`evaluacion/README.md`](evaluacion/README.md).
+
+**Mejoras probadas después de la evaluación final.** En la partición de desarrollo, por pares (IC 95 % por
+bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin empeorar otra medida:
+
+| Cambio | Resultado | Decisión | Corrida |
+|---|---|---|---|
+| Síntesis con un ejemplo de líneas citadas y revisión final de las citas (20 consultas) | afirmaciones con cita válida 0.743 → **0.829** (+0.086 [+0.021, +0.161]); sin cita 0.144 → 0.066; ningún pronóstico | adoptado | `20261123-201729_e566e3d_sintesis-citas` |
+| QC_1 lee la ficha precalculada en lugar del fragmento (660 pares) | recall 0.725 → **0.844** (+0.120 [+0.036, +0.204]); especificidad 0.410 → 0.396 (no significativo); precisión 0.294 → 0.321 | adoptado | `20261123-230824_5fc9b67_qc` |
+| QC_1 con `qwen2.5:7b` (660 pares) | recall 0.844 → 0.425 (−0.419, significativo); 1.9 s por llamada, pero cada cambio de modelo en 8 GB cuesta 5-8 s | descartado | `20261123-234717_e28a600_qc` |
+| QC_1 solo con el veredicto, sin razonar (660 pares) | 0.59 s por llamada, pero responde SI en 649 de 660 pares (especificidad 0.022): deja de filtrar | descartado | `20261123-234717_e28a600_qc` |
+| Ficha: pedir solo los artículos que invoca la Sala (120 sentencias) | precisión del fundamento +0.010 [−0.040, +0.060]; exhaustividad −0.023, significativa | descartado | `20261123-174502_b8fdd94_fundamento-prompt` |
+| Ficha: darle al modelo la parte considerativa (120 sentencias) | precisión −0.048 [−0.096, +0.006]; exhaustividad −0.030, significativa | descartado | `20261123-212426_5fc9b67_fundamento-contexto` |
+| Consultas planteadas como toca en estudio (39 consultas) | Hit@3 de familia igual (+0.051 [−0.077, +0.205]); nDCG@5 0.266 → 0.145, significativo | medición del perfil | `20261123-202205_e566e3d-sucio_perfil-tribunal` |
 
 Orden de la evaluación final: corpus definitivo → fichas → juez y `referencias` → `congelar` → corridas con
 `--particion prueba`, una sola vez. Lo que sigue en esta sección es **diagnóstico** de versiones anteriores.
@@ -278,8 +291,11 @@ Continuación, mejora y evolución del proyecto, en orden de prioridad:
 4. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
    reCAPTCHA) y volver a descargar las sentencias con páginas omitidas; los PDF escaneados ya se leen por OCR al
    construir el corpus, pero antes de incorporarlos hay que comprobar que tengan suprimidos los datos personales.
-5. **Controles.** Mejorar la precisión de QC_1 (0.322 en prueba) sin perder exhaustividad y fijar el umbral de
-   «sin precedentes del mismo tipo» cuando una señal lo separe mejor que `kem_max`.
+5. **Controles.** QC_1 ya conserva más precedentes relevantes leyendo la ficha (recall 0.844 en desarrollo), pero su
+   precisión sigue baja (0.321): deja pasar la mayoría de los no relevantes, que después ordena la búsqueda. Ni otro
+   modelo ni un prompt sin razonamiento la mejoraron sin perder exhaustividad. Medir el cambio en la partición de
+   prueba con un nuevo congelado y fijar el umbral de «sin precedentes del mismo tipo» cuando una señal lo separe
+   mejor que `kem_max`.
 6. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
    juicio sobre la utilidad de los precedentes.
 

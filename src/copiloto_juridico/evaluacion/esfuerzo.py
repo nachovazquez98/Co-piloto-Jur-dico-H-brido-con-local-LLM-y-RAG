@@ -1,4 +1,4 @@
-"""Esfuerzo simulado (v11.2): sustituye al estudio de uso con abogados, que no están disponibles.
+"""Esfuerzo simulado: sustituye al estudio de uso con abogados, que no están disponibles.
 
 ¿Cuántas sentencias tendría que abrir alguien para encontrar `K` precedentes útiles? Útil = referencia automática de
 relevancia 2: misma familia de delito (categoría del STJ) y mismo acto impugnado (mayoría de lectores, ver
@@ -9,7 +9,7 @@ relevancia 2: misma familia de delito (categoría del STJ) y mismo acto impugnad
 - portal por delito y tipo de sentencia: además, el filtro "Definitiva / Interlocutoria" del portal.
 - búsqueda por palabras: BM25 con el texto de la consulta.
 - la app: la lista de candidatos de `buscar_candidatos`, en su orden.
-- la app con el delito elegido (v11.2): el usuario elige en la app la familia de delito de su caso (la de la categoría
+- la app con el delito elegido: el usuario elige en la app la familia de delito de su caso (la de la categoría
   del STJ, igual de optimista que el portal) y la búsqueda se filtra por ella en lugar de por el clasificador.
 
 Si no se llega a `K` dentro de las primeras `TOPE` sentencias, cuenta como `TOPE` + 1 (no encontró). Advertencia: la

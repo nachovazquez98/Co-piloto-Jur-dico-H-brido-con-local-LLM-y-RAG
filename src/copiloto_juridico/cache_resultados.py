@@ -1,4 +1,4 @@
-"""Resultados guardados para la demo (v11.1).
+"""Resultados guardados para la demo.
 
 Si una consulta ya se analizó con la misma configuración, la app muestra el resultado guardado de inmediato (una
 línea "Resultado guardado el <fecha>"). La clave junta la consulta normalizada, el hash de la configuración

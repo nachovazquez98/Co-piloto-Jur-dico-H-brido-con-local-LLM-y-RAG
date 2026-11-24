@@ -1,4 +1,4 @@
-"""Robustez (v11.1): la app completa con consultas difíciles. `python -m copiloto_juridico.evaluacion robustez`.
+"""Robustez: la app completa con consultas difíciles. `python -m copiloto_juridico.evaluacion robustez`.
 
 Diagnóstico con el LLM real (las pruebas usan un LLM simulado). Para cada consulta registra si terminó sin error,
 si avisó cuando no hay precedentes del tipo (esperado en las de fuera de materia o de tema) y si la síntesis

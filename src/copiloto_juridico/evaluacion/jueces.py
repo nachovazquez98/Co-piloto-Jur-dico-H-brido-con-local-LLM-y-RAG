@@ -1,4 +1,4 @@
-"""Jueces LLM de la evaluación automática (v11.2): sustituyen al anotador humano, que no está disponible.
+"""Jueces LLM de la evaluación automática: sustituyen al anotador humano, que no está disponible.
 
 Tres tareas, con los criterios de la guía de anotación:
 - `sentencia`: familia del delito, acto impugnado, apelante y sentido del fallo, leídos del inicio y de los

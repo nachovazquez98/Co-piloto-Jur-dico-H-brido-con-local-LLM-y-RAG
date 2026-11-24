@@ -5,10 +5,10 @@
   que debería encontrarse; si es None, el tema no tiene tipo en el corpus y la app debería avisarlo.
 - `EJEMPLOS_TRIBUNAL`: temas planteados por el tribunal de alzada que estudia un toca (segundo perfil de usuario de
   la interfaz, `PERFILES`).
-- `EJEMPLOS_PENALES` (v11): los mismos temas redactados como los plantearía un defensor en apelación. Ya no se
+- `EJEMPLOS_PENALES`: los mismos temas redactados como los plantearía un defensor en apelación. Ya no se
   muestran en la app; se conservan sin cambios porque la evaluación (`evaluacion/regresion.py`, errores, modelos)
   y sus corridas guardadas se hicieron con ellos.
-- Las consultas penales de v10 están en `evaluacion/regresion.py`.
+- Las consultas penales de la línea base están en `evaluacion/regresion.py`.
 
 Estos ejemplos son para demostrar la app: **no** forman parte del conjunto de evaluación (que debe redactarse
 de forma independiente, ver `evaluacion/README.md`).
@@ -23,7 +23,7 @@ class Ejemplo:
     tipo: str
     texto: str
     etapa: str | None = None          # acto impugnado o etapa del caso
-    tipo_corpus: str | None = ""      # "" = no verificado (v10); None = sin tipo en el corpus
+    tipo_corpus: str | None = ""      # "" = no verificado (línea base); None = sin tipo en el corpus
     perfil: str = "abogado"           # perfil de usuario: una de las claves de PERFILES
 
     @property
@@ -204,7 +204,7 @@ EJEMPLOS_VICTIMA: list[Ejemplo] = [
 ]
 
 
-# Segundo perfil de usuario (v11.2): el tribunal de alzada que estudia un toca.
+# Segundo perfil de usuario: el tribunal de alzada que estudia un toca.
 EJEMPLOS_TRIBUNAL: list[Ejemplo] = [
     Ejemplo("Penal", "Robo calificado",
             "Toca en estudio: la defensa apela el auto de vinculación a proceso por robo calificado; el único dato "

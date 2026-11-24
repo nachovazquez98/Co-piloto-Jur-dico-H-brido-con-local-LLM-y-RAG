@@ -141,7 +141,7 @@ RE_RESOLUTIVOS = re.compile(r"r\s?e\s?s\s?u\s?e\s?l\s?v\s?e|p\s?r\s?o\s?p\s?o\s?
 def extract_and_clean_legal_text(raw_text: str) -> str:
     """Quita ruido (encabezados, numeración) y aísla el cuerpo de la resolución: desde la primera palabra de sección
     (si está en el primer 10 % del texto; si no, desde el inicio) hasta la fórmula final ("Notifíquese", "Así lo
-    resolvió"...) posterior a los resolutivos. v11.2: antes el final se buscaba después de la última palabra de
+    resolvió"...) posterior a los resolutivos. Antes el final se buscaba después de la última palabra de
     sección al inicio de línea, y un "Notifíquese" citado de la resolución de primera instancia dejaba hasta el 1 %
     del documento."""
     pre = RE_NOISE_F1.sub(" ", raw_text)
@@ -210,7 +210,7 @@ def process_pdf_folder(folder: Path, log: Callable[[str], None] = print) -> list
 
 
 # --------------------------------------------------------------------------------------------------------------
-# Limpieza v11 del texto ya extraído (se aplica también al corpus guardado: no hacen falta los PDFs)
+# Limpieza del texto ya extraído (se aplica también al corpus guardado: no hacen falta los PDFs)
 # --------------------------------------------------------------------------------------------------------------
 
 # Cada entrada del anexo de datos testados termina en "LGPPICR" (Lineamientos Generales para la Protección de la
@@ -333,7 +333,7 @@ def _limpiar_una_vez(t: str) -> str:
 
 
 def limpiar_texto(texto: str) -> str:
-    """Limpieza v11, idempotente: anexo de datos testados, etiquetas de testado -> "[eliminado]", encabezados y
+    """Limpieza, idempotente: anexo de datos testados, etiquetas de testado -> "[eliminado]", encabezados y
     numeración de página, palabras deletreadas y espacios repetidos. Conserva las marcas "... N págs omitidas ..."
     (avisan que esa parte del PDF no se leyó). Se repite hasta que el texto no cambia, porque unir palabras o
     quitar un encabezado puede dejar completo otro."""

@@ -3,7 +3,7 @@
 Preparación (sin LLM):
     congelar                         Huella de código, corpus, índice, fichas, configuración, prompts y modelo
     familias                         Exporta evaluacion/familias_penal.csv (tipo -> familia) para revisión
-    familias --coherencia            Comprueba la agrupación con los embeddings del índice (v11.2)
+    familias --coherencia            Comprueba la agrupación con los embeddings del índice
     validar                          Valida las consultas, detecta fuga y resume el conjunto
 Experimentos sin LLM (usan los conceptos en caché):
     recuperacion --particion P       Líneas base, filtro, k de RRF, k-NN; métricas con IC 95 %
@@ -20,7 +20,7 @@ Con LLM:
     sintesis-citas --particion P     Citas de la síntesis: prompt v11 (app) frente a v12, mismos precedentes
 Análisis (sin LLM):
     errores --corrida ID [ID ...]    Un caso por fallo, con su tipo (evaluacion/errores/) y casos para la presentación
-Referencia automática, sin anotadores humanos (v11.2):
+Referencia automática, sin anotadores humanos:
     jueces --pares                   Pares (consulta, sentencia) a juzgar, por agrupamiento (sin LLM)
     jueces --modelo M [--tareas ...] Una tanda de un juez LLM (un modelo a la vez; reanudable)
     referencias                      Reglas + jueces -> referencias, juicios y consultas validadas (sin LLM)
@@ -152,7 +152,7 @@ def cmd_borradores(args) -> None:
 
     destino = Path(args.consultas)
     textos = load_corpus().set_index("id")["texto"]
-    if args.ampliar:  # v11.2: consultas nuevas hasta N por familia, sin tocar las existentes
+    if args.ampliar:  # consultas nuevas hasta N por familia, sin tocar las existentes
         from .conjuntos import ampliar_plantilla
         from .familias import cargar_familias
 
@@ -162,7 +162,7 @@ def cmd_borradores(args) -> None:
                                    n_por_familia=args.ampliar)
         _log(f"Redactando {len(nuevas)} consultas nuevas (prompt estricto)...")
         consultas = existentes + redactar_borradores(nuevas, textos, _llm(), intentos=5, estricto=True, log=_log)
-    elif args.solo_atencion:  # v11.1: solo las marcadas por el verificador, con el prompt estricto
+    elif args.solo_atencion:  # solo las marcadas por el verificador, con el prompt estricto
         consultas = cargar_consultas(destino, permitir_vacias=True)
         from ..pipeline import es_fallo
 

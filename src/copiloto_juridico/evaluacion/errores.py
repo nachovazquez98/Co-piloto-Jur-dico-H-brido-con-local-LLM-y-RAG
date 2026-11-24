@@ -1,4 +1,4 @@
-"""Análisis de errores (v11.1): un caso por fallo, a partir de una corrida guardada.
+"""Análisis de errores: un caso por fallo, a partir de una corrida guardada.
 
 `python -m copiloto_juridico.evaluacion errores --corrida <id> [<id> ...]` lee la corrida (regresión,
 qc-diagnostico, recuperación, qc o generación), toma de ella qué falló y reconstruye cada caso sin LLM con el código

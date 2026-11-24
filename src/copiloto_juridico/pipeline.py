@@ -72,7 +72,7 @@ class Opciones:
     max_candidatos: int = 15
     qc_relevancia: bool = True
     qc_post_reporte: bool = True
-    # v11.2: familias de delito que elige el usuario (una o varias); vacío = las elige el clasificador
+    # familias de delito que elige el usuario (una o varias); vacío = las elige el clasificador
     familias: tuple[str, ...] = ()
 
 
@@ -95,7 +95,7 @@ class Precedente:
 
     @property
     def datos_penales(self) -> dict:
-        """Acto impugnado, agravios, calificación y sentido del fallo (prompt v11). Si el sentido leído de los
+        """Acto impugnado, agravios, calificación y sentido del fallo. Si el sentido leído de los
         resolutivos difiere del que dio el LLM, manda el de los resolutivos y se marca para verificar."""
         from .fichas import datos_penales
 
@@ -163,7 +163,7 @@ class Resultado:
     aviso_cobertura: str | None = None    # "no hay precedentes del mismo tipo..." cuando aplica
     llamadas_llm: int = 0
     citas: dict | None = None             # verificación de citas de la síntesis (afirmaciones, válidas, marcadas)
-    familias_elegidas: tuple[str, ...] = ()  # v11.2: delitos que eligió el usuario (vacío = los eligió el clasificador)
+    familias_elegidas: tuple[str, ...] = ()  # delitos que eligió el usuario (vacío = los eligió el clasificador)
     nota_delito: str | None = None        # el clasificador habría buscado en otra familia que la elegida
 
     def markdown(self) -> str:
@@ -240,7 +240,7 @@ _VERBOS_SINTESIS = {"CONFIRMA": r"confirm", "REVOCA": r"revoc", "MODIFICA": r"mo
 
 
 def verificar_citas(sintesis: str, precedentes: list["Precedente"]) -> tuple[str, dict]:
-    """Verificación determinista de la síntesis (v11.1). Cada afirmación (viñeta completa, o frase de 30+ caracteres
+    """Verificación determinista de la síntesis. Cada afirmación (viñeta completa, o frase de 30+ caracteres
     en un párrafo; los títulos no cuentan) debe citar un precedente existente ([P1], "Precedente 1"); si menciona un sentido del fallo
     (confirmó, revocó...) o una familia de delito, debe coincidir con la ficha de algún precedente citado. Las
     que fallan se marcan "verificar" (mismo estilo que las fichas). Devuelve (texto marcado, conteos)."""
@@ -336,7 +336,7 @@ def recortar_contexto(texto: str, max_chars: int, patron: re.Pattern = _RE_AGRAV
     Si no cabe: el inicio (25 %: tribunal, toca, antecedentes), el final (25 %: resolutivos) y, en medio, la
     ventana del texto intermedio con más menciones a los agravios y su calificación ("agravio", "fundado",
     "infundado", "inoperante"), que es lo que más le sirve a la defensa y suele estar en los considerandos. Si el
-    texto intermedio no habla de agravios, se usa 55 % inicio / 45 % final como en v10. `patron` cambia lo que se
+    texto intermedio no habla de agravios, se usa 55 % inicio / 45 % final. `patron` cambia lo que se
     cuenta en la ventana intermedia (`_RE_CONSIDERATIVA`: experimento `fundamento-contexto`)."""
     if len(texto) <= max_chars:
         return texto
@@ -424,7 +424,7 @@ def familias_disponibles(corpus: pd.DataFrame) -> dict[str, int]:
 
 
 def sugerir_familias(store, clasificador, consulta: str) -> list[str]:
-    """Sugerencia inicial para el selector de delitos (v11.2): las familias de las 3 primeras categorías del
+    """Sugerencia inicial para el selector de delitos: las familias de las 3 primeras categorías del
     clasificador, sin llamar al LLM (la consulta hace de conceptos clave; tarda menos de un segundo). La búsqueda
     real usa los conceptos del LLM, así que puede diferir un poco."""
     q = embed_query(consulta)
@@ -455,7 +455,7 @@ def buscar_candidatos(store, clasificador, consulta: str, entidades: str, q_emb,
                       orden: str | None = None, familias: tuple[str, ...] | list[str] = ()) -> Busqueda:
     """Pasos 2 y 3 de la app (clasificación y búsqueda adaptativa), compartidos con la evaluación.
 
-    `familias` (v11.2): las familias de delito que eligió el usuario. Sustituyen a las 3 primeras categorías del
+    `familias`: las familias de delito que eligió el usuario. Sustituyen a las 3 primeras categorías del
     clasificador en el filtro estricto, en el orden por facetas y en QC_2; la búsqueda amplia sigue completando si el
     filtro trae pocos candidatos (marcados como "Búsqueda amplia"), para no dejar sin resultados una familia chica."""
     from .metadatos import acto_de_consulta
@@ -583,7 +583,7 @@ class Copiloto:
                 verificar_ficha(prec)
                 prec.informe = ficha.informe_markdown(prec.articulos_no_encontrados, prec.sentido_reglas)
                 return self._qc2(consulta, prec, categorias, op, logs)
-        # Ficha en dos llamadas (v10, solo para comparar) o respaldo si la ficha JSON no fue válida.
+        # Ficha en dos llamadas (línea base) o respaldo si la ficha JSON no fue válida.
         p_ext, p_rep = prompts.prompts_penal()
         logs.append(f"   -> Extrayendo hechos ({len(contexto):,} de {len(cand.texto):,} caracteres)...")
         hechos = self._llm(p_ext.format(contexto=contexto))
@@ -604,7 +604,7 @@ class Copiloto:
              logs: list[str]) -> tuple["Precedente | None", str, list[str]]:
         """QC_2. Determinista (por defecto): descarta si el delito de la ficha no es de ninguna familia clasificada
         ni de la etiqueta de la sentencia (la ficha habla de otra cosa o el LLM extrajo mal). Con "llm", el
-        verificador LLM de v10."""
+        verificador LLM (línea base)."""
         if op.qc_post_reporte and config.QC2_MODO == "llm":
             prec.veredicto_reporte = self._llm(prompts.PROMPT_VERIFICACION_POST_REPORTE.format(
                 texto_consulta=consulta, informe_generado=prec.informe))
@@ -808,7 +808,7 @@ class Copiloto:
             yield log(f"   -> Citas: {citas['con_cita_valida']}/{citas['afirmaciones']} afirmaciones con cita válida"
                       f"{marcadas}.", "sintesis")
         balance = balance_precedentes(precedentes)
-        if balance and config.PROMPT_SINTESIS_VERSION != "v10":  # v11 y v12 parten de la lista por reglas
+        if balance and config.PROMPT_SINTESIS_VERSION != "v10":  # salvo la línea base, la síntesis parte de la lista por reglas
             sintesis = balance + "\n\n" + sintesis.strip()
         yield Evento("paso_fin", "sintesis")
 

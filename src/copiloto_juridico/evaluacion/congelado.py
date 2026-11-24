@@ -1,4 +1,4 @@
-"""Congelar lo que se evalúa (v11.1).
+"""Congelar lo que se evalúa.
 
 `congelar` guarda en `evaluacion/congelado.json` la huella de todo lo que cambia los resultados: código, corpus,
 índice, fichas precalculadas, configuración efectiva (config.py + variables de entorno), texto de cada prompt y

@@ -216,7 +216,7 @@ def relevancia_por_par(juicios: pd.DataFrame, anotador_principal: str | None = N
 
 def exigir_revisadas(consultas: list["Consulta"]) -> None:
     """La partición de prueba solo se usa con consultas revisadas por una persona o, en la evaluación automática
-    (v11.2), validadas por `referencias` (comprobaciones de la guía + jueces LLM); nunca con borradores sin validar."""
+   , validadas por `referencias` (comprobaciones de la guía + jueces LLM); nunca con borradores sin validar."""
     sin = [c.id for c in consultas if c.particion == "prueba" and not (c.revisado or c.extra.get("validada"))]
     if sin:
         raise ErrorValidacion(f"Rechazado: {len(sin)} consultas de prueba sin revisar ni validar, p. ej. "
@@ -231,7 +231,7 @@ def exigir_revisadas(consultas: list["Consulta"]) -> None:
 def ampliar_plantilla(corpus: pd.DataFrame, familias: dict[str, str], existentes: list[Consulta],
                       n_por_familia: int = 10, min_sentencias_familia: int = 10,
                       semilla: int = config.EVAL_SEED, largo_extracto: int = 1200) -> list[Consulta]:
-    """v11.2: entradas NUEVAS para llegar a `n_por_familia` consultas por familia (la mitad en cada partición), con
+    """entradas NUEVAS para llegar a `n_por_familia` consultas por familia (la mitad en cada partición), con
     sentencias que aún no son fuente de ninguna consulta y tipos aún no cubiertos primero. No toca las existentes;
     los ids siguen la numeración. Sin revisión humana, más consultas dan intervalos de confianza más estrechos."""
     rng = np.random.default_rng(semilla + 1)

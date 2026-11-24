@@ -1,4 +1,4 @@
-"""Metadatos procesales por reglas, sin LLM (v11.1): acto impugnado, quién apeló y sentido del fallo.
+"""Metadatos procesales por reglas, sin LLM: acto impugnado, quién apeló y sentido del fallo.
 
 Casi todas las sentencias de apelación del STJ Jalisco abren con el mismo párrafo: "vistos para resolver los autos
 del toca penal …, formado con motivo del recurso de apelación interpuesto por EL APELANTE, en contra de EL ACTO …".

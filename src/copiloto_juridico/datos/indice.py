@@ -82,8 +82,8 @@ def _guardar(chunks: pd.DataFrame, emb: np.ndarray, manifest: dict, directory: P
 
 def recortar_indice(corpus: pd.DataFrame, directory: Path = config.INDICE_DIR,
                     log: Callable[[str], None] = print) -> dict:
-    """Conserva del índice actual solo los fragmentos de las sentencias del corpus, sin recalcular embeddings (v11.2:
-    el corpus pasó a ser solo penal). Exige los mismos parámetros y, por sentencia, el mismo número de fragmentos que
+    """Conserva del índice actual solo los fragmentos de las sentencias del corpus, sin recalcular embeddings
+    (cuando el corpus se reduce, como al dejarlo solo penal). Exige los mismos parámetros y, por sentencia, el mismo número de fragmentos que
     produciría `build_chunks`; si no, hay que reindexar."""
     manifest, chunks, emb = load_index(directory)
     if {k: manifest.get(k) for k in index_params()} != index_params():
