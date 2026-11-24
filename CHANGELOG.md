@@ -66,10 +66,11 @@ usarse. Corpus penal ampliado con descargas a mano desde el portal.
 ### Experimentos en desarrollo, después del congelado
 Cada uno en la partición de desarrollo, por pares y con IC 95 % por bootstrap; la partición de prueba no se volvió a
 medir.
-- **Síntesis v12, adoptada:** v11 más un ejemplo de líneas bien citadas y una revisión final. En 20 consultas, las
-  afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086 [+0.021, +0.161]) y las sin cita de 0.144 a 0.066, sin
-  ningún pronóstico (`20261123-201729_e566e3d_sintesis-citas`). La lista por reglas de cada precedente sigue
-  encabezando la síntesis.
+- **Síntesis con ejemplo de citas, descartada:** con un ejemplo de contenido jurídico (v12), la primera medición
+  mejoraba las citas (+0.086, `20261123-201729_e566e3d_sintesis-citas`), pero con los precedentes de QC_1 sobre la
+  ficha no se reprodujo (−0.024 [−0.144, +0.078]), copió el ejemplo en 9 de 19 síntesis y pronosticó en una; con un
+  ejemplo solo de formato (v13), +0.024 [−0.069, +0.121], sin copias ni pronósticos
+  (`20261124-003427_905c255_sintesis-citas`). Ninguna es significativa: la app sigue con la síntesis v11.
 - **Fundamento legal, dos variantes descartadas:** pedir solo los artículos que invoca la Sala (precisión +0.010
   [−0.040, +0.060], exhaustividad −0.023, significativa; `20261123-174502_b8fdd94_fundamento-prompt`) y darle al
   modelo la parte considerativa (precisión −0.048 [−0.096, +0.006], exhaustividad −0.030, significativa;

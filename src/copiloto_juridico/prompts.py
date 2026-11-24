@@ -262,9 +262,9 @@ Formato de salida (Markdown):
 """
 
 
-# Síntesis de la app: la anterior más un ejemplo de líneas bien citadas y una revisión final de las citas. Con la
-# anterior, 16.9 % de las afirmaciones no citaba ningún precedente (20261121-052935_4b1529e_latencia); con esta, las
-# afirmaciones con cita válida pasan de 0.743 a 0.829 (`20261123-201729_e566e3d_sintesis-citas`).
+# Solo para el experimento `sintesis-citas` (la app usa v11): la síntesis con un ejemplo de líneas citadas y una
+# revisión final de las citas. No se adoptó: ni v12 ni v13 mejoran de forma significativa las citas de v11 y v12 copia
+# su ejemplo (`20261124-003427_905c255_sintesis-citas`).
 _REGLA_NO_PREDECIR = ('- NO predigas el resultado del caso consultado ni digas que una apelación "tendrá éxito". Di '
                       'qué argumentos acogió\n  o rechazó la Sala y por qué.')
 _REGLAS_CITA_V12 = (_REGLA_NO_PREDECIR + "\n- Una frase general sobre varios precedentes cita todos los que la "
@@ -277,8 +277,8 @@ _EJEMPLO_CITAS_V12 = ("\nEjemplo de líneas bien citadas (el contenido es ilustr
 assert _REGLA_NO_PREDECIR in PROMPT_SINTESIS_FINAL_V11
 PROMPT_SINTESIS_FINAL_V12 = PROMPT_SINTESIS_FINAL_V11.replace(_REGLA_NO_PREDECIR, _REGLAS_CITA_V12) + _EJEMPLO_CITAS_V12
 # v13: las mismas reglas de cita, con un ejemplo que solo muestra el formato. El ejemplo de v12 tenía contenido
-# jurídico y el modelo lo copiaba: «dictamen pericial» aparece en 10 de las 20 síntesis de la demo sin que la
-# consulta lo mencione (`sintesis-citas` mide estas copias).
+# jurídico y el modelo lo copiaba («dictamen pericial» en 10 de 20 síntesis de la demo sin que la consulta lo
+# mencionara).
 _EJEMPLO_CITAS_V13 = ("\nFormato de las líneas (sustituye lo que está entre < > por el contenido de las fichas; no "
                       "escribas los signos < >):\n- <qué resolvió la Sala sobre un agravio y por qué> [P1].\n"
                       "- <qué conviene leer de una sentencia y para qué> [P2].\n")
@@ -292,8 +292,8 @@ FRASES_EJEMPLO_SINTESIS = {"v12": ("dictamen pericial", "con defensor presente")
 
 
 def prompt_sintesis(version: str | None = None) -> str:
-    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v12", la de la app; "v11" y "v10", líneas
-    base de la evaluación)."""
+    """Prompt de la síntesis según `config.PROMPT_SINTESIS_VERSION` ("v11", la de la app; "v10", línea base;
+    "v12" y "v13", experimento `sintesis-citas`)."""
     from . import config
 
     version = version or config.PROMPT_SINTESIS_VERSION

@@ -132,7 +132,7 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 
 | Cambio | Resultado | Decisión | Corrida |
 |---|---|---|---|
-| Síntesis con un ejemplo de líneas citadas y revisión final de las citas (20 consultas) | afirmaciones con cita válida 0.743 → **0.829** (+0.086 [+0.021, +0.161]); sin cita 0.144 → 0.066; ningún pronóstico | adoptado | `20261123-201729_e566e3d_sintesis-citas` |
+| Síntesis con un ejemplo de líneas citadas y revisión final de las citas (19 consultas) | con un ejemplo de contenido jurídico, cita válida −0.024 [−0.144, +0.078], lo copia en 9 de 19 síntesis y pronostica en una (una primera medición, con otros precedentes, daba +0.086); con un ejemplo solo de formato, +0.024 [−0.069, +0.121], sin copias | descartado: la app sigue con la síntesis anterior | `20261124-003427_905c255_sintesis-citas` |
 | QC_1 lee la ficha precalculada en lugar del fragmento (660 pares) | recall 0.725 → **0.844** (+0.120 [+0.036, +0.204]); especificidad 0.410 → 0.396 (no significativo); precisión 0.294 → 0.321 | adoptado | `20261123-230824_5fc9b67_qc` |
 | QC_1 con `qwen2.5:7b` (660 pares) | recall 0.844 → 0.425 (−0.419, significativo); 1.9 s por llamada, pero cada cambio de modelo en 8 GB cuesta 5-8 s | descartado | `20261123-234717_e28a600_qc` |
 | QC_1 solo con el veredicto, sin razonar (660 pares) | 0.59 s por llamada, pero responde SI en 649 de 660 pares (especificidad 0.022): deja de filtrar | descartado | `20261123-234717_e28a600_qc` |

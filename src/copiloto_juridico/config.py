@@ -190,10 +190,12 @@ QC2_MODO = _env("COPILOTO_QC2_MODO", "determinista")
 PROMPT_PENAL_VERSION = _env("COPILOTO_PROMPT_PENAL", "v11")
 # Síntesis (paso 5): parte de la lista por reglas de quién apeló, qué resolvió la Sala y a qué parte favoreció; no
 # pronostica el resultado (una síntesis sin esas reglas leyó al revés un precedente y concluyó que "es probable que la
-# apelación tenga éxito"). Incluye un ejemplo de líneas bien citadas y una revisión final de que cada línea termine
-# en [Pn]: en 20 consultas de desarrollo, por pares, las afirmaciones con cita válida pasan de 0.743 a 0.829 (+0.086
-# [+0.021, +0.161]) y las sin cita de 0.144 a 0.066, sin ningún pronóstico (`20261123-201729_e566e3d_sintesis-citas`).
-PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v12")
+# apelación tenga éxito"). Se probó agregar un ejemplo de líneas citadas y una revisión final de las citas: con
+# contenido jurídico en el ejemplo (v12), la primera medición mejoraba las citas (`20261123-201729_e566e3d_sintesis-citas`), pero con los
+# precedentes que deja QC_1 sobre la ficha no se reprodujo (−0.024 [−0.144, +0.078]), copió el ejemplo en 9 de 19
+# síntesis y pronosticó en una; con un ejemplo solo de formato (v13), +0.024 [−0.069, +0.121], no significativo
+# (`20261124-003427_905c255_sintesis-citas`). Ninguna cumple el criterio y la app sigue con v11.
+PROMPT_SINTESIS_VERSION = _env("COPILOTO_PROMPT_SINTESIS", "v11")
 # La síntesis cita cada afirmación ([P1], [P2]...) y el código verifica que la cita exista y que el sentido del
 # fallo o el delito mencionados coincidan con la ficha citada; si no, la frase se marca "verificar".
 VERIFICAR_CITAS = _env("COPILOTO_VERIFICAR_CITAS", True)
