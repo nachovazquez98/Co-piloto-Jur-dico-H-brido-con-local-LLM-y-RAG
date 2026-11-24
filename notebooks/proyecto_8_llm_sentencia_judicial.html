@@ -7986,8 +7986,9 @@ Modelo de embeddings: intfloat/multilingual-e5-base · materias en la búsqueda:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Planteamiento-del-problema,-objeto-y-alcance">1. Planteamiento del problema, objeto y alcance<a class="anchor-link" href="#1.-Planteamiento-del-problema,-objeto-y-alcance">¶</a></h2><p><strong>Planteamiento.</strong> La defensa penal que prepara o contesta un recurso de apelación requiere conocer el criterio con
-que las Salas Penales del Supremo Tribunal de Justicia del Estado de Jalisco (STJ) han resuelto supuestos análogos.
+<h2 id="1.-Planteamiento-del-problema,-objeto-y-alcance">1. Planteamiento del problema, objeto y alcance<a class="anchor-link" href="#1.-Planteamiento-del-problema,-objeto-y-alcance">¶</a></h2><p><strong>Planteamiento.</strong> Quien prepara o contesta un recurso de apelación penal y el propio tribunal de alzada que lo
+resuelve requieren conocer el criterio con que las Salas Penales del Supremo Tribunal de Justicia del Estado
+de Jalisco (STJ) han resuelto supuestos análogos.
 El portal público del tribunal permite consultar las resoluciones por categoría, pero no por similitud de hechos ni
 por problema procesal, y cada resolución debe leerse íntegra para identificar el acto impugnado, los agravios, su
 calificación y el sentido del fallo.</p>
@@ -7997,14 +7998,34 @@ y entre 2019 y 2024 las causas acumuladas pasaron de 221 mil a 425 mil [12]. Mé
 en el factor de justicia penal del <em>Rule of Law Index 2025</em> [13]. En Jalisco se registraron en 2024 14,677 personas
 procesadas o imputadas en causas penales ingresadas en primera instancia, séptimo lugar nacional; de las personas
 imputadas con resolución del juez de control, el 76.3 % fue vinculada a proceso [14]. En ese contexto de carga y
-rezago, consultar el criterio de las Salas sobre supuestos análogos debe ser tan económico como sea posible para la
-defensa.</p>
+rezago, consultar el criterio de las Salas sobre supuestos análogos debe ser tan económico como sea posible para
+quienes intervienen en el proceso.</p>
 <p><strong>Objeto.</strong> Desarrollar un sistema que, a partir de la descripción de un caso en lenguaje natural, recupere las
 resoluciones del propio tribunal más afines y elabore de cada una una ficha estructurada (delito, acto impugnado,
 apelante, agravios y su calificación, sentido del fallo, fundamento legal), así como una síntesis comparativa que
-distinga los precedentes favorables y desfavorables para la defensa.</p>
-<p><strong>Usuario destinatario.</strong> El abogado defensor, público o particular, que actúa en segunda instancia penal.</p>
-<p><strong>Alcance.</strong> Materia penal exclusivamente. El sistema no pronostica el resultado del asunto, no redacta agravios y
+indique la parte favorecida por cada precedente.</p>
+<p><strong>Usuarios destinatarios.</strong> Dos perfiles ante el mismo problema de localización y lectura de precedentes, que
+emplean la misma búsqueda y las mismas fichas:</p>
+<table>
+<thead>
+<tr>
+<th>Perfil</th>
+<th>Necesidad</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abogado, defensor o asesor jurídico de la víctima (usuario principal)</td>
+<td>Interponer o contestar un recurso de apelación con precedentes en que la Sala calificó agravios semejantes</td>
+</tr>
+<tr>
+<td>Tribunal de alzada (Sala Penal)</td>
+<td>Contrastar su criterio con el de resoluciones previas en supuestos semejantes; el sentido de la resolución le corresponde exclusivamente</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Alcance.</strong> Materia penal exclusivamente. La consulta de una persona sin formación jurídica queda fuera del alcance
+de esta versión: no tiene perfil en la aplicación ni se ha evaluado. El sistema no pronostica el resultado del asunto, no redacta agravios y
 no sustituye la lectura íntegra de la resolución ni el criterio profesional. Las resoluciones del STJ constituyen
 precedentes orientadores, no jurisprudencia obligatoria.</p>
 <p><strong>Método.</strong> Generación aumentada por recuperación (<em>Retrieval-Augmented Generation</em>, RAG): el modelo de lenguaje
@@ -8184,7 +8205,7 @@ qwen2.5:7b resultó más rápido y mejor en los diagnósticos:</p>
 <p><strong>Evidencia disponible.</strong> qwen2.5:7b destaca en velocidad y en completitud de campos en el diagnóstico de 20 fichas;
 en la prueba piloto como lector de la familia del delito quedó por debajo del umbral de 0.80. La configuración vigente
 aprovecha ambas fortalezas.</p>
-<p><strong>Decisión: uso complementario de ambos modelos.</strong> En la versión 11.2, el modelo principal de la aplicación y de
+<p><strong>Decisión: uso complementario de ambos modelos.</strong> El modelo principal de la aplicación y de
 toda la evaluación es <code>llama3.1:8b</code>, con el que se construyeron y midieron las 2,495 fichas. <code>qwen2.5:7b</code> se incorpora como <strong>modelo de respaldo de las fichas</strong>
 (<code>config.FICHAS_MODELO_RESPALDO</code>): <code>fichas-batch --respaldo</code> precalcula con él, por lotes y sin otro modelo cargado,
 las fichas de las resoluciones que carecen de una ficha válida de <code>llama3.1:8b</code>, fuera de la muestra de la referencia
@@ -8247,10 +8268,11 @@ profesional, no sale del equipo; (ii) costo marginal nulo por consulta una vez a
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="3.-Fase-I.-Obtenci%C3%B3n-del-corpus">3. Fase I. Obtención del corpus<a class="anchor-link" href="#3.-Fase-I.-Obtenci%C3%B3n-del-corpus">¶</a></h2><p><img alt="Fase I" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4NTAgMjQyIiB3aWR0aD0iODUwIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CjxkZWZzPjxtYXJrZXIgaWQ9ImYiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzU1NSIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9Ijg1MCIgaGVpZ2h0PSIyNDIiIGZpbGw9IiNmY2ZjZmMiIHJ4PSIxMCIvPgo8dGV4dCB4PSIxOCIgeT0iMzQiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMjIyIj5GYXNlIEkuIE9idGVuY2nDs24gZGVsIGNvcnB1czwvdGV4dD4KPHJlY3QgeD0iMTgiIHk9IjUyIiB3aWR0aD0iMTc4IiBoZWlnaHQ9IjY2IiByeD0iOCIgZmlsbD0iI2VlZjNmYiIgc3Ryb2tlPSIjM2I2ZmI2IiBzdHJva2Utd2lkdGg9IjEuNiIvPgo8dGV4dCB4PSIxMDcuMCIgeT0iODEuMCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+UG9ydGFsIHDDumJsaWNvPC90ZXh0Pgo8dGV4dCB4PSIxMDcuMCIgeT0iOTcuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+ZGVsIFNUSiBKYWxpc2NvPC90ZXh0Pgo8cmVjdCB4PSIyMzAiIHk9IjUyIiB3aWR0aD0iMTc4IiBoZWlnaHQ9IjY2IiByeD0iOCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNGE0YTRhIiBzdHJva2Utd2lkdGg9IjEuNiIvPgo8dGV4dCB4PSIzMTkuMCIgeT0iODEuMCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+QVBJIGRlIGRlc2NhcmdhPC90ZXh0Pgo8dGV4dCB4PSIzMTkuMCIgeT0iOTcuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+KGhhc3RhIG9jdC0yMDI2KTwvdGV4dD4KPHJlY3QgeD0iNDQyIiB5PSI1MiIgd2lkdGg9IjE3OCIgaGVpZ2h0PSI2NiIgcng9IjgiIGZpbGw9IiNmZGVjZWMiIHN0cm9rZT0iI2IzM2EzYSIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPHRleHQgeD0iNTMxLjAiIHk9IjczLjAiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyMjIiPnJlQ0FQVENIQSBleGlnaWRvPC90ZXh0Pgo8dGV4dCB4PSI1MzEuMCIgeT0iODkuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+ZWwgZGVzY2FyZ2Fkb3Igc2UgZGV0aWVuZTwvdGV4dD4KPHRleHQgeD0iNTMxLjAiIHk9IjEwNS4wIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0ibm9ybWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjIyIj4obm8gc2UgZXZhZGUpPC90ZXh0Pgo8cmVjdCB4PSIyMzAiIHk9IjE1OCIgd2lkdGg9IjE3OCIgaGVpZ2h0PSI2NiIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzRhNGE0YSIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPHRleHQgeD0iMzE5LjAiIHk9IjE3OS4wIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjIyIj5MaXN0YXMgZGUgZGVzY2FyZ2E8L3RleHQ+Cjx0ZXh0IHg9IjMxOS4wIiB5PSIxOTUuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+aW5jb21wbGV0YXMgwrcgbnVldmFzPC90ZXh0Pgo8dGV4dCB4PSIzMTkuMCIgeT0iMjExLjAiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyMjIiPsK3IHZvbHZlciBhIGJhamFyPC90ZXh0Pgo8cmVjdCB4PSI0NDIiIHk9IjE1OCIgd2lkdGg9IjE3OCIgaGVpZ2h0PSI2NiIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzRhNGE0YSIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPHRleHQgeD0iNTMxLjAiIHk9IjE4Ny4wIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjIyIj5EZXNjYXJnYSBtYW51YWw8L3RleHQ+Cjx0ZXh0IHg9IjUzMS4wIiB5PSIyMDMuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+Z3VpYWRhIHBvciBsYXMgbGlzdGFzPC90ZXh0Pgo8cmVjdCB4PSI2NTQiIHk9IjE1OCIgd2lkdGg9IjE3OCIgaGVpZ2h0PSI2NiIgcng9IjgiIGZpbGw9IiNlZWYzZmIiIHN0cm9rZT0iIzNiNmZiNiIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPHRleHQgeD0iNzQzLjAiIHk9IjE3OS4wIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjIyIj5QREYgbm9tYnJhZG8gcG9yPC90ZXh0Pgo8dGV4dCB4PSI3NDMuMCIgeT0iMTk1LjAiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyMjIiPmZlY2hhIHkgaG9yYSBkZSBwdWJsaWNhY2nDs248L3RleHQ+Cjx0ZXh0IHg9Ijc0My4wIiB5PSIyMTEuMCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzIyMiI+KyBtYXRlcmlhICsgZGVsaXRvPC90ZXh0Pgo8bGluZSB4MT0iMTk2IiB5MT0iODUuMCIgeDI9IjIzMCIgeTI9Ijg1LjAiIHN0cm9rZT0iIzU1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiIG1hcmtlci1lbmQ9InVybCgjZikiLz4KPGxpbmUgeDE9IjQwOCIgeTE9Ijg1LjAiIHgyPSI0NDIiIHkyPSI4NS4wIiBzdHJva2U9IiM1NTUiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItZW5kPSJ1cmwoI2YpIi8+CjxsaW5lIHgxPSI1MzEuMCIgeTE9IjExOCIgeDI9IjUzMS4wIiB5Mj0iMTU4IiBzdHJva2U9IiM1NTUiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItZW5kPSJ1cmwoI2YpIi8+Cjx0ZXh0IHg9IjUzOC4wIiB5PSIxNDIuMCIgZm9udC1zaXplPSIxMC41IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZpbGw9IiM1NTUiPmRlc2RlIG9jdC0yMDI2PC90ZXh0Pgo8bGluZSB4MT0iNDA4IiB5MT0iMTkxLjAiIHgyPSI0NDIiIHkyPSIxOTEuMCIgc3Ryb2tlPSIjNTU1IiBzdHJva2Utd2lkdGg9IjEuNSIgbWFya2VyLWVuZD0idXJsKCNmKSIvPgo8bGluZSB4MT0iNjIwIiB5MT0iMTkxLjAiIHgyPSI2NTQiIHkyPSIxOTEuMCIgc3Ryb2tlPSIjNTU1IiBzdHJva2Utd2lkdGg9IjEuNSIgbWFya2VyLWVuZD0idXJsKCNmKSIvPgo8L3N2Zz4="/></p>
-<p>Las resoluciones son públicas y provienen del portal del STJ. Inicialmente se descargaron mediante su API
-(<code>datos/descarga.py</code>), con un máximo de 30 resoluciones por tipo penal, para equilibrar los delitos frecuentes y los
-escasos. <strong>En octubre de 2026 la API comenzó a exigir verificación reCAPTCHA</strong>: el descargador lo detecta y se
-detiene; el proyecto no evade dicha verificación.</p>
+<p>Las resoluciones son públicas y provienen del portal del STJ. Inicialmente se descargaron mediante su API, con un
+máximo de 30 resoluciones por tipo penal, para equilibrar los delitos frecuentes y los escasos. <strong>En octubre de 2026
+la API comenzó a exigir verificación reCAPTCHA.</strong> El descargador del proyecto (<code>descarga_datos/descargar.py</code>, para
+cualquier materia) se detiene ante ella en el modo <code>api</code>; en el modo <code>navegador</code>, una persona la resuelve en una
+ventana del portal y el script continúa con esa sesión. El proyecto nunca resuelve ni evade dicha verificación.</p>
 <p>Desde entonces el corpus se amplía mediante <strong>descarga manual</strong> guiada por tres listas:</p>
 <table>
 <thead>
@@ -8262,7 +8284,7 @@ detiene; el proyecto no evade dicha verificación.</p>
 <tbody>
 <tr>
 <td><code>evaluacion/descargas/1_incompletas.csv</code></td>
-<td>Resoluciones procesadas con una versión anterior que omitía páginas</td>
+<td>Resoluciones extraídas cuando los PDF largos se muestreaban y se omitían páginas</td>
 </tr>
 <tr>
 <td><code>evaluacion/descargas/2_nuevas.csv</code></td>
@@ -8454,7 +8476,7 @@ Resoluciones repetidas retiradas: 8
 mediante reglas sobre el nombre del tipo; la tabla completa, con la regla que decidió cada asignación, está en
 <code>evaluacion/familias_penal.csv</code>. Ninguna asignación ha sido revisada por un especialista, lo que se declara como
 limitación. La familia es la unidad de clasificación y de filtrado: agrupa variantes de un mismo delito (robo calificado,
-robo equiparado) que la defensa consideraría comparables.</p>
+robo equiparado) que un abogado consideraría comparables.</p>
 <p>La familia <strong>«cuestiones procesales»</strong> reúne las resoluciones que no versan sobre un delito (quejas, excusas y
 conflictos de competencia). La familia <strong>«otros»</strong> es residual: reúne los delitos que no encuadran en ninguna de las
 demás (por ejemplo, aborto, allanamiento de morada, ataque peligroso o delitos contra el ambiente). En el análisis
@@ -8781,7 +8803,7 @@ Fragmentos de resoluciones penales: 186,971 (mediana de 51 por resolución)
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 17584.14it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 20954.67it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -8820,10 +8842,10 @@ según cada búsqueda y según su fusión.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copiloto_juridico.ejemplos</span><span class="w"> </span><span class="kn">import</span> <span class="n">EJEMPLOS_PENALES</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copiloto_juridico.ejemplos</span><span class="w"> </span><span class="kn">import</span> <span class="n">ejemplos_de</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copiloto_juridico.embeddings</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_query</span>
 
-<span class="n">ejemplo</span> <span class="o">=</span> <span class="n">EJEMPLOS_PENALES</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ejemplo</span> <span class="o">=</span> <span class="n">ejemplos_de</span><span class="p">(</span><span class="s2">"abogado"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># caso guía: el abogado de la víctima de un robo calificado</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ejemplo</span><span class="o">.</span><span class="n">texto</span><span class="p">)</span>
 <span class="n">q</span> <span class="o">=</span> <span class="n">embed_query</span><span class="p">(</span><span class="n">ejemplo</span><span class="o">.</span><span class="n">texto</span><span class="p">)</span>
 <span class="n">tipo_de</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">corpus</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)[</span><span class="s2">"tipo"</span><span class="p">]</span>
@@ -8844,7 +8866,7 @@ según cada búsqueda y según su fusión.</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Mi defendido fue vinculado a proceso porque supuestamente le arrebató el celular a una mujer en una parada de camión, amagándola con un cuchillo. La única prueba es el señalamiento de la víctima en un reconocimiento por fotografía hecho sin presencia de defensor. Quiero apelar el auto de vinculación.
+<pre>Mi cliente fue asaltado en una parada de camión: un hombre lo amenazó con un cuchillo y le quitó el celular. Lo reconoció en unas fotografías y el agresor fue vinculado a proceso, pero su defensa apeló el auto de vinculación. Quiero saber cómo ha resuelto la Sala apelaciones parecidas y qué valor le da al reconocimiento.
 </pre>
 </div>
 </div>
@@ -8878,32 +8900,32 @@ según cada búsqueda y según su fusión.</p>
 <tr>
 <th>1</th>
 <td>robo-calificado-y-tentativa-de-robo-calificado</td>
-<td>feminicidio</td>
-<td>secuestro-express</td>
-</tr>
-<tr>
-<th>2</th>
 <td>violacion</td>
-<td>tentativa-de-homicidio-simple-intencional</td>
 <td>homicidio-en-rina</td>
 </tr>
 <tr>
+<th>2</th>
+<td>corrupcion-de-menores</td>
+<td>tentativa-de-homicidio-simple-intencional</td>
+<td>contra-la-dignidad-de-las-personas</td>
+</tr>
+<tr>
 <th>3</th>
-<td>ataque-peligroso</td>
-<td>violacion-y-otros</td>
-<td>ataque-peligroso</td>
+<td>violencia-familiar-y-lesiones</td>
+<td>homicidio-calificado-en-grado-de-tentativa</td>
+<td>homicidio-simple</td>
 </tr>
 <tr>
 <th>4</th>
-<td>suplantacion-de-identidad</td>
+<td>homicidio-en-rina</td>
+<td>homicidio-simple-intencional-y-otro</td>
 <td>violacion-y-corrupcion-de-menores</td>
-<td>homicidio-a-titulo-de-culpa-grave</td>
 </tr>
 <tr>
 <th>5</th>
-<td>violacion</td>
-<td>violacion</td>
-<td>violacion-y-corrupcion-de-menores</td>
+<td>abuso-de-autoridad</td>
+<td>atentados-al-pudor</td>
+<td>abuso-de-autoridad</td>
 </tr>
 </tbody>
 </table>
@@ -8961,7 +8983,7 @@ consulta: primero extrae los conceptos clave y clasifica la familia del delito, 
 <tr>
 <td><code>num_docs</code></td>
 <td>Resoluciones indexadas</td>
-<td>Incluye las de otras materias heredadas de la versión 10, que se excluyen al buscar; las penales se indexan completas</td>
+<td>Solo resoluciones penales, indexadas completas</td>
 </tr>
 <tr>
 <td><code>num_chunks</code></td>
@@ -9042,7 +9064,33 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 13933.63it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 17749.42it/s]</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>GPU sin memoria para el modelo de embeddings; se usa la CPU.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>Loading weights:   0%|          | 0/199 [00:00&lt;?, ?it/s]</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 16674.65it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9110,13 +9158,13 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 </tr>
 <tr>
 <th>Modelo de embeddings</th>
-<td>278 M parámetros en cuda:0, torch.float16</td>
-<td>0.52 GB</td>
+<td>278 M parámetros en cpu, torch.float32</td>
+<td>1.04 GB</td>
 </tr>
 <tr>
 <th>Memoria RAM de este proceso (índice + BM25 + modelo)</th>
 <td></td>
-<td>4.04 GB</td>
+<td>4.31 GB</td>
 </tr>
 <tr>
 <th>RAM total del equipo</th>
@@ -9161,9 +9209,10 @@ seleccionó el usuario; si el filtro arroja pocas, se completa sin filtro y así
 primero por coincidencia de familia y de acto impugnado (leído por reglas): en los ejemplos penales, de los 3
 primeros candidatos, 37 de 42 son de la familia correcta, frente a 32 de 42 con el orden RRF (regresiones
 <code>20261113-000836_137c238</code> y <code>20261113-001214_a5c476b</code>).</p>
-<p><strong>Paso 4. Análisis de precedentes.</strong> Para cada candidata: <strong>QC_1</strong>, el modelo lee la ventana del fragmento más
-parecido y decide si trata el mismo delito o familia o el mismo problema procesal (descarta el 14 % de los
-candidatos, frente al 55 % de la versión anterior; corrida <code>20261112-184123_2c7be47</code>); <strong>ficha</strong>, el modelo devuelve
+<p><strong>Paso 4. Análisis de precedentes.</strong> Para cada candidata: <strong>QC_1</strong>, el modelo lee la ficha precalculada de la candidata (delito, acto
+impugnado, agravios, sentido) y decide si trata el mismo delito o familia o el mismo problema procesal (descarta el 14 % de los
+candidatos, frente al 55 % si se exige «mismo tema y contexto» leyendo el inicio; corrida <code>20261112-184123_2c7be47</code>; leer la ficha en lugar del fragmento
+sube su recall de 0.725 a 0.844 en desarrollo, <code>20261123-230824_5fc9b67_qc</code>); <strong>ficha</strong>, el modelo devuelve
 un objeto JSON de 14 campos extraídos solo del texto, con reintento si el formato es inválido; <strong>verificaciones
 automáticas</strong>, el sentido del fallo se contrasta con los puntos resolutivos leídos por reglas, cada artículo citado se
 busca en la resolución y <strong>QC_2</strong> comprueba que el delito de la ficha pertenezca a una familia buscada. Las fichas se
@@ -9171,9 +9220,10 @@ calculan previamente (con el modelo principal y, para las faltantes, con el de r
 vigente. Si una resolución excede la ventana del modelo
 (8,192 tokens, unos 20,000 caracteres), se envían su inicio, el estudio de los agravios y los puntos resolutivos; no
 se resume.</p>
-<p><strong>Paso 5. Síntesis.</strong> Por reglas se determina qué precedentes fueron favorables o desfavorables para la defensa
+<p><strong>Paso 5. Síntesis.</strong> Por reglas se determina la parte favorecida por cada precedente, el acusado o la acusación
 (quién apeló y sentido del fallo). El modelo redacta la respuesta <strong>exclusivamente con las fichas</strong>, cita cada
-afirmación ([P1], [P2]…) y el código verifica que la cita exista y concuerde con la ficha; no pronostica el resultado.</p>
+afirmación ([P1], [P2]…) y el código verifica que la cita exista y concuerde con la ficha; no pronostica el resultado. Agregar al prompt un ejemplo de líneas citadas no mejoró las
+citas de forma significativa y, con contenido jurídico, el modelo lo copiaba (<code>20261124-003427_905c255_sintesis-citas</code>).</p>
 <p><strong>Delito seleccionado por el usuario (opcional).</strong> La aplicación sugiere, sin invocar al modelo de lenguaje, las
 familias que deduce de la descripción. La sugerencia contiene la familia correcta en 73 de 100 consultas de
 desarrollo (81 con los conceptos del modelo de lenguaje) y en 13 de 14 ejemplos; por ello es una orientación y no un
@@ -9194,8 +9244,9 @@ filtro automático (<code>evaluacion/errores/sugerencia_delito.md</code>).</p>
 
 <span class="n">sugerencia</span> <span class="o">=</span> <span class="n">sugerir_familias</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">clasificador</span><span class="p">,</span> <span class="n">ejemplo</span><span class="o">.</span><span class="n">texto</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Sugerencia inicial de delito:"</span><span class="p">,</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">etiqueta_familia</span><span class="p">,</span> <span class="n">sugerencia</span><span class="p">)))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Este ejemplo es uno de los casos en que la sugerencia no contiene la familia correcta; el análisis completo,"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"con los conceptos del modelo de lenguaje, sí la identifica."</span><span class="p">)</span>
+<span class="n">esperada</span> <span class="o">=</span> <span class="n">ejemplo</span><span class="o">.</span><span class="n">tipo_corpus</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"-"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># "robo" para el caso guía</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"La sugerencia contiene la familia del caso guía."</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">esperada</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">sugerencia</span><span class="p">)</span> <span class="k">else</span>
+      <span class="s2">"La sugerencia no contiene la familia del caso guía; el análisis completo usa además los conceptos del modelo."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -9208,9 +9259,8 @@ filtro automático (<code>evaluacion/errores/sugerencia_delito.md</code>).</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Sugerencia inicial de delito: privacion de la libertad y secuestro, feminicidio, robo
-Este ejemplo es uno de los casos en que la sugerencia no contiene la familia correcta; el análisis completo,
-con los conceptos del modelo de lenguaje, sí la identifica.
+<pre>Sugerencia inicial de delito: homicidio, robo, delitos sexuales
+La sugerencia contiene la familia del caso guía.
 </pre>
 </div>
 </div>
@@ -9253,7 +9303,7 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>✓ entidades: robo calificado, vinculación a proceso, falta de contradicción en el reconocimiento por fotografía
+<pre>✓ entidades: robo calificado, vinculación a proceso, apelación del auto de vinculación
 </pre>
 </div>
 </div>
@@ -9304,7 +9354,7 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Conceptos clave: robo calificado, vinculación a proceso, falta de contradicción en el reconocimiento por fotografía
+<pre>Conceptos clave: robo calificado, vinculación a proceso, apelación del auto de vinculación
 </pre>
 </div>
 </div>
@@ -9340,42 +9390,42 @@ con los conceptos del modelo de lenguaje, sí la identifica.
 <tr>
 <th>0</th>
 <td>PENAL · familia: robo</td>
-<td>0.515078</td>
-<td>0.822655</td>
-<td>0.125</td>
-<td>1.000000</td>
+<td>0.506943</td>
+<td>0.826997</td>
+<td>0.166667</td>
+<td>0.766248</td>
 </tr>
 <tr>
 <th>1</th>
 <td>PENAL · familia: homicidio</td>
-<td>0.284342</td>
-<td>0.819376</td>
-<td>0.000</td>
-<td>0.567163</td>
+<td>0.400000</td>
+<td>0.812812</td>
+<td>0.000000</td>
+<td>1.000000</td>
 </tr>
 <tr>
 <th>2</th>
-<td>PENAL · familia: feminicidio</td>
-<td>0.281285</td>
-<td>0.837785</td>
-<td>0.000</td>
-<td>0.089386</td>
+<td>PENAL · familia: delitos sexuales</td>
+<td>0.299964</td>
+<td>0.821287</td>
+<td>0.000000</td>
+<td>0.547614</td>
 </tr>
 <tr>
 <th>3</th>
-<td>PENAL · familia: delitos culposos</td>
-<td>0.262646</td>
-<td>0.835738</td>
-<td>0.000</td>
-<td>0.130110</td>
+<td>PENAL · familia: contra la dignidad de las personas</td>
+<td>0.263598</td>
+<td>0.836048</td>
+<td>0.000000</td>
+<td>0.080693</td>
 </tr>
 <tr>
 <th>4</th>
-<td>PENAL · familia: delitos sexuales</td>
-<td>0.261848</td>
-<td>0.820673</td>
-<td>0.000</td>
-<td>0.511684</td>
+<td>PENAL · familia: privacion de la libertad y secuestro</td>
+<td>0.251407</td>
+<td>0.831401</td>
+<td>0.000000</td>
+<td>0.178696</td>
 </tr>
 </tbody>
 </table>
@@ -9489,23 +9539,23 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <tbody>
 <tr>
 <th>1</th>
-<td>homicidio-en-rina</td>
+<td>homicidio-simple</td>
 </tr>
 <tr>
 <th>2</th>
-<td>robo-calificado</td>
+<td>homicidio-en-rina</td>
 </tr>
 <tr>
 <th>3</th>
-<td>robo-calificado-y-otro</td>
+<td>corrupcion-de-menores</td>
 </tr>
 <tr>
 <th>4</th>
-<td>robo-calificado-y-lesiones</td>
+<td>violacion-y-corrupcion-de-menores</td>
 </tr>
 <tr>
 <th>5</th>
-<td>robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos</td>
+<td>homicidio-simple-intencional-y-robo-calificado</td>
 </tr>
 </tbody>
 </table>
@@ -9535,22 +9585,23 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/markdown" tabindex="0">
-<h1 id="Informe-del-Co-piloto-Jur%C3%ADdico">Informe del Co-piloto Jurídico<a class="anchor-link" href="#Informe-del-Co-piloto-Jur%C3%ADdico">¶</a></h1><p><strong>Consulta:</strong> Mi defendido fue vinculado a proceso porque supuestamente le arrebató el celular a una mujer en una parada de camión, amagándola con un cuchillo. La única prueba es el señalamiento de la víctima en un reconocimiento por fotografía hecho sin presencia de defensor. Quiero apelar el auto de vinculación.</p>
+<h1 id="Informe-del-Co-piloto-Jur%C3%ADdico">Informe del Co-piloto Jurídico<a class="anchor-link" href="#Informe-del-Co-piloto-Jur%C3%ADdico">¶</a></h1><p><strong>Consulta:</strong> Mi cliente fue asaltado en una parada de camión: un hombre lo amenazó con un cuchillo y le quitó el celular. Lo reconoció en unas fotografías y el agresor fue vinculado a proceso, pero su defensa apeló el auto de vinculación. Quiero saber cómo ha resuelto la Sala apelaciones parecidas y qué valor le da al reconocimiento.</p>
 <p><strong>Categoría detectada:</strong> PENAL · familia: robo<br/>
 <strong>Búsqueda:</strong> Filtro estricto<br/>
-<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 27 s · <strong>Veredictos ambiguos:</strong> 0</p>
+<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 32 s · <strong>Veredictos ambiguos:</strong> 0</p>
 <hr/>
-<h2 id="S%C3%ADntesis-de-precedentes-relevantes">Síntesis de precedentes relevantes<a class="anchor-link" href="#S%C3%ADntesis-de-precedentes-relevantes">¶</a></h2><h3 id="Precedentes-a-favor-y-en-contra">Precedentes a favor y en contra<a class="anchor-link" href="#Precedentes-a-favor-y-en-contra">¶</a></h3><ul>
-<li><strong>Precedente 1:</strong> apeló defensa contra auto de vinculación a proceso; la Sala CONFIRMA → <strong>desfavorable para la defensa</strong>.</li>
-<li><strong>Precedente 2:</strong> apeló defensor oficial de la imputada contra auto de vinculación a proceso; la Sala REVOCA → <strong>favorable para la defensa</strong>.</li>
-<li><strong>Precedente 3:</strong> apeló defensa del imputado y ministerio público contra auto de vinculación a proceso; la Sala CONFIRMA → resultado para la defensa no determinado.</li>
+<h2 id="S%C3%ADntesis-de-precedentes-relevantes">Síntesis de precedentes relevantes<a class="anchor-link" href="#S%C3%ADntesis-de-precedentes-relevantes">¶</a></h2><h3 id="Resultado-de-cada-precedente">Resultado de cada precedente<a class="anchor-link" href="#Resultado-de-cada-precedente">¶</a></h3><ul>
+<li><strong>Precedente 1:</strong> apeló defensa contra auto de vinculación a proceso; la Sala CONFIRMA → favorece a <strong>la acusación (Ministerio Público o víctima)</strong>.</li>
+<li><strong>Precedente 2:</strong> apeló defensa del imputado y ministerio público contra auto de vinculación a proceso; la Sala CONFIRMA → parte favorecida no determinada.</li>
+<li><strong>Precedente 3:</strong> apeló agente del ministerio público contra auto de vinculación a proceso dictado por el [eliminado], enjuiciamiento y justicia integral para adolescentes, adscrito al centro de justicia penal del [eliminado] judicial con sede en [eliminado]; la Sala MODIFICA → favorece a <strong>en parte, la acusación (Ministerio Público o víctima)</strong>.</li>
 </ul>
-<h3 id="Respuesta-breve">Respuesta breve<a class="anchor-link" href="#Respuesta-breve">¶</a></h3><p>La Sala consideró que la valoración de los datos probatorios fue conjunta e integral en el caso de un robo calificado [P1], y revocó el auto de vinculación a proceso por falta de pruebas suficientes en otro caso [P2]. En ambos casos, se analizaron las pruebas presentadas para determinar si existían indicios racionales que vincularan al imputado con los hechos delictivos.</p>
+<h3 id="Respuesta-breve">Respuesta breve<a class="anchor-link" href="#Respuesta-breve">¶</a></h3><p>La Sala Penal del STJ Jalisco ha considerado que la valoración de los datos probatorios fue conjunta e integral en un caso de robo calificado [P1], y también ha confirmado autos de vinculación a proceso cuando se han presentado pruebas suficientes para establecer la participación del imputado en el delito, como es el caso del reconocimiento en cámara de gesell [P2]. Además, la Sala ha considerado que existen datos de prueba suficientes que acreditan la utilización del cuchillo en un robo calificado [P3].</p>
 <h3 id="Argumentos-que-la-Sala-acept%C3%B3-o-rechaz%C3%B3">Argumentos que la Sala aceptó o rechazó<a class="anchor-link" href="#Argumentos-que-la-Sala-acept%C3%B3-o-rechaz%C3%B3">¶</a></h3><ul>
-<li>La defensa argumentó que no existen pruebas suficientes para vincular a la imputada a los hechos, y la Sala consideró que este argumento era <strong>FUNDADO</strong> [P2].</li>
-<li>El imputado argumentó que el reconocimiento en cámara de gesell es viciado, pero la Sala consideró que este argumento era <strong>INFUNDADO</strong> [P3].</li>
+<li>La defensa argumentó que los testigos no son objetivos y tienen interés en favorecer al imputado, pero la Sala considera que el tribunal comparte el criterio del juez de control sobre la falta de objetividad de los testigos [P1].</li>
+<li>El imputado argumentó que la detención fue ilegal y que se obtuvieron pruebas violentando los artículos 14 y 16 de la Constitución, pero la Sala considera que el imputado no aportó suficientes pruebas para demostrar la ilegalidad de la detención [P2].</li>
+<li>El Ministerio Público argumentó insuficiencia probatoria para la agravante contenida en la fracción xi del artículo 236 del Código Penal del Estado, pero la Sala considera que existen datos de prueba suficientes que acreditan la utilización del cuchillo [P3].</li>
 </ul>
-<h3 id="Qu%C3%A9-revisar-en-las-sentencias">Qué revisar en las sentencias<a class="anchor-link" href="#Qu%C3%A9-revisar-en-las-sentencias">¶</a></h3><p>Es importante revisar los fundamentos legales y las pruebas decisivas presentadas en ambos casos para comprender cómo se aplicaron las leyes y se valoraron las pruebas en cada situación. En particular, es relevante analizar el artículo 316 del código nacional de procedimientos penales y el artículo 19 constitucional en [P2].</p>
+<h3 id="Qu%C3%A9-revisar-en-las-sentencias">Qué revisar en las sentencias<a class="anchor-link" href="#Qu%C3%A9-revisar-en-las-sentencias">¶</a></h3><p>Es recomendable revisar los precedentes completos para comprender el contexto y la fundamentación legal de cada caso. En particular, es importante leer el Precedente 1 para entender cómo se valoró la falta de objetividad de los testigos [P1], y el Precedente 3 para ver cómo se consideraron suficientes las pruebas para acreditar la utilización del cuchillo en un robo calificado [P3].</p>
 <hr/>
 <h2 id="Ap%C3%A9ndice:-an%C3%A1lisis-detallado-de-precedentes">Apéndice: análisis detallado de precedentes<a class="anchor-link" href="#Ap%C3%A9ndice:-an%C3%A1lisis-detallado-de-precedentes">¶</a></h2><h3 id="Precedente-1:-PENAL-%C2%B7-robo-calificado">Precedente 1: PENAL · robo calificado<a class="anchor-link" href="#Precedente-1:-PENAL-%C2%B7-robo-calificado">¶</a></h3><table>
 <thead>
@@ -9567,7 +9618,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <td><code>2025-04-24-105911_penal_robo-calificado.pdf</code></td>
 <td>2025-04-24</td>
 <td>PENAL</td>
-<td>0.868</td>
+<td>0.860</td>
 <td>Filtro estricto</td>
 </tr>
 </tbody>
@@ -9579,7 +9630,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <li><strong>Acto impugnado:</strong> Auto de vinculación a proceso · <strong>Apelante:</strong> Defensa</li>
 <li><strong>Delito(s):</strong> Delito de robo calificado, previsto por el artículo 233 en relación al 236 fracción xi del código penal del estado de Jalisco</li>
 <li><strong>Sentido del fallo:</strong> CONFIRMA</li>
-<li><strong>Resultado para la defensa:</strong> desfavorable</li>
+<li><strong>Parte favorecida:</strong> la acusación (Ministerio Público o víctima)</li>
 </ul>
 <h4 id="Agravios-y-su-calificaci%C3%B3n">Agravios y su calificación<a class="anchor-link" href="#Agravios-y-su-calificaci%C3%B3n">¶</a></h4><ul>
 <li>La Sala considera que los testigos de la defensa no son objetivos y tienen interés en favorecer al imputado. — <strong>INFUNDADO</strong>: Porque el tribunal comparte el criterio del juez de control sobre la falta de objetividad de los testigos.</li>
@@ -9595,49 +9646,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <li>El informe policial homologado</li>
 <li>La declaración ministerial del imputado</li>
 </ul>
-<h3 id="Precedente-2:-PENAL-%C2%B7-robo-calificado-y-otro">Precedente 2: PENAL · robo calificado y otro<a class="anchor-link" href="#Precedente-2:-PENAL-%C2%B7-robo-calificado-y-otro">¶</a></h3><table>
-<thead>
-<tr>
-<th>Documento</th>
-<th>Fecha</th>
-<th>Materia</th>
-<th>Similitud</th>
-<th>Fuente</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>2025-11-05-140542_penal_robo-calificado-y-otro.pdf</code></td>
-<td>2025-11-05</td>
-<td>PENAL</td>
-<td>0.865</td>
-<td>Filtro estricto</td>
-</tr>
-</tbody>
-</table>
-<h4 id="Resumen">Resumen<a class="anchor-link" href="#Resumen">¶</a></h4><p>Se revoca el auto de vinculación a proceso y se dicta auto de no vinculación a proceso a favor de la imputada, al no existir pruebas suficientes para vincularla a los hechos delictivos.</p>
-<h4 id="Datos-del-proceso">Datos del proceso<a class="anchor-link" href="#Datos-del-proceso">¶</a></h4><ul>
-<li><strong>Tribunal:</strong> Sala Penal · 29/12/2024</li>
-<li><strong>Toca / expediente:</strong> Toca penal de juicio oral número 2052025</li>
-<li><strong>Acto impugnado:</strong> Auto de vinculación a proceso · <strong>Apelante:</strong> Defensor oficial de la imputada</li>
-<li><strong>Delito(s):</strong> Robo calificado y extorsión, previstos y sancionados por los artículos 233 en relación al 236 fracciones vii, ix, xi y xii, así como por el diverso 189 del código penal del estado de jalisco</li>
-<li><strong>Sentido del fallo:</strong> REVOCA</li>
-<li><strong>Resultado para la defensa:</strong> favorable</li>
-</ul>
-<h4 id="Agravios-y-su-calificaci%C3%B3n">Agravios y su calificación<a class="anchor-link" href="#Agravios-y-su-calificaci%C3%B3n">¶</a></h4><ul>
-<li>La defensa argumentó que no existen pruebas suficientes para vincular a la imputada a los hechos. — <strong>FUNDADO</strong>: Porque se analizaron los antecedentes de la investigación y no se encontraron datos de prueba que corroboren la participación de la imputada en los hechos delictivos.</li>
-<li>La defensa argumentó que el auto de vinculación a proceso fue emitido sin cumplir con los requisitos establecidos por la ley. — <strong>FUNDADO</strong>: Porque se consideró que no se encontraban reunidos los requisitos para emitir un auto de vinculación a proceso.</li>
-</ul>
-<h4 id="Hechos-y-decisi%C3%B3n">Hechos y decisión<a class="anchor-link" href="#Hechos-y-decisi%C3%B3n">¶</a></h4><p><strong>Hechos:</strong> La imputada denunció el robo de una camioneta, pero no se encontraron pruebas que la vinculen a los hechos. Las víctimas declararon que fueron amenazadas y que les pidieron sus teléfonos y contraseñas.</p>
-<p><strong>Decisión:</strong> Se revoca el auto de vinculación a proceso y se dicta auto de no vinculación a proceso a favor de la imputada.</p>
-<h4 id="Fundamento-legal">Fundamento legal<a class="anchor-link" href="#Fundamento-legal">¶</a></h4><ul>
-<li>Artículo 316 del código nacional de procedimientos penales</li>
-<li>Artículo 19 constitucional</li>
-</ul>
-<h4 id="Pruebas-decisivas">Pruebas decisivas<a class="anchor-link" href="#Pruebas-decisivas">¶</a></h4><ul>
-<li>La declaración de las víctimas, el reporte de robo presentado por la imputada</li>
-</ul>
-<h3 id="Precedente-3:-PENAL-%C2%B7-robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos">Precedente 3: PENAL · robo calificado y privacion ilegal de la libertad y otros derechos<a class="anchor-link" href="#Precedente-3:-PENAL-%C2%B7-robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos">¶</a></h3><table>
+<h3 id="Precedente-2:-PENAL-%C2%B7-robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos">Precedente 2: PENAL · robo calificado y privacion ilegal de la libertad y otros derechos<a class="anchor-link" href="#Precedente-2:-PENAL-%C2%B7-robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos">¶</a></h3><table>
 <thead>
 <tr>
 <th>Documento</th>
@@ -9652,7 +9661,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <td><code>2023-11-23-134518_penal_robo-calificado-y-privacion-ilegal-de-la-libertad-y-otros-derechos.pdf</code></td>
 <td>2023-11-23</td>
 <td>PENAL</td>
-<td>0.866</td>
+<td>0.865</td>
 <td>Filtro estricto</td>
 </tr>
 </tbody>
@@ -9664,7 +9673,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <li><strong>Acto impugnado:</strong> Auto de vinculación a proceso · <strong>Apelante:</strong> Defensa del imputado y Ministerio Público</li>
 <li><strong>Delito(s):</strong> Delito de robo calificado (artículo 233, en contexto con el 236, fracciones ix y xi, del código penal para el estado de Jalisco) y delito de privación ilegal de la libertad (artículo 193 del citado cuerpo de leyes)</li>
 <li><strong>Sentido del fallo:</strong> CONFIRMA</li>
-<li><strong>Resultado para la defensa:</strong> [DATO NO DISPONIBLE]</li>
+<li><strong>Parte favorecida:</strong> [DATO NO DISPONIBLE]</li>
 </ul>
 <h4 id="Agravios-y-su-calificaci%C3%B3n">Agravios y su calificación<a class="anchor-link" href="#Agravios-y-su-calificaci%C3%B3n">¶</a></h4><ul>
 <li>El imputado argumenta que la detención fue ilegal y que se obtuvieron pruebas violentando los artículos 14 y 16 de la Constitución. — <strong>INFUNDADO</strong>: La Sala considera que el imputado no aportó suficientes pruebas para demostrar la ilegalidad de la detención.</li>
@@ -9682,6 +9691,49 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <li>El reconocimiento en cámara de gesell</li>
 <li>La identificación en contra del imputado</li>
 </ul>
+<h3 id="Precedente-3:-PENAL-%C2%B7-robo-simple">Precedente 3: PENAL · robo simple<a class="anchor-link" href="#Precedente-3:-PENAL-%C2%B7-robo-simple">¶</a></h3><table>
+<thead>
+<tr>
+<th>Documento</th>
+<th>Fecha</th>
+<th>Materia</th>
+<th>Similitud</th>
+<th>Fuente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2026-11-10-131731_penal_robo-simple.pdf</code></td>
+<td>2026-11-10</td>
+<td>PENAL</td>
+<td>0.859</td>
+<td>Filtro estricto</td>
+</tr>
+</tbody>
+</table>
+<h4 id="Resumen">Resumen<a class="anchor-link" href="#Resumen">¶</a></h4><p>El Ministerio Público apeló la vinculación a proceso por robo simple, argumentando insuficiencia probatoria para la agravante. La Sala modificó la resolución, considerando suficientes los datos de prueba.</p>
+<h4 id="Datos-del-proceso">Datos del proceso<a class="anchor-link" href="#Datos-del-proceso">¶</a></h4><ul>
+<li><strong>Tribunal:</strong> Primera Sala del Tribunal de Alzada · 13 de marzo de 2026</li>
+<li><strong>Toca / expediente:</strong> Toca penal digital número 2022026</li>
+<li><strong>Acto impugnado:</strong> Auto de vinculación a proceso dictado por el [eliminado], enjuiciamiento y justicia integral para adolescentes, adscrito al centro de justicia penal del [eliminado] judicial con sede en [eliminado] · <strong>Apelante:</strong> Agente del Ministerio Público</li>
+<li><strong>Delito(s):</strong> Robo calificado (artículo 233 en relación al 236 fracción xi, Código Penal del Estado)</li>
+<li><strong>Sentido del fallo:</strong> MODIFICA</li>
+<li><strong>Parte favorecida:</strong> en parte, la acusación (Ministerio Público o víctima)</li>
+</ul>
+<h4 id="Agravios-y-su-calificaci%C3%B3n">Agravios y su calificación<a class="anchor-link" href="#Agravios-y-su-calificaci%C3%B3n">¶</a></h4><ul>
+<li>Insuficiencia probatoria para la agravante contenida en la fracción xi del artículo 236 del Código Penal del Estado — <strong>FUNDADO</strong>: Existen datos de prueba suficientes que acreditan la utilización del cuchillo.</li>
+</ul>
+<h4 id="Hechos-y-decisi%C3%B3n">Hechos y decisión<a class="anchor-link" href="#Hechos-y-decisi%C3%B3n">¶</a></h4><p><strong>Hechos:</strong> El imputado ingresó a una tienda de conveniencia, tomó un producto sin pagar y posteriormente amenazó con un cuchillo a la víctima.; La víctima entregó dinero en efectivo por miedo a que el imputado lo agrediera.; Se encontraron pruebas como el cuchillo y fotografías del lugar de los hechos.</p>
+<p><strong>Decisión:</strong> Se modifica el auto de vinculación a proceso para incluir la agravante y se decreta auto de vinculación a proceso por robo calificado.</p>
+<h4 id="Fundamento-legal">Fundamento legal<a class="anchor-link" href="#Fundamento-legal">¶</a></h4><ul>
+<li>Artículo 461 del Código Nacional de Procedimientos Penales</li>
+<li>Artículo 233 en relación al 236 fracción xi, Código Penal del Estado</li>
+</ul>
+<h4 id="Pruebas-decisivas">Pruebas decisivas<a class="anchor-link" href="#Pruebas-decisivas">¶</a></h4><ul>
+<li>Narrativa de los primeros respondientes</li>
+<li>Inspección, aseguramiento y cadena de custodia de los objetos</li>
+<li>Cuchillo encontrado en el suelo</li>
+</ul>
 <hr/>
 <p><em>Herramienta de apoyo basada en precedentes públicos del STJ Jalisco. No sustituye la asesoría de un profesional del derecho.</em></p>
 </div>
@@ -9696,10 +9748,10 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="8.-Cat%C3%A1logo-de-instrucciones-al-modelo-(prompts)">8. Catálogo de instrucciones al modelo (<em>prompts</em>)<a class="anchor-link" href="#8.-Cat%C3%A1logo-de-instrucciones-al-modelo-(prompts)">¶</a></h2><p>Las instrucciones se dividen en dos grupos: las que <strong>opera la aplicación</strong> en cada consulta y las que se emplean
-<strong>solo en la evaluación</strong>. Todas residen en <code>src/copiloto_juridico/prompts.py</code>; las versiones anteriores (v10) se
-conservan únicamente para comparar mediante variables de entorno.</p>
+<strong>solo en la evaluación</strong>. Todas residen en <code>src/copiloto_juridico/prompts.py</code>; las de la línea base se
+conservan únicamente para que la evaluación las compare, mediante variables de entorno.</p>
 <p><strong>Integración de la recuperación con las instrucciones.</strong> El paso 1 recibe solo la consulta. QC_1 recibe la consulta
-y la ventana del fragmento recuperado. La ficha recibe el texto de la resolución recuperada, recortado a la ventana
+y la ficha precalculada de la resolución recuperada (o, sin ficha, el fragmento más parecido). La ficha recibe el texto de la resolución recuperada, recortado a la ventana
 del modelo; esta es la parte de <em>generación aumentada por recuperación</em>. La síntesis recibe solo las fichas, nunca el
 texto completo ni conocimiento externo, y debe citar cada afirmación.</p>
 </div>
@@ -9804,7 +9856,7 @@ texto completo ni conocimiento externo, y debe citar cada afirmación.</p>
 <td>5. Síntesis</td>
 <td>PROMPT_SINTESIS_FINAL_V11</td>
 <td>consulta + fichas → respuesta con citas [Pn]</td>
-<td>1751</td>
+<td>1778</td>
 </tr>
 <tr>
 <th>5</th>
@@ -10271,11 +10323,13 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Resultados de la partición de prueba (una sola corrida por comando, con el código y los datos congelados)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Evaluación final: partición de prueba, una sola corrida por comando, con el código y los datos congelados.</span>
+<span class="c1"># Latencia, coherencia de las familias y robustez no dependen de la partición (robustez: la versión final).</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copiloto_juridico.evaluacion.reporte</span><span class="w"> </span><span class="kn">import</span> <span class="n">ultimo_resultado</span>
 
+<span class="n">con_particion</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"recuperacion"</span><span class="p">,</span> <span class="s2">"fichas-referencia"</span><span class="p">,</span> <span class="s2">"esfuerzo"</span><span class="p">,</span> <span class="s2">"qc"</span><span class="p">}</span>
 <span class="k">for</span> <span class="n">comando</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"recuperacion"</span><span class="p">,</span> <span class="s2">"fichas-referencia"</span><span class="p">,</span> <span class="s2">"esfuerzo"</span><span class="p">,</span> <span class="s2">"qc"</span><span class="p">,</span> <span class="s2">"familias-coherencia"</span><span class="p">,</span> <span class="s2">"latencia"</span><span class="p">,</span> <span class="s2">"robustez"</span><span class="p">]:</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">ultimo_resultado</span><span class="p">(</span><span class="n">comando</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">ultimo_resultado</span><span class="p">(</span><span class="n">comando</span><span class="p">,</span> <span class="n">particion</span><span class="o">=</span><span class="s2">"prueba"</span> <span class="k">if</span> <span class="n">comando</span> <span class="ow">in</span> <span class="n">con_particion</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">continue</span>
     <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"#### </span><span class="si">{</span><span class="n">comando</span><span class="si">}</span><span class="s2"> · </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">'_archivo'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
@@ -12565,8 +12619,74 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h4 id="robustez-%C2%B7-20261121-053544_4b1529e_robustez.json">robustez · 20261121-053544_4b1529e_robustez.json<a class="anchor-link" href="#robustez-%C2%B7-20261121-053544_4b1529e_robustez.json">¶</a></h4>
+<h4 id="robustez-%C2%B7-20261124-004225_82c94ed_robustez.json">robustez · 20261124-004225_82c94ed_robustez.json<a class="anchor-link" href="#robustez-%C2%B7-20261124-004225_82c94ed_robustez.json">¶</a></h4>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5104fd22">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="9.2-Mejoras-probadas-despu%C3%A9s-de-la-evaluaci%C3%B3n-final">9.2 Mejoras probadas después de la evaluación final<a class="anchor-link" href="#9.2-Mejoras-probadas-despu%C3%A9s-de-la-evaluaci%C3%B3n-final">¶</a></h3><p>En la partición de desarrollo, por pares (IC 95 % por
+bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin empeorar otra medida:</p>
+<table>
+<thead>
+<tr>
+<th>Cambio</th>
+<th>Resultado</th>
+<th>Decisión</th>
+<th>Corrida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Síntesis con un ejemplo de líneas citadas y revisión final de las citas (19 consultas)</td>
+<td>con un ejemplo de contenido jurídico, cita válida −0.024 [−0.144, +0.078], lo copia en 9 de 19 síntesis y pronostica en una (una primera medición, con otros precedentes, daba +0.086); con un ejemplo solo de formato, +0.024 [−0.069, +0.121], sin copias</td>
+<td>descartado: la app sigue con la síntesis anterior</td>
+<td><code>20261124-003427_905c255_sintesis-citas</code></td>
+</tr>
+<tr>
+<td>QC_1 lee la ficha precalculada en lugar del fragmento (660 pares)</td>
+<td>recall 0.725 → <strong>0.844</strong> (+0.120 [+0.036, +0.204]); especificidad 0.410 → 0.396 (no significativo); precisión 0.294 → 0.321</td>
+<td>adoptado</td>
+<td><code>20261123-230824_5fc9b67_qc</code></td>
+</tr>
+<tr>
+<td>QC_1 con <code>qwen2.5:7b</code> (660 pares)</td>
+<td>recall 0.844 → 0.425 (−0.419, significativo); 1.9 s por llamada, pero cada cambio de modelo en 8 GB cuesta 5-8 s</td>
+<td>descartado</td>
+<td><code>20261123-234717_e28a600_qc</code></td>
+</tr>
+<tr>
+<td>QC_1 solo con el veredicto, sin razonar (660 pares)</td>
+<td>0.59 s por llamada, pero responde SI en 649 de 660 pares (especificidad 0.022): deja de filtrar</td>
+<td>descartado</td>
+<td><code>20261123-234717_e28a600_qc</code></td>
+</tr>
+<tr>
+<td>Ficha: pedir solo los artículos que invoca la Sala (120 sentencias)</td>
+<td>precisión del fundamento +0.010 [−0.040, +0.060]; exhaustividad −0.023, significativa</td>
+<td>descartado</td>
+<td><code>20261123-174502_b8fdd94_fundamento-prompt</code></td>
+</tr>
+<tr>
+<td>Ficha: darle al modelo la parte considerativa (120 sentencias)</td>
+<td>precisión −0.048 [−0.096, +0.006]; exhaustividad −0.030, significativa</td>
+<td>descartado</td>
+<td><code>20261123-212426_5fc9b67_fundamento-contexto</code></td>
+</tr>
+<tr>
+<td>Consultas planteadas como toca en estudio (39 consultas)</td>
+<td>Hit@3 de familia igual (+0.051 [−0.077, +0.205]); nDCG@5 0.266 → 0.145, significativo</td>
+<td>medición del perfil</td>
+<td><code>20261123-202205_e566e3d-sucio_perfil-tribunal</code></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -12699,13 +12819,6 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <td></td>
 </tr>
 <tr>
-<th>qc</th>
-<td>20261121-052256_4b1529e_qc</td>
-<td>2026-11-21T05:22</td>
-<td>4b1529e</td>
-<td>sí</td>
-</tr>
-<tr>
 <th>latencia</th>
 <td>20261121-052935_4b1529e_latencia</td>
 <td>2026-11-21T05:29</td>
@@ -12713,17 +12826,52 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <td></td>
 </tr>
 <tr>
+<th>fundamento-prompt</th>
+<td>20261123-174502_b8fdd94_fundamento-prompt</td>
+<td>2026-11-23T17:45</td>
+<td>b8fdd94</td>
+<td></td>
+</tr>
+<tr>
+<th>perfil-tribunal</th>
+<td>20261123-202205_e566e3d-sucio_perfil-tribunal</td>
+<td>2026-11-23T20:22</td>
+<td>e566e3d</td>
+<td></td>
+</tr>
+<tr>
+<th>fundamento-contexto</th>
+<td>20261123-212426_5fc9b67_fundamento-contexto</td>
+<td>2026-11-23T21:24</td>
+<td>5fc9b67</td>
+<td></td>
+</tr>
+<tr>
+<th>qc</th>
+<td>20261123-234717_e28a600_qc</td>
+<td>2026-11-23T23:47</td>
+<td>e28a600</td>
+<td></td>
+</tr>
+<tr>
+<th>sintesis-citas</th>
+<td>20261124-003427_905c255_sintesis-citas</td>
+<td>2026-11-24T00:34</td>
+<td>905c255</td>
+<td></td>
+</tr>
+<tr>
 <th>robustez</th>
-<td>20261121-053544_4b1529e_robustez</td>
-<td>2026-11-21T05:35</td>
-<td>4b1529e</td>
+<td>20261124-004225_82c94ed_robustez</td>
+<td>2026-11-24T00:42</td>
+<td>82c94ed</td>
 <td></td>
 </tr>
 <tr>
 <th>demo</th>
-<td>20261121-054503_c9a03a8_demo</td>
-<td>2026-11-21T05:45</td>
-<td>c9a03a8</td>
+<td>20261124-005412_82c94ed_demo</td>
+<td>2026-11-24T00:54</td>
+<td>82c94ed</td>
 <td></td>
 </tr>
 </tbody>
@@ -12745,18 +12893,33 @@ datos personales que el STJ suprimió en la versión pública ([eliminado]) nunc
 para la demostración pueden desactivarse (<code>COPILOTO_CACHE_RESULTADOS=false</code>).</p>
 <p><strong>Alcance y líneas de desarrollo.</strong></p>
 <ul>
-<li>La referencia de la evaluación proviene del tribunal y del texto de la resolución, no del juicio de un experto sobre
-la utilidad de cada precedente; acto impugnado, apelante y sentido se contrastan con las reglas sobre el texto.</li>
-<li>Las familias de delito se asignan por reglas; su revisión por un especialista es una línea de desarrollo.</li>
-<li>El acuerdo entre lectores sobre la relevancia graduada es leve (kappa cercano a 0.2; corrida
-<code>20261117-065346_a60ca4f_referencias</code>); por ello las métricas principales se apoyan en la etiqueta del STJ.</li>
-<li>54 resoluciones penales conservan la versión con páginas omitidas; su sustitución es una línea de desarrollo.</li>
-<li>Varios tipos penales cuentan con muy pocas resoluciones; cuando ningún precedente corresponde a la familia
-detectada, la aplicación lo advierte.</li>
-<li>El aviso de consulta ajena a la materia penal se basa en una lista de términos.</li>
-<li>La incorporación de reconocimiento óptico de caracteres (OCR) para documentos escaneados es una línea de desarrollo.</li>
+<li><p>Los dos perfiles de usuario comparten la búsqueda y las fichas evaluadas; las consultas de evaluación están
+redactadas como las plantearía un abogado, por lo que la medición con el planteamiento de un toca en estudio
+(tribunal de alzada) es una línea de desarrollo.</p>
+</li>
+<li><p>Para el tribunal de alzada, la integración de la búsqueda por hechos y de la ficha en el portal del STJ resolvería
+el problema de localización en su origen.</p>
+</li>
+<li><p>La referencia de la evaluación proviene del tribunal y del texto de la resolución, no del juicio de un experto sobre
+la utilidad de cada precedente; acto impugnado, apelante y sentido se contrastan con las reglas sobre el texto.</p>
+</li>
+<li><p>Las familias de delito se asignan por reglas; su revisión por un especialista es una línea de desarrollo.</p>
+</li>
+<li><p>El acuerdo entre lectores sobre la relevancia graduada es leve (kappa cercano a 0.2; corrida
+<code>20261117-065346_a60ca4f_referencias</code>); por ello las métricas principales se apoyan en la etiqueta del STJ.</p>
+</li>
+<li><p>54 resoluciones penales conservan la versión con páginas omitidas; su sustitución es una línea de desarrollo.</p>
+</li>
+<li><p>Varios tipos penales cuentan con muy pocas resoluciones; cuando ningún precedente corresponde a la familia
+detectada, la aplicación lo advierte.</p>
+</li>
+<li><p>El aviso de consulta ajena a la materia penal se basa en una lista de términos.</p>
+</li>
+<li><p>Los documentos escaneados se leen por OCR (Tesseract) al construir el corpus; solo 1 de los 1,899 PDF lo está y no
+se incorporó, porque su versión escaneada no tiene suprimidos los datos personales.</p>
+</li>
 </ul>
-<p><strong>Decisión de alcance: solo materia penal.</strong> El corpus de la versión 10 incluía 2,119 resoluciones de otras materias
+<p><strong>Decisión de alcance: solo materia penal.</strong> El corpus inicial incluía 2,119 resoluciones de otras materias
 (civil, familiar, mercantil y laboral). Todo el método vigente es específico de la materia penal: familias de delito,
 ficha de 14 campos (acto impugnado, agravios, sentido del fallo), reglas de lectura de los puntos resolutivos,
 consultas de prueba y evaluación. Por ello esas resoluciones se retiraron del corpus y del índice (186,971 fragmentos
