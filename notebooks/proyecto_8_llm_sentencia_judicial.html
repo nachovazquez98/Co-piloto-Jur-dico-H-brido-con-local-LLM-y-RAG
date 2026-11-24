@@ -8803,7 +8803,7 @@ Fragmentos de resoluciones penales: 186,971 (mediana de 51 por resolución)
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 20954.67it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 20063.62it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9064,7 +9064,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 17749.42it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 20593.79it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9090,7 +9090,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 16674.65it/s]</pre>
+<pre>Loading weights: 100%|██████████| 199/199 [00:00&lt;00:00, 23280.24it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9164,7 +9164,7 @@ términos que aparecen en menos de 2 resoluciones o en más de la mitad. (iv) El
 <tr>
 <th>Memoria RAM de este proceso (índice + BM25 + modelo)</th>
 <td></td>
-<td>4.31 GB</td>
+<td>4.30 GB</td>
 </tr>
 <tr>
 <th>RAM total del equipo</th>
@@ -9209,7 +9209,9 @@ seleccionó el usuario; si el filtro arroja pocas, se completa sin filtro y así
 primero por coincidencia de familia y de acto impugnado (leído por reglas): en los ejemplos penales, de los 3
 primeros candidatos, 37 de 42 son de la familia correcta, frente a 32 de 42 con el orden RRF (regresiones
 <code>20261113-000836_137c238</code> y <code>20261113-001214_a5c476b</code>).</p>
-<p><strong>Paso 4. Análisis de precedentes.</strong> Para cada candidata: <strong>QC_1</strong>, el modelo lee la ficha precalculada de la candidata (delito, acto
+<p><strong>Paso 4. Análisis de precedentes.</strong> Para cada candidata, en el orden por familia y acto: <strong>QC_1</strong> (opcional,
+apagado por defecto: sobre 39 consultas de desarrollo no cambió los 3 precedentes mostrados, P@3 +0.000
+[−0.034, +0.034], y costaba 3 de las 5 llamadas al modelo; <code>20261124-014247_0f2894a_precedentes</code>), el modelo lee la ficha precalculada de la candidata (delito, acto
 impugnado, agravios, sentido) y decide si trata el mismo delito o familia o el mismo problema procesal (descarta el 14 % de los
 candidatos, frente al 55 % si se exige «mismo tema y contexto» leyendo el inicio; corrida <code>20261112-184123_2c7be47</code>; leer la ficha en lugar del fragmento
 sube su recall de 0.725 a 0.844 en desarrollo, <code>20261123-230824_5fc9b67_qc</code>); <strong>ficha</strong>, el modelo devuelve
@@ -9312,13 +9314,7 @@ La sugerencia contiene la familia del caso guía.
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>✓ clasificacion: PENAL · familia: robo
 ✓ busqueda: 30 candidatos · Filtro estricto
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>✓ analisis: 3 informes válidos · 0 descartados
+✓ analisis: 3 informes válidos · 0 descartados
 </pre>
 </div>
 </div>
@@ -9390,8 +9386,8 @@ La sugerencia contiene la familia del caso guía.
 <tr>
 <th>0</th>
 <td>PENAL · familia: robo</td>
-<td>0.506943</td>
-<td>0.826997</td>
+<td>0.503387</td>
+<td>0.826590</td>
 <td>0.166667</td>
 <td>0.766248</td>
 </tr>
@@ -9399,15 +9395,15 @@ La sugerencia contiene la familia del caso guía.
 <th>1</th>
 <td>PENAL · familia: homicidio</td>
 <td>0.400000</td>
-<td>0.812812</td>
+<td>0.812829</td>
 <td>0.000000</td>
 <td>1.000000</td>
 </tr>
 <tr>
 <th>2</th>
 <td>PENAL · familia: delitos sexuales</td>
-<td>0.299964</td>
-<td>0.821287</td>
+<td>0.300520</td>
+<td>0.821362</td>
 <td>0.000000</td>
 <td>0.547614</td>
 </tr>
@@ -9421,11 +9417,11 @@ La sugerencia contiene la familia del caso guía.
 </tr>
 <tr>
 <th>4</th>
-<td>PENAL · familia: privacion de la libertad y secuestro</td>
-<td>0.251407</td>
-<td>0.831401</td>
+<td>PENAL · familia: delitos culposos</td>
+<td>0.229645</td>
+<td>0.835385</td>
 <td>0.000000</td>
-<td>0.178696</td>
+<td>0.000000</td>
 </tr>
 </tbody>
 </table>
@@ -9588,7 +9584,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <h1 id="Informe-del-Co-piloto-Jur%C3%ADdico">Informe del Co-piloto Jurídico<a class="anchor-link" href="#Informe-del-Co-piloto-Jur%C3%ADdico">¶</a></h1><p><strong>Consulta:</strong> Mi cliente fue asaltado en una parada de camión: un hombre lo amenazó con un cuchillo y le quitó el celular. Lo reconoció en unas fotografías y el agresor fue vinculado a proceso, pero su defensa apeló el auto de vinculación. Quiero saber cómo ha resuelto la Sala apelaciones parecidas y qué valor le da al reconocimiento.</p>
 <p><strong>Categoría detectada:</strong> PENAL · familia: robo<br/>
 <strong>Búsqueda:</strong> Filtro estricto<br/>
-<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 32 s · <strong>Veredictos ambiguos:</strong> 0</p>
+<strong>Modelo:</strong> llama3.1:8b · <strong>Tiempo:</strong> 18 s · <strong>Veredictos ambiguos:</strong> 0</p>
 <hr/>
 <h2 id="S%C3%ADntesis-de-precedentes-relevantes">Síntesis de precedentes relevantes<a class="anchor-link" href="#S%C3%ADntesis-de-precedentes-relevantes">¶</a></h2><h3 id="Resultado-de-cada-precedente">Resultado de cada precedente<a class="anchor-link" href="#Resultado-de-cada-precedente">¶</a></h3><ul>
 <li><strong>Precedente 1:</strong> apeló defensa contra auto de vinculación a proceso; la Sala CONFIRMA → favorece a <strong>la acusación (Ministerio Público o víctima)</strong>.</li>
@@ -9601,7 +9597,7 @@ GPU; si no cabe, la parte restante se ejecuta desde la RAM, con una pérdida con
 <li>El imputado argumentó que la detención fue ilegal y que se obtuvieron pruebas violentando los artículos 14 y 16 de la Constitución, pero la Sala considera que el imputado no aportó suficientes pruebas para demostrar la ilegalidad de la detención [P2].</li>
 <li>El Ministerio Público argumentó insuficiencia probatoria para la agravante contenida en la fracción xi del artículo 236 del Código Penal del Estado, pero la Sala considera que existen datos de prueba suficientes que acreditan la utilización del cuchillo [P3].</li>
 </ul>
-<h3 id="Qu%C3%A9-revisar-en-las-sentencias">Qué revisar en las sentencias<a class="anchor-link" href="#Qu%C3%A9-revisar-en-las-sentencias">¶</a></h3><p>Es recomendable revisar los precedentes completos para comprender el contexto y la fundamentación legal de cada caso. En particular, es importante leer el Precedente 1 para entender cómo se valoró la falta de objetividad de los testigos [P1], y el Precedente 3 para ver cómo se consideraron suficientes las pruebas para acreditar la utilización del cuchillo en un robo calificado [P3].</p>
+<h3 id="Qu%C3%A9-revisar-en-las-sentencias">Qué revisar en las sentencias<a class="anchor-link" href="#Qu%C3%A9-revisar-en-las-sentencias">¶</a></h3><p>Es importante revisar los fundamentos legales y las pruebas decisivas en los precedentes P1 y P2 para comprender cómo se valoraron los datos probatorios y las pruebas presentadas por el imputado.</p>
 <hr/>
 <h2 id="Ap%C3%A9ndice:-an%C3%A1lisis-detallado-de-precedentes">Apéndice: análisis detallado de precedentes<a class="anchor-link" href="#Ap%C3%A9ndice:-an%C3%A1lisis-detallado-de-precedentes">¶</a></h2><h3 id="Precedente-1:-PENAL-%C2%B7-robo-calificado">Precedente 1: PENAL · robo calificado<a class="anchor-link" href="#Precedente-1:-PENAL-%C2%B7-robo-calificado">¶</a></h3><table>
 <thead>
@@ -10308,7 +10304,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <td><strong>Latencia p50 / p95</strong> (<code>latencia</code>)</td>
 <td>¿Cuánto espera el usuario?</td>
 <td>Mediana y percentil 95 por consulta</td>
-<td>30.8 s / 52.6 s, 5 llamadas al LLM (p50)</td>
+<td>30.8 s / 52.6 s, 5 llamadas al LLM (p50); con QC_1 apagado, como queda la app, 17.1 s / 34.6 s y 2 llamadas (<code>20261124-020004_2e50981_latencia</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -10324,7 +10320,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Evaluación final: partición de prueba, una sola corrida por comando, con el código y los datos congelados.</span>
-<span class="c1"># Latencia, coherencia de las familias y robustez no dependen de la partición (robustez: la versión final).</span>
+<span class="c1"># Latencia, coherencia de las familias y robustez no dependen de la partición (latencia y robustez: la versión final).</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copiloto_juridico.evaluacion.reporte</span><span class="w"> </span><span class="kn">import</span> <span class="n">ultimo_resultado</span>
 
 <span class="n">con_particion</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"recuperacion"</span><span class="p">,</span> <span class="s2">"fichas-referencia"</span><span class="p">,</span> <span class="s2">"esfuerzo"</span><span class="p">,</span> <span class="s2">"qc"</span><span class="p">}</span>
@@ -12480,7 +12476,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h4 id="latencia-%C2%B7-20261121-052935_4b1529e_latencia.json">latencia · 20261121-052935_4b1529e_latencia.json<a class="anchor-link" href="#latencia-%C2%B7-20261121-052935_4b1529e_latencia.json">¶</a></h4>
+<h4 id="latencia-%C2%B7-20261124-020004_2e50981_latencia.json">latencia · 20261124-020004_2e50981_latencia.json<a class="anchor-link" href="#latencia-%C2%B7-20261124-020004_2e50981_latencia.json">¶</a></h4>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -12521,15 +12517,15 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <th>0</th>
 <td>Extracción de conceptos clave</td>
 <td>10</td>
-<td>0.818</td>
-<td>1.174</td>
+<td>0.831</td>
+<td>1.150</td>
 </tr>
 <tr>
 <th>1</th>
 <td>Clasificación híbrida de la consulta</td>
 <td>10</td>
-<td>0.412</td>
-<td>2.768</td>
+<td>0.234</td>
+<td>0.327</td>
 </tr>
 <tr>
 <th>2</th>
@@ -12542,22 +12538,22 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <th>3</th>
 <td>Análisis de precedentes (verificación, extracción e informe)</td>
 <td>10</td>
-<td>15.163</td>
-<td>32.476</td>
+<td>0.082</td>
+<td>17.020</td>
 </tr>
 <tr>
 <th>4</th>
 <td>Síntesis comparativa final</td>
 <td>10</td>
-<td>16.019</td>
-<td>19.419</td>
+<td>14.998</td>
+<td>19.149</td>
 </tr>
 <tr>
 <th>5</th>
 <td>Total por consulta</td>
 <td>10</td>
-<td>30.830</td>
-<td>52.556</td>
+<td>17.118</td>
+<td>34.644</td>
 </tr>
 </tbody>
 </table>
@@ -12605,9 +12601,9 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <th>0</th>
 <td>10</td>
 <td>0</td>
-<td>5.0</td>
-<td>6.0</td>
-<td>5.2</td>
+<td>2.0</td>
+<td>2.55</td>
+<td>2.1</td>
 <td>0.1</td>
 <td>0.0</td>
 </tr>
@@ -12619,7 +12615,7 @@ de la partición de prueba se niega a ejecutarse si algo cambió y solo se permi
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h4 id="robustez-%C2%B7-20261124-004225_82c94ed_robustez.json">robustez · 20261124-004225_82c94ed_robustez.json<a class="anchor-link" href="#robustez-%C2%B7-20261124-004225_82c94ed_robustez.json">¶</a></h4>
+<h4 id="robustez-%C2%B7-20261124-014756_b2da1e5_robustez.json">robustez · 20261124-014756_b2da1e5_robustez.json<a class="anchor-link" href="#robustez-%C2%B7-20261124-014756_b2da1e5_robustez.json">¶</a></h4>
 </div>
 </div>
 </div>
@@ -12648,6 +12644,18 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 <td>con un ejemplo de contenido jurídico, cita válida −0.024 [−0.144, +0.078], lo copia en 9 de 19 síntesis y pronostica en una (una primera medición, con otros precedentes, daba +0.086); con un ejemplo solo de formato, +0.024 [−0.069, +0.121], sin copias</td>
 <td>descartado: la app sigue con la síntesis anterior</td>
 <td><code>20261124-003427_905c255_sintesis-citas</code></td>
+</tr>
+<tr>
+<td>Precedentes que ve el usuario (39 consultas): la lista real de la app, con el orden por familia y acto impugnado, frente a la que medía <code>recuperacion</code></td>
+<td>P@3 0.248 → <strong>0.410</strong> (+0.162 [+0.077, +0.248]); condensada, sin los no juzgados, +0.128 [+0.043, +0.222]; nDCG@5 0.270 → 0.442</td>
+<td>medición: la calidad real es mayor que la reportada</td>
+<td><code>20261124-014247_0f2894a_precedentes</code></td>
+</tr>
+<tr>
+<td>QC_1 sobre los precedentes mostrados (39 consultas)</td>
+<td>P@3 0.410 con y sin QC_1 (+0.000 [−0.034, +0.034]); nDCG@3 −0.007, no significativo; igual si la consulta nombra el acto o no. Sin QC_1, la consulta pasa de 30.8 s a 17.1 s (p50) y de 5 a 2 llamadas al modelo (<code>20261124-020004_2e50981_latencia</code>)</td>
+<td>QC_1 apagado por defecto (opcional en Configuración)</td>
+<td><code>20261124-014247_0f2894a_precedentes</code></td>
 </tr>
 <tr>
 <td>QC_1 lee la ficha precalculada en lugar del fragmento (660 pares)</td>
@@ -12819,13 +12827,6 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 <td></td>
 </tr>
 <tr>
-<th>latencia</th>
-<td>20261121-052935_4b1529e_latencia</td>
-<td>2026-11-21T05:29</td>
-<td>4b1529e</td>
-<td></td>
-</tr>
-<tr>
 <th>fundamento-prompt</th>
 <td>20261123-174502_b8fdd94_fundamento-prompt</td>
 <td>2026-11-23T17:45</td>
@@ -12861,17 +12862,31 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 <td></td>
 </tr>
 <tr>
+<th>precedentes</th>
+<td>20261124-014247_0f2894a_precedentes</td>
+<td>2026-11-24T01:42</td>
+<td>0f2894a</td>
+<td></td>
+</tr>
+<tr>
 <th>robustez</th>
-<td>20261124-004225_82c94ed_robustez</td>
-<td>2026-11-24T00:42</td>
-<td>82c94ed</td>
+<td>20261124-014756_b2da1e5_robustez</td>
+<td>2026-11-24T01:47</td>
+<td>b2da1e5</td>
+<td></td>
+</tr>
+<tr>
+<th>latencia</th>
+<td>20261124-020004_2e50981_latencia</td>
+<td>2026-11-24T02:00</td>
+<td>2e50981</td>
 <td></td>
 </tr>
 <tr>
 <th>demo</th>
-<td>20261124-005412_82c94ed_demo</td>
-<td>2026-11-24T00:54</td>
-<td>82c94ed</td>
+<td>20261124-020755_2e50981_demo</td>
+<td>2026-11-24T02:07</td>
+<td>2e50981</td>
 <td></td>
 </tr>
 </tbody>
