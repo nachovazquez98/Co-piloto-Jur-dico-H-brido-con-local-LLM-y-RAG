@@ -84,6 +84,14 @@ medir.
   descartaron, `qwen2.5:7b` (recall 0.425; cambiar de modelo en 8 GB cuesta 5-8 s) y un prompt solo con el veredicto
   (responde SI en 649 de 660 pares) (`20261123-234717_e28a600_qc`).
 - La página «Cómo funciona» muestra las corridas de la partición de prueba, no los experimentos de desarrollo.
+- **Precedentes que ve el usuario** (`precedentes`, 39 consultas, `20261124-014247_0f2894a_precedentes`): la lista
+  real de la app, con el orden por familia y acto impugnado, tiene P@3 0.410 frente a 0.248 de la lista que medía
+  `recuperacion` sin ese orden (+0.162 [+0.077, +0.248]; condensada +0.128). QC_1 no cambia los 3 precedentes
+  mostrados (P@3 +0.000 [−0.034, +0.034]) y costaba 3 de las 5 llamadas al modelo: **queda apagado por defecto**
+  (`COPILOTO_QC1`, interruptor en Configuración). Sin acto impugnado en la consulta, P@3 0.246 frente a 0.567: la
+  guía de la consulta pide nombrar la resolución que se apela.
+- La tarjeta y la síntesis marcan **sin verificar** el sentido del fallo que sale solo de la ficha (sin puntos
+  resolutivos legibles).
 - **OCR:** `construir-corpus` lee por OCR (Tesseract, español) las páginas sin capa de texto, si está instalado. Solo
   1 de 1,899 PDF está escaneado; no se incorporó porque su versión escaneada no suprime los datos personales.
 

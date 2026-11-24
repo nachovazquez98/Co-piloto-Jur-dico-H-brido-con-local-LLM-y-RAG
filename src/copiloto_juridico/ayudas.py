@@ -78,8 +78,10 @@ FUNDAMENTOS = {
         "semántica con el nombre de cada familia, las palabras en común y el delito de las sentencias más parecidas. "
         "La búsqueda se concentra en las 3 familias más probables, o en los delitos que seleccione el usuario."),
     "Controles de calidad": (
-        "QC_1: el modelo de lenguaje verifica que cada candidata trate el mismo delito o el mismo problema procesal. "
-        "Ficha: el modelo extrae, solo del texto de la resolución, los datos del recurso en un formato fijo. "
+        "Orden: si la consulta nombra la resolución que se apela, primero van los precedentes del mismo delito y la "
+        "misma resolución impugnada. QC_1 (opcional, en Configuración): el modelo de lenguaje verifica que cada "
+        "candidata trate el mismo delito o el mismo problema procesal; está apagado porque en la evaluación no cambió "
+        "los precedentes mostrados y alarga la consulta. Ficha: el modelo extrae, solo del texto de la resolución, los datos del recurso en un formato fijo. "
         "Verificaciones automáticas: el sentido del fallo se contrasta con los puntos resolutivos, cada artículo "
         "citado se busca en la sentencia y QC_2 comprueba que el delito de la ficha corresponda a las familias "
         "buscadas. Las discrepancias se señalan con **verificar**."),

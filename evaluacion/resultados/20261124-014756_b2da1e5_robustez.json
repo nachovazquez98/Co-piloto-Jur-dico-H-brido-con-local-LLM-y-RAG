@@ -1,7 +1,7 @@
 {
   "comando": "robustez",
-  "fecha": "2026-11-24T00:42:25",
-  "commit": "82c94ed",
+  "fecha": "2026-11-24T01:47:56",
+  "commit": "b2da1e5",
   "sucio": false,
   "semilla": 42,
   "parametros": {
@@ -102,6 +102,7 @@
     "PROMPT_PENAL_VERSION": "v11",
     "PROMPT_QC1_VERSION": "v11",
     "PROMPT_SINTESIS_VERSION": "v11",
+    "QC1_ACTIVO": false,
     "QC1_CONTEXTO": "ficha",
     "QC1_MAX_CHARS": 2500,
     "QC2_MODO": "determinista",
@@ -162,7 +163,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 25.5
+          "segundos": 16.8
         },
         {
           "id": "R02",
@@ -176,7 +177,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 43.1
+          "segundos": 11.1
         },
         {
           "id": "R03",
@@ -190,7 +191,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 36.7
+          "segundos": 15.7
         },
         {
           "id": "R04",
@@ -204,7 +205,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 57.1
+          "segundos": 20.6
         },
         {
           "id": "R05",
@@ -218,7 +219,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 85.6
+          "segundos": 14.5
         },
         {
           "id": "R06",
@@ -232,7 +233,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "La consulta no menciona ningún delito ni etapa del procedimiento penal. El corpus comprende únicamente resoluciones de l",
-          "segundos": 73.1
+          "segundos": 19.7
         },
         {
           "id": "R07",
@@ -246,7 +247,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 26.5
+          "segundos": 16.6
         },
         {
           "id": "R08",
@@ -260,7 +261,7 @@
           "sin pronóstico": "sí",
           "balance por reglas": "sí",
           "mensaje": "",
-          "segundos": 38.4
+          "segundos": 15.0
         }
       ]
     },

@@ -48,7 +48,8 @@ jurisprudencia obligatoria.
 3. Pulsa **Buscar precedentes** y espera a que terminen los 5 pasos.
 4. Lee la síntesis (empieza con la parte que favoreció cada precedente) y las tarjetas.
    Donde aparezca **verificar** (el sentido del fallo de la ficha no coincide con los resolutivos, o un artículo
-   citado no está en la sentencia) o **no verificado por QC_1**, revisa la sentencia original antes de citarla.
+   citado no está en la sentencia) o **sin verificar** (el sentido es el de la ficha porque no se encontraron los
+   puntos resolutivos), revisa la sentencia original antes de citarla.
    Puedes descargar el informe en Markdown.
 
 La página **Cómo funciona** explica el flujo, los límites de tamaño, un glosario jurídico breve y muestra la última
@@ -61,7 +62,7 @@ evaluación guardada.
 | 1. Conceptos clave | consulta → delito + problema procesal | LLM (Ollama, `llama3.1:8b`) |
 | 2. Clasificación | consulta → 3 familias de delito más probables | coseno de embeddings + Jaccard de lemas + voto de las sentencias recuperadas |
 | 3. Búsqueda | familias (o los delitos que elige el usuario, uno o varios) → hasta 30 sentencias candidatas | embeddings `multilingual-e5-base` (ChromaDB) + BM25, fusión RRF; filtro por familia con respaldo sin filtro |
-| 4. Fichas | candidato → ficha penal | QC_1 (LLM: ¿sirve como precedente?, leyendo la ficha precalculada), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
+| 4. Fichas | candidato → ficha penal | orden por familia y acto impugnado; QC_1 opcional (LLM: ¿sirve como precedente?, apagado por defecto), ficha en **una** llamada (JSON validado), verificaciones deterministas (sentido del fallo por reglas, artículos contra el texto, QC_2 por familia del delito) |
 | 5. Síntesis | fichas → respuesta a la consulta | parte favorecida por cada precedente, por reglas (quién apeló + sentido del fallo); el LLM, solo con las fichas, resume los argumentos que la Sala aceptó o rechazó, sin pronosticar |
 
 **Datos:** sentencias públicas del STJ Jalisco, con un máximo de 30 por tipo (materia + delito): las descargadas
@@ -133,6 +134,8 @@ bootstrap), sin volver a medir la de prueba. Se adoptó solo lo que mejoró sin 
 | Cambio | Resultado | Decisión | Corrida |
 |---|---|---|---|
 | Síntesis con un ejemplo de líneas citadas y revisión final de las citas (19 consultas) | con un ejemplo de contenido jurídico, cita válida −0.024 [−0.144, +0.078], lo copia en 9 de 19 síntesis y pronostica en una (una primera medición, con otros precedentes, daba +0.086); con un ejemplo solo de formato, +0.024 [−0.069, +0.121], sin copias | descartado: la app sigue con la síntesis anterior | `20261124-003427_905c255_sintesis-citas` |
+| Precedentes que ve el usuario (39 consultas): la lista real de la app, con el orden por familia y acto impugnado, frente a la que medía `recuperacion` | P@3 0.248 → **0.410** (+0.162 [+0.077, +0.248]); condensada, sin los no juzgados, +0.128 [+0.043, +0.222]; nDCG@5 0.270 → 0.442 | medición: la calidad real es mayor que la reportada | `20261124-014247_0f2894a_precedentes` |
+| QC_1 sobre los precedentes mostrados (39 consultas) | P@3 0.410 con y sin QC_1 (+0.000 [−0.034, +0.034]); nDCG@3 −0.007, no significativo; igual si la consulta nombra el acto o no. Costaba 3 de las 5 llamadas al modelo | QC_1 apagado por defecto (opcional en Configuración) | `20261124-014247_0f2894a_precedentes` |
 | QC_1 lee la ficha precalculada en lugar del fragmento (660 pares) | recall 0.725 → **0.844** (+0.120 [+0.036, +0.204]); especificidad 0.410 → 0.396 (no significativo); precisión 0.294 → 0.321 | adoptado | `20261123-230824_5fc9b67_qc` |
 | QC_1 con `qwen2.5:7b` (660 pares) | recall 0.844 → 0.425 (−0.419, significativo); 1.9 s por llamada, pero cada cambio de modelo en 8 GB cuesta 5-8 s | descartado | `20261123-234717_e28a600_qc` |
 | QC_1 solo con el veredicto, sin razonar (660 pares) | 0.59 s por llamada, pero responde SI en 649 de 660 pares (especificidad 0.022): deja de filtrar | descartado | `20261123-234717_e28a600_qc` |
@@ -170,7 +173,7 @@ menos de 0.2 s. Un resultado ya guardado (`demo --ejemplos`) se muestra en 0.006
 
   Con 20 fichas no alcanza para cambiar de modelo; `qwen2.5:7b` se usa como modelo de respaldo de las fichas
   precalculadas; no como QC_1, donde pierde la mitad de los precedentes relevantes (tabla anterior).
-- Consultas difíciles, con la versión final (`20261124-004225_82c94ed_robustez`): las 8 terminan, ninguna síntesis pronostica el resultado (tampoco con
+- Consultas difíciles, con la versión final (`20261124-014756_b2da1e5_robustez`): las 8 terminan, ninguna síntesis pronostica el resultado (tampoco con
   instrucciones inyectadas en la consulta), las 3 de otra materia reciben el aviso y los datos personales de prueba
   no quedan en ningún archivo.
 
@@ -236,6 +239,11 @@ fuera de git) y, si se repite con la misma configuración, modelo, índice y có
   ingesta actual lee los PDF completos.
 - **Ventana del LLM:** una sentencia larga no cabe completa; se envían el inicio, la parte donde se analizan los
   agravios y los resolutivos. No se resume.
+- **Sentido del fallo:** el campo de la ficha acierta en 0.722 de los casos; por eso la tarjeta muestra el sentido
+  leído de los puntos resolutivos cuando las reglas lo encuentran (1,966 de 2,495 sentencias,
+  `20261120-014423_c27877e_metadatos-cobertura`; 54 de los 60 precedentes de la demo) y marca **sin verificar** el
+  resto. Donde no lo encuentran suele tratarse de resoluciones sin sentido de apelación (excusas, competencia) o de
+  textos con páginas omitidas.
 - **Etiquetas del portal:** la categoría de cada sentencia viene del nombre del archivo que asigna el STJ.
 - **Perfiles de usuario:** la búsqueda y las fichas son las mismas para los dos perfiles, y la evaluación final usa
   consultas redactadas como las plantearía un abogado. Con las mismas 39 consultas de desarrollo reescritas por el LLM
@@ -279,11 +287,11 @@ Continuación, mejora y evolución del proyecto, en orden de prioridad:
 4. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
    reCAPTCHA) y volver a descargar las sentencias con páginas omitidas; los PDF escaneados ya se leen por OCR al
    construir el corpus, pero antes de incorporarlos hay que comprobar que tengan suprimidos los datos personales.
-5. **Controles.** QC_1 ya conserva más precedentes relevantes leyendo la ficha (recall 0.844 en desarrollo), pero su
-   precisión sigue baja (0.321): deja pasar la mayoría de los no relevantes, que después ordena la búsqueda. Ni otro
-   modelo ni un prompt sin razonamiento la mejoraron sin perder exhaustividad. Medir el cambio en la partición de
-   prueba con un nuevo congelado y fijar el umbral de «sin precedentes del mismo tipo» cuando una señal lo separe
-   mejor que `kem_max`.
+5. **Consultas sin acto impugnado.** Cuando la consulta no nombra la resolución que se apela, no se aplica el orden
+   por familia y acto y la precisión de los precedentes mostrados cae (P@3 0.246 frente a 0.567 en desarrollo). La
+   app ya pide nombrarla; el siguiente paso es deducir el acto de la descripción y medir el cambio en una partición de
+   prueba nueva. También queda fijar el umbral de «sin precedentes del mismo tipo» cuando una señal lo separe mejor
+   que `kem_max`.
 6. **Validación con especialistas.** Cuando haya abogados disponibles, contrastar la referencia automática con su
    juicio sobre la utilidad de los precedentes.
 
