@@ -23,7 +23,8 @@ AYUDA = {
     "descartados": "Candidatos eliminados por los controles; muchos descartes indican una consulta ambigua o un tema poco cubierto.",
     "ambiguos": "El control respondió algo que no se pudo leer como SI/NO y el sistema continuó.",
     "sentido_fallo": ("Leído de los puntos resolutivos de la sentencia cuando es posible; 'verificar' = la ficha del "
-                      "modelo dice otra cosa."),
+                      "modelo dice otra cosa; 'sin verificar' = no se encontraron los puntos resolutivos y el sentido es "
+                      "el que leyó el modelo: conviene confirmarlo en la sentencia."),
     "parte_favorecida": ("Parte que obtuvo la resolución de la Sala, deducida del apelante y del sentido del fallo: "
                          "si apeló la defensa y la Sala confirmó, la acusación; si revocó, el acusado."),
 }

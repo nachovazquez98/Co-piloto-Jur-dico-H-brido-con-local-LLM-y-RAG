@@ -127,6 +127,7 @@ class Precedente:
         return {
             "documento": c.doc_id, "fecha": c.fecha, "identificador": identificador, "delito": delito,
             "acto_impugnado": acto, "sentido_fallo": d.get("sentido_fallo") or DATO_NO_DISPONIBLE,
+            "sentido_verificado": bool(self.sentido_reglas),  # leído de los puntos resolutivos, no solo de la ficha
             "agravios": agravios, "fundamento": fundamento, "verificar": list(self.verificar),
             "no_verificado_qc1": self.no_verificado_qc1, "articulos_no_encontrados": self.articulos_no_encontrados,
             "para_defensa": resultado_para_defensa(f.apelante, d.get("sentido_fallo")) if f is not None else None,
@@ -227,8 +228,9 @@ def balance_precedentes(precedentes: list["Precedente"]) -> str:
             continue
         t = p.tarjeta()
         resultado = f"favorece a **{t['parte_favorecida']}**" if t["parte_favorecida"] else "parte favorecida no determinada"
+        origen = "" if t["sentido_verificado"] else " (según la ficha; sin verificar en los puntos resolutivos)"
         filas.append(f"- **Precedente {p.numero}:** apeló {p.ficha.apelante.lower()} contra "
-                     f"{t['acto_impugnado'][:1].lower() + t['acto_impugnado'][1:]}; la Sala {t['sentido_fallo']} → "
+                     f"{t['acto_impugnado'][:1].lower() + t['acto_impugnado'][1:]}; la Sala {t['sentido_fallo']}{origen} → "
                      f"{resultado}.")
     return TITULO_BALANCE + "\n" + "\n".join(filas) if filas else ""
 

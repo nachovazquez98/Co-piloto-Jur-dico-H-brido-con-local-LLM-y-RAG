@@ -983,7 +983,7 @@ def experimento_precedentes(env: Entorno, llm, log: Callable[[str], None] = prin
     max_cand = Opciones().max_candidatos
     variantes = ["filtro sin facetas", "app (filtro + facetas)", "mostrados sin QC_1", "mostrados con QC_1 (app)",
                  "mostrados con QC_1 + regla de familia"]
-    filas, llamadas = [], 0
+    filas, llamadas, todos_veredictos = [], 0, []
     for i, p in enumerate(preparadas, 1):
         c, juicios = p.consulta, env.juicios[p.consulta.id]
         amplios, _, rk = _clasificacion(env, p)
@@ -1026,9 +1026,11 @@ def experimento_precedentes(env: Entorno, llm, log: Callable[[str], None] = prin
             r3, r5 = metricas_graduadas(ids, juicios, k=3), metricas_graduadas(ids, juicios, k=5)
             cond = [d for d in ids if d in juicios]  # condensada: solo los juzgados
             c3, c5 = metricas_graduadas(cond, juicios, k=3), metricas_graduadas(cond, juicios, k=5)
-            filas.append({"id": c.id, "variante": nombre, "ndcg3": r3["ndcg5"], "p3": r3["p5"], "cob3": r3["cobertura"],
+            filas.append({"id": c.id, "variante": nombre, "acto": b.acto_consulta is not None,
+                          "ndcg3": r3["ndcg5"], "p3": r3["p5"], "cob3": r3["cobertura"],
                           "ndcg5": r5["ndcg5"], "p5": r5["p5"], "n_mostrados": min(len(ids), 3),
                           "ndcg3c": c3["ndcg5"], "p3c": c3["p5"], "ndcg5c": c5["ndcg5"]})
+        todos_veredictos += list(veredictos.values())
         if i % 5 == 0:
             log(f"[{i}/{len(preparadas)}] llamadas a QC_1 sin caché o con caché: {llamadas}")
     d = pd.DataFrame(filas)
@@ -1066,7 +1068,19 @@ def experimento_precedentes(env: Entorno, llm, log: Callable[[str], None] = prin
                               "significativa": "sí" if dif["significativa"] else "no"})
     corrida.tabla("Comparaciones pareadas", "Mismas consultas; IC 95 % por bootstrap pareado.",
                   pd.DataFrame(comparaciones))
-    corrida.parametros.update(max_candidatos=max_cand, llamadas_qc1=llamadas)
+    por_acto = []
+    for acto, etiqueta in ((True, "la consulta nombra un acto impugnado (orden por facetas)"),
+                           (False, "no lo nombra (orden de la búsqueda)")):
+        for v in ("mostrados sin QC_1", "mostrados con QC_1 (app)"):
+            x = d[(d["variante"] == v) & (d["acto"] == acto)]
+            por_acto.append({"consultas de este tipo": etiqueta, "variante": v, "n": len(x),
+                             "P@3": round(x["p3"].mean(), 3) if len(x) else float("nan"),
+                             "nDCG@3": round(x["ndcg3"].mean(), 3) if len(x) else float("nan")})
+    corrida.tabla("QC_1 según el tipo de consulta",
+                  "El orden por familia y acto impugnado solo se aplica si la consulta nombra el acto; sin él, QC_1 "
+                  "podría pesar más.", pd.DataFrame(por_acto))
+    corrida.parametros.update(max_candidatos=max_cand, llamadas_qc1=llamadas,
+                              veredictos_no=sum(not v for v in todos_veredictos), veredictos=len(todos_veredictos))
     return corrida
 
 

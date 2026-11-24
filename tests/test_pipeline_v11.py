@@ -349,3 +349,17 @@ def test_sugerencia_inicial_de_delitos_sin_llm():
     miembros = {"penal/familia/robo": ["penal/robo"], "penal/familia/homicidio": ["penal/homicidio"]}
     clasif = ClasificadorFalso(["penal/familia/robo", "penal/familia/homicidio"], miembros)
     assert pipeline.sugerir_familias(StoreFalso([], []), clasif, "me acusan de robo") == ["robo", "homicidio"]
+
+
+def test_sentido_sin_resolutivos_se_marca_sin_verificar():
+    """Sin puntos resolutivos legibles, el sentido es el de la ficha y la tarjeta lo dice."""
+    ext = "- **Sentido del Fallo:** CONFIRMA"
+    sin = pipeline.Precedente(1, _cand("d1", texto="... considerando ... sin resolutivos legibles"), "Filtro estricto",
+                              "informe", ext, False)
+    pipeline.verificar_ficha(sin)
+    t = sin.tarjeta()
+    assert sin.sentido_reglas is None and t["sentido_fallo"] == "CONFIRMA" and not t["sentido_verificado"]
+    con = pipeline.Precedente(2, _cand("d2", texto="... r e s u e l v e primera. - se confirma el auto de vinculación"),
+                              "Filtro estricto", "informe", ext, False)
+    pipeline.verificar_ficha(con)
+    assert con.tarjeta()["sentido_verificado"]

@@ -173,7 +173,8 @@ def tarjeta(p) -> None:
         a.markdown(f"**Toca / expediente**  \n{t['identificador']}  \n**Fecha de publicación**  \n{t['fecha']}")
         b.markdown(f"**Delito**  \n{t['delito']}  \n**Acto impugnado**  \n{t['acto_impugnado']}")
         verificar_sentido = any(v.startswith("sentido") for v in t["verificar"])
-        c.metric("Sentido del fallo", t["sentido_fallo"] + (" · verificar" if verificar_sentido else ""),
+        marca = " · verificar" if verificar_sentido else "" if t["sentido_verificado"] else " · sin verificar"
+        c.metric("Sentido del fallo", t["sentido_fallo"] + marca,
                  help=AYUDA["sentido_fallo"])
         if t["parte_favorecida"]:
             c.markdown(f"**Parte favorecida:** {t['parte_favorecida']}", help=AYUDA["parte_favorecida"])
