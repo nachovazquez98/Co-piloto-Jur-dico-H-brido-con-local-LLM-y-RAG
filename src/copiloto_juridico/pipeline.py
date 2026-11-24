@@ -324,6 +324,7 @@ def es_fallo(texto: str | None) -> bool:
 _RE_AGRAVIOS = re.compile(r"agravi|infundad|inoperante|fundad")
 # Parte considerativa: donde la Sala, con su propia voz, cita las normas en que funda la decisión. No usa las
 # fórmulas de fundamentación de la referencia ("con fundamento en"...), para no medir la referencia contra sí misma.
+# Solo para el experimento: no mejoró el fundamento legal (`20261123-212426_5fc9b67_fundamento-contexto`).
 _RE_CONSIDERATIVA = re.compile(r"art[ií]culos?\b|\bart\.|esta\s+(?:sala|alzada)|este\s+(?:tribunal|[oó]rgano)",
                                re.IGNORECASE)
 _OMITIDO = "\n\n[... texto omitido por longitud ...]\n\n"

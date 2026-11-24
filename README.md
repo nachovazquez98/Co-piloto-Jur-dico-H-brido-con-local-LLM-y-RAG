@@ -261,15 +261,20 @@ Continuación, mejora y evolución del proyecto, en orden de prioridad:
    (+0.010 [−0.040, +0.060], no significativa) y la exhaustividad baja de 0.146 a 0.123 (significativo); no se
    adoptó (`20261123-174502_b8fdd94_fundamento-prompt`). De 127 artículos que la ficha cita fuera del fundamento de
    la Sala, 126 sí aparecen en la sentencia: el error es de selección (agravios, primera instancia), no de invención.
-   El siguiente paso es dar al modelo la parte considerativa donde la Sala funda su decisión, no solo cambiar la
-   instrucción.
+   Tampoco la mejora darle al modelo la parte considerativa en lugar de la ventana de los agravios, aunque así ve más
+   artículos del fundamento (80.3 % frente a 75.6 % en 297 sentencias): precisión 0.717 → 0.669 (−0.048
+   [−0.096, +0.006]) y exhaustividad 0.147 → 0.116 (significativo), sin empeorar el sentido ni los agravios
+   (`20261123-212426_5fc9b67_fundamento-contexto`). El límite está en cómo el modelo de 8B elige los artículos, no
+   en lo que ve; queda para un modelo mayor, cuando quepa en el equipo, o para la validación con especialistas
+   (punto 6), que permitiría medir estrategias no basadas en las mismas reglas de la referencia.
 2. **Evaluación del perfil del tribunal de alzada.** La medición en desarrollo (ver Limitaciones) usa consultas
    reescritas por el LLM; el siguiente paso es un conjunto redactado por personal de una Sala, con la misma
    referencia automática y una partición de prueba única.
 3. **Tribunal de alzada.** Integrar la búsqueda por hechos y la ficha en el portal del STJ, lo que resolvería el
-   problema de localización en su origen; normalizar el catálogo del portal con las 25
-   familias de delito (hoy 546 tipos) y señalar resoluciones de distintas Salas con sentido opuesto en supuestos
-   semejantes.
+   problema de localización en su origen; normalizar su catálogo (546 tipos) con la agrupación en 25 familias de
+   [`evaluacion/familias_penal.csv`](evaluacion/familias_penal.csv), y señalar resoluciones de distintas Salas con
+   sentido opuesto en supuestos semejantes. Esto último requiere leer la Sala y el sentido con más exactitud que la
+   ficha actual (sentido del fallo 0.722 en prueba), para no señalar falsas divergencias.
 4. **Corpus.** Ampliarlo con el procedimiento de [`descarga_datos/`](descarga_datos/) (una persona resuelve el
    reCAPTCHA) y volver a descargar las sentencias con páginas omitidas; los PDF escaneados ya se leen por OCR al
    construir el corpus, pero antes de incorporarlos hay que comprobar que tengan suprimidos los datos personales.
