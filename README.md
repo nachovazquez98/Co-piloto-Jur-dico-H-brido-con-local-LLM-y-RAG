@@ -94,6 +94,16 @@ ollama pull llama3.1:8b
 streamlit run app/Copiloto.py
 ```
 
+Para usar la app basta con clonar: los PDF originales no están en git y `git clone` no los descarga. Solo se
+necesitan para reconstruir el corpus; en ese caso se descargan aparte, desde la versión publicada `v11.2`:
+
+```bash
+for i in $(seq -w 1 15); do
+  curl -LO https://github.com/nachovazquez98/Co-piloto-Jur-dico-H-brido-con-local-LLM-y-RAG/releases/download/v11.2/sentencias-penales-pdf-$i-de-15.zip
+done
+for f in sentencias-penales-pdf-*-de-15.zip; do unzip -q -o "$f" -d data/raw/; done
+```
+
 Opcional, solo para construir el corpus con PDF escaneados: `tesseract` y `pdftoppm` (poppler) con el modelo de
 español `spa` (por ejemplo `tesseract-langpack-spa` o `tesseract-ocr-spa` en Linux, o `spa.traineddata` en la carpeta que
 indique `TESSDATA_PREFIX`). Sin ellos, esas páginas se omiten (`COPILOTO_PDF_OCR=false` lo desactiva).
