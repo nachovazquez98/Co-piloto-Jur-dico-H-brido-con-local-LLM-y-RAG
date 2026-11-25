@@ -970,7 +970,6 @@ def experimento_precedentes(env: Entorno, llm, log: Callable[[str], None] = prin
     Los no juzgados cuentan 0; como los pares a juzgar no cubren por igual todas las listas, se reporta además la
     versión condensada (sin los no juzgados, Sakai 2007), que no favorece a la lista mejor juzgada. Diferencias
     pareadas con IC 95 % por bootstrap."""
-    from ..embeddings import embed_query  # noqa: F401  (las consultas ya traen su embedding)
     from ..fichas_precalculadas import ficha_guardada
     from ..pipeline import Opciones, buscar_candidatos, familias_de_categoria, parse_veredicto
     from .familias import cargar_familias
